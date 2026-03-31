@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-cosmic-bg: #0f051d;
+  --color-cosmic-purple: #7b2ff7;
+  --color-cosmic-pink: #f72fb4;
+  --color-cosmic-cyan: #2ff7f7;
+}
+
+body {
+  background-color: var(--color-cosmic-bg);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 15px rgba(123, 47, 247, 0.4), 0 0 30px rgba(123, 47, 247, 0.2);
+}
+
+.neon-text-purple {
+  text-shadow: 0 0 8px rgba(123, 47, 247, 0.8);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hide scrollbar for cleaner look */
+::-webkit-scrollbar {
+  display: none;
+}
