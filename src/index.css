@@ -1,38 +1,98 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Space+Grotesk:wght@300;400;700&family=Inter:wght@300;400;600&display=swap');
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
+  --font-gothic: "UnifrakturMaguntia", serif;
   
-  --color-cosmic-bg: #0f051d;
-  --color-cosmic-purple: #7b2ff7;
-  --color-cosmic-pink: #f72fb4;
-  --color-cosmic-cyan: #2ff7f7;
+  --color-goth-bg: #0B0118;
+  --color-neon-pink: #FF007A;
+  --color-neon-cyan: #00F2FF;
+  --color-neon-purple: #BC00FF;
 }
 
 body {
-  background-color: var(--color-cosmic-bg);
+  background-color: var(--color-goth-bg);
   color: #ffffff;
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-.neon-glow-purple {
-  box-shadow: 0 0 15px rgba(123, 47, 247, 0.4), 0 0 30px rgba(123, 47, 247, 0.2);
+.goth-glass {
+  background: rgba(11, 1, 24, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 0, 122, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
-.neon-text-purple {
-  text-shadow: 0 0 8px rgba(123, 47, 247, 0.8);
+.neon-border-pink {
+  border: 1px solid var(--color-neon-pink);
+  box-shadow: 0 0 10px var(--color-neon-pink), inset 0 0 5px var(--color-neon-pink);
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.neon-text-pink {
+  color: var(--color-neon-pink);
+  text-shadow: 0 0 5px var(--color-neon-pink), 0 0 10px var(--color-neon-pink);
 }
 
-/* Hide scrollbar for cleaner look */
+.neon-text-cyan {
+  color: var(--color-neon-cyan);
+  text-shadow: 0 0 5px var(--color-neon-cyan), 0 0 10px var(--color-neon-cyan);
+}
+
+.star-field {
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 160px 120px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+@keyframes flash {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-flash {
+  animation: flash 1.5s ease-out forwards;
+}
+
 ::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.scrollbar-neon-pink::-webkit-scrollbar-thumb {
+  background: var(--color-neon-pink);
+  box-shadow: 0 0 10px var(--color-neon-pink);
+}
+
+.scrollbar-neon-cyan::-webkit-scrollbar-thumb {
+  background: var(--color-neon-cyan);
+  box-shadow: 0 0 10px var(--color-neon-cyan);
+}
+
+.scrollbar-neon-purple::-webkit-scrollbar-thumb {
+  background: var(--color-neon-purple);
+  box-shadow: 0 0 10px var(--color-neon-purple);
 }
