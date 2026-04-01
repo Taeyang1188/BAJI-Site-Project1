@@ -85,4 +85,11 @@ export interface BaZiResult {
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];
   currentCycleIndex: number;
+  analysis?: {
+    geJu: string;
+    yongShen: string;
+    interactions: string[];
+    shenSha: { name: string; description: string }[];
+    tenGodsRatio: Record<string, number>;
+  };
 }

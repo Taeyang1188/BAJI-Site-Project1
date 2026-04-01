@@ -31,15 +31,30 @@ export default function App() {
     birthTime: '12:00',
     city: 'Seoul',
   });
+  const [botField, setBotField] = useState('');
+  const [debouncedInput, setDebouncedInput] = useState<UserInput>(userInput);
   const [coords, setCoords] = useState({ lat: 37.5665, lon: 126.9780 }); // Default to Seoul
   const [isLocationSynced, setIsLocationSynced] = useState(false);
   const [greeting, setGreeting] = useState('');
+  
+  // Throttling State
+  const [submitTimestamps, setSubmitTimestamps] = useState<number[]>([]);
+  const [isThrottled, setIsThrottled] = useState(false);
+  const [throttleMessage, setThrottleMessage] = useState('');
 
   const t = TRANSLATIONS[lang];
 
   // Google Maps Autocomplete Ref
   const autocompleteRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Debounce Input for Calculation
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedInput(userInput);
+    }, 800);
+    return () => clearTimeout(handler);
+  }, [userInput]);
 
   useEffect(() => {
     const loadGoogleMaps = async () => {
@@ -51,7 +66,7 @@ export default function App() {
       }
 
       if (window.google?.maps?.importLibrary) {
-        if (page === 2) initAutocomplete();
+        if (page === 2 && !autocompleteRef.current) initAutocomplete();
         return;
       }
 
@@ -80,16 +95,23 @@ export default function App() {
 
       try {
         await window.google.maps.importLibrary("places");
-        initAutocomplete();
+        if (page === 2 && !autocompleteRef.current) initAutocomplete();
       } catch (e) {
         console.error("Google Maps failed to load", e);
       }
     };
 
     loadGoogleMaps();
+    
+    // Cleanup autocomplete instance when leaving page 2
+    if (page !== 2) {
+      autocompleteRef.current = null;
+    }
   }, [page]);
 
   const initAutocomplete = async () => {
+    if (autocompleteRef.current) return; // Guard against multiple initializations
+
     console.log("Initializing Autocomplete...", { 
       hasInput: !!inputRef.current, 
       hasGoogle: !!window.google?.maps 
@@ -99,9 +121,10 @@ export default function App() {
       try {
         const { Autocomplete } = await window.google.maps.importLibrary("places");
         
+        if (autocompleteRef.current) return; // Double check after await
+
         console.log("Places library loaded, creating Autocomplete instance.");
 
-        // Re-initialize every time the input is mounted
         const autocomplete = new Autocomplete(inputRef.current, {
           types: ['(cities)'],
           fields: ['geometry', 'name']
@@ -138,25 +161,49 @@ export default function App() {
 
   // Real BaZi Calculation with Error Handling
   const result = useMemo(() => {
-    if ((page === 2 || page === 3) && userInput.birthDate && userInput.birthTime) {
+    // Only calculate on page 3 (Reveal) to prevent heavy CPU usage while typing
+    if (page === 3 && debouncedInput.birthDate && debouncedInput.birthTime) {
       // Validate year range before calculating to avoid library errors
-      const year = parseInt(userInput.birthDate.split('-')[0]);
+      const year = parseInt(debouncedInput.birthDate.split('-')[0]);
       if (isNaN(year) || year < 1900 || year > 2100) {
         return null;
       }
 
       try {
-        console.log("Attempting BaZi calculation with:", userInput, coords, lang);
-        return calculateRealBaZi(userInput, coords.lat, coords.lon, lang);
+        console.log("Attempting BaZi calculation with:", debouncedInput.birthDate, debouncedInput.birthTime, coords.lat, coords.lon, lang);
+        return calculateRealBaZi(debouncedInput, coords.lat, coords.lon, lang);
       } catch (error) {
         console.error("BaZi calculation failed in App.tsx:", error);
         return null;
       }
     }
     return null;
-  }, [page, userInput, coords, lang]);
+  }, [page, debouncedInput.birthDate, debouncedInput.birthTime, debouncedInput.gender, coords.lat, coords.lon, lang]);
 
   const handleReveal = () => {
+    // 1. Honeypot Check
+    if (botField) {
+      alert("Bot detected. Calculation aborted.");
+      return;
+    }
+
+    // 2. Throttling Check
+    const now = Date.now();
+    const recentSubmits = submitTimestamps.filter(timestamp => now - timestamp < 10000); // 10 seconds window
+    
+    if (recentSubmits.length >= 3) {
+      setIsThrottled(true);
+      setThrottleMessage('우주의 기운이 너무 복잡하여 잠시 휴식이 필요합니다');
+      
+      // Clear throttle after 5 seconds
+      setTimeout(() => {
+        setIsThrottled(false);
+        setThrottleMessage('');
+      }, 5000);
+      return;
+    }
+
+    setSubmitTimestamps([...recentSubmits, now]);
     setPage(3);
   };
 
@@ -282,7 +329,7 @@ export default function App() {
                 {/* Background Glow */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-neon-pink/10 blur-[60px]" />
 
-                <CosmicWheel result={result} lang={lang} />
+                <CosmicWheel birthDate={userInput.birthDate} />
 
                 <div className="space-y-6 relative z-10">
                   <div className="text-center">
@@ -292,6 +339,17 @@ export default function App() {
                   </div>
 
                   <div className="space-y-4">
+                    {/* Honeypot Field */}
+                    <input 
+                      type="text" 
+                      name="bot_field" 
+                      style={{ display: 'none' }} 
+                      value={botField}
+                      onChange={(e) => setBotField(e.target.value)}
+                      tabIndex={-1} 
+                      autoComplete="off" 
+                    />
+
                     {/* Name */}
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink" />
@@ -387,11 +445,24 @@ export default function App() {
                     </div>
                   </div>
 
+                  <AnimatePresence>
+                    {isThrottled && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-center text-neon-pink text-xs font-bold p-2 bg-red-900/20 border border-red-500/30 rounded-lg"
+                      >
+                        {throttleMessage}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleReveal}
-                    disabled={!userInput.birthDate || !userInput.birthTime}
+                    disabled={!userInput.birthDate || !userInput.birthTime || isThrottled}
                     className="w-full py-5 bg-gradient-to-r from-neon-pink to-neon-purple rounded-2xl text-xs font-bold tracking-[0.4em] uppercase shadow-[0_10px_30px_rgba(255,0,122,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t.input.button}

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
+import { calculateTenGods } from '../services/bazi-engine';
 import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon } from 'lucide-react';
 
 interface BaZiResultPageProps {
@@ -13,7 +15,7 @@ interface BaZiResultPageProps {
 }
 
 export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiResultPageProps) {
-  const t = TRANSLATIONS[lang].result;
+  const t = TRANSLATIONS[lang].result as any;
 
   const renderPillarText = (type: 'stem' | 'branch', value: string) => {
     const mapping = (type === 'stem' ? BAZI_MAPPING.stems : BAZI_MAPPING.branches) as any;
@@ -29,6 +31,37 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const [expandedCycle, setExpandedCycle] = useState<number | null>(null);
   const [expandedYear, setExpandedYear] = useState<number | null>(null);
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
+  const elementData = useMemo(() => {
+    const counts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+    result.pillars.forEach(p => {
+      const stemElement = BAZI_MAPPING.stems[p.stem as keyof typeof BAZI_MAPPING.stems]?.element;
+      const branchElement = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
+      if (stemElement && counts[stemElement as keyof typeof counts] !== undefined) counts[stemElement as keyof typeof counts]++;
+      if (branchElement && counts[branchElement as keyof typeof counts] !== undefined) counts[branchElement as keyof typeof counts]++;
+    });
+    
+    return [
+      { name: lang === 'KO' ? '목(Wood)' : 'Wood', value: counts.Wood, color: '#22c55e' },
+      { name: lang === 'KO' ? '화(Fire)' : 'Fire', value: counts.Fire, color: '#ef4444' },
+      { name: lang === 'KO' ? '토(Earth)' : 'Earth', value: counts.Earth, color: '#eab308' },
+      { name: lang === 'KO' ? '금(Metal)' : 'Metal', value: counts.Metal, color: '#f8fafc' },
+      { name: lang === 'KO' ? '수(Water)' : 'Water', value: counts.Water, color: '#3b82f6' },
+    ].filter(d => d.value > 0);
+  }, [result.pillars, lang]);
+
+  const getAnalysisText = () => {
+    const sorted = [...elementData].sort((a, b) => b.value - a.value);
+    const dominant = sorted[0];
+    const missing = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].filter(e => !elementData.find(d => d.name.includes(e)));
+    
+    if (lang === 'KO') {
+      return `당신의 영혼 매트릭스는 ${dominant.name}의 기운이 지배적입니다. 사이버네틱 코어에 각인된 이 강력한 에너지는 당신을 끊임없이 움직이게 하지만, ${missing.length > 0 ? missing.map(m => m === 'Wood' ? '목' : m === 'Fire' ? '화' : m === 'Earth' ? '토' : m === 'Metal' ? '금' : '수').join(', ') + '의 결핍이 시스템의 과부하를 초래할 수 있습니다.' : '모든 원소가 균형을 이루어 안정적인 출력을 자랑합니다.'} 충돌하는 기운을 제어하고 당신만의 네온 불빛을 밝히십시오.`;
+    } else {
+      return `Your soul matrix is dominated by the energy of ${dominant.name}. This powerful force engraved in your cybernetic core drives you relentlessly, but ${missing.length > 0 ? 'the lack of ' + missing.join(', ') + ' may cause system overloads.' : 'all elements are balanced, boasting stable output.'} Control the clashing energies and ignite your own neon lights.`;
+    }
+  };
 
   const renderTitle = () => {
     return (
@@ -62,6 +95,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   const currentCycle = result.grandCycles[result.currentCycleIndex] || result.grandCycles[0];
+  const dayMaster = result.pillars[2].stem;
+  
+  const tenGod = React.useMemo(() => {
+    return calculateTenGods(dayMaster, currentCycle.element);
+  }, [dayMaster, currentCycle.element]);
 
   const getLifeStage = (age: number) => {
     const stages = t.lifeStages;
@@ -92,9 +130,14 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
           <MessageSquare className="w-6 h-6 text-neon-pink" />
         </div>
         <div className="space-y-1">
-          <div className="text-xs font-bold text-white/40 uppercase tracking-widest">Current Vibe</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-bold text-white/40 uppercase tracking-widest">{t.seasonVibe}</div>
+            <div className="text-[10px] text-white/30 italic">{t.seasonVibeDisclaimer}</div>
+          </div>
           <p className="text-lg font-display italic text-white leading-relaxed">
-            "{t.comments[currentCycle.element as keyof typeof t.comments]}"
+            "{lang === 'KO' 
+              ? t.comments[currentCycle.element as keyof typeof t.comments] 
+              : (t.comments[currentCycle.element as keyof typeof t.comments] as any)[tenGod] || (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean}"
           </p>
         </div>
       </motion.div>
@@ -177,6 +220,8 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
         </div>
       </div>
 
+
+
       {/* Grand Cycle Timeline */}
       <div className="space-y-6">
         <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center">
@@ -191,12 +236,12 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 
               return (
                 <div key={actualIndex} className="flex flex-col items-center space-y-1" dir="ltr">
+                  <div className="text-xs text-white/40 font-mono">
+                    {cycle.year}
+                  </div>
                   <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                     <PolarityIcon polarity={cycle.stemPolarity} size={8} />
                     {lang === 'KO' ? cycle.stemTenGodKo : cycle.stemTenGodEn}
-                  </div>
-                  <div className="text-xs text-white/40 font-mono">
-                    {cycle.year}
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -258,11 +303,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                   const isYearExpanded = expandedYear === api;
                   return (
                     <div key={api} className="flex flex-col items-center space-y-1">
+                      <div className="text-[10px] font-mono text-white/40">{ap.year}</div>
                       <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                         <PolarityIcon polarity={ap.stemPolarity} size={6} />
                         {lang === 'KO' ? ap.stemTenGodKo : ap.stemTenGodEn}
                       </div>
-                      <div className="text-[10px] font-mono text-white/40">{ap.year}</div>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -317,12 +362,12 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                           const isMonthExpanded = expandedMonth === mi;
                           return (
                             <div key={mi} className="flex flex-col items-center space-y-1 w-24">
-                              <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                              <div className="text-[13px] font-mono text-white/90 font-bold uppercase">
+                                {t.months[m.month - 1]}
+                              </div>
+                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                                 <PolarityIcon polarity={m.stemPolarity} size={6} />
                                 {lang === 'KO' ? m.stemTenGodKo : m.stemTenGodEn}
-                              </div>
-                              <div className="text-[11px] font-mono text-white/40 uppercase">
-                                {t.months[m.month - 1]}
                               </div>
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
@@ -348,7 +393,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                                   {isMonthExpanded ? <ChevronUp className="w-2 h-2 text-neon-pink" /> : <ChevronDown className="w-2 h-2 text-white/20" />}
                                 </div>
                               </motion.button>
-                              <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                                 <PolarityIcon polarity={m.branchPolarity} size={6} />
                                 {lang === 'KO' ? m.branchTenGodKo : m.branchTenGodEn}
                               </div>
@@ -359,50 +404,42 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     </div>
 
                     {/* Daily Breakdown for the selected month - Moved outside of monthly scroll container */}
-                    <AnimatePresence mode="wait">
-                      {expandedMonth !== null && result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth]?.dailyPillars && (
-                        <motion.div
-                          key={`daily-${expandedCycle}-${expandedYear}-${expandedMonth}`}
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="pt-4 border-t border-white/5"
-                        >
-                          <div className="text-[11px] font-bold text-white/20 uppercase tracking-widest text-center mb-4">Daily Rhythm (Full Month)</div>
-                          <div className="overflow-x-auto pb-4 scrollbar-neon-cyan px-2">
-                            <div className="flex gap-3 min-w-max">
-                              {result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth].dailyPillars.map((d, di) => (
-                                <div key={di} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
-                                  <div className="text-[7px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
-                                    <PolarityIcon polarity={d.stemPolarity} size={5} />
-                                    {lang === 'KO' ? d.stemTenGodKo : d.stemTenGodEn}
+                    {expandedMonth !== null && result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth]?.dailyPillars ? (
+                      <div className="pt-4 border-t border-white/5">
+                        <div className="text-[11px] font-bold text-white/20 uppercase tracking-widest text-center mb-4">Daily Rhythm (Full Month)</div>
+                        <div className="overflow-x-auto pb-4 scrollbar-neon-cyan px-2">
+                          <div className="flex gap-3 min-w-max">
+                            {result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth].dailyPillars.map((d, di) => (
+                              <div key={di} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
+                                <div className="text-[12px] font-mono text-white/90 font-bold">{d.day}</div>
+                                <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                                  <PolarityIcon polarity={d.stemPolarity} size={5} />
+                                  {lang === 'KO' ? d.stemTenGodKo : d.stemTenGodEn}
+                                </div>
+                                <div className="w-full bg-white/5 rounded-lg p-2 flex flex-col items-center border border-white/5">
+                                  <div 
+                                    className="text-[10px] font-gothic font-bold text-center"
+                                    style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                  >
+                                    {renderPillarText('stem', d.stem)}
                                   </div>
-                                  <div className="text-[10px] font-mono text-white/40">{d.day}</div>
-                                  <div className="w-full bg-white/5 rounded-lg p-2 flex flex-col items-center border border-white/5">
-                                    <div 
-                                      className="text-[10px] font-gothic font-bold text-center"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                    >
-                                      {renderPillarText('stem', d.stem)}
-                                    </div>
-                                    <div 
-                                      className="text-[10px] font-gothic text-center opacity-70"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                    >
-                                      {renderPillarText('branch', d.branch)}
-                                    </div>
-                                  </div>
-                                  <div className="text-[7px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
-                                    <PolarityIcon polarity={d.branchPolarity} size={5} />
-                                    {lang === 'KO' ? d.branchTenGodKo : d.branchTenGodEn}
+                                  <div 
+                                    className="text-[10px] font-gothic text-center opacity-70"
+                                    style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                  >
+                                    {renderPillarText('branch', d.branch)}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
+                                <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                                  <PolarityIcon polarity={d.branchPolarity} size={5} />
+                                  {lang === 'KO' ? d.branchTenGodKo : d.branchTenGodEn}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                        </div>
+                      </div>
+                    ) : null}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -411,7 +448,155 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
         </AnimatePresence>
       </div>
 
-      <div className="flex justify-center pt-8">
+      {/* Saju Analysis Button & Report */}
+      <div className="flex flex-col items-center space-y-6 pt-8">
+        <button 
+          onClick={() => setShowAnalysis(!showAnalysis)}
+          className="px-6 py-3 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-bold tracking-widest uppercase hover:bg-neon-pink hover:text-white transition-all rounded-lg shadow-[0_0_15px_rgba(255,20,147,0.4)]"
+        >
+          {lang === 'KO' ? '사주 풀이하기 (Extract Soul Details)' : 'Extract Soul Details'}
+        </button>
+
+        <AnimatePresence>
+          {showAnalysis && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="w-full overflow-hidden"
+            >
+              <div className="goth-glass p-6 rounded-2xl border border-white/10 space-y-8">
+                <h3 className="text-xl font-gothic text-center text-neon-cyan tracking-widest uppercase">
+                  {lang === 'KO' ? '오행 분석 리포트' : 'Elemental Analysis Report'}
+                </h3>
+                
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-full md:w-1/2 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={elementData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {elementData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#050505', border: '1px solid #333', borderRadius: '8px' }}
+                          itemStyle={{ color: '#fff' }}
+                          formatter={(value: number) => [`${(value / 8 * 100).toFixed(1)}%`, '']}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <div className="w-full md:w-1/2 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {elementData.map((d, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
+                          <span className="text-sm text-white/80 font-mono">{d.name}: {(d.value / 8 * 100).toFixed(1)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                      <p className="text-sm font-display leading-relaxed text-white/90 italic">
+                        "{getAnalysisText()}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Advanced Analysis Section */}
+                {result.analysis && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/10">
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-bold text-neon-pink uppercase tracking-widest">{lang === 'KO' ? '격국과 용신 (Structure & Useful God)' : 'Structure & Useful God'}</h4>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/60 text-xs">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
+                          <span className="text-white font-bold">{result.analysis.geJu}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/60 text-xs">{lang === 'KO' ? '용신 (Useful God)' : 'Useful God'}</span>
+                          <span className="text-white font-bold">{result.analysis.yongShen}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-bold text-neon-cyan uppercase tracking-widest">{lang === 'KO' ? '합형충파해 (Interactions)' : 'Interactions'}</h4>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        {result.analysis.interactions.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {result.analysis.interactions.map((interaction, i) => (
+                              <span key={i} className="px-2 py-1 bg-white/5 rounded text-xs text-white/80 border border-white/10">
+                                {interaction}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '특별한 충돌이나 결합이 없습니다.' : 'No significant interactions.'}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 md:col-span-2">
+                      <h4 className="text-sm font-bold text-green-400 uppercase tracking-widest">{lang === 'KO' ? '십성 비율 (Ten Gods Ratio)' : 'Ten Gods Ratio'}</h4>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        <div className="flex flex-wrap gap-4 justify-between">
+                          {Object.entries(result.analysis.tenGodsRatio).map(([god, ratio]) => (
+                            <div key={god} className="flex flex-col items-center space-y-2 flex-1 min-w-[80px]">
+                              <span className="text-xs text-white/60 text-center">{god}</span>
+                              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-green-400 rounded-full"
+                                  style={{ width: `${ratio}%` }}
+                                />
+                              </div>
+                              <span className="text-sm font-bold text-white">{ratio}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 md:col-span-2">
+                      <h4 className="text-sm font-bold text-yellow-400 uppercase tracking-widest">{lang === 'KO' ? '신살 (Divine Stars)' : 'Divine Stars'}</h4>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        {result.analysis.shenSha.length > 0 ? (
+                          <div className="flex flex-wrap gap-3">
+                            {result.analysis.shenSha.map((star, i) => (
+                              <div key={i} className="relative group cursor-help">
+                                <span className="px-3 py-1.5 bg-yellow-400/10 text-yellow-400 rounded border border-yellow-400/30 text-sm font-bold">
+                                  {star.name}
+                                </span>
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border border-white/20 rounded-lg text-xs text-white/90 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
+                                  {star.description}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 없습니다.' : 'No major divine stars present.'}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="flex justify-center pt-4">
         <button 
           onClick={onBack}
           className="px-8 py-3 border border-neon-pink text-neon-pink text-xs font-bold tracking-[0.3em] hover:bg-neon-pink hover:text-white transition-all rounded-full"
