@@ -7,6 +7,7 @@ export interface UserInput {
   birthTime: string;
   city: string;
   gender?: 'male' | 'female' | 'non-binary' | 'prefer-not-to-tell';
+  calendarType?: 'solar' | 'lunar';
 }
 
 export interface BaZiCard {
@@ -88,8 +89,12 @@ export interface BaZiResult {
   analysis?: {
     geJu: string;
     yongShen: string;
-    interactions: string[];
-    shenSha: { name: string; description: string }[];
+    interactions: any[]; // Detailed interactions
+    conflicts: any[];
+    shinsal: any[];
+    gongmang: any;
     tenGodsRatio: Record<string, number>;
+    dayMasterStrength: any;
+    yongshinDetail: any;
   };
 }

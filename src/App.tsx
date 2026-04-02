@@ -373,6 +373,27 @@ export default function App() {
                       />
                     </div>
 
+                    {/* Calendar Type Selection (Only for KO) */}
+                    {lang === 'KO' && (
+                      <div className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl">
+                        <span className="text-xs font-bold tracking-widest text-white/40 uppercase">{t.input.calendarType}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <button 
+                            onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
+                            className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'bg-white/5 text-white/40'}`}
+                          >
+                            {t.input.solar}
+                          </button>
+                          <button 
+                            onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
+                            className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'bg-white/5 text-white/40'}`}
+                          >
+                            {t.input.lunar}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Time */}
                     <div className="relative">
                       <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink" />

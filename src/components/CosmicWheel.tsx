@@ -29,6 +29,11 @@ const HorizontalDial = ({
   const [prevIndex, setPrevIndex] = useState(selectedIndex);
   const [direction, setDirection] = useState(1);
 
+  const getImagePath = (item: any) => {
+    const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+    return `${baseUrl}assets/zodiac/${item.id}.${item.slug.toLowerCase()}.png`;
+  };
+
   useEffect(() => {
     if (selectedIndex !== prevIndex) {
       let diff = selectedIndex - prevIndex;
@@ -97,13 +102,13 @@ const HorizontalDial = ({
                 {isImage ? (
                   <div className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all duration-500 ${isCenter ? 'scale-110' : 'scale-100'}`}>
                     <img 
-                      src={item.icon} 
+                      src={getImagePath(item)} 
                       alt={item.name} 
                       className="w-full h-full object-contain" 
                       style={{ 
                         filter: isCenter 
-                          ? 'drop-shadow(0 0 12px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 4px rgba(255, 215, 0, 1))' 
-                          : 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))' 
+                          ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
+                          : 'sepia(0.8) saturate(1.5) brightness(0.8) drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))' 
                       }}
                       referrerPolicy="no-referrer" 
                     />
@@ -154,26 +159,30 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[320px] scale-[0.8] sm:scale-100 origin-bottom">
           {/* Base Pivot Container for Rings (The Misty Energy Field) */}
           <div className="absolute bottom-[40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-0 pointer-events-none">
-            {/* Line 4 (Outer boundary of Zodiac) */}
-            <div className="absolute w-[520px] h-[520px] rounded-full border-[2px] border-[#FF1493]/30 shadow-[0_0_15px_rgba(255,20,147,0.3)]" />
+            {/* Line 4 (Outer boundary of Zodiac) - Strongest */}
+            <div className="absolute w-[520px] h-[520px] rounded-full border-[3px] border-[#FF1493]/90 shadow-[0_0_20px_rgba(255,20,147,0.8),inset_0_0_10px_rgba(255,20,147,0.4)]" />
             
             {/* Line 3 (Between Zodiac and Symbols) */}
-            <div className="absolute w-[370px] h-[370px] rounded-full border-[2px] border-[#FF1493]/50 shadow-[0_0_15px_rgba(255,20,147,0.5)]" />
+            <div className="absolute w-[370px] h-[370px] rounded-full border-[2px] border-[#FF1493]/70 shadow-[0_0_15px_rgba(255,20,147,0.6)]" />
             
             {/* Line 2 (Between Symbols and Numbers) */}
-            <div className="absolute w-[230px] h-[230px] rounded-full border-[2px] border-[#FF1493]/70 shadow-[0_0_15px_rgba(255,20,147,0.7)]" />
+            <div className="absolute w-[230px] h-[230px] rounded-full border-[2px] border-[#FF1493]/50 shadow-[0_0_10px_rgba(255,20,147,0.4)]" />
             
-            {/* Line 1 (Inner boundary of Numbers) */}
-            <div className="absolute w-[90px] h-[90px] rounded-full border-[2px] border-[#FF1493]/90 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(255,20,147,0.1)_100%)] backdrop-blur-[2px] shadow-[0_0_15px_rgba(255,20,147,0.9)]" />
+            {/* Line 1 (Inner boundary of Numbers) - Weakest */}
+            <div className="absolute w-[90px] h-[90px] rounded-full border-[1px] border-[#FF1493]/30 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(255,20,147,0.05)_100%)] backdrop-blur-[1px] shadow-[0_0_8px_rgba(255,20,147,0.2)]" />
           </div>
 
           {/* The Active Wedge (Central Highlight / Crosshair) */}
-          <div 
-            className="absolute bottom-[40px] left-1/2 -translate-x-1/2 w-[400px] h-[300px] pointer-events-none z-20"
-            style={{ clipPath: 'polygon(42% 0, 58% 0, 50% 100%)' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-[#FFD700]/30 via-[#FFD700]/10 to-transparent backdrop-blur-[1px]" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[30%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.5)_0%,transparent_70%)]" />
+          <div className="absolute bottom-[40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-20 pointer-events-none">
+            <div className="absolute w-[520px] h-[520px] rounded-full overflow-hidden">
+              <div 
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[260px]"
+                style={{ clipPath: 'polygon(35% 0, 65% 0, 50% 100%)' }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-[#FFD700]/15 via-[#FFD700]/5 to-transparent backdrop-blur-[1px]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.3)_0%,transparent_80%)]" />
+              </div>
+            </div>
           </div>
 
           {/* Outer Layer: Zodiac (Counter-rotated to stay upright) */}

@@ -3,7 +3,10 @@ import { DateTime } from 'luxon';
 import tzlookup from 'tz-lookup';
 import { UserInput, BaZiResult, BaZiCard, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
-import { calculateGeJu, calculateYongShen, calculateInteractions, calculateShenSha, calculateTenGodsRatio } from './bazi-analysis';
+import { calculateGeJu, calculateTenGodsRatio } from './bazi-analysis';
+import { calculateInteractions as calculateDetailedInteractions } from './bazi-interactions';
+import { detectShinsal } from './bazi-shinsal';
+import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan } from './bazi-yongshin';
 
 const STEMS_INFO: Record<string, { element: string, polarity: number }> = {
   '甲': { element: 'Wood', polarity: 1 }, '乙': { element: 'Wood', polarity: -1 },
@@ -140,8 +143,23 @@ export const getCosmicTime = (dateStr: string, timeStr: string, lat: number, lon
  */
 export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, lang: Language): BaZiResult => {
   try {
+    let birthDateStr = input.birthDate;
+
+    if (input.calendarType === 'lunar') {
+      const parts = birthDateStr.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        const lunarObj = Lunar.fromYmd(y, m, d);
+        const solarObj = lunarObj.getSolar();
+        birthDateStr = `${solarObj.getYear()}-${solarObj.getMonth().toString().padStart(2, '0')}-${solarObj.getDay().toString().padStart(2, '0')}`;
+        console.log(`Converted Lunar ${input.birthDate} to Solar ${birthDateStr}`);
+      }
+    }
+
     // 1. Get precise cosmic time
-    const { tstDate, zone } = getCosmicTime(input.birthDate, input.birthTime, lat, lon);
+    const { tstDate, zone } = getCosmicTime(birthDateStr, input.birthTime, lat, lon);
     console.log(`Cosmic Time: ${tstDate.toString()} (Zone: ${zone})`);
     
     // 2. Initialize Lunar/Solar
@@ -404,7 +422,9 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   // 6. Analysis (격국, 용신, 합형충파해, 신살)
   const monthZhi = baZi.getMonthZhi();
   const yearZhi = baZi.getYearZhi();
+  const yearGan = baZi.getYearGan();
   const allBranches = pillars.map(p => p.branch);
+  const allStems = pillars.map(p => p.stem);
   
   const elementCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
   pillars.forEach(p => {
@@ -413,11 +433,42 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     if (branchElement) elementCounts[branchElement as keyof typeof elementCounts]++;
   });
 
-  const geJu = calculateGeJu(dayGan, monthZhi);
-  const yongShen = calculateYongShen(elementCounts, STEMS_INFO[dayGan]?.element || 'Earth');
-  const interactions = calculateInteractions(allBranches);
-  const shenSha = calculateShenSha(dayGan, dayZhi, yearZhi, allBranches);
-  const tenGodsRatio = calculateTenGodsRatio(pillars);
+  const geJu = calculateGeJu(dayGan, monthZhi, lang);
+  
+  // New detailed calculations
+  const interactionsResult = calculateDetailedInteractions(allStems, allBranches);
+  const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
+  const strength = calcDayMasterStrength(allStems, allBranches);
+  const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength);
+  
+  // Check for ByeongYak and TongGwan
+  const byeongYak = checkByeongYak(allStems, allBranches, yongshinDetail);
+  const tongGwan = checkTongGwan(allStems, allBranches);
+  
+  if (byeongYak) yongshinDetail.byeongYak = byeongYak;
+  if (tongGwan) yongshinDetail.tongGwan = tongGwan;
+
+  const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
+
+  let translatedGod = yongshinDetail.primary.god;
+  let translatedElement = yongshinDetail.primary.element;
+  
+  if (lang === 'EN') {
+    if (translatedGod === "식상/재성/관성") translatedGod = "Output/Wealth/Power";
+    else if (translatedGod === "인성/비겁") translatedGod = "Wisdom/Self";
+    else if (translatedGod === "인성") translatedGod = "Wisdom";
+    else if (translatedGod === "비겁") translatedGod = "Self";
+    else if (translatedGod === "식상") translatedGod = "Output";
+    else if (translatedGod === "재성") translatedGod = "Wealth";
+    else if (translatedGod === "관성") translatedGod = "Power";
+  } else if (lang === 'KO') {
+    const elementKoMap: Record<string, string> = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
+    if (translatedElement.includes('/')) {
+      translatedElement = translatedElement.split('/').map(el => elementKoMap[el] || el).join('/');
+    } else {
+      translatedElement = elementKoMap[translatedElement] || translatedElement;
+    }
+  }
 
   return {
     pillars,
@@ -425,10 +476,14 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     currentCycleIndex,
     analysis: {
       geJu,
-      yongShen,
-      interactions,
-      shenSha,
-      tenGodsRatio
+      yongShen: `${translatedElement} (${translatedGod})`,
+      interactions: interactionsResult.interactions,
+      conflicts: interactionsResult.conflicts,
+      shinsal: shinsalResult.shinsal,
+      gongmang: shinsalResult.gongmang,
+      tenGodsRatio,
+      dayMasterStrength: strength,
+      yongshinDetail
     }
   };
 } catch (error) {

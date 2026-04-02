@@ -24,6 +24,9 @@ export const TRANSLATIONS = {
       female: "FEMME",
       nonBinary: "NON-BINARY",
       preferNotToTell: "PREFER NOT TO TELL",
+      calendarType: "CALENDAR",
+      solar: "SOLAR",
+      lunar: "LUNAR",
       button: "SUMMON MY DESTINY",
       locationSynced: "COORDINATES LOCKED. ✨",
       errorTitle: "GLITCH IN THE MATRIX",
@@ -56,6 +59,129 @@ export const TRANSLATIONS = {
       months: [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
+      ],
+      comments: {
+        Wood: {
+          BiGyean: "The season of Wood 🌿. A time for new beginnings and growth.",
+          GeopJae: "The season of Wood 🌿. Growth through healthy competition.",
+          SikSin: "The season of Wood 🌿. Steady effort leads to harvest.",
+          SangGwan: "The season of Wood 🌿. Creative energy is overflowing.",
+          PyeonJae: "The season of Wood 🌿. Unexpected opportunities arise.",
+          JeongJae: "The season of Wood 🌿. Stable wealth is on the rise.",
+          PyeonGwan: "The season of Wood 🌿. A time for responsibility and leadership.",
+          JeongGwan: "The season of Wood 🌿. Honor and order prevail.",
+          PyeonIn: "The season of Wood 🌿. Your intuition is sharpening.",
+          JeongIn: "The season of Wood 🌿. Wisdom and knowledge run deep."
+        },
+        Fire: {
+          BiGyean: "The season of Fire 🔥. Time to show your passion to the world!",
+          GeopJae: "The season of Fire 🔥. Intense competition fuels your growth.",
+          SikSin: "The season of Fire 🔥. Express your talents freely.",
+          SangGwan: "The season of Fire 🔥. Your expression is bold and brilliant.",
+          PyeonJae: "The season of Fire 🔥. Dynamic wealth energy flows in.",
+          JeongJae: "The season of Fire 🔥. Build your wealth through steady effort.",
+          PyeonGwan: "The season of Fire 🔥. Strong leadership is required.",
+          JeongGwan: "The season of Fire 🔥. A time for honor and recognition.",
+          PyeonIn: "The season of Fire 🔥. Inspiration strikes like lightning.",
+          JeongIn: "The season of Fire 🔥. Warm wisdom guides your path."
+        },
+        Earth: {
+          BiGyean: "The season of Earth ⛰️. A time to find your center and build stability.",
+          GeopJae: "The season of Earth ⛰️. Unwavering conviction is your strength.",
+          SikSin: "The season of Earth ⛰️. Focus on inner growth and refinement.",
+          SangGwan: "The season of Earth ⛰️. Create with a practical touch.",
+          PyeonJae: "The season of Earth ⛰️. Good for stable investments.",
+          JeongJae: "The season of Earth ⛰️. Manage your resources with care.",
+          PyeonGwan: "The season of Earth ⛰️. Overcome challenges with persistence.",
+          JeongGwan: "The season of Earth ⛰️. A time to build trust and reliability.",
+          PyeonIn: "The season of Earth ⛰️. Deep reflection brings clarity.",
+          JeongIn: "The season of Earth ⛰️. Acquire stable and lasting knowledge."
+        },
+        Metal: {
+          BiGyean: "The season of Metal ⚔️. Cut away the unnecessary with precision.",
+          GeopJae: "The season of Metal ⚔️. Sharp judgment in the face of competition.",
+          SikSin: "The season of Metal ⚔️. Refine your skills and expertise.",
+          SangGwan: "The season of Metal ⚔️. Sharp criticism turns into deep insight.",
+          PyeonJae: "The season of Metal ⚔️. Bold decisions bring financial rewards.",
+          JeongJae: "The season of Metal ⚔️. Meticulous management of your assets.",
+          PyeonGwan: "The season of Metal ⚔️. Achieve your goals with strong will.",
+          JeongGwan: "The season of Metal ⚔️. Principles and rules are your guide.",
+          PyeonIn: "The season of Metal ⚔️. Sharp analytical skills shine through.",
+          JeongIn: "The season of Metal ⚔️. Build a systematic foundation of knowledge."
+        },
+        Water: {
+          BiGyean: "The season of Water 🌊. Flow with wisdom and adaptability.",
+          GeopJae: "The season of Water 🌊. Flexible response to competitive challenges.",
+          SikSin: "The season of Water 🌊. Create within the gentle flow of life.",
+          SangGwan: "The season of Water 🌊. Solve problems with fluid thinking.",
+          PyeonJae: "The season of Water 🌊. Good fortune follows the natural flow.",
+          JeongJae: "The season of Water 🌊. Wealth flows in smoothly and steadily.",
+          PyeonGwan: "The season of Water 🌊. Wise and adaptable leadership is key.",
+          JeongGwan: "The season of Water 🌊. Gentle order and harmony prevail.",
+          PyeonIn: "The season of Water 🌊. Deep insights emerge from the depths.",
+          JeongIn: "The season of Water 🌊. Wisdom springs forth like a fountain."
+        }
+      }
+    }
+  },
+  KO: {
+    intro: {
+      title: "코스믹 DNA",
+      subtitle: "네 운명을 직접 확인해봐!",
+      button: "지금 바로 시작하기",
+      greetings: [
+        "안녕, 너의 바이브를 맞춰보자.",
+        "너의 코스믹 DNA를 깨울 준비 됐어?",
+        "별들이 네 이름을 부르고 있어.",
+        "공허가 너에게 무엇을 말하는지 보자."
+      ]
+    },
+    input: {
+      title: "코스믹 정렬",
+      name: "이름",
+      birthDate: "생년월일",
+      birthTime: "태어난 시간",
+      city: "태어난 도시",
+      gender: "성별",
+      male: "남성",
+      female: "여성",
+      nonBinary: "논바이너리",
+      preferNotToTell: "밝히고 싶지 않음",
+      calendarType: "양/음력",
+      solar: "양력",
+      lunar: "음력",
+      button: "운명 확인하기",
+      locationSynced: "위치 동기화 완료! ✨",
+      errorTitle: "코스믹 오류 발생",
+      errorDesc: "별들이 당신을 외면하고 있어요. 입력 정보를 확인하고 다시 시도해 주세요.",
+      errorButton: "다시 시도하기"
+    },
+    wheel: {
+      alignment: "현재 정렬",
+      year: "연",
+      month: "월",
+      hour: "시"
+    },
+    nav: {
+      home: "홈으로 돌아가기",
+      synced: "동기화 완료!",
+      back: "뒤로가기"
+    },
+    result: {
+      title: "사주팔자",
+      grandCycle: "대운 타임라인",
+      seasonVibe: "시즌 바이브",
+      seasonVibeDisclaimer: "현재 대운의 오행을 바탕으로 합니다.",
+      back: "다시 입력하기",
+      lifeStages: {
+        childhood: "유년",
+        youth: "청년",
+        maturity: "중년",
+        legacy: "말년"
+      },
+      months: [
+        "1월", "2월", "3월", "4월", "5월", "6월",
+        "7월", "8월", "9월", "10월", "11월", "12월"
       ],
       comments: {
         Wood: {
@@ -120,87 +246,22 @@ export const TRANSLATIONS = {
         }
       }
     }
-  },
-  KO: {
-    intro: {
-      title: "코스믹 DNA",
-      subtitle: "네 운명을 직접 확인해봐!",
-      button: "지금 바로 시작하기",
-      greetings: [
-        "안녕, 너의 바이브를 맞춰보자.",
-        "너의 코스믹 DNA를 깨울 준비 됐어?",
-        "별들이 네 이름을 부르고 있어.",
-        "공허가 너에게 무엇을 말하는지 보자."
-      ]
-    },
-    input: {
-      title: "코스믹 정렬",
-      name: "이름",
-      birthDate: "생년월일",
-      birthTime: "태어난 시간",
-      city: "태어난 도시",
-      gender: "성별",
-      male: "남성",
-      female: "여성",
-      nonBinary: "논바이너리",
-      preferNotToTell: "밝히고 싶지 않음",
-      button: "운명 확인하기",
-      locationSynced: "위치 동기화 완료! ✨",
-      errorTitle: "코스믹 오류 발생",
-      errorDesc: "별들이 당신을 외면하고 있어요. 입력 정보를 확인하고 다시 시도해 주세요.",
-      errorButton: "다시 시도하기"
-    },
-    wheel: {
-      alignment: "현재 정렬",
-      year: "연",
-      month: "월",
-      hour: "시"
-    },
-    nav: {
-      home: "홈으로 돌아가기",
-      synced: "동기화 완료!",
-      back: "뒤로가기"
-    },
-    result: {
-      title: "사주팔자",
-      grandCycle: "대운 타임라인",
-      seasonVibe: "시즌 바이브",
-      seasonVibeDisclaimer: "현재 대운의 오행을 바탕으로 합니다.",
-      back: "다시 입력하기",
-      lifeStages: {
-        childhood: "유년",
-        youth: "청년",
-        maturity: "중년",
-        legacy: "말년"
-      },
-      months: [
-        "1월", "2월", "3월", "4월", "5월", "6월",
-        "7월", "8월", "9월", "10월", "11월", "12월"
-      ],
-      comments: {
-        Wood: "목(Wood)의 계절입니다 🌿. 새로운 시작과 성장의 기운이 느껴지네요.",
-        Fire: "화(Fire)의 계절입니다 🔥. 당신의 열정을 세상에 보여줄 때예요!",
-        Earth: "토(Earth)의 계절입니다 ⛰️. 내실을 다지고 중심을 잡아야 할 시기입니다.",
-        Metal: "금(Metal)의 계절입니다 ⚔️. 결단력 있게 불필요한 것들을 정리해보세요.",
-        Water: "수(Water)의 계절입니다 🌊. 지혜롭게 흐름에 몸을 맡겨보세요."
-      }
-    }
   }
 };
 
 export const ZODIAC_ANIMALS = [
-  { name: 'Rat', hanja: '子', icon: '/assets/zodiac/1.za.png' },
-  { name: 'Ox', hanja: '丑', icon: '/assets/zodiac/2.chuck.png' },
-  { name: 'Tiger', hanja: '寅', icon: '/assets/zodiac/3.in.png' },
-  { name: 'Rabbit', hanja: '卯', icon: '/assets/zodiac/4.myo.png' },
-  { name: 'Dragon', hanja: '辰', icon: '/assets/zodiac/5.zin.png' },
-  { name: 'Snake', hanja: '巳', icon: '/assets/zodiac/6.sa.png' },
-  { name: 'Horse', hanja: '午', icon: '/assets/zodiac/7.oh.png' },
-  { name: 'Goat', hanja: '未', icon: '/assets/zodiac/8.me.png' },
-  { name: 'Monkey', hanja: '申', icon: '/assets/zodiac/9.sin.png' },
-  { name: 'Rooster', hanja: '酉', icon: '/assets/zodiac/10.yu.png' },
-  { name: 'Dog', hanja: '戌', icon: '/assets/zodiac/11.sul.png' },
-  { name: 'Pig', hanja: '亥', icon: '/assets/zodiac/12.hae.png' },
+  { id: 1, name: 'Rat', slug: 'za', hanja: '子' },
+  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑' },
+  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅' },
+  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯' },
+  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰' },
+  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳' },
+  { id: 7, name: 'Horse', slug: 'oh', hanja: '午' },
+  { id: 8, name: 'Goat', slug: 'me', hanja: '未' },
+  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申' },
+  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉' },
+  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌' },
+  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥' },
 ];
 
 export const ELEMENT_COLORS = {
