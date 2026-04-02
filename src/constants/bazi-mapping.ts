@@ -55,6 +55,60 @@ export const BAZI_MAPPING = {
     "격충": { ko: "격충(隔沖)", en: "Distant Clash" },
     "원충": { ko: "원충(遠沖)", en: "Remote Clash" },
   },
+  interactionDetails: {
+    "충": {
+      ko: {
+        title: '충(沖)',
+        general: '고여서 썩어가는 기운을 강제로 깨워 흐르게 만드는 삶의 역동성입니다.',
+        types: {
+          wangJi: '자오묘유(子午卯酉) 간의 충돌. 타협이 없는 정면승부로, 전부 아니면 전무(All or Nothing)식의 결과가 나타납니다.',
+          cheonJi: '천간과 지지가 동시에 부딪히는 현상. 인생의 전환점이 강렬하게 나타나며, 큰 위기 혹은 대역전의 기회가 됩니다.',
+          saengJi: '인신사해(寅申巳亥) 간의 충돌. 역마의 기운이 강해 매우 분주하고 빠르게 변화가 나타납니다.',
+          goJi: '진술축미(辰戌丑未) 간의 충돌. 창고가 열려 그 안의 보물이 나오거나 문제가 터지는 복잡한 양상을 띱니다.'
+        },
+        specific: {
+          jaO: '일지(자수)와 시지(오화)의 충돌. 차가운 물과 뜨거운 불이 부딪히는 형상으로, 감정 기복이 심하거나 주거/환경 변화가 잦을 수 있습니다.',
+          myoYu: '월지(묘목)와 연지(유금)의 충돌. 날카로운 칼이 나무를 베어내는 형상으로, 사회 생활에서의 갈등이나 이직, 가족 간의 가치관 차이가 나타날 수 있습니다.',
+          byeongIm: '일간 임수(壬)와 시간 병화(丙)의 충돌. 역동적이고 화려한 충으로, 목표를 향한 저돌적인 에너지가 강하지만 스스로 피로감을 느끼기 쉽습니다.'
+        }
+      },
+      en: {
+        title: 'Clash (Chung)',
+        general: 'The dynamism of life that forces stagnant energy to wake up and flow.',
+        types: {
+          wangJi: 'Clash between Rat, Horse, Rabbit, Rooster. No compromise, All or Nothing results.',
+          cheonJi: 'Heavenly Stem and Earthly Branch clash simultaneously. Intense turning point, potential for crisis or great reversal.',
+          saengJi: 'Clash between Tiger, Monkey, Snake, Pig. Strong travel energy, busy, fast changes.',
+          goJi: 'Clash between Dragon, Dog, Ox, Goat. Complex, opening of storage, hidden treasures or problems emerge.'
+        },
+        specific: {
+          jaO: 'Clash between Day Branch (Rat) and Hour Branch (Horse). Water vs Fire. Emotional instability, frequent environmental changes.',
+          myoYu: 'Clash between Month Branch (Rabbit) and Year Branch (Rooster). Metal vs Wood. Social conflicts, career changes, family value differences.',
+          byeongIm: 'Clash between Day Master (Yang Water) and Hour Stem (Yang Fire). Dynamic and intense. Strong drive, but prone to fatigue.'
+        }
+      }
+    },
+    "합": {
+      ko: {
+        title: '합(合)',
+        general: '서로 다른 기운이 만나 새로운 에너지를 만들어내는 결합과 조화의 힘입니다.',
+        types: {
+          cheonGan: '천간끼리의 합. 정신적인 지향점이나 가치관의 결합을 의미하며, 서로에게 긍정적인 영향을 주고받습니다.',
+          jiJi: '지지끼리의 합. 현실적인 환경이나 인간관계에서의 결합을 의미하며, 실질적인 협력과 안정을 가져옵니다.',
+          cheonJi: '천간과 지지가 동시에 합을 이루는 현상. 정신과 현실이 일치하여 강력한 성취와 안정감을 줍니다.'
+        }
+      },
+      en: {
+        title: 'Combination (Hap)',
+        general: 'The power of union and harmony where different energies meet to create something new.',
+        types: {
+          cheonGan: 'Combination between Stems. Represents alignment of mental goals or values, mutually positive influence.',
+          jiJi: 'Combination between Branches. Represents alignment in practical environment or relationships, practical cooperation and stability.',
+          cheonJi: 'Simultaneous combination of Stem and Branch. Alignment of mind and reality, leading to powerful achievements and stability.'
+        }
+      }
+    }
+  },
   shenSha: {
     "천을귀인": { ko: "천을귀인(天乙貴人)", en: "Noble Guardian", desc: "The highest noble star. Brings help from influential people and turns bad luck into good.", descKo: "최고의 길성으로, 인복이 많아지고 흉한 일을 길하게 바꾸어주는 힘이 있습니다." },
     "문창귀인": { ko: "문창귀인(文昌貴인)", en: "Literary Star", desc: "Star of intelligence and academic success. Good for writing, learning, and exams.", descKo: "지혜와 학문의 별로, 공부와 글쓰기에 재능이 있으며 시험 운이 좋습니다." },
@@ -173,5 +227,17 @@ export const BAZI_MAPPING = {
     "酉": { ko: "유금", en: "Rooster", element: "Metal" },
     "戌": { ko: "술토", en: "Dog", element: "Earth" },
     "亥": { ko: "해수", en: "Pig", element: "Water" },
+  },
+  lifeStages: {
+    "甲": { "亥": { ko: "장생", en: "Growth" }, "子": { ko: "목욕", en: "Bath" }, "丑": { ko: "관대", en: "Cap" }, "寅": { ko: "건록", en: "Prosperity" }, "卯": { ko: "제왕", en: "Emperor" }, "辰": { ko: "쇠", en: "Decay" }, "巳": { ko: "병", en: "Sickness" }, "午": { ko: "사", en: "Death" }, "未": { ko: "묘", en: "Grave" }, "申": { ko: "절", en: "Extinction" }, "酉": { ko: "태", en: "Fetus" }, "戌": { ko: "양", en: "Nourishment" } },
+    "乙": { "午": { ko: "장생", en: "Growth" }, "巳": { ko: "목욕", en: "Bath" }, "辰": { ko: "관대", en: "Cap" }, "卯": { ko: "건록", en: "Prosperity" }, "寅": { ko: "제왕", en: "Emperor" }, "丑": { ko: "쇠", en: "Decay" }, "子": { ko: "병", en: "Sickness" }, "亥": { ko: "사", en: "Death" }, "戌": { ko: "묘", en: "Grave" }, "酉": { ko: "절", en: "Extinction" }, "申": { ko: "태", en: "Fetus" }, "未": { ko: "양", en: "Nourishment" } },
+    "丙": { "寅": { ko: "장생", en: "Growth" }, "卯": { ko: "목욕", en: "Bath" }, "辰": { ko: "관대", en: "Cap" }, "巳": { ko: "건록", en: "Prosperity" }, "午": { ko: "제왕", en: "Emperor" }, "未": { ko: "쇠", en: "Decay" }, "申": { ko: "병", en: "Sickness" }, "酉": { ko: "사", en: "Death" }, "戌": { ko: "묘", en: "Grave" }, "亥": { ko: "절", en: "Extinction" }, "子": { ko: "태", en: "Fetus" }, "丑": { ko: "양", en: "Nourishment" } },
+    "丁": { "酉": { ko: "장생", en: "Growth" }, "申": { ko: "목욕", en: "Bath" }, "未": { ko: "관대", en: "Cap" }, "午": { ko: "건록", en: "Prosperity" }, "巳": { ko: "제왕", en: "Emperor" }, "辰": { ko: "쇠", en: "Decay" }, "卯": { ko: "병", en: "Sickness" }, "寅": { ko: "사", en: "Death" }, "丑": { ko: "묘", en: "Grave" }, "子": { ko: "절", en: "Extinction" }, "亥": { ko: "태", en: "Fetus" }, "戌": { ko: "양", en: "Nourishment" } },
+    "戊": { "寅": { ko: "장생", en: "Growth" }, "卯": { ko: "목욕", en: "Bath" }, "辰": { ko: "관대", en: "Cap" }, "巳": { ko: "건록", en: "Prosperity" }, "午": { ko: "제왕", en: "Emperor" }, "未": { ko: "쇠", en: "Decay" }, "申": { ko: "병", en: "Sickness" }, "酉": { ko: "사", en: "Death" }, "戌": { ko: "묘", en: "Grave" }, "亥": { ko: "절", en: "Extinction" }, "子": { ko: "태", en: "Fetus" }, "丑": { ko: "양", en: "Nourishment" } },
+    "己": { "酉": { ko: "장생", en: "Growth" }, "申": { ko: "목욕", en: "Bath" }, "未": { ko: "관대", en: "Cap" }, "午": { ko: "건록", en: "Prosperity" }, "巳": { ko: "제왕", en: "Emperor" }, "辰": { ko: "쇠", en: "Decay" }, "卯": { ko: "병", en: "Sickness" }, "寅": { ko: "사", en: "Death" }, "丑": { ko: "묘", en: "Grave" }, "子": { ko: "절", en: "Extinction" }, "亥": { ko: "태", en: "Fetus" }, "戌": { ko: "양", en: "Nourishment" } },
+    "庚": { "巳": { ko: "장생", en: "Growth" }, "午": { ko: "목욕", en: "Bath" }, "未": { ko: "관대", en: "Cap" }, "申": { ko: "건록", en: "Prosperity" }, "酉": { ko: "제왕", en: "Emperor" }, "戌": { ko: "쇠", en: "Decay" }, "亥": { ko: "병", en: "Sickness" }, "子": { ko: "사", en: "Death" }, "丑": { ko: "묘", en: "Grave" }, "寅": { ko: "절", en: "Extinction" }, "卯": { ko: "태", en: "Fetus" }, "辰": { ko: "양", en: "Nourishment" } },
+    "辛": { "子": { ko: "장생", en: "Growth" }, "亥": { ko: "목욕", en: "Bath" }, "戌": { ko: "관대", en: "Cap" }, "酉": { ko: "건록", en: "Prosperity" }, "申": { ko: "제왕", en: "Emperor" }, "未": { ko: "쇠", en: "Decay" }, "午": { ko: "병", en: "Sickness" }, "巳": { ko: "사", en: "Death" }, "辰": { ko: "묘", en: "Grave" }, "卯": { ko: "절", en: "Extinction" }, "寅": { ko: "태", en: "Fetus" }, "丑": { ko: "양", en: "Nourishment" } },
+    "壬": { "申": { ko: "장생", en: "Growth" }, "酉": { ko: "목욕", en: "Bath" }, "戌": { ko: "관대", en: "Cap" }, "亥": { ko: "건록", en: "Prosperity" }, "子": { ko: "제왕", en: "Emperor" }, "丑": { ko: "쇠", en: "Decay" }, "寅": { ko: "병", en: "Sickness" }, "卯": { ko: "사", en: "Death" }, "辰": { ko: "묘", en: "Grave" }, "巳": { ko: "절", en: "Extinction" }, "午": { ko: "태", en: "Fetus" }, "未": { ko: "양", en: "Nourishment" } },
+    "癸": { "卯": { ko: "장생", en: "Growth" }, "寅": { ko: "목욕", en: "Bath" }, "丑": { ko: "관대", en: "Cap" }, "子": { ko: "건록", en: "Prosperity" }, "亥": { ko: "제왕", en: "Emperor" }, "戌": { ko: "쇠", en: "Decay" }, "酉": { ko: "병", en: "Sickness" }, "申": { ko: "사", en: "Death" }, "未": { ko: "묘", en: "Grave" }, "午": { ko: "절", en: "Extinction" }, "巳": { ko: "태", en: "Fetus" }, "辰": { ko: "양", en: "Nourishment" } }
   }
 };

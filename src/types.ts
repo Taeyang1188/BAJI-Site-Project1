@@ -23,6 +23,7 @@ export interface BaZiCard {
   description: string;
   stemPolarity: number;
   branchPolarity: number;
+  lifeStage?: string;
 }
 
 export interface DailyPillar {

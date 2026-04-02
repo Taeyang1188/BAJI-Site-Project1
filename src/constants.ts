@@ -250,18 +250,18 @@ export const TRANSLATIONS = {
 };
 
 export const ZODIAC_ANIMALS = [
-  { id: 1, name: 'Rat', slug: 'za', hanja: '子' },
-  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑' },
-  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅' },
-  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯' },
-  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰' },
-  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳' },
-  { id: 7, name: 'Horse', slug: 'oh', hanja: '午' },
-  { id: 8, name: 'Goat', slug: 'me', hanja: '未' },
-  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申' },
-  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉' },
-  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌' },
-  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥' },
+  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://i.imgur.com/08eHmVx.png' },
+  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://i.imgur.com/QKHj09z.png' },
+  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://i.imgur.com/AXYWuRE.png' },
+  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://i.imgur.com/pFRYKl5.png' },
+  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://i.imgur.com/s03uyAV.png' },
+  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://i.imgur.com/olwZKJD.png' },
+  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://i.imgur.com/pHB8hMR.png' },
+  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://i.imgur.com/EG5XZP5.png' },
+  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://i.imgur.com/FcS0rn0.png' },
+  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://i.imgur.com/jKXQ0Cf.png' },
+  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://i.imgur.com/GAWDRMd.png' },
+  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://i.imgur.com/2DcazT3.png' },
 ];
 
 export const ELEMENT_COLORS = {
@@ -295,4 +295,19 @@ export const TEN_GOD_COLORS = {
   "The Judge": ELEMENT_COLORS.Metal,
   "The Mystic": ELEMENT_COLORS.Water,
   "The Sage": ELEMENT_COLORS.Water,
+};
+
+export const SHINSAL_DEFINITIONS = {
+  반안살: {
+    hanja: '攀鞍殺',
+    meaning: '말 안장에 오르다',
+    modern: '승진, 자격 취득, 안락한 지위',
+    desc: '전쟁(삶의 고비)에서 승리하고 돌아온 장수가 말 안장 위에 편안히 앉아 있는 형국입니다. 실속이 있고 주위의 인정을 받으며, 경제적으로나 사회적으로 안정된 궤도에 진입함을 뜻합니다.'
+  },
+  화개살: {
+    hanja: '華蓋殺',
+    meaning: '화려한 덮개를 덮다',
+    modern: '예술적 재능, 종교/철학적 깊이, 반복과 복구',
+    desc: '과거의 화려했던 시절을 뒤로하고 내면의 정신세계로 침잠하는 기운입니다. 머리가 영리하고 문학, 예술, 종교 쪽에 탁월한 재능을 보입니다. 또한, 한 번 멈췄던 일을 다시 시작하거나(재기), 복구하는 힘이 강합니다.'
+  }
 };

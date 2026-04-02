@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
+import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { calculateTenGods } from '../services/bazi-engine';
-import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon } from 'lucide-react';
+import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon, HelpCircle, X } from 'lucide-react';
 
 const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
   const gongmang = result.analysis.gongmang;
@@ -258,7 +259,12 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const [expandedCycle, setExpandedCycle] = useState<number | null>(null);
   const [expandedYear, setExpandedYear] = useState<number | null>(null);
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
+  const [showTongGwanInfo, setShowTongGwanInfo] = useState(false);
+  const [showEokbuInfo, setShowEokbuInfo] = useState(false);
+  const [showYongshinInfo, setShowYongshinInfo] = useState(false);
+  const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showHanja, setShowHanja] = useState(false);
 
   const elementData = useMemo(() => {
     const counts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
@@ -370,8 +376,9 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   const getInteractionName = (type: string) => {
-    if (lang === 'KO') return type;
-    return BAZI_MAPPING.interactions[type as keyof typeof BAZI_MAPPING.interactions]?.en || type;
+    const mapping = BAZI_MAPPING.interactions[type as keyof typeof BAZI_MAPPING.interactions];
+    if (lang === 'KO') return mapping?.ko || type;
+    return mapping?.en || type;
   };
 
   const getShinsalName = (name: string) => {
@@ -483,6 +490,14 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 
       {/* 8 Pillars Grid (4x2) */}
       <div className="space-y-4">
+        <div className="flex justify-end gap-2">
+          <button 
+            onClick={() => setShowHanja(!showHanja)} 
+            className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors text-white/70"
+          >
+            {showHanja ? (lang === 'KO' ? '한자 숨기기' : 'Hide Hanja') : (lang === 'KO' ? '한자 보기' : 'Show Hanja')}
+          </button>
+        </div>
         <div className="grid grid-cols-4 gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => (
             <motion.div
@@ -504,10 +519,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                 </div>
                 <div className="text-xl md:text-3xl font-gothic text-white leading-tight min-h-[3.2em] flex flex-col justify-center">
                   {lang === 'KO' ? 
-                    (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem) : 
-                    (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
+                    (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
+                    (showHanja ? `${pillar.stem} (${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem})` : (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
                       <div key={idx}>{word}</div>
-                    ))}
+                    )))}
                 </div>
               </div>
               <div className="bg-white/5 border-t border-white/10 py-2 px-1 text-center">
@@ -522,40 +537,46 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
           ))}
         </div>
         <div className="grid grid-cols-4 gap-2 md:gap-4">
-          {result.pillars.map((pillar, i) => (
-            <motion.div
-              key={`branch-${i}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: (i + 4) * 0.05 }}
-              className="goth-glass rounded-xl border-t-2 flex flex-col overflow-hidden"
-              style={{ borderColor: ELEMENT_COLORS[BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
-            >
-              <div className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 flex-grow relative">
-                <div className="absolute top-2 right-2 opacity-40">
-                  <PolarityIcon polarity={pillar.branchPolarity} />
+          {result.pillars.map((pillar, i) => {
+            const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
+            return (
+              <motion.div
+                key={`branch-${i}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (i + 4) * 0.05 }}
+                className="goth-glass rounded-xl border-t-2 flex flex-col overflow-hidden"
+                style={{ borderColor: ELEMENT_COLORS[BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
+              >
+                <div className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 flex-grow relative">
+                  <div className="absolute top-2 right-2 opacity-40">
+                    <PolarityIcon polarity={pillar.branchPolarity} />
+                  </div>
+                  <div className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase">
+                    {lang === 'KO' ? 
+                      (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
+                      `${pillar.title} Branch`}
+                  </div>
+                  <div className="text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.6em] flex flex-col justify-center">
+                    {lang === 'KO' ? 
+                      (showHanja ? `${pillar.branch}(${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch})` : `${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch}`) : 
+                      (showHanja ? `${pillar.branch} (${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch})` : (BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch))}
+                  </div>
+                  <div className="text-[10px] text-neon-cyan font-bold">
+                    {lang === 'KO' ? lifeStage.ko : lifeStage.en}
+                  </div>
                 </div>
-                <div className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase">
-                  {lang === 'KO' ? 
-                    (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
-                    `${pillar.title} Branch`}
+                <div className="bg-white/5 border-t border-white/10 py-2 px-1 text-center">
+                  <div 
+                    className="text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wider truncate"
+                    style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
+                  >
+                    {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
+                  </div>
                 </div>
-                <div className="text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.6em] flex flex-col justify-center">
-                  {lang === 'KO' ? 
-                    (BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch) : 
-                    (BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch)}
-                </div>
-              </div>
-              <div className="bg-white/5 border-t border-white/10 py-2 px-1 text-center">
-                <div 
-                  className="text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wider truncate"
-                  style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
-                >
-                  {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
@@ -861,25 +882,24 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         <h4 className="text-sm font-bold text-neon-pink uppercase tracking-widest cursor-help">{lang === 'KO' ? '격국과 용신 (Structure & Useful God)' : 'Structure & Useful God'}</h4>
                       </BaziTooltip>
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-white/60 text-xs">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
-                          <span className="text-white font-bold">{lang === 'KO' ? result.analysis.geJu : (BAZI_MAPPING.geju[result.analysis.geJu as keyof typeof BAZI_MAPPING.geju]?.en || result.analysis.geJu)}</span>
+                        <div className="flex justify-between items-start gap-4">
+                          <span className="text-white/60 text-xs shrink-0 pt-0.5">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
+                          <span className="text-white font-bold text-right">{lang === 'KO' ? result.analysis.geJu : (BAZI_MAPPING.geju[result.analysis.geJu as keyof typeof BAZI_MAPPING.geju]?.en || result.analysis.geJu)}</span>
                         </div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-start gap-4">
                           <BaziTooltip content={BAZI_MAPPING.tooltips.dayMasterStrength} lang={lang}>
-                            <span className="text-white/60 text-xs cursor-help">{lang === 'KO' ? '일간 강약 (DM Strength)' : 'DM Strength'}</span>
+                            <span className="text-white/60 text-xs cursor-help shrink-0 pt-0.5">{lang === 'KO' ? '일간 강약 (DM Strength)' : 'DM Strength'}</span>
                           </BaziTooltip>
-                          <span className="text-white font-bold">{getStrengthLevel(result.analysis.dayMasterStrength.level)} ({result.analysis.dayMasterStrength.score.toFixed(1)})</span>
+                          <span className="text-white font-bold text-right">{getStrengthLevel(result.analysis.dayMasterStrength.level)} ({result.analysis.dayMasterStrength.score.toFixed(1)})</span>
                         </div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-start gap-4">
                           <BaziTooltip content={BAZI_MAPPING.tooltips.yongShen} lang={lang}>
-                            <span className="text-white/60 text-xs cursor-help">{lang === 'KO' ? '용신 (Useful God)' : 'Useful God'}</span>
+                            <div className="flex items-center gap-1 cursor-help" onClick={() => setShowYongshinInfo(true)}>
+                              <span className="text-white/60 text-xs shrink-0 pt-0.5">{lang === 'KO' ? '용신 (Useful God)' : 'Useful God'}</span>
+                              <HelpCircle className="w-3 h-3 text-white/40 hover:text-white transition-colors cursor-pointer" />
+                            </div>
                           </BaziTooltip>
-                          <span className="text-white font-bold text-neon-pink">{result.analysis.yongShen}</span>
-                        </div>
-                        <div className="pt-2 border-t border-white/5 space-y-1">
-                          <div className="text-[10px] text-white/40 uppercase tracking-widest">{lang === 'KO' ? '용신 근거' : 'Yongshin Reason'}</div>
-                          <div className="text-xs text-white/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.primary.reason : result.analysis.yongshinDetail.primary.reasonEn}</div>
+                          <span className="text-white font-bold text-neon-pink text-right">{result.analysis.yongShen}</span>
                         </div>
                         {result.analysis.yongshinDetail.byeongYak && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
@@ -889,13 +909,23 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         )}
                         {result.analysis.yongshinDetail.tongGwan && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
-                            <div className="text-[10px] text-neon-cyan/60 uppercase tracking-widest">{lang === 'KO' ? '통관용신' : 'Tong-Gwan'}</div>
+                            <div className="flex items-center gap-1">
+                              <div className="text-[10px] text-neon-cyan/60 uppercase tracking-widest">{lang === 'KO' ? '통관용신' : 'Tong-Gwan'}</div>
+                              <button onClick={() => setShowTongGwanInfo(true)} className="text-neon-cyan/60 hover:text-neon-cyan transition-colors" title={lang === 'KO' ? '설명 보기' : 'View explanation'}>
+                                <HelpCircle className="w-3 h-3" />
+                              </button>
+                            </div>
                             <div className="text-xs text-neon-cyan/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.tongGwan.note : result.analysis.yongshinDetail.tongGwan.noteEn}</div>
                           </div>
                         )}
                         {result.analysis.yongshinDetail.eokbu && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
-                            <div className="text-[10px] text-neon-pink/60 uppercase tracking-widest">{lang === 'KO' ? '억부용신' : 'Eokbu'}</div>
+                            <div className="flex items-center gap-1">
+                              <div className="text-[10px] text-neon-pink/60 uppercase tracking-widest">{lang === 'KO' ? '억부용신' : 'Eokbu'}</div>
+                              <button onClick={() => setShowEokbuInfo(true)} className="text-neon-pink/60 hover:text-neon-pink transition-colors" title={lang === 'KO' ? '설명 보기' : 'View explanation'}>
+                                <HelpCircle className="w-3 h-3" />
+                              </button>
+                            </div>
                             <div className="text-xs text-neon-pink/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.eokbu.note : result.analysis.yongshinDetail.eokbu.noteEn}</div>
                           </div>
                         )}
@@ -929,7 +959,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                                 content={getInteractionTooltip(interaction.type)} 
                                 lang={lang}
                               >
-                                <div className="flex flex-col p-2 bg-white/5 rounded border border-white/10 min-w-[80px] cursor-help">
+                                <div 
+                                  className="flex flex-col p-2 bg-white/5 rounded border border-white/10 min-w-[80px] cursor-pointer hover:bg-white/10 transition-colors"
+                                  onClick={() => setShowInteractionInfo(interaction.type)}
+                                >
                                   <span className="text-[10px] text-white/40 uppercase tracking-tighter">{getInteractionName(interaction.type)}</span>
                                   <span className="text-xs text-white font-bold">{interaction.note}</span>
                                   <span className="text-[9px] text-neon-cyan/60">
@@ -983,24 +1016,29 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-4">
                         {result.analysis.shinsal.length > 0 ? (
                           <div className="flex flex-wrap gap-3">
-                            {result.analysis.shinsal.map((star, i) => (
-                              <BaziTooltip 
-                                key={i} 
-                                content={{ 
-                                  ko: BAZI_MAPPING.shenSha[star.name as keyof typeof BAZI_MAPPING.shenSha]?.descKo || star.note, 
-                                  en: BAZI_MAPPING.shenSha[star.name as keyof typeof BAZI_MAPPING.shenSha]?.desc || "" 
-                                }} 
-                                lang={lang}
-                              >
-                                <div className="relative group cursor-help">
-                                  <div className={`px-3 py-1.5 rounded border text-sm font-bold flex flex-col ${
-                                    star.severity === 'strong' ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400' : 'bg-yellow-400/5 border-yellow-400/30 text-yellow-400/70'
-                                  }`}>
-                                    <span>{getShinsalName(star.name)}</span>
+                            {result.analysis.shinsal.map((star, i) => {
+                              const shinsalName = getShinsalName(star.name);
+                              const definition = SHINSAL_DEFINITIONS[shinsalName as keyof typeof SHINSAL_DEFINITIONS];
+                              
+                              return (
+                                <BaziTooltip 
+                                  key={i} 
+                                  content={{ 
+                                    ko: definition ? `${definition.hanja} | ${definition.meaning}\n${definition.modern}\n${definition.desc}` : (BAZI_MAPPING.shenSha[star.name as keyof typeof BAZI_MAPPING.shenSha]?.descKo || star.note),
+                                    en: definition ? `${definition.enMeaning}\n${definition.enModern}\n${definition.enDesc}` : (BAZI_MAPPING.shenSha[star.name as keyof typeof BAZI_MAPPING.shenSha]?.desc || "")
+                                  }} 
+                                  lang={lang}
+                                >
+                                  <div className="relative group cursor-help">
+                                    <div className={`px-3 py-1.5 rounded border text-sm font-bold flex flex-col ${
+                                      star.severity === 'strong' ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400' : 'bg-yellow-400/5 border-yellow-400/30 text-yellow-400/70'
+                                    }`}>
+                                      <span>{shinsalName}</span>
+                                    </div>
                                   </div>
-                                </div>
-                              </BaziTooltip>
-                            ))}
+                                </BaziTooltip>
+                              );
+                            })}
                           </div>
                         ) : (
                           <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 없습니다.' : 'No major divine stars present.'}</span>
@@ -1044,6 +1082,228 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
           {t.back}
         </button>
       </div>
+
+      {/* Tong-Gwan Yongshin Info Modal */}
+      <AnimatePresence>
+        {showTongGwanInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowTongGwanInfo(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            >
+              <div className="p-6 space-y-6">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold text-neon-cyan">
+                    {lang === 'KO' ? '통관용신(通關用神)이란?' : 'What is Tong-Gwan (Mediating) Yongshin?'}
+                  </h3>
+                  <button onClick={() => setShowTongGwanInfo(false)} className="text-white/50 hover:text-white transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="text-sm text-white/80 space-y-4 leading-relaxed">
+                  <p>
+                    {lang === 'KO' 
+                      ? '대립하는 두 기운 사이를 이어주어 소통시키는 오행입니다.' 
+                      : 'An element that bridges two opposing forces, enabling smooth energy flow.'}
+                  </p>
+
+                  <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
+                    <h4 className="font-bold text-white/90">{lang === 'KO' ? '예시 상황' : 'Example Scenario'}</h4>
+                    <ul className="space-y-2 text-xs">
+                      <li><span className="text-neon-pink font-bold">{lang === 'KO' ? '상황:' : 'Situation:'}</span> {lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</li>
+                      <li><span className="text-neon-cyan font-bold">{lang === 'KO' ? '처방:' : 'Prescription:'}</span> {lang === 'KO' ? '목(木) - 인성 필요' : 'Wood - Resource needed'}</li>
+                      <li><span className="text-green-400 font-bold">{lang === 'KO' ? '결과:' : 'Result:'}</span> {lang === 'KO' ? '수(水) → 목(木) → 화(火)' : 'Water → Wood → Fire'}</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-white/90">{lang === 'KO' ? '대립하는 기운과 통관용신' : 'Clashing Elements & Mediators'}</h4>
+                    <div className="grid grid-cols-1 gap-2 text-xs">
+                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                        <span>{lang === 'KO' ? '목(木) ⚡ 토(土)' : 'Wood ⚡ Earth'}</span>
+                        <span className="text-red-400 font-bold">{lang === 'KO' ? '화(火)가 통관' : 'Fire mediates'}</span>
+                        <span className="text-white/40">{lang === 'KO' ? '(목→화→토)' : '(Wood→Fire→Earth)'}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                        <span>{lang === 'KO' ? '화(火) ⚡ 금(金)' : 'Fire ⚡ Metal'}</span>
+                        <span className="text-yellow-400 font-bold">{lang === 'KO' ? '토(土)가 통관' : 'Earth mediates'}</span>
+                        <span className="text-white/40">{lang === 'KO' ? '(화→토→금)' : '(Fire→Earth→Metal)'}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                        <span>{lang === 'KO' ? '토(土) ⚡ 수(水)' : 'Earth ⚡ Water'}</span>
+                        <span className="text-gray-300 font-bold">{lang === 'KO' ? '금(金)이 통관' : 'Metal mediates'}</span>
+                        <span className="text-white/40">{lang === 'KO' ? '(토→금→수)' : '(Earth→Metal→Water)'}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                        <span>{lang === 'KO' ? '금(金) ⚡ 목(木)' : 'Metal ⚡ Wood'}</span>
+                        <span className="text-blue-400 font-bold">{lang === 'KO' ? '수(水)가 통관' : 'Water mediates'}</span>
+                        <span className="text-white/40">{lang === 'KO' ? '(금→수→목)' : '(Metal→Water→Wood)'}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                        <span>{lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</span>
+                        <span className="text-green-400 font-bold">{lang === 'KO' ? '목(木)이 통관' : 'Wood mediates'}</span>
+                        <span className="text-white/40">{lang === 'KO' ? '(수→목→화)' : '(Water→Wood→Fire)'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Yongshin Info Modal */}
+      <AnimatePresence>
+        {showYongshinInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowYongshinInfo(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            >
+              <div className="p-6 space-y-6">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold text-neon-pink">
+                    {lang === 'KO' ? '용신(用神)이란?' : 'What is Yongshin?'}
+                  </h3>
+                  <button onClick={() => setShowYongshinInfo(false)} className="text-white/50 hover:text-white transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="text-sm text-white/80 space-y-4 leading-relaxed">
+                  <p>
+                    {lang === 'KO' 
+                      ? '용신은 사주팔자의 균형을 맞추고, 부족한 기운을 보완하여 인생의 흐름을 원활하게 만드는 가장 필요한 오행입니다.' 
+                      : 'Yongshin is the most essential element that balances the BaZi chart, supplements weak energies, and facilitates the smooth flow of life.'}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Eokbu Yongshin Info Modal */}
+      <AnimatePresence>
+        {showEokbuInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowEokbuInfo(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            >
+              <div className="p-6 space-y-6">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold text-neon-pink">
+                    {lang === 'KO' ? '억부용신(抑扶用神)이란?' : 'What is Eokbu (Balancing) Yongshin?'}
+                  </h3>
+                  <button onClick={() => setShowEokbuInfo(false)} className="text-white/50 hover:text-white transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="text-sm text-white/80 space-y-4 leading-relaxed">
+                  <p>
+                    {lang === 'KO' 
+                      ? '사주의 균형을 맞추기 위해, 너무 강한 기운은 억제(抑)하고 부족한 기운은 도와주는(扶) 오행입니다.' 
+                      : 'To balance the chart, Eokbu Yongshin suppresses (抑) overly strong elements and supports (扶) weak ones.'}
+                  </p>
+
+                  <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
+                    <h4 className="font-bold text-white/90">{lang === 'KO' ? '사용자 맞춤 분석' : 'Personalized Analysis'}</h4>
+                    <p>
+                      {lang === 'KO' 
+                        ? '사주 내에서 강한 기운을 조절하여 전체적인 균형을 잡는 역할을 합니다.'
+                        : 'It plays a role in balancing the overall chart by regulating strong energies.'}
+                    </p>
+                    <p className="italic text-white/60">
+                      {lang === 'KO' ? result.analysis.yongshinDetail.eokbu.note : result.analysis.yongshinDetail.eokbu.noteEn}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Interaction Info Modal */}
+      <AnimatePresence>
+        {showInteractionInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setShowInteractionInfo(null)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            >
+              <div className="p-6 space-y-6">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-xl font-bold text-neon-cyan">
+                    {lang === 'KO' ? '상호작용 상세' : 'Interaction Details'}
+                  </h3>
+                  <button onClick={() => setShowInteractionInfo(null)} className="text-white/50 hover:text-white transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="text-sm text-white/80 space-y-4 leading-relaxed">
+                  {showInteractionInfo && BAZI_MAPPING.interactionDetails[showInteractionInfo as keyof typeof BAZI_MAPPING.interactionDetails] ? (
+                    <>
+                      <p className="text-lg font-bold text-white">
+                        {BAZI_MAPPING.interactionDetails[showInteractionInfo as keyof typeof BAZI_MAPPING.interactionDetails][lang === 'KO' ? 'ko' : 'en'].title}
+                      </p>
+                      <p>{BAZI_MAPPING.interactionDetails[showInteractionInfo as keyof typeof BAZI_MAPPING.interactionDetails][lang === 'KO' ? 'ko' : 'en'].general}</p>
+                      <div className="space-y-2">
+                        {Object.entries(BAZI_MAPPING.interactionDetails[showInteractionInfo as keyof typeof BAZI_MAPPING.interactionDetails][lang === 'KO' ? 'ko' : 'en'].types).map(([key, value]) => (
+                          <p key={key}><span className="text-neon-cyan font-bold">{key}:</span> {value}</p>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p>{lang === 'KO' ? '상세 설명이 준비 중입니다.' : 'Detailed explanation is being prepared.'}</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
