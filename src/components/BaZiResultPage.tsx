@@ -576,7 +576,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 space-y-12">
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-8 sm:space-y-12">
       <div className="text-center">
         {renderTitle()}
       </div>
@@ -611,36 +611,36 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             {showHanja ? (lang === 'KO' ? '한자 숨기기' : 'Hide Hanja') : (lang === 'KO' ? '한자 보기' : 'Show Hanja')}
           </button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => (
             <motion.div
               key={`stem-${i}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="goth-glass rounded-xl border-t-2 flex flex-col overflow-hidden"
+              className="goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden"
               style={{ borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
             >
-              <div className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 flex-grow relative">
-                <div className="absolute top-2 right-2 opacity-40">
-                  <PolarityIcon polarity={pillar.stemPolarity} />
+              <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                  <PolarityIcon polarity={pillar.stemPolarity} size={8} />
                 </div>
-                <div className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase">
+                <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
                   {lang === 'KO' ? 
                     (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
                     `${pillar.title} Stem`}
                 </div>
-                <div className="text-xl md:text-3xl font-gothic text-white leading-tight min-h-[3.2em] flex flex-col justify-center">
+                <div className="text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight min-h-[2.4em] sm:min-h-[3.2em] flex flex-col justify-center">
                   {lang === 'KO' ? 
                     (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
                     (showHanja ? `${pillar.stem} (${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem})` : (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
-                      <div key={idx}>{word}</div>
+                      <div key={idx} className="text-[10px] sm:text-base md:text-xl">{word}</div>
                     )))}
                 </div>
               </div>
-              <div className="bg-white/5 border-t border-white/10 py-2 px-1 text-center">
+              <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
                 <div 
-                  className="text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wider truncate"
+                  className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
                   style={{ color: getTenGodColor(lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName) }}
                 >
                   {lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)}
@@ -649,7 +649,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             </motion.div>
           ))}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => {
             const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
             return (
@@ -658,30 +658,30 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (i + 4) * 0.05 }}
-                className="goth-glass rounded-xl border-t-2 flex flex-col overflow-hidden"
+                className="goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden"
                 style={{ borderColor: ELEMENT_COLORS[BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
               >
-                <div className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 flex-grow relative">
-                  <div className="absolute top-2 right-2 opacity-40">
-                    <PolarityIcon polarity={pillar.branchPolarity} />
+                <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
+                  <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                    <PolarityIcon polarity={pillar.branchPolarity} size={8} />
                   </div>
-                  <div className="text-[10px] md:text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase">
+                  <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
                     {lang === 'KO' ? 
                       (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
                       `${pillar.title} Branch`}
                   </div>
-                  <div className="text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.6em] flex flex-col justify-center">
+                  <div className="text-base sm:text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.2em] sm:min-h-[1.6em] flex flex-col justify-center">
                     {lang === 'KO' ? 
                       (showHanja ? `${pillar.branch}(${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch})` : `${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch}`) : 
                       (showHanja ? `${pillar.branch} (${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch})` : (BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch))}
                   </div>
-                  <div className="text-[10px] text-neon-cyan font-bold">
+                  <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
                     {lang === 'KO' ? lifeStage.ko : lifeStage.en}
                   </div>
                 </div>
-                <div className="bg-white/5 border-t border-white/10 py-2 px-1 text-center">
+                <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
                   <div 
-                    className="text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wider truncate"
+                    className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
                     style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
                   >
                     {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
