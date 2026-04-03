@@ -5,7 +5,7 @@ export const STEM_ELEMENTS: Record<string, string> = {
   '己': 'Earth', '庚': 'Metal', '辛': 'Metal', '壬': 'Water', '癸': 'Water'
 };
 
-const BRANCH_ELEMENTS: Record<string, string> = {
+export const BRANCH_ELEMENTS: Record<string, string> = {
   '寅': 'Wood', '卯': 'Wood', '巳': 'Fire', '午': 'Fire', '辰': 'Earth',
   '戌': 'Earth', '丑': 'Earth', '未': 'Earth', '申': 'Metal', '酉': 'Metal',
   '亥': 'Water', '子': 'Water'

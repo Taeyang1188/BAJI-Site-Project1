@@ -137,47 +137,47 @@ export const TRANSLATIONS = {
       ]
     },
     input: {
-      title: "코스믹 정렬",
-      name: "이름",
-      birthDate: "생년월일",
-      birthTime: "태어난 시간",
-      city: "태어난 도시",
-      gender: "성별",
+      title: "영혼 추출",
+      name: "자신을 식별하세요",
+      birthDate: "시간적 기원",
+      birthTime: "정확한 시간",
+      city: "공간적 좌표",
+      gender: "바이브 체크",
       male: "남성",
       female: "여성",
       nonBinary: "논바이너리",
       preferNotToTell: "밝히고 싶지 않음",
-      calendarType: "양/음력",
+      calendarType: "달력",
       solar: "양력",
       lunar: "음력",
-      button: "운명 확인하기",
-      locationSynced: "위치 동기화 완료! ✨",
-      errorTitle: "코스믹 오류 발생",
-      errorDesc: "별들이 당신을 외면하고 있어요. 입력 정보를 확인하고 다시 시도해 주세요.",
+      button: "운명 소환",
+      locationSynced: "좌표 고정됨. ✨",
+      errorTitle: "매트릭스 오류",
+      errorDesc: "별들이 우리를 무시하고 있습니다. 데이터를 확인하고 다시 시도하세요.",
       errorButton: "다시 시도하기"
     },
     wheel: {
       alignment: "현재 정렬",
-      year: "연",
+      year: "년",
       month: "월",
       hour: "시"
     },
     nav: {
-      home: "홈으로 돌아가기",
-      synced: "동기화 완료!",
-      back: "뒤로가기"
+      home: "공허로 돌아가기",
+      synced: "고정됨.",
+      back: "뒤로"
     },
     result: {
-      title: "사주팔자",
-      grandCycle: "대운 타임라인",
-      seasonVibe: "대운 바이브",
-      seasonVibeDisclaimer: "현재 대운의 오행을 바탕으로 합니다.",
-      back: "다시 입력하기",
+      title: "영혼 설계도",
+      grandCycle: "인생의 계절",
+      seasonVibe: "사이클 바이브",
+      seasonVibeDisclaimer: "현재 대운의 오행을 기반으로 합니다.",
+      back: "재정렬",
       lifeStages: {
-        childhood: "유년",
-        youth: "청년",
-        maturity: "중년",
-        legacy: "말년"
+        childhood: "유년기",
+        youth: "청년기",
+        maturity: "장년기",
+        legacy: "노년기"
       },
       months: [
         "1월", "2월", "3월", "4월", "5월", "6월",
@@ -185,28 +185,28 @@ export const TRANSLATIONS = {
       ],
       comments: {
         Wood: {
-          BiGyean: "목(Wood)의 대운입니다 🌿. 새로운 시작과 성장의 기운이 느껴지네요.",
-          GeopJae: "목(Wood)의 대운입니다 🌿. 경쟁을 통해 성장하는 시기입니다.",
-          SikSin: "목(Wood)의 대운입니다 🌿. 꾸준한 노력으로 결실을 맺으세요.",
-          SangGwan: "목(Wood)의 대운입니다 🌿. 창의적인 에너지가 폭발합니다.",
+          BiGyean: "목(Wood)의 대운입니다 🌿. 새로운 시작과 성장의 시기입니다.",
+          GeopJae: "목(Wood)의 대운입니다 🌿. 건강한 경쟁을 통한 성장입니다.",
+          SikSin: "목(Wood)의 대운입니다 🌿. 꾸준한 노력이 결실로 이어집니다.",
+          SangGwan: "목(Wood)의 대운입니다 🌿. 창의적인 에너지가 넘쳐납니다.",
           PyeonJae: "목(Wood)의 대운입니다 🌿. 예상치 못한 기회가 찾아옵니다.",
           JeongJae: "목(Wood)의 대운입니다 🌿. 안정적인 재물운이 상승합니다.",
-          PyeonGwan: "목(Wood)의 대운입니다 🌿. 책임감이 필요한 시기입니다.",
+          PyeonGwan: "목(Wood)의 대운입니다 🌿. 책임감과 리더십이 필요한 때입니다.",
           JeongGwan: "목(Wood)의 대운입니다 🌿. 명예와 질서가 함께합니다.",
           PyeonIn: "목(Wood)의 대운입니다 🌿. 직관력이 예리해집니다.",
-          JeongIn: "목(Wood)의 대운입니다 🌿. 학문과 지혜가 깊어집니다."
+          JeongIn: "목(Wood)의 대운입니다 🌿. 지혜와 지식이 깊어집니다."
         },
         Fire: {
-          BiGyean: "화(Fire)의 대운입니다 🔥. 당신의 열정을 세상에 보여줄 때예요!",
-          GeopJae: "화(Fire)의 대운입니다 🔥. 열정적인 경쟁이 시작됩니다.",
+          BiGyean: "화(Fire)의 대운입니다 🔥. 당신의 열정을 세상에 보여줄 때입니다!",
+          GeopJae: "화(Fire)의 대운입니다 🔥. 치열한 경쟁이 당신을 성장시킵니다.",
           SikSin: "화(Fire)의 대운입니다 🔥. 당신의 재능을 마음껏 펼치세요.",
-          SangGwan: "화(Fire)의 대운입니다 🔥. 거침없는 표현력이 돋보입니다.",
-          PyeonJae: "화(Fire)의 대운입니다 🔥. 화끈한 재물운이 들어옵니다.",
-          JeongJae: "화(Fire)의 대운입니다 🔥. 성실한 노력으로 재물을 모으세요.",
-          PyeonGwan: "화(Fire)의 대운입니다 🔥. 강렬한 리더십이 요구됩니다.",
-          JeongGwan: "화(Fire)의 대운입니다 🔥. 명예가 빛나는 시기입니다.",
-          PyeonIn: "화(Fire)의 대운입니다 🔥. 영감이 번뜩이는 시기입니다.",
-          JeongIn: "화(Fire)의 대운입니다 🔥. 따뜻한 지혜가 함께합니다."
+          SangGwan: "화(Fire)의 대운입니다 🔥. 표현이 대담하고 화려해집니다.",
+          PyeonJae: "화(Fire)의 대운입니다 🔥. 역동적인 재물운이 들어옵니다.",
+          JeongJae: "화(Fire)의 대운입니다 🔥. 꾸준한 노력으로 재물을 쌓으세요.",
+          PyeonGwan: "화(Fire)의 대운입니다 🔥. 강한 리더십이 요구됩니다.",
+          JeongGwan: "화(Fire)의 대운입니다 🔥. 명예와 인정을 받는 시기입니다.",
+          PyeonIn: "화(Fire)의 대운입니다 🔥. 번뜩이는 영감이 찾아옵니다.",
+          JeongIn: "화(Fire)의 대운입니다 🔥. 따뜻한 지혜가 당신을 인도합니다."
         },
         Earth: {
           BiGyean: "토(Earth)의 대운입니다 ⛰️. 내실을 다지고 중심을 잡아야 할 시기입니다.",
@@ -245,6 +245,30 @@ export const TRANSLATIONS = {
           JeongIn: "수(Water)의 대운입니다 🌊. 지혜가 샘솟는 시기입니다."
         }
       }
+    }
+  },
+  INTERACTION_MESSAGES: {
+    KO: {
+      SikSinSaengJae: { title: "식신생재 (食神生財)", desc: "아이디어가 돈으로 직결됨", detail: "내가 가진 기술이나 재능(식상)이 시장의 수요(재성)를 만나 활발하게 유통되는 형상입니다. 완벽한 상품 출시와 매출 폭발." },
+      JaeSaengGwan: { title: "재생관 (財生官)", desc: "자금력을 바탕으로 명예를 얻음", detail: "내가 쌓아온 재산이나 결과물(재성)이 나를 보호해주고 높여주는 조직이나 명예(관성)를 생해주는 형상입니다. 투자 성공 후 직급 상승 혹은 브랜드 가치 상승." },
+      SalInSangSaeng: { title: "살인상생 (殺印相生)", desc: "위기를 기회와 권위로 바꿈", detail: "나를 힘들게 하는 압박과 스트레스(편관)를 공부와 인내, 지혜(인성)로 받아내어 오히려 내 권위로 만드는 형상입니다. 어려운 프로젝트 완수 후 독보적인 전문가로 인정됨." },
+      SikSinJeSal: { title: "식신제살 (食神制殺)", desc: "내 능력으로 문제를 해결함", detail: "나를 괴롭히는 난제나 경쟁자(편관)를 나의 뛰어난 전문 기술이나 논리(식신)로 단칼에 해결하는 형상입니다. 리스크 관리 성공 및 난공불락의 거래처 확보." },
+      GwanInSangSaeng: { title: "관인상생 (官印相生)", desc: "조직의 전폭적인 지원을 받음", detail: "조직(관성)의 기운이 나를 돕는 인성으로 흘러들어와 내가 편안하게 혜택을 입는 형상입니다. 대기업과의 안정적인 계약 혹은 승진 발령." },
+      SangGwanPaeIn: { title: "상관패인 (傷官佩印)", desc: "날카로운 재능에 자격을 갖춤", detail: "상관(천재성, 비판력, 파격)이라는 날카로운 칼에 인성(학문, 도덕, 자격)이라는 칼집을 씌운 형상입니다. 브랜드 기획의 정점, 고도의 전략가." },
+      JaeGeukIn: { title: "재극인 (財剋印)", desc: "현실적 이익과 명분의 충돌", detail: "학문이나 문서(인성)를 다루는 중에 현실적인 돈(재성)이 들어와 갈등하는 형상입니다. 학업 중단 후 취업 또는 지적 재산권을 통한 현금화." },
+      ANeungSaengMo: { title: "아능생모 (兒能生母)", desc: "결과물이 다시 나를 살림", detail: "내가 만든 결과물(재성)이 너무 많아 힘들 때, 나의 활동력(식상)이 이를 소화해내는 형상입니다. 사업 확장 후 시스템 자동화 성공." },
+      GeopJaeTalJae: { title: "겁재탈재 (劫財奪財)", desc: "동업 혹은 경쟁을 통한 재물 분탈", detail: "내 돈(재성)을 노리는 경쟁자나 동료(비겁)가 나타나는 형상입니다. 동업 사기 주의 또는 공동 투자로 인한 수익 배분." }
+    },
+    EN: {
+      SikSinSaengJae: { title: "Siksin-Saengjae", desc: "Ideas directly translate to money", detail: "Your skills or talents (Sik-sang) meet market demand (Jae-seong), leading to active circulation. Perfect product launch and explosive sales." },
+      JaeSaengGwan: { title: "Jae-Saeng-Gwan", desc: "Gaining honor through financial power", detail: "Your accumulated wealth or results (Jae-seong) support the organization or honor (Gwan-seong) that protects and elevates you. Career jump after investment success." },
+      SalInSangSaeng: { title: "Sal-In-Sang-Saeng", desc: "Turning crisis into opportunity and authority", detail: "Taking the pressure and stress (Sal) and absorbing it with study, patience, and wisdom (In-seong) to turn it into your own authority. Recognized as an expert after completing a difficult project." },
+      SikSinJeSal: { title: "Siksin-Je-Sal", desc: "Solving problems with your own ability", detail: "Using your superior technical skills or logic (Sik-sin) to resolve challenges or competitors (Sal). Risk management success and securing an impregnable client." },
+      GwanInSangSaeng: { title: "Gwan-In-Sang-Saeng", desc: "Full support from the organization", detail: "The energy of the organization (Gwan-seong) flows into the In-seong that helps you, allowing you to comfortably receive benefits. Stable contract with a large corporation or promotion." },
+      SangGwanPaeIn: { title: "Sang-Gwan-Pae-In", desc: "Equipping sharp talent with qualifications", detail: "The sharp blade of Sang-gwan (genius, critical power, unconventionality) is fitted with the scabbard of In-seong (academic, moral, qualification). The pinnacle of brand planning, a high-level strategist." },
+      JaeGeukIn: { title: "Jae-Geuk-In", desc: "Conflict between realistic interest and justification", detail: "While dealing with academic or documents (In-seong), realistic money (Jae-seong) comes in, causing conflict. Employment after dropping out of studies or monetization through intellectual property rights." },
+      ANeungSaengMo: { title: "A-Neung-Saeng-Mo", desc: "Results bring you back to life", detail: "When you have too many results (Jae-seong) and are struggling, your activity (Sik-sang) manages to digest it. Success in system automation after business expansion." },
+      GeopJaeTalJae: { title: "Geop-Jae-Tal-Jae", desc: "Wealth deprivation through partnership or competition", detail: "A competitor or colleague (Bi-geop) aiming for your money (Jae-seong) appears. Beware of partnership fraud or profit sharing due to joint investment." }
     }
   }
 };

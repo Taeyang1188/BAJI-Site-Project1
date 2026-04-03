@@ -6,7 +6,7 @@ import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
-import { calculateTenGods, STEM_ELEMENTS } from '../services/bazi-engine';
+import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon, HelpCircle, X } from 'lucide-react';
 
 const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
@@ -518,7 +518,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             {showHanja ? (lang === 'KO' ? '한자 숨기기' : 'Hide Hanja') : (lang === 'KO' ? '한자 보기' : 'Show Hanja')}
           </button>
         </div>
-        <div className="grid grid-cols-4 gap-2 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => (
             <motion.div
               key={`stem-${i}`}
@@ -556,7 +556,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             </motion.div>
           ))}
         </div>
-        <div className="grid grid-cols-4 gap-2 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => {
             const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
             return (
@@ -604,8 +604,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 
       {/* Grand Cycle Timeline */}
       <div className="space-y-6">
-        <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center">
+        <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center flex items-center justify-center gap-2">
           {t.grandCycle}
+          <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'입니다. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년입니다.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'입니다. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생깁니다.", en: "Daewoon (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
+            <HelpCircle className="w-3 h-3 cursor-help" />
+          </BaziTooltip>
         </h3>
         <div className="relative overflow-x-auto pb-4 scrollbar-neon-purple" dir="rtl">
           <div className="flex gap-4 min-w-max px-4 flex-row-reverse">
@@ -1023,21 +1026,32 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                                 const [koNote, enNote] = interaction.note.split('|');
                                 displayNote = lang === 'KO' ? koNote : enNote;
                                 
-                                // Colorize the yongshin stem in the tooltip
+                                // Colorize the yongshin stem/branch in the tooltip
                                 const colorizeNote = (note: string) => {
                                   if (!result.analysis.yongshinDetail) return note;
                                   const yongshinElement = result.analysis.yongshinDetail.primary.element;
                                   const elementColor = ELEMENT_COLORS[yongshinElement as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
                                   
-                                  // Find the yongshin stem in the note and wrap it in a span with color
-                                  const stems = interaction.stems || [];
                                   let colorized = note;
+                                  
+                                  // Colorize stems
+                                  const stems = interaction.stems || [];
                                   stems.forEach(stem => {
                                     if (STEM_ELEMENTS[stem] === yongshinElement) {
                                       const regex = new RegExp(`(${stem})`, 'g');
                                       colorized = colorized.replace(regex, `<span style="color: ${elementColor}; font-weight: bold;">$1</span>`);
                                     }
                                   });
+
+                                  // Colorize branches
+                                  const branches = interaction.branches || [];
+                                  branches.forEach(branch => {
+                                    if (BRANCH_ELEMENTS[branch] === yongshinElement) {
+                                      const regex = new RegExp(`(${branch})`, 'g');
+                                      colorized = colorized.replace(regex, `<span style="color: ${elementColor}; font-weight: bold;">$1</span>`);
+                                    }
+                                  });
+                                  
                                   return colorized;
                                 };
 
@@ -1055,7 +1069,6 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                                 >
                                   <div 
                                     className="flex flex-col p-2 bg-white/5 rounded border border-white/10 min-w-[80px] cursor-pointer hover:bg-white/10 transition-colors"
-                                    onClick={() => setShowInteractionInfo(interaction.type)}
                                   >
                                     <span className="text-[10px] text-white/40 uppercase tracking-tighter">{getInteractionName(interaction.type)}</span>
                                     <span className="text-[9px] text-neon-cyan/60">

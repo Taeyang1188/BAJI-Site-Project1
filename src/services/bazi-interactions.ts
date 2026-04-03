@@ -34,6 +34,95 @@ const BRANCH_ELEMENTS: Record<string, string> = {
 const PILLAR_NAMES = ["시주", "일주", "월주", "년주"];
 const PILLAR_NAMES_EN = ["Time", "Day", "Month", "Year"];
 
+const getPillarMeaning = (idx: number, lang: 'KO' | 'EN') => {
+  if (lang === 'KO') {
+    if (idx === 0) return "말년/자식";
+    if (idx === 1) return "나 자신/배우자";
+    if (idx === 2) return "사회생활/청년기";
+    if (idx === 3) return "초년/조상";
+  } else {
+    if (idx === 0) return "Later Years/Children";
+    if (idx === 1) return "Self/Spouse";
+    if (idx === 2) return "Social Life/Youth";
+    if (idx === 3) return "Early Years/Ancestors";
+  }
+  return "";
+};
+
+const getPillarName = (idx: number, lang: 'KO' | 'EN') => {
+  if (lang === 'KO') {
+    if (idx === 0) return "시지";
+    if (idx === 1) return "일지";
+    if (idx === 2) return "월지";
+    if (idx === 3) return "연지";
+  } else {
+    if (idx === 0) return "Time Branch";
+    if (idx === 1) return "Day Branch";
+    if (idx === 2) return "Month Branch";
+    if (idx === 3) return "Year Branch";
+  }
+  return "";
+};
+
+const getElementKo = (elementEn: string) => {
+  const map: any = { 'Wood': '목(木)', 'Fire': '화(火)', 'Earth': '토(土)', 'Metal': '금(金)', 'Water': '수(水)' };
+  return map[elementEn] || elementEn;
+};
+
+function generateCombinationNote(
+  type: string, 
+  combBranches: string[], 
+  resultElement: string, 
+  pillars: BaZiCard[] | undefined, 
+  allBranches: string[]
+): string {
+  if (!pillars) {
+    return `${combBranches.join('-')} ${type} (${resultElement})`;
+  }
+
+  const indices = combBranches.map(b => allBranches.indexOf(b)).filter(idx => idx !== -1);
+  
+  if (indices.length < 2) {
+    return `${combBranches.join('-')} ${type} (${resultElement})`;
+  }
+
+  const koPositions = indices.map(idx => `${getPillarName(idx, 'KO')}(${combBranches[indices.indexOf(idx)]})`).join('와 ');
+  const koTenGods = indices.map(idx => `${pillars[idx].branchKoreanName}(${combBranches[indices.indexOf(idx)]})`).join('과 ');
+  const koPillarMeanings = indices.map(idx => `${getPillarName(idx, 'KO')}(${getPillarMeaning(idx, 'KO')})`).join('와 ');
+  
+  let koDesc = "";
+  if (type === "육합") {
+    koDesc = `육합은 부부나 연인처럼 다정한 합입니다. ${koPillarMeanings}가 합을 하고 있어 정서적인 안정감을 줍니다. 또한 ${koTenGods}이 합을 하므로, 해당 십성들의 에너지가 서로 긍정적으로 연결되어 시너지를 냅니다.`;
+  } else if (type === "삼합" || type === "반합") {
+    koDesc = `${type}은 사회적인 목적을 위한 강력한 결속입니다. ${koPillarMeanings}가 합을 하여 ${getElementKo(resultElement)}의 기운을 만들어냅니다. ${koTenGods}이 결합하여 사회적 성취와 목적 달성을 향한 강한 원동력이 됩니다.`;
+  } else if (type === "방합" || type === "준방합") {
+    koDesc = `${type}은 같은 계절(방향)의 강력한 세력입니다. ${koPillarMeanings}가 모여 ${getElementKo(resultElement)}의 기운을 증폭시킵니다. ${koTenGods}이 무리를 지어 해당 분야에서 폭발적인 에너지와 추진력을 발휘하게 됩니다.`;
+  } else if (type === "암합") {
+    koDesc = `암합은 지장간 내부에서 일어나는 은밀한 합입니다. ${koPillarMeanings} 사이에 보이지 않는 강한 끌림과 결속력이 존재하며, ${koTenGods} 간의 은밀한 조력이나 연결고리가 있음을 암시합니다.`;
+  }
+
+  const koNote = `<div class="space-y-2"><b>${type}: ${combBranches.join('-')} ${type}</b><br/><b>위치:</b> ${koPositions}<br/><b>성격:</b> ${getElementKo(resultElement)}의 기운을 강화합니다.<br/><b>영향:</b> ${koDesc}</div>`;
+
+  const enPositions = indices.map(idx => `${getPillarName(idx, 'EN')} (${combBranches[indices.indexOf(idx)]})`).join(' and ');
+  const enTenGods = indices.map(idx => `${pillars[idx].branchEnglishName} (${combBranches[indices.indexOf(idx)]})`).join(' and ');
+  const enPillarMeanings = indices.map(idx => `${getPillarName(idx, 'EN')} (${getPillarMeaning(idx, 'EN')})`).join(' and ');
+  
+  let enDesc = "";
+  if (type === "육합") {
+    enDesc = `The Six Combination is an affectionate bond like a couple. The ${enPillarMeanings} are combining, providing emotional stability. Also, the ${enTenGods} combine, creating a positive synergy between these energies.`;
+  } else if (type === "삼합" || type === "반합") {
+    enDesc = `This combination is a strong alliance for social purpose. The ${enPillarMeanings} combine to create ${resultElement} energy. The ${enTenGods} unite to become a strong driving force for social achievement.`;
+  } else if (type === "방합" || type === "준방합") {
+    enDesc = `This is a powerful force of the same season/direction. The ${enPillarMeanings} gather to amplify ${resultElement} energy. The ${enTenGods} form a group, exerting explosive energy and drive in their respective fields.`;
+  } else if (type === "암합") {
+    enDesc = `The Hidden Combination is a secret bond within the hidden stems. There is an invisible strong attraction between ${enPillarMeanings}, suggesting secret assistance or connection between ${enTenGods}.`;
+  }
+
+  const enNote = `<div class="space-y-2"><b>${type}: ${combBranches.join('-')} ${type}</b><br/><b>Position:</b> ${enPositions}<br/><b>Nature:</b> Strengthens ${resultElement} energy.<br/><b>Influence:</b> ${enDesc}</div>`;
+
+  return `${koNote}|${enNote}`;
+}
+
 export function calculateInteractions(stems: string[], branches: string[], pillars?: BaZiCard[], yongshinDetail?: any): BaziInteractions {
   const interactions: Interaction[] = [];
   const conflicts: { resolved: string; affected: string[]; note?: string }[] = [];
@@ -91,7 +180,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
           branches: [branches[i], branches[j]],
           element: branchSixHapPairs[pair],
           severity: "full",
-          note: `${branches[i]}-${branches[j]} 육합 (${branchSixHapPairs[pair]})`
+          note: generateCombinationNote("육합", [branches[i], branches[j]], branchSixHapPairs[pair], pillars, branches)
         });
       }
     }
@@ -116,7 +205,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
         element: group.element,
         severity: "full",
         isFull: true,
-        note: `${group.branches.join('')} 삼합 (${group.element})`
+        note: generateCombinationNote("삼합", group.branches, group.element, pillars, branches)
       });
     } else if (present.length === 2) {
       // Check if center is present
@@ -128,7 +217,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
           element: group.element,
           severity: "half",
           isFull: false,
-          note: `${present.join('')} 반합 (${group.element})`
+          note: generateCombinationNote("반합", present, group.element, pillars, branches)
         });
       }
     }
@@ -151,7 +240,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
         element: group.element,
         severity: "full",
         partial: false,
-        note: `${group.branches.join('')} 방합 (${group.element})`
+        note: generateCombinationNote("방합", group.branches, group.element, pillars, branches)
       });
     } else if (present.length === 2) {
       interactions.push({
@@ -161,7 +250,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
         element: group.element,
         severity: "partial",
         partial: true,
-        note: `${present.join('')} 준방합 (${group.element})`
+        note: generateCombinationNote("준방합", present, group.element, pillars, branches)
       });
     }
   });
