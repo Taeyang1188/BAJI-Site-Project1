@@ -229,6 +229,247 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
     });
   }
 
+  // 고란살 (Solitary Phoenix)
+  const goRan = ['甲寅', '乙巳', '丁巳', '戊申', '辛亥'];
+  if (goRan.includes(dayPillar)) {
+    shinsal.push({
+      name: "고란살",
+      nameKo: "고란살(孤鸞殺)",
+      basis: "일주",
+      foundAt: ["일주"],
+      branches: [dayBranch],
+      severity: "present",
+      note: "독립심이 강하고 자수성가할 힘"
+    });
+  }
+
+  // 4. 원국 전체 구성 신살
+  // 귀문관살 (Ghost Gate)
+  const guiMenPairs = [['子', '酉'], ['丑', '午'], ['寅', '未'], ['卯', '申'], ['辰', '亥'], ['巳', '戌']];
+  const foundGuiMen: string[] = [];
+  guiMenPairs.forEach(pair => {
+    if (branches.includes(pair[0]) && branches.includes(pair[1])) {
+      foundGuiMen.push(`${pair[0]}-${pair[1]}`);
+    }
+  });
+  if (foundGuiMen.length > 0) {
+    shinsal.push({
+      name: "귀문관살",
+      nameKo: "귀문관살(鬼門關殺)",
+      basis: "지합",
+      foundAt: ["원국"],
+      branches: branches.filter(b => foundGuiMen.some(p => p.includes(b))),
+      severity: "present",
+      note: "집요함과 천재적 영감, 고도의 집중력"
+    });
+  }
+
+  // 원진살 (Resentment Star)
+  const wonJinPairs = [['子', '未'], ['丑', '午'], ['寅', '酉'], ['卯', '申'], ['辰', '亥'], ['巳', '戌']];
+  const foundWonJin: string[] = [];
+  wonJinPairs.forEach(pair => {
+    if (branches.includes(pair[0]) && branches.includes(pair[1])) {
+      foundWonJin.push(`${pair[0]}-${pair[1]}`);
+    }
+  });
+  if (foundWonJin.length > 0) {
+    shinsal.push({
+      name: "원진살",
+      nameKo: "원진살(元嗔殺)",
+      basis: "지합",
+      foundAt: ["원국"],
+      branches: branches.filter(b => foundWonJin.some(p => p.includes(b))),
+      severity: "present",
+      note: "복잡한 인간관계와 깊은 감수성"
+    });
+  }
+
+  // 현침살 (Dangling Needle)
+  const hyeonChimChars = ['甲', '辛', '卯', '午', '申'];
+  const foundHyeonChimAt: string[] = [];
+  const foundHyeonChimChars: string[] = [];
+  stems.forEach((s, i) => {
+    if (hyeonChimChars.includes(s)) {
+      foundHyeonChimAt.push(PILLAR_NAMES[i]);
+      foundHyeonChimChars.push(s);
+    }
+  });
+  branches.forEach((b, i) => {
+    if (hyeonChimChars.includes(b)) {
+      foundHyeonChimAt.push(PILLAR_NAMES[i]);
+      foundHyeonChimChars.push(b);
+    }
+  });
+  if (foundHyeonChimAt.length >= 3) {
+    shinsal.push({
+      name: "현침살",
+      nameKo: "현침살(懸針殺)",
+      basis: "원국",
+      foundAt: [...new Set(foundHyeonChimAt)],
+      branches: branches.filter(b => hyeonChimChars.includes(b)),
+      severity: foundHyeonChimAt.length >= 4 ? "strong" : "present",
+      note: "날카로운 통찰력과 전문 기술"
+    });
+  }
+
+  // 탕화살 (Scalding Fire)
+  const tangHwaMap: Record<string, string[]> = {
+    '寅': ['寅', '巳', '申'],
+    '午': ['午', '辰', '丑'],
+    '丑': ['丑', '戌', '未']
+  };
+  if (tangHwaMap[dayBranch]) {
+    const targets = tangHwaMap[dayBranch];
+    const foundAt: string[] = [];
+    branches.forEach((b, i) => {
+      if (targets.includes(b)) {
+        foundAt.push(PILLAR_NAMES[i]);
+      }
+    });
+    if (foundAt.length >= 2) {
+      shinsal.push({
+        name: "탕화살",
+        nameKo: "탕화살(湯火殺)",
+        basis: "일지",
+        foundAt,
+        branches: branches.filter(b => targets.includes(b)),
+        severity: foundAt.length >= 3 ? "strong" : "present",
+        note: "욱하는 기질과 열정적인 변화"
+      });
+    }
+  }
+
+  // 고신살 & 과숙살 (Solitary God & Widow Star)
+  const solitaryMap: Record<string, { goShin: string, gwaSuk: string }> = {
+    '寅': { goShin: '巳', gwaSuk: '丑' }, '卯': { goShin: '巳', gwaSuk: '丑' }, '辰': { goShin: '巳', gwaSuk: '丑' },
+    '巳': { goShin: '申', gwaSuk: '辰' }, '午': { goShin: '申', gwaSuk: '辰' }, '未': { goShin: '申', gwaSuk: '辰' },
+    '申': { goShin: '亥', gwaSuk: '未' }, '酉': { goShin: '亥', gwaSuk: '未' }, '戌': { goShin: '亥', gwaSuk: '未' },
+    '亥': { goShin: '寅', gwaSuk: '戌' }, '子': { goShin: '寅', gwaSuk: '戌' }, '丑': { goShin: '寅', gwaSuk: '戌' }
+  };
+  const sol = solitaryMap[yearBranch];
+  if (sol) {
+    if (branches.includes(sol.goShin)) {
+      shinsal.push({
+        name: "고신살",
+        nameKo: "고신살(孤神殺)",
+        basis: "년지",
+        foundAt: branches.map((b, i) => b === sol.goShin ? PILLAR_NAMES[i] : "").filter(Boolean),
+        branches: [sol.goShin],
+        severity: "present",
+        note: "자발적 고독과 내면의 탐구"
+      });
+    }
+    if (branches.includes(sol.gwaSuk)) {
+      shinsal.push({
+        name: "과숙살",
+        nameKo: "과숙살(寡宿殺)",
+        basis: "년지",
+        foundAt: branches.map((b, i) => b === sol.gwaSuk ? PILLAR_NAMES[i] : "").filter(Boolean),
+        branches: [sol.gwaSuk],
+        severity: "present",
+        note: "자기 주도적 삶과 독립성"
+      });
+    }
+  }
+
+  // 태극귀인 (Great Polarity)
+  const taiJi: Record<string, string[]> = {
+    '甲': ['子', '午'], '乙': ['子', '午'],
+    '丙': ['卯', '酉'], '丁': ['卯', '酉'],
+    '戊': ['辰', '戌', '丑', '未'], '己': ['辰', '戌', '丑', '未'],
+    '庚': ['寅', '亥'], '辛': ['寅', '亥'],
+    '壬': ['巳', '申'], '癸': ['巳', '申']
+  };
+  if (taiJi[dayStem]) {
+    const targets = taiJi[dayStem];
+    const foundAt: string[] = [];
+    branches.forEach((b, i) => {
+      if (targets.includes(b)) foundAt.push(PILLAR_NAMES[i]);
+    });
+    if (foundAt.length > 0) {
+      shinsal.push({
+        name: "태극귀인",
+        nameKo: "태극귀인(太極貴人)",
+        basis: "일간",
+        foundAt,
+        branches: branches.filter(b => targets.includes(b)),
+        severity: "present",
+        note: "시작과 끝이 좋고 큰 복록을 누림"
+      });
+    }
+  }
+
+  // 암록 (Hidden Prosperity)
+  const anLu: Record<string, string> = {
+    '甲': '亥', '乙': '戌', '丙': '申', '丁': '未', '戊': '申', '己': '未', '庚': '巳', '辛': '辰', '壬': '寅', '癸': '丑'
+  };
+  if (anLu[dayStem]) {
+    const target = anLu[dayStem];
+    const foundAt: string[] = [];
+    branches.forEach((b, i) => {
+      if (b === target) foundAt.push(PILLAR_NAMES[i]);
+    });
+    if (foundAt.length > 0) {
+      shinsal.push({
+        name: "암록",
+        nameKo: "암록(暗祿)",
+        basis: "일간",
+        foundAt,
+        branches: [target],
+        severity: "present",
+        note: "보이지 않는 도움과 예상치 못한 횡재"
+      });
+    }
+  }
+
+  // 천덕귀인 (Heavenly Virtue)
+  const monthBranch = branches[1]; // 월지
+  const tianDeMap: Record<string, string> = {
+    '子': '巳', '丑': '庚', '寅': '丁', '卯': '申', '辰': '壬', '巳': '辛',
+    '午': '亥', '未': '甲', '申': '癸', '酉': '寅', '戌': '丙', '亥': '乙'
+  };
+  if (tianDeMap[monthBranch]) {
+    const target = tianDeMap[monthBranch];
+    const foundAt: string[] = [];
+    stems.forEach((s, i) => { if (s === target) foundAt.push(PILLAR_NAMES[i]); });
+    branches.forEach((b, i) => { if (b === target) foundAt.push(PILLAR_NAMES[i]); });
+    if (foundAt.length > 0) {
+      shinsal.push({
+        name: "천덕귀인",
+        nameKo: "천덕귀인(天德貴人)",
+        basis: "월지",
+        foundAt,
+        branches: branches.filter(b => b === target),
+        severity: "present",
+        note: "하늘의 보살핌으로 흉이 길로 변함"
+      });
+    }
+  }
+
+  // 월덕귀인 (Monthly Virtue)
+  const yueDeMap: Record<string, string> = {
+    '寅': '丙', '午': '丙', '戌': '丙',
+    '亥': '甲', '卯': '甲', '未': '甲',
+    '申': '壬', '子': '壬', '辰': '壬',
+    '巳': '庚', '酉': '庚', '丑': '庚'
+  };
+  if (yueDeMap[monthBranch]) {
+    const target = yueDeMap[monthBranch];
+    const foundAt: string[] = [];
+    stems.forEach((s, i) => { if (s === target) foundAt.push(PILLAR_NAMES[i]); });
+    if (foundAt.length > 0) {
+      shinsal.push({
+        name: "월덕귀인",
+        nameKo: "월덕귀인(月德貴人)",
+        basis: "월지",
+        foundAt,
+        branches: [],
+        severity: "present",
+        note: "매사 순조롭고 인덕이 두터움"
+      });
+    }
+  }
+
   // 백호대살 (White Tiger)
   const baiHu = ['甲辰', '乙未', '丙戌', '丁丑', '戊辰', '己丑', '庚戌', '辛미', '壬진', '癸축', '甲술', '壬술']; // Correcting typos
   const baiHuCorrected = ['甲辰', '乙未', '丙戌', '丁丑', '戊辰', '己丑', '庚戌', '辛未', '壬辰', '癸丑', '甲戌', '壬戌'];

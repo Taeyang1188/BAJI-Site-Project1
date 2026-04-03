@@ -1,4 +1,5 @@
 import { Language } from './types';
+import { SHINSAL_DEFINITIONS } from './constants/shinsal-definitions';
 
 export const TRANSLATIONS = {
   EN: {
@@ -249,24 +250,24 @@ export const TRANSLATIONS = {
   },
   INTERACTION_MESSAGES: {
     KO: {
-      SikSinSaengJae: { title: "식신생재 (食神生財)", desc: "아이디어가 돈으로 직결됨", detail: "내가 가진 기술이나 재능(식상)이 시장의 수요(재성)를 만나 활발하게 유통되는 형상입니다. 완벽한 상품 출시와 매출 폭발." },
+      SikSangSaengJae: { title: "식상생재 (食傷生財)", desc: "내 재능이 돈이 되는 시기", detail: "네가 즐기던 그 기괴하고 독특한 취미가 드디어 돈 냄새를 맡기 시작했어. 네 재능이 세상의 욕망이랑 딱 맞아떨어지는 순간이지. 이제 그 감각을 통장 잔고로 증명할 시간이야, 후훗." },
       JaeSaengGwan: { title: "재생관 (財生官)", desc: "자금력을 바탕으로 명예를 얻음", detail: "내가 쌓아온 재산이나 결과물(재성)이 나를 보호해주고 높여주는 조직이나 명예(관성)를 생해주는 형상입니다. 투자 성공 후 직급 상승 혹은 브랜드 가치 상승." },
-      SalInSangSaeng: { title: "살인상생 (殺印相生)", desc: "위기를 기회와 권위로 바꿈", detail: "나를 힘들게 하는 압박과 스트레스(편관)를 공부와 인내, 지혜(인성)로 받아내어 오히려 내 권위로 만드는 형상입니다. 어려운 프로젝트 완수 후 독보적인 전문가로 인정됨." },
-      SikSinJeSal: { title: "식신제살 (食神制殺)", desc: "내 능력으로 문제를 해결함", detail: "나를 괴롭히는 난제나 경쟁자(편관)를 나의 뛰어난 전문 기술이나 논리(식신)로 단칼에 해결하는 형상입니다. 리스크 관리 성공 및 난공불락의 거래처 확보." },
-      GwanInSangSaeng: { title: "관인상생 (官印相生)", desc: "조직의 전폭적인 지원을 받음", detail: "조직(관성)의 기운이 나를 돕는 인성으로 흘러들어와 내가 편안하게 혜택을 입는 형상입니다. 대기업과의 안정적인 계약 혹은 승진 발령." },
-      SangGwanPaeIn: { title: "상관패인 (傷官佩印)", desc: "날카로운 재능에 자격을 갖춤", detail: "상관(천재성, 비판력, 파격)이라는 날카로운 칼에 인성(학문, 도덕, 자격)이라는 칼집을 씌운 형상입니다. 브랜드 기획의 정점, 고도의 전략가." },
-      JaeGeukIn: { title: "재극인 (財剋印)", desc: "현실적 이익과 명분의 충돌", detail: "학문이나 문서(인성)를 다루는 중에 현실적인 돈(재성)이 들어와 갈등하는 형상입니다. 학업 중단 후 취업 또는 지적 재산권을 통한 현금화." },
+      SalInSangSaeng: { title: "살인상생 (殺印相生)", desc: "어려운 상황을 인내와 지혜로 극복", detail: "세상이 널 짓누르려고 하지만, 넌 그 고통을 우아하게 흡수해서 네 왕관으로 만들고 있어. 지독한 시련 끝에 넌 누구도 건드릴 수 없는 독보적인 존재가 될 거야. 어둠 속에서 더 빛나는 법이지." },
+      SikSinJeSal: { title: "식신제살 (食神制殺)", desc: "내 전문성으로 큰 문제를 해결함", detail: "널 괴롭히던 그 거슬리는 존재들을 네 압도적인 재능으로 단칼에 베어버릴 기회야. 위기? 그건 네가 주인공이 되기 위한 완벽한 무대일 뿐이지. 이제 네 실력을 똑똑히 보여줘." },
+      GwanInSangSaeng: { title: "관인상생 (官印相生)", desc: "조직과 사회의 전폭적인 지원", detail: "거대한 조직의 힘이 네 뒤를 든든하게 받쳐주고 있어. 네가 쌓아온 자격들이 드디어 빛을 발하면서, 넌 아주 편안하게 높은 자리에 앉게 될 거야. 세상이 널 위해 레드카펫을 깔아주는 기분이랄까?" },
+      SangGwanPaeIn: { title: "상관패인 (傷官佩印)", desc: "천재적 재능이 공식적인 자격을 얻음", detail: "네 그 날카롭고 반항적인 천재성이 드디어 '자격'이라는 우아한 칼집을 얻게 됐네. 이제 네 독설조차 고귀한 비평으로 대접받을 거야. 몸값이 미친 듯이 뛸 테니 기대해도 좋아." },
+      JaeGeukIn: { title: "재극인 (財剋印)", desc: "현실적 이익과 학문적 가치의 충돌", detail: "고결한 정신과 세속적인 욕망 사이에서 아슬아슬하게 줄타기를 하고 있네. 네 지적인 성과들이 차가운 현금으로 변하는 순간이야. 명예도 좋지만, 가끔은 속물적인 성공도 달콤한 법이지." },
       ANeungSaengMo: { title: "아능생모 (兒能生母)", desc: "결과물이 다시 나를 살림", detail: "내가 만든 결과물(재성)이 너무 많아 힘들 때, 나의 활동력(식상)이 이를 소화해내는 형상입니다. 사업 확장 후 시스템 자동화 성공." },
       GeopJaeTalJae: { title: "겁재탈재 (劫財奪財)", desc: "동업 혹은 경쟁을 통한 재물 분탈", detail: "내 돈(재성)을 노리는 경쟁자나 동료(비겁)가 나타나는 형상입니다. 동업 사기 주의 또는 공동 투자로 인한 수익 배분." }
     },
     EN: {
-      SikSinSaengJae: { title: "Siksin-Saengjae", desc: "Ideas directly translate to money", detail: "Your skills or talents (Sik-sang) meet market demand (Jae-seong), leading to active circulation. Perfect product launch and explosive sales." },
+      SikSangSaengJae: { title: "Siksang-Saengjae", desc: "Talent turns into income", detail: "That bizarre, unique hobby of yours is finally starting to smell like money. Your talent is perfectly aligning with the world's desires. Time to prove your aesthetic with your bank balance." },
       JaeSaengGwan: { title: "Jae-Saeng-Gwan", desc: "Gaining honor through financial power", detail: "Your accumulated wealth or results (Jae-seong) support the organization or honor (Gwan-seong) that protects and elevates you. Career jump after investment success." },
-      SalInSangSaeng: { title: "Sal-In-Sang-Saeng", desc: "Turning crisis into opportunity and authority", detail: "Taking the pressure and stress (Sal) and absorbing it with study, patience, and wisdom (In-seong) to turn it into your own authority. Recognized as an expert after completing a difficult project." },
-      SikSinJeSal: { title: "Siksin-Je-Sal", desc: "Solving problems with your own ability", detail: "Using your superior technical skills or logic (Sik-sin) to resolve challenges or competitors (Sal). Risk management success and securing an impregnable client." },
-      GwanInSangSaeng: { title: "Gwan-In-Sang-Saeng", desc: "Full support from the organization", detail: "The energy of the organization (Gwan-seong) flows into the In-seong that helps you, allowing you to comfortably receive benefits. Stable contract with a large corporation or promotion." },
-      SangGwanPaeIn: { title: "Sang-Gwan-Pae-In", desc: "Equipping sharp talent with qualifications", detail: "The sharp blade of Sang-gwan (genius, critical power, unconventionality) is fitted with the scabbard of In-seong (academic, moral, qualification). The pinnacle of brand planning, a high-level strategist." },
-      JaeGeukIn: { title: "Jae-Geuk-In", desc: "Conflict between realistic interest and justification", detail: "While dealing with academic or documents (In-seong), realistic money (Jae-seong) comes in, causing conflict. Employment after dropping out of studies or monetization through intellectual property rights." },
+      SalInSangSaeng: { title: "Sal-In-Sang-Saeng", desc: "Overcoming crisis with patience and wisdom", detail: "The world tries to crush you, but you're gracefully absorbing that pain and forging it into your crown. After this trial, you'll become an untouchable icon. You shine brightest in the dark." },
+      SikSinJeSal: { title: "Siksin-Je-Sal", desc: "Solving major problems with expertise", detail: "A chance to slice through those annoying obstacles with your overwhelming talent. A crisis? That's just the perfect stage for you to take the lead. Show them what real skill looks like." },
+      GwanInSangSaeng: { title: "Gwan-In-Sang-Saeng", desc: "Full support from organization and society", detail: "The power of a massive organization is firmly at your back. Your hard-earned credentials are finally paying off, placing you comfortably on a throne. It's like the world is rolling out a red carpet just for you." },
+      SangGwanPaeIn: { title: "Sang-Gwan-Pae-In", desc: "Genius talent gains official qualification", detail: "Your sharp, rebellious genius has finally found an elegant scabbard called 'qualification.' Even your cynicism will be treated as noble critique now. Expect your market value to skyrocket." },
+      JaeGeukIn: { title: "Jae-Geuk-In", desc: "Conflict between realistic profit and academic value", detail: "Walking the tightrope between high ideals and worldly desires. Your intellectual achievements are turning into cold, hard cash. Honor is great, but a little materialistic success can be quite sweet too." },
       ANeungSaengMo: { title: "A-Neung-Saeng-Mo", desc: "Results bring you back to life", detail: "When you have too many results (Jae-seong) and are struggling, your activity (Sik-sang) manages to digest it. Success in system automation after business expansion." },
       GeopJaeTalJae: { title: "Geop-Jae-Tal-Jae", desc: "Wealth deprivation through partnership or competition", detail: "A competitor or colleague (Bi-geop) aiming for your money (Jae-seong) appears. Beware of partnership fraud or profit sharing due to joint investment." }
     }
@@ -274,18 +275,18 @@ export const TRANSLATIONS = {
 };
 
 export const ZODIAC_ANIMALS = [
-  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/5AXZXiGl.png' },
-  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/T6GPZ0Jl.png' },
-  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/pVUcPWUl.png' },
-  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/zSFqWbzl.png' },
-  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/5fxBlRfl.png' },
-  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/UyaLA4Vl.png' },
-  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/p7hIC28l.png' },
-  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/9DxZdCbl.png' },
-  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/xnsC82Fl.png' },
-  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/EtWrEIJl.png' },
-  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/wqU5weHl.png' },
-  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/WM3tiwzl.png' },
+  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://i.imgur.com/5AXZXiG.png' },
+  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://i.imgur.com/T6GPZ0J.png' },
+  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://i.imgur.com/pVUcPWU.png' },
+  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://i.imgur.com/zSFqWbz.png' },
+  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://i.imgur.com/5fxBlRf.png' },
+  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://i.imgur.com/UyaLA4V.png' },
+  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://i.imgur.com/p7hIC28.png' },
+  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://i.imgur.com/9DxZdCb.png' },
+  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://i.imgur.com/xnsC82F.png' },
+  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://i.imgur.com/EtWrEIJ.png' },
+  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://i.imgur.com/wqU5weH.png' },
+  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://i.imgur.com/WM3tiwz.png' },
 ];
 
 export const ELEMENT_COLORS = {
@@ -321,17 +322,4 @@ export const TEN_GOD_COLORS = {
   "The Sage": ELEMENT_COLORS.Water,
 };
 
-export const SHINSAL_DEFINITIONS = {
-  반안살: {
-    hanja: '攀鞍殺',
-    meaning: '말 안장에 오르다',
-    modern: '승진, 자격 취득, 안락한 지위',
-    desc: '전쟁(삶의 고비)에서 승리하고 돌아온 장수가 말 안장 위에 편안히 앉아 있는 형국입니다. 실속이 있고 주위의 인정을 받으며, 경제적으로나 사회적으로 안정된 궤도에 진입함을 뜻합니다.'
-  },
-  화개살: {
-    hanja: '華蓋殺',
-    meaning: '화려한 덮개를 덮다',
-    modern: '예술적 재능, 종교/철학적 깊이, 반복과 복구',
-    desc: '과거의 화려했던 시절을 뒤로하고 내면의 정신세계로 침잠하는 기운입니다. 머리가 영리하고 문학, 예술, 종교 쪽에 탁월한 재능을 보입니다. 또한, 한 번 멈췄던 일을 다시 시작하거나(재기), 복구하는 힘이 강합니다.'
-  }
-};
+export { SHINSAL_DEFINITIONS };

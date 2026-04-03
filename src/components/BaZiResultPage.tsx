@@ -51,13 +51,16 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
                 3. <strong>정신적/형이상학적 발달:</strong> 현실적인 힘은 약해지지만, 대신 정신적, 철학적, 예술적 기운이 맑아집니다.
               </p>
               
-              <div>
-                <strong className="text-white/90">궁성(자리)에 따른 의미:</strong>
-                <ul className="list-disc pl-4 mt-1 space-y-1">
-                  {affectedPillars.includes('년주') && <li><strong>년주(Year):</strong> 조상의 덕이 부족하거나 고향을 떠나 자수성가해야 할 수 있습니다.</li>}
-                  {affectedPillars.includes('월주') && <li><strong>월주(Month):</strong> 부모, 형제의 덕이 약하며 사회 생활이나 직장 운에서 정착이 어려울 수 있습니다.</li>}
-                  {affectedPillars.includes('일주') && <li><strong>일주(Day):</strong> 본인의 내면적 공허함이 있거나 배우자와의 인연이 약할 수 있습니다.</li>}
-                  {affectedPillars.includes('시주') && <li><strong>시주(Hour):</strong> 노년의 고독이나 자식과의 인연이 박할 수 있으며, 일의 최종 결과물이 허무할 수 있습니다.</li>}
+              <div className="p-4 bg-neon-pink/5 rounded-xl border border-neon-pink/20 shadow-[0_0_15px_rgba(255,20,147,0.05)]">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] bg-neon-pink/20 text-neon-pink px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Personalized</span>
+                  <strong className="text-white/90">궁성(자리)에 따른 나의 공망 의미:</strong>
+                </div>
+                <ul className="list-disc pl-4 space-y-2">
+                  {affectedPillars.includes('년주') && <li><strong className="text-neon-pink/90">년주(Year):</strong> 조상의 덕이 부족하거나 고향을 떠나 자수성가해야 할 수 있습니다.</li>}
+                  {affectedPillars.includes('월주') && <li><strong className="text-neon-pink/90">월주(Month):</strong> 부모, 형제의 덕이 약하며 사회 생활이나 직장 운에서 정착이 어려울 수 있습니다.</li>}
+                  {affectedPillars.includes('일주') && <li><strong className="text-neon-pink/90">일주(Day):</strong> 본인의 내면적 공허함이 있거나 배우자와의 인연이 약할 수 있습니다.</li>}
+                  {affectedPillars.includes('시주') && <li><strong className="text-neon-pink/90">시주(Hour):</strong> 노년의 고독이나 자식과의 인연이 박할 수 있으며, 일의 최종 결과물이 허무할 수 있습니다.</li>}
                 </ul>
               </div>
 
@@ -96,13 +99,16 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
               3. <strong>Spiritual/Metaphysical Development:</strong> While realistic power weakens, spiritual, philosophical, and artistic energies become clearer.
             </p>
             
-            <div>
-              <strong className="text-white/90">Meaning by Pillar Position:</strong>
-              <ul className="list-disc pl-4 mt-1 space-y-1">
-                {affectedPillars.includes('년주') && <li><strong>Year Pillar:</strong> Lack of ancestral benefits; may need to leave home and succeed independently.</li>}
-                {affectedPillars.includes('월주') && <li><strong>Month Pillar:</strong> Weak benefits from parents/siblings; may face challenges settling in society or career.</li>}
-                {affectedPillars.includes('일주') && <li><strong>Day Pillar:</strong> Inner emptiness or weak karmic ties/alignment with a spouse.</li>}
-                {affectedPillars.includes('시주') && <li><strong>Hour Pillar:</strong> Solitude in old age, weak ties with children, or feeling empty about final outcomes.</li>}
+            <div className="p-4 bg-neon-pink/5 rounded-xl border border-neon-pink/20 shadow-[0_0_15px_rgba(255,20,147,0.05)]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] bg-neon-pink/20 text-neon-pink px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Personalized</span>
+                <strong className="text-white/90">Meaning by Pillar Position in Your Chart:</strong>
+              </div>
+              <ul className="list-disc pl-4 space-y-2">
+                {affectedPillars.includes('년주') && <li><strong className="text-neon-pink/90">Year Pillar:</strong> Lack of ancestral benefits; may need to leave home and succeed independently.</li>}
+                {affectedPillars.includes('월주') && <li><strong className="text-neon-pink/90">Month Pillar:</strong> Weak benefits from parents/siblings; may face challenges settling in society or career.</li>}
+                {affectedPillars.includes('일주') && <li><strong className="text-neon-pink/90">Day Pillar:</strong> Inner emptiness or weak karmic ties/alignment with a spouse.</li>}
+                {affectedPillars.includes('시주') && <li><strong className="text-neon-pink/90">Hour Pillar:</strong> Solitude in old age, weak ties with children, or feeling empty about final outcomes.</li>}
               </ul>
             </div>
 
@@ -464,9 +470,91 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const currentCycle = result.grandCycles[result.currentCycleIndex] || result.grandCycles[0];
   const dayMaster = result.pillars[1].stem;
   
+  const currentYear = new Date().getFullYear();
+  const currentAnnualPillar = React.useMemo(() => {
+    if (!currentCycle.annualPillars) return null;
+    return currentCycle.annualPillars.find(ap => ap.year === currentYear) || currentCycle.annualPillars[0];
+  }, [currentCycle, currentYear]);
+
   const tenGod = React.useMemo(() => {
     return calculateTenGods(dayMaster, currentCycle.element);
   }, [dayMaster, currentCycle.element]);
+
+  const cycleVibe = React.useMemo(() => {
+    if (!currentAnnualPillar) {
+      return ((t.comments[currentCycle.element as keyof typeof t.comments] as any)?.[tenGod] || 
+              (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean);
+    }
+
+    const daewoonGodEn = currentCycle.stemTenGodEn || '';
+    const daewoonGodKo = currentCycle.stemTenGodKo || '';
+    const sewoonGodEn = currentAnnualPillar.stemTenGodEn || '';
+    const sewoonGodKo = currentAnnualPillar.stemTenGodKo || '';
+
+    const d = `${daewoonGodEn} ${daewoonGodKo}`;
+    const s = `${sewoonGodEn} ${sewoonGodKo}`;
+
+    // Check for specific interactions between Daewoon and Sewoon
+    const interactions = [
+      {
+        // 상관패인: 상관(Rebel) + 인성(Sage/Mystic)
+        condition: (d: string, s: string) => 
+          ((d.includes('Rebel') || d.includes('상관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
+          ((s.includes('Rebel') || s.includes('상관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
+        key: 'SangGwanPaeIn'
+      },
+      {
+        // 재극인: 재성(Maverick/Architect) + 인성(Sage/Mystic)
+        condition: (d: string, s: string) => 
+          ((d.includes('Maverick') || d.includes('Architect') || d.includes('편재') || d.includes('정재')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
+          ((s.includes('Maverick') || s.includes('Architect') || s.includes('편재') || s.includes('정재')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
+        key: 'JaeGeukIn'
+      },
+      {
+        // 식상생재: 식상(Artist/Rebel) + 재성(Maverick/Architect)
+        condition: (d: string, s: string) => 
+          ((d.includes('Artist') || d.includes('Rebel') || d.includes('식신') || d.includes('상관')) && (s.includes('Maverick') || s.includes('Architect') || s.includes('편재') || s.includes('정재'))) || 
+          ((s.includes('Artist') || s.includes('Rebel') || s.includes('식신') || s.includes('상관')) && (d.includes('Maverick') || d.includes('Architect') || d.includes('편재') || d.includes('정재'))),
+        key: 'SikSangSaengJae'
+      },
+      {
+        // 관인상생: 관성(Warrior/Judge) + 인성(Sage/Mystic)
+        condition: (d: string, s: string) => 
+          ((d.includes('Warrior') || d.includes('Judge') || d.includes('편관') || d.includes('정관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
+          ((s.includes('Warrior') || s.includes('Judge') || s.includes('편관') || s.includes('정관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
+        key: 'GwanInSangSaeng'
+      },
+      {
+        // 식신제살: 식신(Artist) + 편관(Warrior)
+        condition: (d: string, s: string) => 
+          ((d.includes('Artist') || d.includes('식신')) && (s.includes('Warrior') || s.includes('편관'))) || 
+          ((s.includes('Artist') || s.includes('식신')) && (d.includes('Warrior') || d.includes('편관'))),
+        key: 'SikSinJeSal'
+      },
+      {
+        // 살인상생: 편관(Warrior) + 인성(Sage/Mystic)
+        condition: (d: string, s: string) => 
+          ((d.includes('Warrior') || d.includes('편관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
+          ((s.includes('Warrior') || s.includes('편관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
+        key: 'SalInSangSaeng'
+      }
+    ];
+
+    for (const inter of interactions) {
+      if (inter.condition(d, s)) {
+        const msg = (TRANSLATIONS.INTERACTION_MESSAGES as any)[lang][inter.key];
+        if (msg) {
+          if (lang === 'KO') {
+            return `있잖아, 지금 네 대운의 '${daewoonGodKo}'이랑 올해 세운의 '${sewoonGodKo}'이 만났어. 그래서 ${currentAnnualPillar.year}년인 올해 너는 '${msg.title}'의 효과를 제대로 받고 있는 중이야. ${msg.detail}`;
+          }
+          return `Hey, your Major Cycle's '${daewoonGodEn}' met this year's '${sewoonGodEn}'. So in ${currentAnnualPillar.year}, you're feeling the effects of '${msg.title}'. ${msg.detail}`;
+        }
+      }
+    }
+
+    return ((t.comments[currentCycle.element as keyof typeof t.comments] as any)?.[tenGod] || 
+            (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean);
+  }, [currentCycle, currentAnnualPillar, tenGod, lang]);
 
   const getLifeStage = (age: number) => {
     const stages = t.lifeStages;
@@ -502,8 +590,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             <div className="text-[10px] text-white/30 italic">{t.seasonVibeDisclaimer}</div>
           </div>
           <p className="text-lg font-display italic text-white leading-relaxed">
-            "{((t.comments[currentCycle.element as keyof typeof t.comments] as any)?.[tenGod] || 
-               (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean)}"
+            "{cycleVibe}"
           </p>
         </div>
       </motion.div>
@@ -1128,6 +1215,9 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         <div className="flex items-center gap-3 mb-4 cursor-help">
                           <div className="h-[1px] w-8 bg-yellow-400/50"></div>
                           <h4 className="text-sm font-display font-medium text-yellow-400 uppercase tracking-[0.2em]">{lang === 'KO' ? '신살 및 공망 (Divine Stars & Void)' : 'Divine Stars & Void'}</h4>
+                          <span className="text-[10px] text-yellow-400/50 italic font-sans">
+                            {lang === 'KO' ? '*밝게 빛나는 별일수록 영향력이 더 강력해' : '*Brighter stars indicate a stronger influence'}
+                          </span>
                           <div className="h-[1px] flex-1 bg-gradient-to-r from-yellow-400/20 to-transparent"></div>
                         </div>
                       </BaziTooltip>
@@ -1136,7 +1226,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                           <div className="flex flex-wrap gap-3">
                             {result.analysis.shinsal.map((star, i) => {
                               const shinsalName = getShinsalName(star.name);
-                              const definition = SHINSAL_DEFINITIONS[shinsalName as keyof typeof SHINSAL_DEFINITIONS];
+                              const definition = SHINSAL_DEFINITIONS[star.name as keyof typeof SHINSAL_DEFINITIONS];
                               
                               return (
                                 <BaziTooltip 
