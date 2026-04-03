@@ -15,7 +15,7 @@ export const TRANSLATIONS = {
       ]
     },
     input: {
-      title: "SOUL EXTRACTION",
+      title: "PEER INTO YOUR DESTINY",
       name: "IDENTIFY YOURSELF",
       birthDate: "TEMPORAL ORIGIN",
       birthTime: "THE PRECISE SECOND",
@@ -138,7 +138,7 @@ export const TRANSLATIONS = {
       ]
     },
     input: {
-      title: "영혼 추출",
+      title: "네 운명을 들여다볼 시간이야",
       name: "자신을 식별하세요",
       birthDate: "시간적 기원",
       birthTime: "정확한 시간",

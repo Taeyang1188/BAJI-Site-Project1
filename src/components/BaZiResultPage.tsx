@@ -469,6 +469,33 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
     return name.startsWith('The ') ? name.slice(4) : name;
   };
 
+  const getDetailedTenGod = (dm: string, target: string) => {
+    const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    
+    const dmIdx = stems.indexOf(dm);
+    const targetIdx = stems.indexOf(target);
+    
+    if (dmIdx === -1 || targetIdx === -1) return { ko: '?', en: '?' };
+    
+    const dmElemIdx = Math.floor(dmIdx / 2);
+    const targetElemIdx = Math.floor(targetIdx / 2);
+    
+    const diff = (targetElemIdx - dmElemIdx + 5) % 5;
+    const samePolarity = (dmIdx % 2) === (targetIdx % 2);
+    
+    const tenGodsMap: Record<number, [string, string]> = {
+      0: samePolarity ? ['비견', 'Mirror'] : ['겁재', 'Rival'],
+      1: samePolarity ? ['식신', 'Artist'] : ['상관', 'Rebel'],
+      2: samePolarity ? ['편재', 'Maverick'] : ['정재', 'Architect'],
+      3: samePolarity ? ['편관', 'Warrior'] : ['정관', 'Judge'],
+      4: samePolarity ? ['편인', 'Mystic'] : ['정인', 'Sage'],
+    };
+    
+    const [ko, en] = tenGodsMap[diff] || ['?', '?'];
+    return { ko, en };
+  };
+
   const getTenGodColor = (name: string) => {
     return TEN_GOD_COLORS[name as keyof typeof TEN_GOD_COLORS] || '#FFFFFF';
   };
@@ -612,82 +639,123 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
           </button>
         </div>
         <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4">
-          {result.pillars.map((pillar, i) => (
-            <motion.div
-              key={`stem-${i}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden"
-              style={{ borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
-            >
-              <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
-                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
-                  <PolarityIcon polarity={pillar.stemPolarity} size={8} />
-                </div>
-                <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
-                  {lang === 'KO' ? 
-                    (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
-                    `${pillar.title} Stem`}
-                </div>
-                <div className="text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight min-h-[2.4em] sm:min-h-[3.2em] flex flex-col justify-center">
-                  {lang === 'KO' ? 
-                    (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
-                    (showHanja ? `${pillar.stem} (${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem})` : (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
-                      <div key={idx} className="text-[10px] sm:text-base md:text-xl">{word}</div>
-                    )))}
-                </div>
-              </div>
-              <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
-                <div 
-                  className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
-                  style={{ color: getTenGodColor(lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName) }}
-                >
-                  {lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4">
           {result.pillars.map((pillar, i) => {
             const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
+            const branchData = BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches];
+            const hiddenStems = branchData?.hiddenStems || [];
+            const isDayPillar = pillar.title === 'Day';
+            const pillarName = lang === 'KO' ? 
+              (pillar.title === 'Year' ? '연주' : pillar.title === 'Month' ? '월주' : pillar.title === 'Day' ? '일주' : '시주') : 
+              `${pillar.title} Pillar`;
+
             return (
-              <motion.div
-                key={`branch-${i}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: (i + 4) * 0.05 }}
-                className="goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden"
-                style={{ borderColor: ELEMENT_COLORS[BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
-              >
-                <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
-                  <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
-                    <PolarityIcon polarity={pillar.branchPolarity} size={8} />
+              <div key={`pillar-${i}`} className="flex flex-col gap-1 sm:gap-2">
+                <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest ${isDayPillar ? 'text-neon-cyan' : 'text-white/40'}`}>
+                  {pillarName}
+                </div>
+                {/* Stem Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={`goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''}`}
+                  style={{ borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
+                >
+                  <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                      <PolarityIcon polarity={pillar.stemPolarity} size={8} />
+                    </div>
+                    <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
+                      {lang === 'KO' ? 
+                        (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
+                        `${pillar.title} Stem`}
+                    </div>
+                    <div className="text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight min-h-[2.4em] sm:min-h-[3.2em] flex flex-col justify-center">
+                      {lang === 'KO' ? 
+                        (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
+                        (showHanja ? `${pillar.stem} (${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem})` : (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
+                          <div key={idx} className="text-[10px] sm:text-base md:text-xl">{word}</div>
+                        )))}
+                    </div>
                   </div>
-                  <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
-                    {lang === 'KO' ? 
-                      (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
-                      `${pillar.title} Branch`}
+                  <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
+                    <div 
+                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
+                      style={{ color: getTenGodColor(lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName) }}
+                    >
+                      {lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)}
+                    </div>
                   </div>
-                  <div className="text-base sm:text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.2em] sm:min-h-[1.6em] flex flex-col justify-center">
-                    {lang === 'KO' ? 
-                      (showHanja ? `${pillar.branch}(${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch})` : `${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko || pillar.branch}`) : 
-                      (showHanja ? `${pillar.branch} (${BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch})` : (BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.en || pillar.branch))}
+                </motion.div>
+
+                {/* Branch Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (i + 4) * 0.05 }}
+                  className={`goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden ${isDayPillar ? 'ring-1 ring-neon-cyan/10' : ''}`}
+                  style={{ borderColor: ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
+                >
+                  <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative">
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                      <PolarityIcon polarity={pillar.branchPolarity} size={8} />
+                    </div>
+                    <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
+                      {lang === 'KO' ? 
+                        (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
+                        `${pillar.title} Branch`}
+                    </div>
+                    <div className="text-base sm:text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.2em] sm:min-h-[1.6em] flex flex-col justify-center">
+                      {lang === 'KO' ? 
+                        (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
+                        (showHanja ? `${pillar.branch} (${branchData?.en || pillar.branch})` : (branchData?.en || pillar.branch))}
+                    </div>
+                    <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
+                      {lang === 'KO' ? lifeStage?.ko : lifeStage?.en}
+                    </div>
                   </div>
-                  <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
-                    {lang === 'KO' ? lifeStage.ko : lifeStage.en}
+                  <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
+                    <div 
+                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
+                      style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
+                    >
+                      {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Hidden Stems (지장간) */}
+                <div className="flex flex-col gap-0.5 sm:gap-1 mt-1">
+                  <div className="text-[7px] sm:text-[9px] text-white/30 uppercase font-bold text-center">
+                    {lang === 'KO' ? '지장간' : 'Hidden'}
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-0.5 sm:gap-1">
+                    {hiddenStems.map((hs, idx) => {
+                      const hsData = BAZI_MAPPING.stems[hs as keyof typeof BAZI_MAPPING.stems];
+                      const hsTenGod = getDetailedTenGod(dayMaster, hs);
+                      return (
+                        <div 
+                          key={idx}
+                          className="flex flex-col items-center p-0.5 sm:p-1 rounded bg-white/5 border border-white/10 min-w-[20px] sm:min-w-[28px]"
+                        >
+                          <div 
+                            className="text-[9px] sm:text-xs font-gothic"
+                            style={{ color: ELEMENT_COLORS[hsData?.element as keyof typeof ELEMENT_COLORS] }}
+                          >
+                            {showHanja ? hs : (lang === 'KO' ? hsData?.ko : hsData?.en.charAt(0))}
+                          </div>
+                          <div 
+                            className="text-[6px] sm:text-[8px] font-bold tracking-tighter opacity-70"
+                            style={{ color: getTenGodColor(hsTenGod.ko) }}
+                          >
+                            {lang === 'KO' ? hsTenGod.ko : hsTenGod.en.substring(0, 2)}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
-                  <div 
-                    className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
-                    style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
-                  >
-                    {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
-                  </div>
-                </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
