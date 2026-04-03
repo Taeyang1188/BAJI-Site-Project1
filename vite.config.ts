@@ -9,9 +9,12 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  
+  // GitHub Actions 환경인 경우 저장소 이름을 base로 사용, 아니면 '/'
+  const repoName = process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/';
+
   return {
-    // 🚩 이 부분을 추가해야 깃허브 페이지에서 경로를 제대로 찾습니다!
-    base: './', 
+    base: repoName, 
     
     plugins: [react(), tailwindcss()],
     define: {
