@@ -104,6 +104,7 @@ const HorizontalDial = ({
                       src={getImagePath(item)} 
                       alt={item.name} 
                       className="w-full h-full object-contain" 
+                      loading="lazy"
                       style={{ 
                         filter: isCenter 
                           ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 

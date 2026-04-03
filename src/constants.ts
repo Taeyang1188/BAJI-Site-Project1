@@ -274,18 +274,18 @@ export const TRANSLATIONS = {
 };
 
 export const ZODIAC_ANIMALS = [
-  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://i.imgur.com/5AXZXiG.png' },
-  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://i.imgur.com/T6GPZ0J.png' },
-  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://i.imgur.com/pVUcPWU.png' },
-  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://i.imgur.com/zSFqWbz.png' },
-  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://i.imgur.com/5fxBlRf.png' },
-  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://i.imgur.com/UyaLA4V.png' },
-  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://i.imgur.com/p7hIC28.png' },
-  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://i.imgur.com/9DxZdCb.png' },
-  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://i.imgur.com/xnsC82F.png' },
-  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://i.imgur.com/EtWrEIJ.png' },
-  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://i.imgur.com/wqU5weH.png' },
-  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://i.imgur.com/WM3tiwz.png' },
+  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/5AXZXiGl.png' },
+  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/T6GPZ0Jl.png' },
+  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/pVUcPWUl.png' },
+  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/zSFqWbzl.png' },
+  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/5fxBlRfl.png' },
+  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/UyaLA4Vl.png' },
+  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/p7hIC28l.png' },
+  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/9DxZdCbl.png' },
+  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/xnsC82Fl.png' },
+  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/EtWrEIJl.png' },
+  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/wqU5weHl.png' },
+  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://cdn.statically.io/img/i.imgur.com/WM3tiwzl.png' },
 ];
 
 export const ELEMENT_COLORS = {
