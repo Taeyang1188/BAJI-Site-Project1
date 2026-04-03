@@ -303,7 +303,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
         return `Your soul matrix is dominated by the energy of ${dominant.name}. This powerful force engraved in your cybernetic core drives you relentlessly, but ${missing.length > 0 ? 'the lack of ' + missing.join(', ') + ' may cause system overloads.' : 'all elements are balanced, boasting stable output.'} Control the clashing energies and ignite your own neon lights.`;
       }
     }
-    const { geJu, yongShen } = result.analysis;
+    const { geJu, yongShen, structureDetail } = result.analysis;
+    if (structureDetail) {
+      if (lang === 'KO') {
+        return `${structureDetail.title} (${structureDetail.category === 'Standard' ? '내격' : '종격'})으로 태어났습니다. ${structureDetail.marketingMessage} ${yongShen}을 삶의 핵심 에너지로 사용합니다.`;
+      }
+      return `Born with ${structureDetail.enTitle} (${structureDetail.category} Alignment). ${structureDetail.enMarketingMessage} Utilizing ${yongShen} as your primary cosmic driver.`;
+    }
     if (lang === 'KO') {
       return `${geJu}으로 태어나 ${yongShen}을 삶의 핵심 에너지로 사용합니다.`;
     }
@@ -1012,9 +1018,28 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         </div>
                       </BaziTooltip>
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-3 h-full">
-                        <div className="flex justify-between items-start gap-4">
-                          <span className="text-white/60 text-xs shrink-0 pt-0.5">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
-                          <span className="text-white font-bold text-right">{lang === 'KO' ? result.analysis.geJu : (BAZI_MAPPING.geju[result.analysis.geJu as keyof typeof BAZI_MAPPING.geju]?.en || result.analysis.geJu)}</span>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-between items-start gap-4">
+                            <span className="text-white/60 text-xs shrink-0 pt-0.5">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
+                            <div className="text-right">
+                              <span className="text-white font-bold block">
+                                {result.analysis.structureDetail 
+                                  ? (lang === 'KO' ? result.analysis.structureDetail.title : result.analysis.structureDetail.enTitle)
+                                  : (lang === 'KO' ? result.analysis.geJu : (BAZI_MAPPING.geju[result.analysis.geJu as keyof typeof BAZI_MAPPING.geju]?.en || result.analysis.geJu))
+                                }
+                              </span>
+                              {result.analysis.structureDetail && (
+                                <span className="text-[10px] text-neon-pink/70 font-medium uppercase tracking-wider">
+                                  {result.analysis.structureDetail.category === 'Standard' ? (lang === 'KO' ? '내격' : 'Standard') : (lang === 'KO' ? '종격/전왕격' : 'Special')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {result.analysis.structureDetail && (
+                            <div className="mt-1 p-2 bg-white/5 rounded border border-white/10 text-[10px] leading-relaxed text-white/60 italic">
+                              {result.analysis.structureDetail.logicNote}
+                            </div>
+                          )}
                         </div>
                         <div className="flex justify-between items-start gap-4">
                           <BaziTooltip content={BAZI_MAPPING.tooltips.dayMasterStrength} lang={lang}>

@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import tzlookup from 'tz-lookup';
 import { UserInput, BaZiResult, BaZiCard, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
-import { calculateGeJu, calculateTenGodsRatio } from './bazi-analysis';
+import { calculateGeJu, calculateTenGodsRatio, determineStructure } from './bazi-analysis';
 import { calculateInteractions as calculateDetailedInteractions } from './bazi-interactions';
 import { detectShinsal } from './bazi-shinsal';
 import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan } from './bazi-yongshin';
@@ -434,10 +434,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   });
 
   const geJu = calculateGeJu(dayGan, monthZhi, lang);
+  const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
   
   // New detailed calculations
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
   const strength = calcDayMasterStrength(allStems, allBranches);
+  const structureDetail = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
+
   const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength);
   const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);
   
@@ -447,8 +450,6 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   
   if (byeongYak) yongshinDetail.byeongYak = byeongYak;
   if (tongGwan) yongshinDetail.tongGwan = tongGwan;
-
-  const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
 
   let translatedGod = yongshinDetail.primary.god;
   let translatedElement = yongshinDetail.primary.element;
@@ -483,7 +484,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       gongmang: shinsalResult.gongmang,
       tenGodsRatio,
       dayMasterStrength: strength,
-      yongshinDetail
+      yongshinDetail,
+      structureDetail
     }
   };
 } catch (error) {

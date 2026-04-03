@@ -97,5 +97,15 @@ export interface BaZiResult {
     tenGodsRatio: Record<string, number>;
     dayMasterStrength: any;
     yongshinDetail: any;
+    structureDetail?: {
+      title: string;
+      enTitle: string;
+      category: string;
+      description: string;
+      enDescription: string;
+      marketingMessage: string;
+      enMarketingMessage: string;
+      logicNote: string;
+    };
   };
 }
