@@ -367,6 +367,7 @@ export default function App() {
                       <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
                       <input 
                         type="date"
+                        lang={lang === 'EN' ? 'en-US' : 'ko-KR'}
                         value={userInput.birthDate}
                         onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all [color-scheme:dark] text-right sm:text-left appearance-none"
@@ -399,6 +400,7 @@ export default function App() {
                       <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
                       <input 
                         type="time"
+                        lang={lang === 'EN' ? 'en-US' : 'ko-KR'}
                         value={userInput.birthTime}
                         onChange={(e) => setUserInput({ ...userInput, birthTime: e.target.value })}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all [color-scheme:dark] text-right sm:text-left appearance-none"

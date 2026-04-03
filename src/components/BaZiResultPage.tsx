@@ -316,7 +316,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   const getGodElementInfo = (godCategory: string) => {
-    const dayMaster = result.pillars[2].stem;
+    const dayMaster = result.pillars[1].stem;
     const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
     if (!dmElement) return null;
 
@@ -442,7 +442,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   const currentCycle = result.grandCycles[result.currentCycleIndex] || result.grandCycles[0];
-  const dayMaster = result.pillars[2].stem;
+  const dayMaster = result.pillars[1].stem;
   
   const tenGod = React.useMemo(() => {
     return calculateTenGods(dayMaster, currentCycle.element);
