@@ -43,7 +43,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
   // Correcting '寅' row in the table (미 -> 未)
   shinsal12Table['寅'] = ['亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌'];
 
-  const shinsal12Names = ["겁살", "재살", "천살", "지살", "년살", "월살", "망신", "장성", "반안", "역마", "육해", "화개"];
+  const shinsal12Names = ["겁살", "재살", "천살", "지살", "년살", "월살", "망신살", "장성살", "반안살", "역마살", "육해살", "화개살"];
   const shinsal12NamesKo = ["겁살(劫殺)", "재살(災殺)", "천살(天殺)", "지살(地殺)", "년살(年殺)", "월살(月殺)", "망신살(亡身殺)", "장성살(將星殺)", "반안살(攀鞍殺)", "역마살(驛馬殺)", "육해살(六害殺)", "화개살(華蓋殺)"];
 
   const yearBranchShinsalRow = shinsal12Table[yearBranch];

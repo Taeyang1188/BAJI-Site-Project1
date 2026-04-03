@@ -478,7 +478,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="text-xs font-bold text-white/40 uppercase tracking-widest">{t.seasonVibe}</div>
+            <div className="text-[11px] font-display font-medium text-white/50 uppercase tracking-[0.2em]">{t.seasonVibe}</div>
             <div className="text-[10px] text-white/30 italic">{t.seasonVibeDisclaimer}</div>
           </div>
           <p className="text-lg font-display italic text-white leading-relaxed">
@@ -657,7 +657,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
               exit={{ opacity: 0, y: -10 }}
               className="goth-glass rounded-2xl p-4 border border-white/10 space-y-4"
             >
-              <div className="text-xs font-bold text-white/40 uppercase tracking-widest text-center">Annual Alignment (Se-Un)</div>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="h-[1px] w-8 bg-white/20"></div>
+                <div className="text-xs font-display font-medium text-white/60 uppercase tracking-[0.2em] text-center">Annual Alignment (Se-Un)</div>
+                <div className="h-[1px] w-8 bg-white/20"></div>
+              </div>
               <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-neon-cyan px-2">
                 {result.grandCycles[expandedCycle].annualPillars.map((ap, api) => {
                   const isYearExpanded = expandedYear === api;
@@ -715,7 +719,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     exit={{ opacity: 0, height: 0 }}
                     className="pt-4 border-t border-white/5"
                   >
-                    <div className="text-[11px] font-bold text-white/20 uppercase tracking-widest text-center mb-4">Monthly Pulse</div>
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      <div className="h-[1px] w-6 bg-white/10"></div>
+                      <div className="text-[11px] font-display font-medium text-white/40 uppercase tracking-[0.2em] text-center">Monthly Pulse</div>
+                      <div className="h-[1px] w-6 bg-white/10"></div>
+                    </div>
                     <div className="overflow-x-auto pb-4 scrollbar-neon-pink">
                       <div className="flex gap-4 min-w-max">
                         {result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars.map((m, mi) => {
@@ -766,7 +774,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     {/* Daily Breakdown for the selected month - Moved outside of monthly scroll container */}
                     {expandedMonth !== null && result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth]?.dailyPillars ? (
                       <div className="pt-4 border-t border-white/5">
-                        <div className="text-[11px] font-bold text-white/20 uppercase tracking-widest text-center mb-4">Daily Rhythm (Full Month)</div>
+                        <div className="flex items-center justify-center gap-3 mb-4">
+                          <div className="h-[1px] w-4 bg-white/5"></div>
+                          <div className="text-[11px] font-display font-medium text-white/30 uppercase tracking-[0.2em] text-center">Daily Rhythm (Full Month)</div>
+                          <div className="h-[1px] w-4 bg-white/5"></div>
+                        </div>
                         <div className="overflow-x-auto pb-4 scrollbar-neon-cyan px-2">
                           <div className="flex gap-3 min-w-max">
                             {result.grandCycles[expandedCycle].annualPillars[expandedYear].monthlyPillars[expandedMonth].dailyPillars.map((d, di) => (
@@ -826,9 +838,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
               className="w-full overflow-hidden"
             >
               <div className="goth-glass p-6 rounded-2xl border border-white/10 space-y-8">
-                <h3 className="text-xl font-gothic text-center text-neon-cyan tracking-widest uppercase">
-                  {lang === 'KO' ? '오행 분석 리포트' : 'Elemental Analysis Report'}
-                </h3>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="h-[1px] w-12 bg-neon-cyan/50"></div>
+                  <h3 className="text-xl font-display font-medium text-neon-cyan uppercase tracking-[0.2em]">
+                    {lang === 'KO' ? '오행 분석 리포트' : 'Elemental Analysis Report'}
+                  </h3>
+                  <div className="h-[1px] flex-1 bg-gradient-to-r from-neon-cyan/20 to-transparent"></div>
+                </div>
                 
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="w-full md:w-1/2 h-64">
@@ -879,9 +895,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/10">
                     <div className="space-y-4">
                       <BaziTooltip content={BAZI_MAPPING.tooltips.geJu} lang={lang}>
-                        <h4 className="text-sm font-bold text-neon-pink uppercase tracking-widest cursor-help">{lang === 'KO' ? '격국과 용신 (Structure & Useful God)' : 'Structure & Useful God'}</h4>
+                        <div className="flex items-center gap-3 mb-4 cursor-help">
+                          <div className="h-[1px] w-8 bg-neon-pink/50"></div>
+                          <h4 className="text-sm font-display font-medium text-neon-pink uppercase tracking-[0.2em]">{lang === 'KO' ? '격국과 용신 (Structure & Useful God)' : 'Structure & Useful God'}</h4>
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-neon-pink/20 to-transparent"></div>
+                        </div>
                       </BaziTooltip>
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-3">
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-3 h-full">
                         <div className="flex justify-between items-start gap-4">
                           <span className="text-white/60 text-xs shrink-0 pt-0.5">{lang === 'KO' ? '격국 (Structure)' : 'Structure'}</span>
                           <span className="text-white font-bold text-right">{lang === 'KO' ? result.analysis.geJu : (BAZI_MAPPING.geju[result.analysis.geJu as keyof typeof BAZI_MAPPING.geju]?.en || result.analysis.geJu)}</span>
@@ -903,14 +923,18 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         </div>
                         {result.analysis.yongshinDetail.byeongYak && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
-                            <div className="text-[10px] text-yellow-400/60 uppercase tracking-widest">{lang === 'KO' ? '병약용신' : 'Byeong-Yak'}</div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="h-[1px] w-4 bg-yellow-400/50"></div>
+                              <div className="text-[10px] font-display font-medium text-yellow-400/80 uppercase tracking-[0.2em]">{lang === 'KO' ? '병약용신' : 'Byeong-Yak'}</div>
+                            </div>
                             <div className="text-xs text-yellow-400/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.byeongYak.note : result.analysis.yongshinDetail.byeongYak.noteEn}</div>
                           </div>
                         )}
                         {result.analysis.yongshinDetail.tongGwan && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
-                            <div className="flex items-center gap-1">
-                              <div className="text-[10px] text-neon-cyan/60 uppercase tracking-widest">{lang === 'KO' ? '통관용신' : 'Tong-Gwan'}</div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="h-[1px] w-4 bg-neon-cyan/50"></div>
+                              <div className="text-[10px] font-display font-medium text-neon-cyan/80 uppercase tracking-[0.2em]">{lang === 'KO' ? '통관용신' : 'Tong-Gwan'}</div>
                               <button onClick={() => setShowTongGwanInfo(true)} className="text-neon-cyan/60 hover:text-neon-cyan transition-colors" title={lang === 'KO' ? '설명 보기' : 'View explanation'}>
                                 <HelpCircle className="w-3 h-3" />
                               </button>
@@ -920,8 +944,9 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         )}
                         {result.analysis.yongshinDetail.eokbu && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
-                            <div className="flex items-center gap-1">
-                              <div className="text-[10px] text-neon-pink/60 uppercase tracking-widest">{lang === 'KO' ? '억부용신' : 'Eokbu'}</div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="h-[1px] w-4 bg-neon-pink/50"></div>
+                              <div className="text-[10px] font-display font-medium text-neon-pink/80 uppercase tracking-[0.2em]">{lang === 'KO' ? '억부용신' : 'Eokbu'}</div>
                               <button onClick={() => setShowEokbuInfo(true)} className="text-neon-pink/60 hover:text-neon-pink transition-colors" title={lang === 'KO' ? '설명 보기' : 'View explanation'}>
                                 <HelpCircle className="w-3 h-3" />
                               </button>
@@ -948,9 +973,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 
                     <div className="space-y-4">
                       <BaziTooltip content={BAZI_MAPPING.tooltips.interactions} lang={lang}>
-                        <h4 className="text-sm font-bold text-neon-cyan uppercase tracking-widest cursor-help">{lang === 'KO' ? '합형충파해 (Interactions)' : 'Interactions'}</h4>
+                        <div className="flex items-center gap-3 mb-4 cursor-help">
+                          <div className="h-[1px] w-8 bg-neon-cyan/50"></div>
+                          <h4 className="text-sm font-display font-medium text-neon-cyan uppercase tracking-[0.2em]">{lang === 'KO' ? '합형충파해 (Interactions)' : 'Interactions'}</h4>
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-neon-cyan/20 to-transparent"></div>
+                        </div>
                       </BaziTooltip>
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-4">
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-4 h-full">
                         {result.analysis.interactions.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {result.analysis.interactions.map((interaction, i) => (
@@ -978,7 +1007,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         
                         {result.analysis.conflicts.length > 0 && (
                           <div className="pt-2 border-t border-white/5">
-                            <div className="text-[10px] text-red-400/60 uppercase tracking-widest mb-1">{lang === 'KO' ? '주의할 충돌' : 'Conflicts'}</div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="h-[1px] w-4 bg-red-400/50"></div>
+                              <div className="text-[10px] font-display font-medium text-red-400/80 uppercase tracking-[0.2em]">{lang === 'KO' ? '주의할 충돌' : 'Conflicts'}</div>
+                            </div>
                             <div className="space-y-1">
                               {result.analysis.conflicts.map((c, i) => (
                                 <div key={i} className="text-[11px] text-red-400/80 italic">• {c.note}</div>
@@ -990,7 +1022,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     </div>
 
                     <div className="space-y-4 md:col-span-2">
-                      <h4 className="text-sm font-bold text-green-400 uppercase tracking-widest">{lang === 'KO' ? '십성 비율 (Ten Gods Ratio)' : 'Ten Gods Ratio'}</h4>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="h-[1px] w-8 bg-green-400/50"></div>
+                        <h4 className="text-sm font-display font-medium text-green-400 uppercase tracking-[0.2em]">{lang === 'KO' ? '십성 비율 (Ten Gods Ratio)' : 'Ten Gods Ratio'}</h4>
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-green-400/20 to-transparent"></div>
+                      </div>
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5">
                         <div className="flex flex-wrap gap-4 justify-between">
                           {Object.entries(result.analysis.tenGodsRatio).map(([god, ratio]) => (
@@ -1011,7 +1047,11 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 
                     <div className="space-y-4 md:col-span-2">
                       <BaziTooltip content={BAZI_MAPPING.tooltips.shinsal} lang={lang}>
-                        <h4 className="text-sm font-bold text-yellow-400 uppercase tracking-widest cursor-help">{lang === 'KO' ? '신살 및 공망 (Divine Stars & Void)' : 'Divine Stars & Void'}</h4>
+                        <div className="flex items-center gap-3 mb-4 cursor-help">
+                          <div className="h-[1px] w-8 bg-yellow-400/50"></div>
+                          <h4 className="text-sm font-display font-medium text-yellow-400 uppercase tracking-[0.2em]">{lang === 'KO' ? '신살 및 공망 (Divine Stars & Void)' : 'Divine Stars & Void'}</h4>
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-yellow-400/20 to-transparent"></div>
+                        </div>
                       </BaziTooltip>
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-4">
                         {result.analysis.shinsal.length > 0 ? (
@@ -1046,7 +1086,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                         
                         <div className="pt-2 border-t border-white/5">
                           <BaziTooltip content={BAZI_MAPPING.tooltips.gongmang} lang={lang}>
-                            <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1 cursor-help">{lang === 'KO' ? '공망 (Void Branches)' : 'Void Branches'}</div>
+                            <div className="flex items-center gap-2 mb-2 cursor-help">
+                              <div className="h-[1px] w-4 bg-white/30"></div>
+                              <div className="text-[10px] font-display font-medium text-white/60 uppercase tracking-[0.2em]">{lang === 'KO' ? '공망 (Void Branches)' : 'Void Branches'}</div>
+                            </div>
                           </BaziTooltip>
                           <div className="flex gap-2">
                             {result.analysis.gongmang?.branches?.map((b: string, i: number) => (

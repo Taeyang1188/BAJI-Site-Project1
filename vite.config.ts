@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     // 🚩 이 부분을 추가해야 깃허브 페이지에서 경로를 제대로 찾습니다!
-    base: mode === 'production' ? '/BAJI-Site-Project1/' : '/', 
+    base: './', 
     
     plugins: [react(), tailwindcss()],
     define: {
