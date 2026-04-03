@@ -30,8 +30,7 @@ const HorizontalDial = ({
   const [direction, setDirection] = useState(1);
 
   const getImagePath = (item: any) => {
-    const baseUrl = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
-    return `${baseUrl}assets/zodiac/${item.id}.${item.slug.toLowerCase()}.png`;
+    return item.imgUrl;
   };
 
   useEffect(() => {

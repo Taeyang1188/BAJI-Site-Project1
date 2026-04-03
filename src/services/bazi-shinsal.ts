@@ -287,10 +287,10 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
     '甲寅': ['子', '丑'], '乙卯': ['子', '丑'], '丙辰': ['子', '丑'], '丁巳': ['子', '丑'], '戊午': ['子', '丑'], '己未': ['子', '丑'], '庚申': ['子', '丑'], '辛酉': ['子', '丑'], '壬戌': ['子', '丑'], '癸亥': ['子', '丑']
   };
 
-  const gongmangBranches = gapJaSun[yearPillar] || [];
+  const gongmangBranches = gapJaSun[dayPillar] || [];
   const affectedPillars: string[] = [];
   branches.forEach((b, idx) => {
-    if (idx < 3 && gongmangBranches.includes(b)) { // 일지, 월지, 시지 체크
+    if (idx !== 1 && gongmangBranches.includes(b)) { // 년지, 월지, 시지 체크 (일지 제외)
       affectedPillars.push(PILLAR_NAMES[idx]);
     }
   });

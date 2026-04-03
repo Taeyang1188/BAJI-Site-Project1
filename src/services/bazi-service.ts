@@ -436,10 +436,10 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const geJu = calculateGeJu(dayGan, monthZhi, lang);
   
   // New detailed calculations
-  const interactionsResult = calculateDetailedInteractions(allStems, allBranches);
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
   const strength = calcDayMasterStrength(allStems, allBranches);
   const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength);
+  const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);
   
   // Check for ByeongYak and TongGwan
   const byeongYak = checkByeongYak(allStems, allBranches, yongshinDetail);

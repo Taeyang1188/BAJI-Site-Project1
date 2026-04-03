@@ -10,11 +10,8 @@ const __dirname = path.dirname(__filename);
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   
-  // GitHub Actions 환경인 경우 저장소 이름을 base로 사용, 아니면 '/'
-  const repoName = process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/';
-
   return {
-    base: repoName, 
+    base: './', 
     
     plugins: [react(), tailwindcss()],
     define: {

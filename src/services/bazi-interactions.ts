@@ -1,4 +1,6 @@
 
+import { BaZiCard } from '../types';
+
 export interface Interaction {
   type: string;
   subtype?: string;
@@ -29,7 +31,10 @@ const BRANCH_ELEMENTS: Record<string, string> = {
   '亥': 'Water', '子': 'Water'
 };
 
-export function calculateInteractions(stems: string[], branches: string[]): BaziInteractions {
+const PILLAR_NAMES = ["시주", "일주", "월주", "년주"];
+const PILLAR_NAMES_EN = ["Time", "Day", "Month", "Year"];
+
+export function calculateInteractions(stems: string[], branches: string[], pillars?: BaZiCard[], yongshinDetail?: any): BaziInteractions {
   const interactions: Interaction[] = [];
   const conflicts: { resolved: string; affected: string[]; note?: string }[] = [];
 
@@ -192,13 +197,30 @@ export function calculateInteractions(stems: string[], branches: string[]): Bazi
   // c. 자형 (Self Punishments)
   const jaHyeongBranches = ['午', '酉', '亥', '辰'];
   jaHyeongBranches.forEach(b => {
-    if (branches.filter(x => x === b).length >= 2) {
+    const indices: number[] = [];
+    branches.forEach((branch, idx) => {
+      if (branch === b) indices.push(idx);
+    });
+    
+    if (indices.length >= 2) {
+      let note = `${b}${b} 자형`;
+      if (pillars) {
+        const pNames = indices.map(idx => PILLAR_NAMES[idx]);
+        let explanation = "";
+        if (b === '午') explanation = "자기 확신이 강해 스스로 번민에 빠질 수 있으니 유연한 사고가 필요합니다.";
+        else if (b === '酉') explanation = "칼날 같은 예민함으로 스스로를 다치게 할 수 있으니 마음의 여유가 필요합니다.";
+        else if (b === '亥') explanation = "생각이 너무 깊어 우울감에 빠질 수 있으니 긍정적인 활동이 필요합니다.";
+        else if (b === '辰') explanation = "이상과 현실의 괴리로 인한 스트레스가 있을 수 있으니 현실적인 목표 설정이 중요합니다.";
+        
+        note = `${pNames.join('와 ')}의 ${b}가 겹쳐 자형을 이룹니다. ${explanation}`;
+      }
+
       interactions.push({
         type: "자형",
         branches: [b, b],
         category: "자형",
         severity: "full",
-        note: `${b}${b} 자형`
+        note
       });
     }
   });
@@ -238,6 +260,41 @@ export function calculateInteractions(stems: string[], branches: string[]): Bazi
           type = "원충";
           note = `${stems[i]}-${stems[j]} 원충 (영향력 미미)`;
           severity = "partial";
+        }
+
+        if (pillars && yongshinDetail && distance === 1) {
+          const yongshinElement = yongshinDetail.primary.element;
+          const stemIElement = STEM_ELEMENTS[stems[i]];
+          const stemJElement = STEM_ELEMENTS[stems[j]];
+          
+          let yongshinIdx = -1;
+          let otherIdx = -1;
+          
+          if (stemIElement === yongshinElement) {
+            yongshinIdx = i;
+            otherIdx = j;
+          } else if (stemJElement === yongshinElement) {
+            yongshinIdx = j;
+            otherIdx = i;
+          }
+          
+          if (yongshinIdx !== -1) {
+            const yongshinStem = stems[yongshinIdx];
+            const otherStem = stems[otherIdx];
+            const otherPillarName = PILLAR_NAMES[otherIdx];
+            const otherPillarNameEn = PILLAR_NAMES_EN[otherIdx];
+            const otherTenGod = pillars[otherIdx].stemKoreanName;
+            const otherTenGodEn = pillars[otherIdx].stemEnglishName;
+            
+            let pillarMeaning = "";
+            let pillarMeaningEn = "";
+            if (otherIdx === 0) { pillarMeaning = "말년/자식"; pillarMeaningEn = "Later Years/Children"; }
+            else if (otherIdx === 1) { pillarMeaning = "나 자신/배우자"; pillarMeaningEn = "Self/Spouse"; }
+            else if (otherIdx === 2) { pillarMeaning = "사회 생활"; pillarMeaningEn = "Social Life"; }
+            else if (otherIdx === 3) { pillarMeaning = "국가/조상"; pillarMeaningEn = "Nation/Ancestors"; }
+            
+            note = `용신인 ${yongshinStem}가 ${otherPillarName}(${otherStem})과 충을 하고 있습니다. 이는 ${pillarMeaning}(${otherPillarName})에서 나의 ${otherTenGod}을(를) 지키기 위한 투쟁이 치열함을 뜻합니다.|The Yongshin ${yongshinStem} is clashing with the ${otherPillarNameEn} (${otherStem}). This indicates a fierce struggle to protect your ${otherTenGodEn} in the area of ${pillarMeaningEn} (${otherPillarNameEn}).`;
+          }
         }
 
         interactions.push({

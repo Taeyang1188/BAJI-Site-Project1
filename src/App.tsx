@@ -15,6 +15,76 @@ import { calculateRealBaZi } from './services/bazi-service';
 
 import { useMemo, useRef } from 'react';
 
+const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: string) => void, lang: Language }) => {
+  const [hourStr, minStr] = value.split(':');
+  const hour = parseInt(hourStr) || 0;
+  const isPM = hour >= 12;
+  const displayHour = hour % 12 || 12;
+
+  const handleAmpmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newIsPM = e.target.value === 'PM';
+    let newHour = displayHour;
+    if (newIsPM && newHour !== 12) newHour += 12;
+    if (!newIsPM && newHour === 12) newHour = 0;
+    onChange(`${newHour.toString().padStart(2, '0')}:${minStr}`);
+  };
+
+  const handleHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    let newHour = parseInt(e.target.value);
+    if (isPM && newHour !== 12) newHour += 12;
+    if (!isPM && newHour === 12) newHour = 0;
+    onChange(`${newHour.toString().padStart(2, '0')}:${minStr}`);
+  };
+
+  const handleMinChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(`${hourStr}:${e.target.value}`);
+  };
+
+  return (
+    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus-within:border-neon-pink transition-all flex items-center justify-between sm:justify-start gap-2">
+      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+      
+      <div className="flex items-center gap-2 w-full justify-end sm:justify-start">
+        <select 
+          value={isPM ? 'PM' : 'AM'} 
+          onChange={handleAmpmChange}
+          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none font-medium"
+          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+        >
+          <option value="AM" className="bg-gray-900">{lang === 'KO' ? '오전' : 'AM'}</option>
+          <option value="PM" className="bg-gray-900">{lang === 'KO' ? '오후' : 'PM'}</option>
+        </select>
+        
+        <select 
+          value={displayHour.toString().padStart(2, '0')} 
+          onChange={handleHourChange}
+          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none text-center font-medium"
+          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+        >
+          {Array.from({length: 12}).map((_, i) => {
+            const val = (i === 0 ? 12 : i).toString().padStart(2, '0');
+            return <option key={val} value={val} className="bg-gray-900">{val}</option>;
+          })}
+        </select>
+        
+        <span className="text-white/40 font-medium">:</span>
+        
+        <select 
+          value={minStr} 
+          onChange={handleMinChange}
+          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none text-center font-medium"
+          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+        >
+          {Array.from({length: 60}).map((_, i) => {
+            const val = i.toString().padStart(2, '0');
+            return <option key={val} value={val} className="bg-gray-900">{val}</option>;
+          })}
+        </select>
+      </div>
+    </div>
+  );
+};
+
 declare global {
   interface Window {
     google: any;
@@ -397,13 +467,10 @@ export default function App() {
 
                     {/* Time */}
                     <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
-                      <input 
-                        type="time"
-                        lang={lang === 'EN' ? 'en-US' : 'ko-KR'}
+                      <TimeInput 
                         value={userInput.birthTime}
-                        onChange={(e) => setUserInput({ ...userInput, birthTime: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all [color-scheme:dark] text-right sm:text-left appearance-none"
+                        onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
+                        lang={lang}
                       />
                     </div>
 

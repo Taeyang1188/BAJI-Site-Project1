@@ -6,7 +6,7 @@ import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
-import { calculateTenGods } from '../services/bazi-engine';
+import { calculateTenGods, STEM_ELEMENTS } from '../services/bazi-engine';
 import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon, HelpCircle, X } from 'lucide-react';
 
 const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
@@ -262,6 +262,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const [showTongGwanInfo, setShowTongGwanInfo] = useState(false);
   const [showEokbuInfo, setShowEokbuInfo] = useState(false);
   const [showYongshinInfo, setShowYongshinInfo] = useState(false);
+  const [showYongshinRolesInfo, setShowYongshinRolesInfo] = useState(false);
   const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showHanja, setShowHanja] = useState(false);
@@ -316,7 +317,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   };
 
   const getGodElementInfo = (godCategory: string) => {
-    const dayMaster = result.pillars[1].stem;
+    const dayPillar = result.pillars.find(p => p.title === 'Day');
+    if (!dayPillar) return null;
+    
+    const dayMaster = dayPillar.stem;
     const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
     if (!dmElement) return null;
 
@@ -354,23 +358,39 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
     };
   };
 
-  const renderYongshinWithElement = (god: string) => {
+  const renderYongshinWithElement = (god: string, isModal: boolean = false) => {
     const info = getGodElementInfo(god);
     const godName = getYongshinName(god);
     
-    if (!info) return godName;
+    if (!info) return <span>{godName}</span>;
 
     const stemText = info.stems.map(s => {
       const stemInfo = BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems];
       return `${lang === 'KO' ? stemInfo.ko : stemInfo.en} (${s})`;
     }).join(' / ');
 
+    const elementColor = ELEMENT_COLORS[info.elementEn as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+
+    if (isModal) {
+      return (
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-sm font-bold" style={{ color: elementColor }}>
+            {lang === 'KO' ? `${info.elementKo} - ${stemText}` : `${info.elementEn} - ${stemText}`}
+          </span>
+          <span className="text-xs opacity-70">({godName})</span>
+        </div>
+      );
+    }
+
     return (
-      <div className="flex flex-col items-center">
-        <span>{godName}</span>
-        <span className="text-[9px] text-white/40 font-normal mt-0.5">
+      <div className="flex flex-col items-center mt-1">
+        <span 
+          className="text-sm font-bold mb-0.5"
+          style={{ color: elementColor }}
+        >
           {lang === 'KO' ? `${info.elementKo} - ${stemText}` : `${info.elementEn} - ${stemText}`}
         </span>
+        <span className="text-[10px] opacity-70">{godName}</span>
       </div>
     );
   };
@@ -954,18 +974,31 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                             <div className="text-xs text-neon-pink/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.eokbu.note : result.analysis.yongshinDetail.eokbu.noteEn}</div>
                           </div>
                         )}
-                        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5">
-                          <div className="flex flex-col items-center">
-                            <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '희신' : 'HeeShin'}</span>
-                            <span className="text-[11px] text-green-400 font-bold text-center">{renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god)}</span>
+                        <div className="pt-4 border-t border-white/5 space-y-2">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="h-[1px] w-4 bg-purple-400/50"></div>
+                              <div className="text-[10px] font-display font-medium text-purple-400/80 uppercase tracking-[0.2em]">
+                                {lang === 'KO' ? '희·기·구신' : 'Supporting Energies'}
+                              </div>
+                            </div>
+                            <button onClick={() => setShowYongshinRolesInfo(true)} className="text-purple-400/60 hover:text-purple-400 transition-colors" title={lang === 'KO' ? '설명 보기' : 'View explanation'}>
+                              <HelpCircle className="w-3 h-3" />
+                            </button>
                           </div>
-                          <div className="flex flex-col items-center">
-                            <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '기신' : 'GiShin'}</span>
-                            <span className="text-[11px] text-red-400 font-bold text-center">{renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god)}</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '구신' : 'GuShin'}</span>
-                            <span className="text-[11px] text-orange-400 font-bold text-center">{renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god)}</span>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="flex flex-col items-center">
+                              <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '희신' : 'HeeShin'}</span>
+                              {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god)}
+                            </div>
+                            <div className="flex flex-col items-center">
+                              <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '기신' : 'GiShin'}</span>
+                              {renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god)}
+                            </div>
+                            <div className="flex flex-col items-center">
+                              <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '구신' : 'GuShin'}</span>
+                              {renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god)}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -982,24 +1015,56 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 space-y-4 h-full">
                         {result.analysis.interactions.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
-                            {result.analysis.interactions.map((interaction, i) => (
-                              <BaziTooltip 
-                                key={i} 
-                                content={getInteractionTooltip(interaction.type)} 
-                                lang={lang}
-                              >
-                                <div 
-                                  className="flex flex-col p-2 bg-white/5 rounded border border-white/10 min-w-[80px] cursor-pointer hover:bg-white/10 transition-colors"
-                                  onClick={() => setShowInteractionInfo(interaction.type)}
+                            {result.analysis.interactions.map((interaction, i) => {
+                              let tooltipContent = getInteractionTooltip(interaction.type);
+                              let displayNote = interaction.note;
+                              
+                              if (interaction.note && interaction.note.includes('|')) {
+                                const [koNote, enNote] = interaction.note.split('|');
+                                displayNote = lang === 'KO' ? koNote : enNote;
+                                
+                                // Colorize the yongshin stem in the tooltip
+                                const colorizeNote = (note: string) => {
+                                  if (!result.analysis.yongshinDetail) return note;
+                                  const yongshinElement = result.analysis.yongshinDetail.primary.element;
+                                  const elementColor = ELEMENT_COLORS[yongshinElement as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+                                  
+                                  // Find the yongshin stem in the note and wrap it in a span with color
+                                  const stems = interaction.stems || [];
+                                  let colorized = note;
+                                  stems.forEach(stem => {
+                                    if (STEM_ELEMENTS[stem] === yongshinElement) {
+                                      const regex = new RegExp(`(${stem})`, 'g');
+                                      colorized = colorized.replace(regex, `<span style="color: ${elementColor}; font-weight: bold;">$1</span>`);
+                                    }
+                                  });
+                                  return colorized;
+                                };
+
+                                tooltipContent = { 
+                                  ko: <span dangerouslySetInnerHTML={{ __html: colorizeNote(koNote) }} />, 
+                                  en: <span dangerouslySetInnerHTML={{ __html: colorizeNote(enNote) }} /> 
+                                };
+                              }
+
+                              return (
+                                <BaziTooltip 
+                                  key={i} 
+                                  content={tooltipContent} 
+                                  lang={lang}
                                 >
-                                  <span className="text-[10px] text-white/40 uppercase tracking-tighter">{getInteractionName(interaction.type)}</span>
-                                  <span className="text-xs text-white font-bold">{interaction.note}</span>
-                                  <span className="text-[9px] text-neon-cyan/60">
-                                    {interaction.branches?.join('-') || interaction.stems?.join('-')}
-                                  </span>
-                                </div>
-                              </BaziTooltip>
-                            ))}
+                                  <div 
+                                    className="flex flex-col p-2 bg-white/5 rounded border border-white/10 min-w-[80px] cursor-pointer hover:bg-white/10 transition-colors"
+                                    onClick={() => setShowInteractionInfo(interaction.type)}
+                                  >
+                                    <span className="text-[10px] text-white/40 uppercase tracking-tighter">{getInteractionName(interaction.type)}</span>
+                                    <span className="text-[9px] text-neon-cyan/60">
+                                      {interaction.branches?.join('-') || interaction.stems?.join('-')}
+                                    </span>
+                                  </div>
+                                </BaziTooltip>
+                              );
+                            })}
                           </div>
                         ) : (
                           <span className="text-white/40 text-xs italic">{lang === 'KO' ? '특별한 충돌이나 결합이 없습니다.' : 'No significant interactions.'}</span>
@@ -1203,6 +1268,81 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* Yongshin Roles Info Modal */}
+      <AnimatePresence>
+        {showYongshinRolesInfo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowYongshinRolesInfo(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-[#0a0a0a] border border-purple-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setShowYongshinRolesInfo(false)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <h3 className="text-xl font-bold text-purple-400 mb-4">
+                {lang === 'KO' ? '희신, 기신, 구신이란?' : 'HeeShin, GiShin, and GuShin'}
+              </h3>
+              
+              <div className="text-sm text-white/80 space-y-4 leading-relaxed max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <p>
+                  {lang === 'KO' 
+                    ? '사주의 균형을 잡아주는 핵심 에너지인 용신(用神)을 기준으로, 나에게 도움이 되는 기운과 방해가 되는 기운을 분류한 것입니다.' 
+                    : 'Based on the Yongshin (Useful God) which balances your chart, these represent the energies that either support or hinder you.'}
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="bg-white/5 p-3 rounded-lg border border-green-400/30">
+                    <h4 className="font-bold text-green-400 mb-1">{lang === 'KO' ? '희신 (喜神 - 기쁠 희, 귀신 신)' : 'HeeShin (喜神 - Joyful God)'}</h4>
+                    <p className="text-xs text-white/70 mb-2">
+                      {lang === 'KO' ? '용신을 도와주는 긍정적인 에너지입니다. 용신이 힘을 잃지 않도록 보좌하는 역할을 합니다.' : 'Positive energy that supports the Yongshin. It assists the Useful God so it doesn\'t lose power.'}
+                    </p>
+                    <div className="text-xs bg-black/40 p-2 rounded text-green-400/90 flex items-center gap-2">
+                      <span className="font-bold">{lang === 'KO' ? '나의 희신:' : 'Your HeeShin:'}</span>
+                      {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god, true)}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 p-3 rounded-lg border border-red-400/30">
+                    <h4 className="font-bold text-red-400 mb-1">{lang === 'KO' ? '기신 (忌神 - 꺼릴 기, 귀신 신)' : 'GiShin (忌神 - Taboo God)'}</h4>
+                    <p className="text-xs text-white/70 mb-2">
+                      {lang === 'KO' ? '용신을 극(沖/剋)하여 방해하는 부정적인 에너지입니다. 이 기운이 강해지면 삶의 균형이 깨지기 쉽습니다.' : 'Negative energy that attacks or hinders the Yongshin. When this energy is strong, life\'s balance can easily be disrupted.'}
+                    </p>
+                    <div className="text-xs bg-black/40 p-2 rounded text-red-400/90 flex items-center gap-2">
+                      <span className="font-bold">{lang === 'KO' ? '나의 기신:' : 'Your GiShin:'}</span>
+                      {renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god, true)}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 p-3 rounded-lg border border-orange-400/30">
+                    <h4 className="font-bold text-orange-400 mb-1">{lang === 'KO' ? '구신 (仇神 - 원수 구, 귀신 신)' : 'GuShin (仇神 - Enemy God)'}</h4>
+                    <p className="text-xs text-white/70 mb-2">
+                      {lang === 'KO' ? '희신을 극하여 방해하거나, 기신을 도와주는 에너지입니다. 기신 다음으로 주의해야 할 기운입니다.' : 'Energy that attacks the HeeShin or supports the GiShin. It is the second most cautious energy after GiShin.'}
+                    </p>
+                    <div className="text-xs bg-black/40 p-2 rounded text-orange-400/90 flex items-center gap-2">
+                      <span className="font-bold">{lang === 'KO' ? '나의 구신:' : 'Your GuShin:'}</span>
+                      {renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god, true)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 

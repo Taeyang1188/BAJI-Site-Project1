@@ -58,11 +58,11 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, lang: Language) 
 // 2. 십성비율 (Ten Gods Ratio)
 export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
   const counts: Record<string, number> = {
-    'Self/Rival': 0,
+    'Mirror/Rival': 0,
     'Artist/Rebel': 0,
-    'Wealth': 0,
-    'Power/Judge': 0,
-    'Wisdom/Sage': 0
+    'Maverick/Architect': 0,
+    'Warrior/Judge': 0,
+    'Mystic/Sage': 0
   };
 
   let total = 0;
@@ -72,11 +72,11 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
     const branchGod = p.branchKoreanName;
 
     const mapGod = (god: string) => {
-      if (god.includes('비견') || god.includes('겁재') || god.includes('일간')) return 'Self/Rival';
+      if (god.includes('비견') || god.includes('겁재') || god.includes('일간')) return 'Mirror/Rival';
       if (god.includes('식신') || god.includes('상관')) return 'Artist/Rebel';
-      if (god.includes('편재') || god.includes('정재')) return 'Wealth';
-      if (god.includes('편관') || god.includes('정관')) return 'Power/Judge';
-      if (god.includes('편인') || god.includes('정인')) return 'Wisdom/Sage';
+      if (god.includes('편재') || god.includes('정재')) return 'Maverick/Architect';
+      if (god.includes('편관') || god.includes('정관')) return 'Warrior/Judge';
+      if (god.includes('편인') || god.includes('정인')) return 'Mystic/Sage';
       return null;
     };
 
@@ -91,11 +91,11 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
   for (const key in counts) {
     let displayKey = key;
     if (lang === 'KO') {
-      if (key === 'Self/Rival') displayKey = '비겁(Self/Rival)';
+      if (key === 'Mirror/Rival') displayKey = '비겁(Mirror/Rival)';
       if (key === 'Artist/Rebel') displayKey = '식상(Artist/Rebel)';
-      if (key === 'Wealth') displayKey = '재성(Wealth)';
-      if (key === 'Power/Judge') displayKey = '관성(Power/Judge)';
-      if (key === 'Wisdom/Sage') displayKey = '인성(Wisdom/Sage)';
+      if (key === 'Maverick/Architect') displayKey = '재성(Maverick/Architect)';
+      if (key === 'Warrior/Judge') displayKey = '관성(Warrior/Judge)';
+      if (key === 'Mystic/Sage') displayKey = '인성(Mystic/Sage)';
     }
     ratio[displayKey] = total > 0 ? Math.round((counts[key] / total) * 100) : 0;
   }

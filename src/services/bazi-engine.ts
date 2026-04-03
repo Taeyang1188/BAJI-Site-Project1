@@ -1,6 +1,6 @@
 import { JIJANGAN, RELATIONSHIPS } from '../constants/bazi-data';
 
-const STEM_ELEMENTS: Record<string, string> = {
+export const STEM_ELEMENTS: Record<string, string> = {
   '甲': 'Wood', '乙': 'Wood', '丙': 'Fire', '丁': 'Fire', '戊': 'Earth',
   '己': 'Earth', '庚': 'Metal', '辛': 'Metal', '壬': 'Water', '癸': 'Water'
 };
