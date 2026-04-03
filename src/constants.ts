@@ -250,18 +250,18 @@ export const TRANSLATIONS = {
 };
 
 export const ZODIAC_ANIMALS = [
-  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://i.imgur.com/08eHmVx.png' },
-  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://i.imgur.com/QKHj09z.png' },
-  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: 'https://i.imgur.com/AXYWuRE.png' },
-  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: 'https://i.imgur.com/pFRYKl5.png' },
-  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: 'https://i.imgur.com/s03uyAV.png' },
-  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: 'https://i.imgur.com/olwZKJD.png' },
-  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: 'https://i.imgur.com/pHB8hMR.png' },
-  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: 'https://i.imgur.com/EG5XZP5.png' },
-  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: 'https://i.imgur.com/FcS0rn0.png' },
-  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: 'https://i.imgur.com/jKXQ0Cf.png' },
-  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: 'https://i.imgur.com/GAWDRMd.png' },
-  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: 'https://i.imgur.com/2DcazT3.png' },
+  { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: '/assets/zodiac/1.za.png' },
+  { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: '/assets/zodiac/2.chuck.png' },
+  { id: 3, name: 'Tiger', slug: 'in', hanja: '寅', imgUrl: '/assets/zodiac/3.in.png' },
+  { id: 4, name: 'Rabbit', slug: 'myo', hanja: '卯', imgUrl: '/assets/zodiac/4.myo.png' },
+  { id: 5, name: 'Dragon', slug: 'zin', hanja: '辰', imgUrl: '/assets/zodiac/5.zin.png' },
+  { id: 6, name: 'Snake', slug: 'sa', hanja: '巳', imgUrl: '/assets/zodiac/6.sa.png' },
+  { id: 7, name: 'Horse', slug: 'oh', hanja: '午', imgUrl: '/assets/zodiac/7.oh.png' },
+  { id: 8, name: 'Goat', slug: 'me', hanja: '未', imgUrl: '/assets/zodiac/8.me.png' },
+  { id: 9, name: 'Monkey', slug: 'sin', hanja: '申', imgUrl: '/assets/zodiac/9.sin.png' },
+  { id: 10, name: 'Rooster', slug: 'yu', hanja: '酉', imgUrl: '/assets/zodiac/10.yu.png' },
+  { id: 11, name: 'Dog', slug: 'sul', hanja: '戌', imgUrl: '/assets/zodiac/11.sul.png' },
+  { id: 12, name: 'Pig', slug: 'hae', hanja: '亥', imgUrl: '/assets/zodiac/12.hae.png' },
 ];
 
 export const ELEMENT_COLORS = {
