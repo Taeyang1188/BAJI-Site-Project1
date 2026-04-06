@@ -105,60 +105,60 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
   // Logic based on Structure (격국) and Strength
   if (geju.includes("정관") || geju.includes("JUDGE")) {
     if (!isStrong) {
-      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "정관격 일간약 → 인성용신", reasonEn: "Judge Structure & Weak DM → Wisdom Useful God" };
+      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "정관격 일간약 → 인성용신", reasonEn: "Warrior/Judge Structure & Weak DM → Mystic/Sage Useful God" };
       heeShin = { god: "비겁", element: getElementByRel('Self') };
       giShin = { god: "상관", element: getElementByRel('Artist') };
       guShin = { god: "재성", element: getElementByRel('Wealth') };
     } else {
-      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "정관격 일간강 → 재성용신", reasonEn: "Judge Structure & Strong DM → Wealth Useful God" };
+      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "정관격 일간강 → 재성용신", reasonEn: "Warrior/Judge Structure & Strong DM → Maverick/Architect Useful God" };
       heeShin = { god: "관성", element: getElementByRel('Power') };
       giShin = { god: "비겁", element: getElementByRel('Self') };
       guShin = { god: "인성", element: getElementByRel('Wisdom') };
     }
   } else if (geju.includes("편관") || geju.includes("칠살") || geju.includes("WARRIOR")) {
     if (!isStrong) {
-      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "편관격 일간약 → 인성용신 (인수화살)", reasonEn: "Warrior Structure & Weak DM → Wisdom Useful God" };
+      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "편관격 일간약 → 인성용신 (인수화살)", reasonEn: "Warrior/Judge Structure & Weak DM → Mystic/Sage Useful God" };
       heeShin = { god: "비겁", element: getElementByRel('Self') };
       giShin = { god: "재성", element: getElementByRel('Wealth') };
       guShin = { god: "식상", element: getElementByRel('Artist') };
     } else {
-      primary = { god: "식상", element: getElementByRel('Artist'), reason: "편관격 일간강 → 식상용신 (식신제살)", reasonEn: "Warrior Structure & Strong DM → Artist Useful God" };
+      primary = { god: "식상", element: getElementByRel('Artist'), reason: "편관격 일간강 → 식상용신 (식신제살)", reasonEn: "Warrior/Judge Structure & Strong DM → Artist/Rebel Useful God" };
       heeShin = { god: "인성", element: getElementByRel('Wisdom') };
       giShin = { god: "비겁", element: getElementByRel('Self') };
       guShin = { god: "재성", element: getElementByRel('Wealth') };
     }
   } else if (geju.includes("식신") || geju.includes("상관") || geju.includes("ARTIST") || geju.includes("REBEL")) {
     if (isStrong) {
-      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "식상격 일간강 → 재성용신", reasonEn: "Output Structure & Strong DM → Wealth Useful God" };
+      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "식상격 일간강 → 재성용신", reasonEn: "Artist/Rebel Structure & Strong DM → Maverick/Architect Useful God" };
       heeShin = { god: "식상", element: getElementByRel('Artist') };
       giShin = { god: "인성", element: getElementByRel('Wisdom') };
       guShin = { god: "비겁", element: getElementByRel('Self') };
     } else {
-      primary = { god: "비겁", element: getElementByRel('Self'), reason: "식상격 일간약 → 비겁용신", reasonEn: "Output Structure & Weak DM → Self Useful God" };
+      primary = { god: "비겁", element: getElementByRel('Self'), reason: "식상격 일간약 → 비겁용신", reasonEn: "Artist/Rebel Structure & Weak DM → Mirror/Rival Useful God" };
       heeShin = { god: "인성", element: getElementByRel('Wisdom') };
       giShin = { god: "관성", element: getElementByRel('Power') };
       guShin = { god: "재성", element: getElementByRel('Wealth') };
     }
   } else if (geju.includes("재성") || geju.includes("정재") || geju.includes("편재") || geju.includes("ARCHITECT") || geju.includes("MAVERICK")) {
     if (isStrong) {
-      primary = { god: "관성", element: getElementByRel('Power'), reason: "재성격 일간강 → 관성용신", reasonEn: "Wealth Structure & Strong DM → Power Useful God" };
+      primary = { god: "관성", element: getElementByRel('Power'), reason: "재성격 일간강 → 관성용신", reasonEn: "Maverick/Architect Structure & Strong DM → Warrior/Judge Useful God" };
       heeShin = { god: "재성", element: getElementByRel('Wealth') };
       giShin = { god: "비겁", element: getElementByRel('Self') };
       guShin = { god: "인성", element: getElementByRel('Wisdom') };
     } else {
-      primary = { god: "비겁", element: getElementByRel('Self'), reason: "재성격 일간약 → 비겁용신", reasonEn: "Wealth Structure & Weak DM → Self Useful God" };
+      primary = { god: "비겁", element: getElementByRel('Self'), reason: "재성격 일간약 → 비겁용신", reasonEn: "Maverick/Architect Structure & Weak DM → Mirror/Rival Useful God" };
       heeShin = { god: "인성", element: getElementByRel('Wisdom') };
       giShin = { god: "식상", element: getElementByRel('Artist') };
       guShin = { god: "관성", element: getElementByRel('Power') };
     }
   } else if (geju.includes("인성") || geju.includes("정인") || geju.includes("편인") || geju.includes("SAGE") || geju.includes("MYSTIC")) {
     if (!isStrong) {
-      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "인성격 일간약 → 인성용신", reasonEn: "Wisdom Structure & Weak DM → Wisdom Useful God" };
+      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "인성격 일간약 → 인성용신", reasonEn: "Mystic/Sage Structure & Weak DM → Mystic/Sage Useful God" };
       heeShin = { god: "관성", element: getElementByRel('Power') };
       giShin = { god: "재성", element: getElementByRel('Wealth') };
       guShin = { god: "식상", element: getElementByRel('Artist') };
     } else {
-      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "인성격 일간강 → 재성용신 (파인: 과도한 인성을 재성으로 제어)", reasonEn: "Wisdom Structure & Strong DM → Wealth Useful God (Pa-In: Using Wealth to control excessive Resource)" };
+      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "인성격 일간강 → 재성용신 (파인: 과도한 인성을 재성으로 제어)", reasonEn: "Mystic/Sage Structure & Strong DM → Maverick/Architect Useful God (Pa-In: Using Maverick/Architect to control excessive Mystic/Sage)" };
       heeShin = { god: "식상", element: getElementByRel('Artist') };
       giShin = { god: "인성", element: getElementByRel('Wisdom') };
       guShin = { god: "관성", element: getElementByRel('Power') };

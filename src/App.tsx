@@ -16,71 +16,44 @@ import { calculateRealBaZi } from './services/bazi-service';
 import { useMemo, useRef } from 'react';
 
 const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: string) => void, lang: Language }) => {
-  const [hourStr, minStr] = value.split(':');
-  const hour = parseInt(hourStr) || 0;
-  const isPM = hour >= 12;
-  const displayHour = hour % 12 || 12;
-
-  const handleAmpmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newIsPM = e.target.value === 'PM';
-    let newHour = displayHour;
-    if (newIsPM && newHour !== 12) newHour += 12;
-    if (!newIsPM && newHour === 12) newHour = 0;
-    onChange(`${newHour.toString().padStart(2, '0')}:${minStr}`);
-  };
-
-  const handleHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    let newHour = parseInt(e.target.value);
-    if (isPM && newHour !== 12) newHour += 12;
-    if (!isPM && newHour === 12) newHour = 0;
-    onChange(`${newHour.toString().padStart(2, '0')}:${minStr}`);
-  };
-
-  const handleMinChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(`${hourStr}:${e.target.value}`);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const prev = value;
+    const isDeleting = val.length < prev.length;
+    
+    let formatted = val;
+    if (isDeleting) {
+      // Backspace through separator: delete the character before it too
+      if (prev.endsWith(':') && val.length === 2) {
+        formatted = val.slice(0, -1);
+      }
+    } else {
+      // Auto-formatting for typing/pasting
+      const digits = val.replace(/\D/g, '');
+      if (digits.length <= 2) {
+        formatted = digits;
+        if (digits.length === 2) formatted += ':';
+      } else {
+        formatted = digits.slice(0, 2) + ':' + digits.slice(2);
+      }
+    }
+    
+    // Limit length to 5 (HH:MM)
+    if (formatted.length <= 5) {
+      onChange(formatted);
+    }
   };
 
   return (
-    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus-within:border-neon-pink transition-all flex items-center justify-between sm:justify-start gap-2">
+    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus-within:border-neon-pink transition-all flex items-center">
       <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
-      
-      <div className="flex items-center gap-2 w-full justify-end sm:justify-start">
-        <select 
-          value={isPM ? 'PM' : 'AM'} 
-          onChange={handleAmpmChange}
-          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none font-medium"
-          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
-        >
-          <option value="AM" className="bg-gray-900">{lang === 'KO' ? '오전' : 'AM'}</option>
-          <option value="PM" className="bg-gray-900">{lang === 'KO' ? '오후' : 'PM'}</option>
-        </select>
-        
-        <select 
-          value={displayHour.toString().padStart(2, '0')} 
-          onChange={handleHourChange}
-          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none text-center font-medium"
-          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
-        >
-          {Array.from({length: 12}).map((_, i) => {
-            const val = (i === 0 ? 12 : i).toString().padStart(2, '0');
-            return <option key={val} value={val} className="bg-gray-900">{val}</option>;
-          })}
-        </select>
-        
-        <span className="text-white/40 font-medium">:</span>
-        
-        <select 
-          value={minStr} 
-          onChange={handleMinChange}
-          className="bg-transparent text-white focus:outline-none cursor-pointer appearance-none outline-none text-center font-medium"
-          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
-        >
-          {Array.from({length: 60}).map((_, i) => {
-            const val = i.toString().padStart(2, '0');
-            return <option key={val} value={val} className="bg-gray-900">{val}</option>;
-          })}
-        </select>
-      </div>
+      <input 
+        type="text"
+        placeholder="HH:MM (24h)"
+        value={value}
+        onChange={handleChange}
+        className="w-full bg-transparent text-white focus:outline-none placeholder:text-white/20"
+      />
     </div>
   );
 };
@@ -94,7 +67,7 @@ declare global {
 // Main Application Component
 export default function App() {
   const [page, setPage] = useState<1 | 2 | 3>(1);
-  const [lang, setLang] = useState<Language>('EN');
+  const [lang, setLang] = useState<Language>('KO');
   const [userInput, setUserInput] = useState<UserInput>({
     name: '',
     birthDate: '1993-01-01',
@@ -308,11 +281,35 @@ export default function App() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 onClick={handleBack}
-                className="w-8 h-8 flex items-center justify-center goth-glass rounded-lg border border-white/20 hover:border-white transition-all group"
+                className="w-8 h-8 flex items-center justify-center goth-glass rounded-lg border border-white/20 hover:border-white transition-all group shrink-0"
                 title={t.nav.back}
               >
                 <ChevronLeft className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
               </motion.button>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {page === 3 && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="hidden sm:flex items-center gap-2 text-xs text-white/60 font-mono"
+              >
+                <span>{userInput.birthDate}</span>
+                <span>{userInput.birthTime}</span>
+                {userInput.calendarType && (
+                  <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-white/10">
+                    {userInput.calendarType === 'solar' ? (lang === 'KO' ? '양력' : 'Solar') : (lang === 'KO' ? '음력' : 'Lunar')}
+                  </span>
+                )}
+                {userInput.gender && (
+                  <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-white/10">
+                    {userInput.gender === 'male' ? (lang === 'KO' ? '남' : 'M') : userInput.gender === 'female' ? (lang === 'KO' ? '여' : 'F') : userInput.gender === 'non-binary' ? 'NB' : 'N/A'}
+                  </span>
+                )}
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -395,20 +392,20 @@ export default function App() {
               exit={{ opacity: 0, scale: 1.1 }}
               className="w-full max-w-md px-6"
             >
-              <div className="goth-glass rounded-[40px] p-8 space-y-8 relative overflow-hidden">
+              <div className="goth-glass rounded-[40px] p-4 sm:p-6 space-y-3 sm:space-y-4 relative overflow-hidden">
                 {/* Background Glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-neon-pink/10 blur-[60px]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-24 bg-neon-pink/10 blur-[60px]" />
 
                 <CosmicWheel birthDate={userInput.birthDate} />
 
-                <div className="space-y-6 relative z-10">
+                <div className="space-y-3 relative z-10">
                   <div className="text-center">
-                    <h2 className="text-xs font-display font-bold tracking-[0.5em] text-white/40 uppercase">
+                    <h2 className="text-[10px] font-display font-bold tracking-[0.4em] text-white/40 uppercase">
                       {t.input.title}
                     </h2>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {/* Honeypot Field */}
                     <input 
                       type="text" 
@@ -428,42 +425,66 @@ export default function App() {
                         placeholder={t.input.name}
                         value={userInput.name}
                         onChange={(e) => setUserInput({ ...userInput, name: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
                       />
                     </div>
 
-                    {/* Date */}
-                    <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
-                      <input 
-                        type="date"
-                        lang={lang === 'EN' ? 'en-US' : 'ko-KR'}
-                        value={userInput.birthDate}
-                        onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all [color-scheme:dark] text-right sm:text-left appearance-none"
-                      />
-                    </div>
+                    {/* Date & Calendar Type */}
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex-1">
+                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+                        <input 
+                          type="text"
+                          placeholder="YYYY-MM-DD"
+                          value={userInput.birthDate}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const prev = userInput.birthDate;
+                            const isDeleting = val.length < prev.length;
+                            let formatted = val;
 
-                    {/* Calendar Type Selection (Only for KO) */}
-                    {lang === 'KO' && (
-                      <div className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl">
-                        <span className="text-xs font-bold tracking-widest text-white/40 uppercase">{t.input.calendarType}</span>
-                        <div className="flex flex-wrap gap-2">
+                            if (isDeleting) {
+                              if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
+                                formatted = val.slice(0, -1);
+                              }
+                            } else {
+                              const digits = val.replace(/\D/g, '');
+                              if (digits.length <= 4) {
+                                formatted = digits;
+                                if (digits.length === 4) formatted += '-';
+                              } else if (digits.length <= 6) {
+                                formatted = digits.slice(0, 4) + '-' + digits.slice(4);
+                                if (digits.length === 6) formatted += '-';
+                              } else {
+                                formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
+                              }
+                            }
+
+                            if (formatted.length <= 10) {
+                              setUserInput({ ...userInput, birthDate: formatted });
+                            }
+                          }}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        />
+                      </div>
+                      
+                      {lang === 'KO' && (
+                        <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[42px] items-center">
                           <button 
                             onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                            className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'bg-white/5 text-white/40'}`}
+                            className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
                           >
                             {t.input.solar}
                           </button>
                           <button 
                             onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                            className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'bg-white/5 text-white/40'}`}
+                            className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                           >
                             {t.input.lunar}
                           </button>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
                     {/* Time */}
                     <div className="relative">
@@ -475,18 +496,21 @@ export default function App() {
                     </div>
 
                     {/* Gender Selection */}
-                    <div className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl">
-                      <span className="text-xs font-bold tracking-widest text-white/40 uppercase">{t.input.gender}</span>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl">
+                      <div className="flex items-center gap-1.5 pl-2 border-r border-white/10 pr-2">
+                        <User className="w-3.5 h-3.5 text-neon-pink" />
+                        <span className="text-[9px] font-bold tracking-widest text-white/40 uppercase whitespace-nowrap">{t.input.gender}</span>
+                      </div>
+                      <div className="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar">
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'male' })}
-                          className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'bg-white/5 text-white/40'}`}
+                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.male}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'female' })}
-                          className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.gender === 'female' ? 'bg-neon-pink text-white' : 'bg-white/5 text-white/40'}`}
+                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'female' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.female}
                         </button>
@@ -494,13 +518,13 @@ export default function App() {
                           <>
                             <button 
                               onClick={() => setUserInput({ ...userInput, gender: 'non-binary' })}
-                              className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white shadow-[0_0_10px_rgba(0,242,255,0.5)]' : 'bg-white/5 text-white/40'}`}
+                              className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.nonBinary}
                             </button>
                             <button 
                               onClick={() => setUserInput({ ...userInput, gender: 'prefer-not-to-tell' })}
-                              className={`px-4 py-1 rounded-full text-[10px] font-bold transition-all ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'bg-white/5 text-white/40'}`}
+                              className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.preferNotToTell}
                             </button>
@@ -518,7 +542,7 @@ export default function App() {
                         placeholder={t.input.city}
                         value={userInput.city}
                         onChange={(e) => setUserInput({ ...userInput, city: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
                       />
                       <AnimatePresence>
                         {isLocationSynced && (
@@ -553,7 +577,7 @@ export default function App() {
                     whileTap={{ scale: 0.98 }}
                     onClick={handleReveal}
                     disabled={!userInput.birthDate || !userInput.birthTime || isThrottled}
-                    className="w-full py-5 bg-gradient-to-r from-neon-pink to-neon-purple rounded-2xl text-xs font-bold tracking-[0.4em] uppercase shadow-[0_10px_30px_rgba(255,0,122,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-gradient-to-r from-neon-pink to-neon-purple rounded-2xl text-xs font-bold tracking-[0.4em] uppercase shadow-[0_10px_30px_rgba(255,0,122,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t.input.button}
                   </motion.button>

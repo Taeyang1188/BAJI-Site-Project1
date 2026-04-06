@@ -1,12 +1,14 @@
 import { Solar, Lunar, EightChar } from 'lunar-typescript';
 import { DateTime } from 'luxon';
-import tzlookup from 'tz-lookup';
 import { UserInput, BaZiResult, BaZiCard, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { calculateGeJu, calculateTenGodsRatio, determineStructure } from './bazi-analysis';
 import { calculateInteractions as calculateDetailedInteractions } from './bazi-interactions';
 import { detectShinsal } from './bazi-shinsal';
 import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan } from './bazi-yongshin';
+import { calculateAdvancedAnalysis } from './bazi-advanced-analysis';
+
+import { getPreciseSajuTime } from './bazi-time';
 
 const STEMS_INFO: Record<string, { element: string, polarity: number }> = {
   '甲': { element: 'Wood', polarity: 1 }, '乙': { element: 'Wood', polarity: -1 },
@@ -68,164 +70,59 @@ const getTenGod = (dayGan: string, targetGan: string, targetZhi: string) => {
 };
 
 /**
- * Calculate precise cosmic time including Timezone and DST adjustment.
- * Longitude adjustment is explicitly removed per user request to prioritize Standard Time.
- */
-export const getCosmicTime = (dateStr: string, timeStr: string, lat: number, lon: number) => {
-  // 1. Find timezone ID from lat/lon (e.g., "America/New_York")
-  const zone = tzlookup(lat, lon) || 'Asia/Seoul';
-  
-  // Parse timeStr to ensure 24-hour format
-  let hour = 0;
-  let minute = 0;
-  
-  // Handle "HH:mm AM/PM" or "HH:mm" formats
-  const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM|am|pm))?$/);
-  if (timeMatch) {
-    let h = parseInt(timeMatch[1], 10);
-    const m = parseInt(timeMatch[2], 10);
-    const ampm = timeMatch[3]?.toUpperCase();
-
-    if (ampm === 'PM' && h < 12) h += 12;
-    if (ampm === 'AM' && h === 12) h = 0;
-    
-    hour = h;
-    minute = m;
-  } else {
-    // Fallback if format is unexpected, though input type="time" usually gives HH:mm in 24h
-    const parts = timeStr.split(':');
-    hour = parseInt(parts[0], 10) || 0;
-    minute = parseInt(parts[1], 10) || 0;
-  }
-
-  // Format as strict ISO 8601 time string (HH:mm:00)
-  const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
-  
-  // 2. Create DateTime in that zone to check for DST
-  // ISO format: YYYY-MM-DDTHH:mm:00
-  const dt = DateTime.fromISO(`${dateStr}T${formattedTime}`, { zone });
-  
-  if (!dt.isValid) {
-    throw new Error(`Invalid Date or Time: ${dateStr} ${timeStr} (parsed as ${formattedTime})`);
-  }
-  
-  console.log(`Parsed Time: Input=${timeStr}, Hour=${hour}, Minute=${minute}, Formatted=${formattedTime}`);
-
-  // 3. Final adjusted date for BaZi calculation
-  // We subtract DST offset if active to get Standard Time.
-  // Longitude adjustment is REMOVED to keep the exact input time (Standard Time).
-  let finalDate = dt;
-  if (dt.isInDST) {
-    finalDate = dt.minus({ hours: 1 });
-  }
-  
-  // 4. Create a local Date object matching the exact Standard Time components.
-  // This ensures lunar-typescript reads the exact year, month, day, hour, minute
-  // regardless of the server's actual timezone.
-  const tstDate = new Date(
-    finalDate.year,
-    finalDate.month - 1,
-    finalDate.day,
-    finalDate.hour,
-    finalDate.minute
-  );
-  
-  return { 
-    zone, 
-    isDST: dt.isInDST, 
-    longitudeAdjustment: 0,
-    tstDate
-  };
-};
-
-/**
  * Calculate BaZi (Saju) using lunar-typescript.
  */
 export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, lang: Language): BaZiResult => {
   try {
-    let birthDateStr = input.birthDate;
+    let solarYear = 0, solarMonth = 0, solarDay = 0;
 
     if (input.calendarType === 'lunar') {
-      const parts = birthDateStr.split('-');
+      const parts = input.birthDate.split('-');
       if (parts.length === 3) {
         const y = parseInt(parts[0], 10);
         const m = parseInt(parts[1], 10);
         const d = parseInt(parts[2], 10);
         const lunarObj = Lunar.fromYmd(y, m, d);
         const solarObj = lunarObj.getSolar();
-        birthDateStr = `${solarObj.getYear()}-${solarObj.getMonth().toString().padStart(2, '0')}-${solarObj.getDay().toString().padStart(2, '0')}`;
-        console.log(`Converted Lunar ${input.birthDate} to Solar ${birthDateStr}`);
+        solarYear = solarObj.getYear();
+        solarMonth = solarObj.getMonth();
+        solarDay = solarObj.getDay();
+      }
+    } else {
+      const parts = input.birthDate.split('-');
+      if (parts.length === 3) {
+        solarYear = parseInt(parts[0], 10);
+        solarMonth = parseInt(parts[1], 10);
+        solarDay = parseInt(parts[2], 10);
       }
     }
 
-    // 1. Get precise cosmic time
-    const { tstDate, zone } = getCosmicTime(birthDateStr, input.birthTime, lat, lon);
-    console.log(`Cosmic Time: ${tstDate.toString()} (Zone: ${zone})`);
+    // 1. Get precise cosmic time using the new engine
+    const timeResult = getPreciseSajuTime(solarYear, solarMonth, solarDay, input.birthTime, lon);
     
-    // 2. Initialize Lunar/Solar
-    const solar = Solar.fromDate(tstDate);
-    console.log("Solar initialized:", solar.toFullString());
+    // 2. Initialize Solar/Lunar with corrected time
+    const solar = Solar.fromYmdHms(
+      timeResult.correctedYear,
+      timeResult.correctedMonth,
+      timeResult.correctedDay,
+      timeResult.correctedHour,
+      timeResult.correctedMinute,
+      0
+    );
     
-    // Check range (lunar-typescript typically supports 1900-2100)
-    const year = tstDate.getFullYear();
-    if (year < 1900 || year > 2100) {
-      throw new Error(`Date ${year} is out of cosmic range (1900-2100)`);
-    }
-
-    const lunar = Lunar.fromDate(tstDate);
-    console.log("Lunar initialized:", lunar.toFullString());
-    
+    const lunar = solar.getLunar();
     const baZi = lunar.getEightChar();
-    console.log("BaZi EightChar:", baZi ? "Generated" : "FAILED");
     
     if (!baZi) {
       throw new Error("Failed to generate Eight Characters (BaZi) for this cosmic alignment.");
     }
   
   // 3. Extract 4 Pillars (Year, Month, Day, Hour)
-  let dayGan = baZi.getDayGan();
-  let dayZhi = baZi.getDayZhi();
-  let timeGan = baZi.getTimeGan();
-  let timeZhi = baZi.getTimeZhi();
-  
-  const hour = tstDate.getHours();
-  const minute = tstDate.getMinutes();
-  
-  const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-  const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-  
-  if (hour === 23) {
-    // For 23:00 ~ 23:59, we use the current day's pillar.
-    // lunar-typescript might advance the day at 23:00, so we get the day pillar from 12:00 PM of the same date.
-    const noonDate = new Date(tstDate.getFullYear(), tstDate.getMonth(), tstDate.getDate(), 12, 0, 0);
-    const noonLunar = Lunar.fromDate(noonDate);
-    const noonBazi = noonLunar.getEightChar();
-    
-    dayGan = noonBazi.getDayGan();
-    dayZhi = noonBazi.getDayZhi();
-    
-    const dayStemIdx = stems.indexOf(dayGan);
-    
-    if (minute < 30) {
-      // 23:00 ~ 23:29: Pig hour (亥時) of the current day
-      const timeBranchIdx = 11; // 亥
-      const timeStemIdx = (dayStemIdx * 2 + timeBranchIdx) % 10;
-      timeGan = stems[timeStemIdx];
-      timeZhi = branches[timeBranchIdx];
-    } else {
-      // 23:30 ~ 23:59: Night Rat Hour (夜子時) of the current day
-      const timeBranchIdx = 0; // 子
-      const timeStemIdx = (dayStemIdx * 2 + timeBranchIdx) % 10;
-      timeGan = stems[timeStemIdx];
-      timeZhi = branches[timeBranchIdx];
-    }
-  } else if (hour === 0) {
-    // 00:00 ~ 00:59: Morning Rat Hour (朝子時)
-    // lunar-typescript handles this correctly (uses current date's day pillar, and Rat hour stem calculated from it).
-    // However, to be absolutely safe and consistent with standard Bazi, 
-    // Morning Rat Hour uses the Rat hour stem of the CURRENT day (which is the "next day" relative to 23:00).
-    // So we can just use lunar-typescript's default output.
-  }
+  // lunar-typescript automatically handles Jo-ja-shi (advances day if hour >= 23)
+  const dayGan = baZi.getDayGan();
+  const dayZhi = baZi.getDayZhi();
+  const timeGan = baZi.getTimeGan();
+  const timeZhi = baZi.getTimeZhi();
   
   const pillarsRaw = [
     { title: 'Hour', stem: timeGan, branch: timeZhi },
@@ -288,7 +185,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     const targetJieQi = isForward ? nextJieQi : birthJieQi;
     const targetSolar = targetJieQi.getSolar();
     
-    const birthDateObj = tstDate;
+    const birthDateObj = new Date(
+      timeResult.correctedYear,
+      timeResult.correctedMonth - 1,
+      timeResult.correctedDay,
+      timeResult.correctedHour,
+      timeResult.correctedMinute
+    );
     const targetDateObj = new Date(targetSolar.getYear(), targetSolar.getMonth() - 1, targetSolar.getDay(), targetSolar.getHour(), targetSolar.getMinute());
     
     const diffMs = Math.abs(targetDateObj.getTime() - birthDateObj.getTime());
@@ -471,10 +374,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     }
   }
 
+  const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength);
+  
   return {
     pillars,
     grandCycles,
     currentCycleIndex,
+    timeCorrectionMessages: timeResult.messages,
     analysis: {
       geJu,
       yongShen: `${translatedElement} (${translatedGod})`,
@@ -485,7 +391,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       tenGodsRatio,
       dayMasterStrength: strength,
       yongshinDetail,
-      structureDetail
+      structureDetail,
+      ...advancedAnalysis
     }
   };
 } catch (error) {

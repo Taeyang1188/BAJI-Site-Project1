@@ -41,6 +41,9 @@ export const BAZI_MAPPING = {
     "육합": { ko: "육합(六合)", en: "Six Combinations" },
     "삼합": { ko: "삼합(三合)", en: "Triple Combination" },
     "방합": { ko: "방합(方合)", en: "Directional Combination" },
+    "반합": { ko: "반합(半合)", en: "Partial Triple Combination" },
+    "준방합": { ko: "준방합(準方合)", en: "Semi-Directional Combination" },
+    "암합": { ko: "암합(暗合)", en: "Hidden Combination" },
     "삼형": { ko: "삼형(三刑)", en: "Triple Punishment" },
     "반형": { ko: "반형(半刑)", en: "Partial Punishment" },
     "자형": { ko: "자형(自刑)", en: "Self Punishment" },
@@ -50,6 +53,7 @@ export const BAZI_MAPPING = {
     "복음": { ko: "복음(伏吟)", en: "Duplicate Pillar" },
     "천간합": { ko: "천간합(天干合)", en: "Stem Combination" },
     "천간충": { ko: "천간충(天干沖)", en: "Stem Clash" },
+    "지지충": { ko: "지지충(地支沖)", en: "Branch Clash" },
     "격합": { ko: "격합(隔合)", en: "Distant Combination" },
     "원합": { ko: "원합(遠合)", en: "Remote Combination" },
     "격충": { ko: "격충(隔沖)", en: "Distant Clash" },
@@ -151,18 +155,18 @@ export const BAZI_MAPPING = {
     "극강": { ko: "극강", en: "Extremely Strong" },
   },
   yongshin: {
-    "인성": { ko: "인성", en: "Resource" },
-    "비겁": { ko: "비겁", en: "Self/Peer" },
-    "식상": { ko: "식상", en: "Output/Artist" },
-    "재성": { ko: "재성", en: "Wealth" },
-    "관성": { ko: "관성", en: "Power/Influence" },
+    "인성": { ko: "인성", en: "Mystic/Sage" },
+    "비겁": { ko: "비겁", en: "Mirror/Rival" },
+    "식상": { ko: "식상", en: "Artist/Rebel" },
+    "재성": { ko: "재성", en: "Maverick/Architect" },
+    "관성": { ko: "관성", en: "Warrior/Judge" },
     "희신": { ko: "희신", en: "Favorable Element" },
     "기신": { ko: "기신", en: "Unfavorable Element" },
     "구신": { ko: "구신", en: "Rescuing Element" },
-    "인성용신": { ko: "인성용신", en: "Resource as Useful God" },
-    "인수화살": { ko: "인수화살", en: "Resource Transforming Seven Killings" },
-    "식신제살": { ko: "식신제살", en: "Eating God Controlling Seven Killings" },
-    "파인": { ko: "파인", en: "Breaking Resource" },
+    "인성용신": { ko: "인성용신", en: "Mystic/Sage as Useful God" },
+    "인수화살": { ko: "인수화살", en: "Mystic/Sage Transforming Seven Killings" },
+    "식신제살": { ko: "식신제살", en: "Artist/Rebel Controlling Seven Killings" },
+    "파인": { ko: "파인", en: "Breaking Mystic/Sage" },
   },
   tooltips: {
     "geJu": {
@@ -204,14 +208,50 @@ export const BAZI_MAPPING = {
     "wonChung": {
       ko: "끝과 끝에 있는 충으로, 명리학적으로 작용력이 거의 없다고 봅니다.",
       en: "A remote clash between Year and Hour stems. Considered to have almost no practical effect."
+    },
+    "bokEum": {
+      ko: "복음(伏吟): 같은 기운이 겹쳐 에너지가 정체되거나 증폭되는 현상입니다. 해당 궁의 변화나 심리적 압박이 나타날 수 있습니다.",
+      en: "Duplicate Pillar (Bok-Eum): When the same energy overlaps, causing stagnation or amplification. Can lead to changes in that pillar or psychological pressure."
+    },
+    "banHyeong": {
+      ko: "반형(半刑): 삼형의 기운이 절반만 형성된 상태로, 잠재적인 갈등이나 조정이 필요한 상황을 암시합니다.",
+      en: "Partial Punishment (Ban-Hyeong): A state where only half of the Triple Punishment is formed, suggesting potential conflict or situations requiring adjustment."
+    },
+    "hae": {
+      ko: "해(害): 합을 방해하는 기운으로, 인간관계에서의 시기나 질투, 혹은 예기치 못한 방해를 의미합니다.",
+      en: "Harm (Hae): Energy that interferes with combinations, signifying jealousy, envy, or unexpected obstacles in relationships."
+    },
+    "jaOChung": {
+      ko: "자오충(子午沖): 물과 불의 정면 충돌. 감정 기복이 심하고 주거 환경이나 직업의 변화가 잦을 수 있습니다.",
+      en: "Rat-Horse Clash: Direct collision of Water and Fire. High emotional volatility and frequent changes in residence or career."
+    },
+    "chukMiChung": {
+      ko: "축미충(丑未沖): 흙과 흙의 충돌. 내부적인 갈등이나 형제/친척 간의 재산 분쟁, 혹은 건강(위장) 주의가 필요합니다.",
+      en: "Ox-Goat Clash: Collision of Earth and Earth. Internal conflicts, property disputes among relatives, or health issues (stomach)."
+    },
+    "inShinChung": {
+      ko: "인신충(寅申沖): 역마의 충돌. 매우 분주하고 빠르게 변화가 나타나며, 이동 중 사고나 관절 건강에 유의해야 합니다.",
+      en: "Tiger-Monkey Clash: Clash of travel stars. Very busy and fast-paced changes. Beware of accidents during travel or joint health."
+    },
+    "myoYuChung": {
+      ko: "묘유충(卯酉沖): 나무와 칼의 충돌. 주변 사람과의 의리가 상하거나 배신을 당할 수 있으며, 수술수나 피부 질환에 주의하십시오.",
+      en: "Rabbit-Rooster Clash: Wood vs Metal. Potential for betrayal or broken loyalty. Beware of surgery or skin issues."
+    },
+    "jinSulChung": {
+      ko: "진술충(辰戌沖): 흙과 흙의 충돌. 고집으로 인한 마찰이나 명예 실추, 혹은 피부나 소화기 계통의 건강을 살펴야 합니다.",
+      en: "Dragon-Dog Clash: Earth vs Earth. Friction due to stubbornness, loss of reputation, or health issues (skin/digestion)."
+    },
+    "saHaeChung": {
+      ko: "사해충(巳亥沖): 불과 물의 충돌. 감정적인 폭발이나 구설수, 혹은 심장이나 신장 계통의 건강에 유의하십시오.",
+      en: "Snake-Pig Clash: Fire vs Water. Emotional outbursts, gossip, or health issues (heart/kidney)."
     }
   },
   elements: {
-    "Wood": { ko: "목 (Wood)", en: "Wood", color: "#4ADE80", vibe: "Growth & Vitality" },
-    "Fire": { ko: "화 (Fire)", en: "Fire", color: "#F87171", vibe: "Passion & Intensity" },
-    "Earth": { ko: "토 (Earth)", en: "Earth", color: "#FACC15", vibe: "Stability & Grounding" },
-    "Metal": { ko: "금 (Metal)", en: "Metal", color: "#E2E8F0", vibe: "Precision & Clarity" },
-    "Water": { ko: "수 (Water)", en: "Water", color: "#60A5FA", vibe: "Wisdom & Flow" },
+    "Wood": { ko: "목", hanja: "木", en: "Wood", color: "#4ADE80", vibe: "Growth & Vitality" },
+    "Fire": { ko: "화", hanja: "火", en: "Fire", color: "#F87171", vibe: "Passion & Intensity" },
+    "Earth": { ko: "토", hanja: "土", en: "Earth", color: "#FACC15", vibe: "Stability & Grounding" },
+    "Metal": { ko: "금", hanja: "金", en: "Metal", color: "#E2E8F0", vibe: "Precision & Clarity" },
+    "Water": { ko: "수", hanja: "水", en: "Water", color: "#60A5FA", vibe: "Wisdom & Flow" },
   },
   stems: {
     "甲": { ko: "갑목", en: "Yang Wood", element: "Wood" },

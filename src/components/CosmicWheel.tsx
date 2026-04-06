@@ -48,7 +48,7 @@ const HorizontalDial = ({
   const visibleOffsets = Array.from({ length: visibleCount }, (_, i) => i - half);
 
   return (
-    <div className="absolute bottom-[40px] left-1/2 w-0 h-0 flex items-center justify-center z-30">
+    <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30">
       <AnimatePresence custom={direction}>
         {visibleOffsets.map(offset => {
           const itemIndex = (selectedIndex + offset + items.length * 100) % items.length;
@@ -144,7 +144,7 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
   const dayIndex = date.getDate() - 1; 
 
   return (
-    <div className="relative w-full max-w-3xl h-[280px] sm:h-[320px] mx-auto flex items-center justify-center bg-[#050505] rounded-2xl border border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
+    <div className="relative w-full max-w-3xl h-[160px] sm:h-[220px] mx-auto flex items-center justify-center bg-[#050505] rounded-2xl border border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
       
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/30 via-black to-pink-950/20" />
@@ -157,9 +157,9 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
           WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
         }}
       >
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[320px] scale-[0.8] sm:scale-100 origin-bottom">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[320px] scale-[0.6] sm:scale-100 origin-bottom">
           {/* Base Pivot Container for Rings (The Misty Energy Field) */}
-          <div className="absolute bottom-[40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-0 pointer-events-none">
+          <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-0 pointer-events-none">
             {/* Line 4 (Outer boundary of Zodiac) - Strongest */}
             <div className="absolute w-[520px] h-[520px] rounded-full border-[3px] border-[#FF1493]/90 shadow-[0_0_20px_rgba(255,20,147,0.8),inset_0_0_10px_rgba(255,20,147,0.4)]" />
             
@@ -174,7 +174,7 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
           </div>
 
           {/* The Active Wedge (Central Highlight / Crosshair) */}
-          <div className="absolute bottom-[40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-20 pointer-events-none">
+          <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-20 pointer-events-none">
             <div className="absolute w-[520px] h-[520px] rounded-full overflow-hidden">
               <div 
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[260px]"

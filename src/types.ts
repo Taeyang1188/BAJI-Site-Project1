@@ -87,6 +87,7 @@ export interface BaZiResult {
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];
   currentCycleIndex: number;
+  timeCorrectionMessages?: string[];
   analysis?: {
     geJu: string;
     yongShen: string;
@@ -107,5 +108,27 @@ export interface BaZiResult {
       enMarketingMessage: string;
       logicNote: string;
     };
+    muJaRon?: { title: string; description: string; enDescription: string }[];
+    daJaRon?: { title: string; description: string; enDescription: string }[];
+    shinGangShinYak?: { 
+      isStrong: boolean;
+      title: string; 
+      summary: string;
+      description: string; 
+      enDescription?: string; 
+      socialContext: string; 
+      enSocialContext?: string;
+    };
+    relationshipAnalysis?: Record<string, {
+      title: string;
+      godName: string;
+      ratio: number;
+      description: string;
+    }>;
+    wolJiDeukRyeong?: string;
+    jiJangGanSaRyeong?: string;
+    geokGukDetail?: { geonRok: boolean; yangIn: boolean; description: string };
+    personalizedInsights?: Record<string, { ko: string; en: string }>;
+    dayMasterElement?: string;
   };
 }
