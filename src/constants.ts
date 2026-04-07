@@ -16,7 +16,7 @@ export const TRANSLATIONS = {
     },
     input: {
       title: "PEER INTO YOUR DESTINY",
-      name: "IDENTIFY YOURSELF",
+      name: "WHAT IS YOUR NAME?",
       birthDate: "TEMPORAL ORIGIN",
       birthTime: "THE PRECISE SECOND",
       city: "SPATIAL COORDINATES",
@@ -49,6 +49,7 @@ export const TRANSLATIONS = {
       title: "SOUL BLUEPRINT",
       grandCycle: "LIFE SEASONS",
       seasonVibe: "CYCLE VIBE",
+      seasonVibePlaceholder: "What do you think your luck for {year} will be? Shall we test it?",
       seasonVibeDisclaimer: "Based on your current Grand Cycle element.",
       back: "RE-ALIGN",
       lifeStages: {
@@ -139,7 +140,7 @@ export const TRANSLATIONS = {
     },
     input: {
       title: "네 운명을 들여다볼 시간이야",
-      name: "자신을 식별하세요",
+      name: "너 이름이 뭐니?",
       birthDate: "시간적 기원",
       birthTime: "정확한 시간",
       city: "공간적 좌표",
@@ -172,6 +173,7 @@ export const TRANSLATIONS = {
       title: "영혼 설계도",
       grandCycle: "인생의 계절",
       seasonVibe: "사이클 바이브",
+      seasonVibePlaceholder: "요번 {year}년도의 너의 행운은 어떨 것 같아? 시험 해 볼까?",
       seasonVibeDisclaimer: "현재 대운의 오행을 기반으로 합니다.",
       back: "재정렬",
       lifeStages: {

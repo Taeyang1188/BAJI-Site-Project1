@@ -234,7 +234,8 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
     const branchGod = p.branchKoreanName;
 
     const mapGod = (god: string) => {
-      if (god.includes('비견') || god.includes('겁재') || god.includes('일간')) return 'Mirror/Rival';
+      if (god.includes('비견') || god.includes('겁재')) return 'Mirror/Rival';
+      if (god.includes('일간')) return null; // Exclude Day Master itself from the ratio for Mu-Ja-Ron detection
       if (god.includes('식신') || god.includes('상관')) return 'Artist/Rebel';
       if (god.includes('편재') || god.includes('정재')) return 'Maverick/Architect';
       if (god.includes('편관') || god.includes('정관')) return 'Warrior/Judge';

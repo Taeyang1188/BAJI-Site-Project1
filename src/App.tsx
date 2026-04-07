@@ -261,7 +261,7 @@ export default function App() {
       <div className="fixed inset-0 star-field opacity-20 pointer-events-none" />
       
       {/* Top Navigation */}
-      <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50">
+      <nav className="fixed top-0 w-full p-4 sm:p-6 flex justify-between items-center z-50">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => {
@@ -295,20 +295,24 @@ export default function App() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="hidden sm:flex items-center gap-2 text-xs text-white/60 font-mono"
+                className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 text-[10px] sm:text-xs text-white/60 font-mono leading-none"
               >
-                <span>{userInput.birthDate}</span>
-                <span>{userInput.birthTime}</span>
-                {userInput.calendarType && (
-                  <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-white/10">
-                    {userInput.calendarType === 'solar' ? (lang === 'KO' ? '양력' : 'Solar') : (lang === 'KO' ? '음력' : 'Lunar')}
-                  </span>
-                )}
-                {userInput.gender && (
-                  <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-white/10">
-                    {userInput.gender === 'male' ? (lang === 'KO' ? '남' : 'M') : userInput.gender === 'female' ? (lang === 'KO' ? '여' : 'F') : userInput.gender === 'non-binary' ? 'NB' : 'N/A'}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5">
+                  <span>{userInput.birthDate}</span>
+                  <span>{userInput.birthTime}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {userInput.calendarType && (
+                    <span className="text-[8px] sm:text-[10px] uppercase px-1 sm:px-1.5 py-0.5 rounded bg-white/10">
+                      {userInput.calendarType === 'solar' ? (lang === 'KO' ? '양력' : 'Solar') : (lang === 'KO' ? '음력' : 'Lunar')}
+                    </span>
+                  )}
+                  {userInput.gender && (
+                    <span className="text-[8px] sm:text-[10px] uppercase px-1 sm:px-1.5 py-0.5 rounded bg-white/10">
+                      {userInput.gender === 'male' ? (lang === 'KO' ? '남' : 'M') : userInput.gender === 'female' ? (lang === 'KO' ? '여' : 'F') : userInput.gender === 'non-binary' ? 'NB' : 'N/A'}
+                    </span>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

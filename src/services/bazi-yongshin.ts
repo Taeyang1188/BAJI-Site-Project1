@@ -82,7 +82,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   return { score, level, breakdown };
 }
 
-export function determineYongshin(stems: string[], branches: string[], geju: string, strength: any) {
+export function determineYongshin(stems: string[], branches: string[], geju: string, strength: any, structureDetail?: any) {
   const dayMaster = stems[1];
   const dmElement = STEM_ELEMENTS[dayMaster];
   const isStrong = strength.score > 50;
@@ -92,6 +92,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
   let giShin = { god: "", element: "" };
   let guShin = { god: "", element: "" };
   let method = "격국용신";
+  let eokbu: any = null;
 
   const getElementByRel = (rel: string) => {
     const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
@@ -100,10 +101,41 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     return ELEMENT_CYCLE[targetIdx];
   };
 
-  let eokbu: any = null;
-
-  // Logic based on Structure (격국) and Strength
-  if (geju.includes("정관") || geju.includes("JUDGE")) {
+  // 0. Special Structure Handling (Jong-gyeok / Jeon-wang-gyeok)
+  if (structureDetail && structureDetail.category === 'Adaptive') {
+    method = "종격용신";
+    const title = structureDetail.title;
+    
+    if (title.includes("종아격")) {
+      primary = { god: "식상", element: getElementByRel('Artist'), reason: "종아격 → 식상용신", reasonEn: "Adaptive Alignment [Artist/Rebel] → Artist/Rebel Useful God" };
+      heeShin = { god: "재성", element: getElementByRel('Wealth') };
+      giShin = { god: "인성", element: getElementByRel('Wisdom') };
+      guShin = { god: "비겁", element: getElementByRel('Self') };
+    } else if (title.includes("종재격")) {
+      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "종재격 → 재성용신", reasonEn: "Adaptive Alignment [Maverick/Architect] → Maverick/Architect Useful God" };
+      heeShin = { god: "식상", element: getElementByRel('Artist') };
+      giShin = { god: "비겁", element: getElementByRel('Self') };
+      guShin = { god: "인성", element: getElementByRel('Wisdom') };
+    } else if (title.includes("종살격")) {
+      primary = { god: "관성", element: getElementByRel('Power'), reason: "종살격 → 관성용신", reasonEn: "Adaptive Alignment [Warrior/Judge] → Warrior/Judge Useful God" };
+      heeShin = { god: "재성", element: getElementByRel('Wealth') };
+      giShin = { god: "식상", element: getElementByRel('Artist') };
+      guShin = { god: "비겁", element: getElementByRel('Self') };
+    } else if (title.includes("종왕격")) {
+      primary = { god: "비겁", element: getElementByRel('Self'), reason: "종왕격 → 비겁용신", reasonEn: "Adaptive Alignment [Mirror/Rival] → Mirror/Rival Useful God" };
+      heeShin = { god: "인성", element: getElementByRel('Wisdom') };
+      giShin = { god: "식상", element: getElementByRel('Artist') };
+      guShin = { god: "재성", element: getElementByRel('Wealth') };
+    }
+  } else if (structureDetail && structureDetail.category === 'Monarch') {
+    method = "전왕격용신";
+    primary = { god: "비겁", element: dmElement, reason: "전왕격 → 비겁용신", reasonEn: "Monarch Alignment → Mirror/Rival Useful God" };
+    heeShin = { god: "인성", element: getElementByRel('Wisdom') };
+    giShin = { god: "관성", element: getElementByRel('Power') };
+    guShin = { god: "재성", element: getElementByRel('Wealth') };
+  }
+  // 1. Standard Structure Logic
+  else if (geju.includes("정관") || geju.includes("JUDGE")) {
     if (!isStrong) {
       primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "정관격 일간약 → 인성용신", reasonEn: "Warrior/Judge Structure & Weak DM → Mystic/Sage Useful God" };
       heeShin = { god: "비겁", element: getElementByRel('Self') };

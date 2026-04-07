@@ -344,7 +344,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const strength = calcDayMasterStrength(allStems, allBranches);
   const structureDetail = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
 
-  const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength);
+  const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength, structureDetail);
   const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);
   
   // Check for ByeongYak and TongGwan

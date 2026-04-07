@@ -48,8 +48,8 @@ export const calculateAdvancedAnalysis = (
       let descEn = '';
       
       if (isBiGyeop) {
-        descKo = '사주에 비겁(나의 기운)이 보이지 않습니다. 이는 타인의 간섭을 싫어하고 독자적인 길을 개척하는 힘이 강함을 의미합니다. 스스로를 믿고 나아가는 뚝심이 필요합니다.';
-        descEn = 'The Mirror/Rival energy is absent. This indicates a strong dislike for interference and a powerful drive to pioneer your own independent path. You need the perseverance to trust yourself and move forward.';
+        descKo = '사주에 비겁(나의 기운)이 보이지 않습니다. 이는 타인의 간섭을 싫어하고 독자적인 길을 개척하는 힘이 강함을 의미합니다. 스스로를 믿고 나아가는 뚝심이 필요하지만, 때로는 고립감을 느끼거나 경쟁 상황에서 쉽게 물러날 수 있습니다.';
+        descEn = 'The Mirror/Rival energy is absent. This indicates a strong dislike for interference and a powerful drive to pioneer your own independent path. While you need the perseverance to trust yourself, you may sometimes feel isolated or step back easily in competitive situations.';
       } else if (isSikSang) {
         if (inSeongRatio > 30) {
           descKo = '식상(표현)이 없고 인성(생각)이 과다합니다. 머릿속의 구상은 화려하나 실행력이 마비될 수 있는 "도식(倒食)"의 위험이 있습니다. 생각을 줄이고 즉각 행동에 옮기는 연습이 필수적입니다.';
@@ -120,7 +120,7 @@ export const calculateAdvancedAnalysis = (
       }
 
       return {
-        title: lang === 'KO' ? `무${godNameKo} 사주` : `Missing ${godNameEn}`,
+        title: lang === 'KO' ? `무${godNameKo} 사주 (무자론)` : `Missing ${godNameEn} (Absence Theory)`,
         description: lang === 'KO' ? descKo : descEn,
         enDescription: descEn
       };
@@ -187,7 +187,7 @@ export const calculateAdvancedAnalysis = (
       }
 
       return {
-        title: lang === 'KO' ? `${godNameKo}다자 사주` : `Dominant ${godNameEn}`,
+        title: lang === 'KO' ? `${godNameKo}다자 사주 (다자론)` : `Dominant ${godNameEn} (Excess Theory)`,
         description: lang === 'KO' ? descKo : descEn,
         enDescription: descEn
       };

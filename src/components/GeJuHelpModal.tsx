@@ -23,9 +23,11 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
   
   // Extract base Ten God (e.g., '편관' from '편관 (Warrior/Judge)')
   const baseTenGod = monthBranchTenGodKo.split(' ')[0];
-  const baseTenGodEn = monthBranchTenGodEn.split('/')[0].trim();
+  const baseTenGodEn = BAZI_MAPPING.tenGods[baseTenGod as keyof typeof BAZI_MAPPING.tenGods]?.en.replace('The ', '') || monthBranchTenGodEn.split('/')[0].trim();
 
-  const strength = result.analysis.dayMasterStrength.level; // 'Strong', 'Weak', 'Extreme Strong', 'Extreme Weak'
+  const strength = result.analysis.dayMasterStrength.level;
+  const score = result.analysis.dayMasterStrength.score;
+  const isStrong = score > 50;
   
   // Determine Johu (Seasonality)
   const spring = ['寅', '卯', '辰'];
@@ -126,10 +128,10 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
   const currentTenGod = tenGodMapping[baseTenGod] || tenGodMapping['정관'];
 
   // Strength text
-  const strengthTextKo = strength.includes('Strong') 
+  const strengthTextKo = isStrong 
     ? '사회의 요구에 당당히 맞서며 주도권을 잡으려 합니다. ("내가 이 판의 주인공이다.")'
     : '사회의 요구가 버거워 눈치를 보거나 시스템에 의존하려 합니다. ("나를 좀 도와달라.")';
-  const strengthTextEn = strength.includes('Strong')
+  const strengthTextEn = isStrong
     ? 'Confidently faces societal demands and tries to take the initiative. ("I am the main character here.")'
     : 'Finds societal demands overwhelming and tends to rely on the system. ("Please help me.")';
 
@@ -171,8 +173,27 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
   const tempDiff = Math.abs(socialTemp - innerTemp);
   let tempDiffTextKo = '';
   let tempDiffTextEn = '';
+  let subTextKo = '';
+  let subTextEn = '';
 
+  // Check for Overload Warning
+  const isOverload = season === 'summer' && dmElement === 'Fire';
+  
+  // Check for Weapon (Yongshin)
+  const yongshinElement = result.analysis.yongshinDetail?.primary?.element;
+  let hasWeapon = false;
   if (tempDiff > 40) {
+    if (socialTemp > 60 && innerTemp > 60 && yongshinElement === 'Water') hasWeapon = true;
+    if (socialTemp < 40 && innerTemp < 40 && yongshinElement === 'Fire') hasWeapon = true;
+  }
+
+  if (isOverload) {
+    tempDiffTextKo = "⚠️ 과부하 경고: 열기가 너무 강해 폭발할 위험이 있습니다. 냉정이 필요합니다.";
+    tempDiffTextEn = "⚠️ Overload Warning: Heat is too intense, risk of explosion. Coolness is required.";
+  } else if (hasWeapon) {
+    tempDiffTextKo = "스트레스는 크지만 극복할 무기가 있습니다. 위기를 기회로 바꿉니다.";
+    tempDiffTextEn = "Stress is high, but you have weapons to overcome it. Turn crisis into opportunity.";
+  } else if (tempDiff > 40) {
     tempDiffTextKo = "사회적 요구와 내 본심이 정면충돌하여 스트레스가 높습니다.";
     tempDiffTextEn = "Societal demands and your true self clash head-on, resulting in high stress.";
   } else if (tempDiff < 20) {
@@ -182,6 +203,9 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
     tempDiffTextKo = "사회적 요구와 내 본심이 적절한 균형을 이루고 있습니다.";
     tempDiffTextEn = "There is a proper balance between societal demands and your true self.";
   }
+
+  subTextKo = "월지(세상)와 일간(나)의 온도차가 클수록, 당신은 세상을 살아가기 위해 더 많은 '배터리'를 소모하고 있습니다.";
+  subTextEn = "The larger the temperature difference between the world (Month) and yourself (DM), the more 'battery' you consume to live in society.";
 
   const geJuName = result.analysis.structureDetail 
     ? (lang === 'KO' ? result.analysis.structureDetail.title : result.analysis.structureDetail.enTitle)
@@ -286,6 +310,9 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
             <p className="text-center text-sm text-neon-pink mt-4 font-medium" dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(
               lang === 'KO' ? tempDiffTextKo : tempDiffTextEn
             )}} />
+            <p className="text-center text-[11px] text-white/40 mt-2 leading-relaxed max-w-sm mx-auto">
+              {lang === 'KO' ? subTextKo : subTextEn}
+            </p>
           </div>
         </div>
       </motion.div>
