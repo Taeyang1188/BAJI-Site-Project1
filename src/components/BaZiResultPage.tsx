@@ -9,9 +9,25 @@ import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
 import { GeJuHelpModal } from './GeJuHelpModal';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
-import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon, HelpCircle, X, Zap, BookOpen, Clock } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronUp, 
+  MessageSquare, 
+  Sun, 
+  Moon, 
+  HelpCircle, 
+  X, 
+  Zap, 
+  BookOpen, 
+  Clock,
+  CheckCircle2,
+  Sparkles,
+  Share2
+} from 'lucide-react';
 
-const TypingText = ({ text, speed = 30 }: { text: string, speed?: number }) => {
+import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
+
+const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 30 }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [showCursor, setShowCursor] = React.useState(true);
@@ -23,6 +39,12 @@ const TypingText = ({ text, speed = 30 }: { text: string, speed?: number }) => {
     }, 500);
     return () => clearInterval(interval);
   }, []);
+
+  // Reset state when text changes
+  React.useEffect(() => {
+    setDisplayedElements([]);
+    setCurrentIndex(0);
+  }, [text]);
 
   const charInfos = React.useMemo(() => {
     if (!text) return [];
@@ -130,6 +152,7 @@ const TypingText = ({ text, speed = 30 }: { text: string, speed?: number }) => {
     </span>
   );
 };
+
 
 
 const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
@@ -893,7 +916,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                 </p>
               ) : (
                 <p className="text-lg font-display italic text-white leading-relaxed">
-                  <TypingText text={cycleVibe} />
+                  <TypingText key={lang + cycleVibe} text={cycleVibe} />
                 </p>
               )}
             </div>
@@ -953,19 +976,21 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className={`goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''}`}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''}`}
                   style={{ borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
                 >
-                  <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative h-full">
-                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                  <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
                       <PolarityIcon polarity={pillar.stemPolarity} size={8} />
                     </div>
-                    <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
-                      {lang === 'KO' ? 
-                        (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
-                        (pillar.title === 'Hour' ? 'Time Stem' : `${pillar.title} Stem`)}
+                    <div className="flex-1 flex items-start justify-center">
+                      <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
+                        {lang === 'KO' ? 
+                          (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
+                          (pillar.title === 'Hour' ? 'Time Stem' : `${pillar.title} Stem`)}
+                      </div>
                     </div>
-                    <div className="text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight min-h-[2.4em] sm:min-h-[3.2em] flex flex-col justify-center flex-grow">
+                    <div className="w-full text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2">
                       {lang === 'KO' ? 
                         (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
                         (showHanja ? (
@@ -973,18 +998,23 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                             <span>{pillar.stem}</span>
                             <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap tracking-tighter text-white/80">{BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
                           </div>
-                        ) : (BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem).split(' ').map((word, idx) => (
-                          <div key={idx} className="text-[10px] sm:text-base md:text-xl">{word}</div>
-                        )))}
+                        ) : (
+                          <span className="text-sm sm:text-base md:text-xl whitespace-nowrap tracking-tighter">{BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
+                        ))}
+                    </div>
+                    <div className="flex-1 flex items-end justify-center">
+                      <div className="text-[8px] sm:text-[10px] opacity-0 pointer-events-none font-bold select-none" aria-hidden="true">
+                        {lang === 'KO' ? '장생' : 'Growth'}
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
-                    <div 
-                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
+                  <div className="w-full bg-white/5 border-t border-white/10 py-2 sm:py-3 px-0.5 min-h-[1.6rem] sm:min-h-[2.4rem] flex items-center justify-center shrink-0">
+                    <span 
+                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase leading-tight"
                       style={{ color: getTenGodColor(lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName) }}
                     >
                       {lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)}
-                    </div>
+                    </span>
                   </div>
                 </motion.div>
 
@@ -993,19 +1023,21 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: (i + 4) * 0.05 }}
-                  className={`goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/10' : ''}`}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/10' : ''}`}
                   style={{ borderColor: ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
                 >
-                  <div className="p-1.5 sm:p-3 md:p-4 flex flex-col items-center text-center space-y-1 sm:space-y-2 flex-grow relative h-full">
-                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40">
+                  <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
                       <PolarityIcon polarity={pillar.branchPolarity} size={8} />
                     </div>
-                    <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
-                      {lang === 'KO' ? 
-                        (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
-                        (pillar.title === 'Hour' ? 'Time Branch' : `${pillar.title} Branch`)}
+                    <div className="flex-1 flex items-start justify-center">
+                      <div className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] text-white/40 uppercase">
+                        {lang === 'KO' ? 
+                          (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
+                          (pillar.title === 'Hour' ? 'Time Branch' : `${pillar.title} Branch`)}
+                      </div>
                     </div>
-                    <div className="text-base sm:text-xl md:text-3xl font-gothic text-white/60 leading-tight min-h-[1.2em] sm:min-h-[1.6em] flex flex-col justify-center flex-grow">
+                    <div className="w-full text-base sm:text-xl md:text-3xl font-gothic text-white/60 leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2">
                       {lang === 'KO' ? 
                         (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
                         (showHanja ? (
@@ -1017,17 +1049,19 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                           <span className="text-sm sm:text-base md:text-xl whitespace-nowrap tracking-tighter">{branchData?.en || pillar.branch}</span>
                         ))}
                     </div>
-                    <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
-                      {lang === 'KO' ? lifeStage?.ko : lifeStage?.en}
+                    <div className="flex-1 flex items-end justify-center">
+                      <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
+                        {lang === 'KO' ? lifeStage?.ko : lifeStage?.en}
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-white/5 border-t border-white/10 py-1 sm:py-2 px-0.5 text-center">
-                    <div 
-                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-tighter sm:tracking-wider truncate"
+                  <div className="w-full bg-white/5 border-t border-white/10 py-2 sm:py-3 px-0.5 min-h-[1.6rem] sm:min-h-[2.4rem] flex items-center justify-center shrink-0">
+                    <span 
+                      className="text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase leading-tight"
                       style={{ color: getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
                     >
                       {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
-                    </div>
+                    </span>
                   </div>
                 </motion.div>
 
@@ -1839,16 +1873,6 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
         </AnimatePresence>
       </div>
 
-      <div className="flex justify-center pt-4">
-        <motion.button 
-          whileTap={{ scale: 0.95 }}
-          onClick={onBack}
-          className="px-8 py-3 border border-neon-pink text-neon-pink text-xs font-bold tracking-[0.3em] hover:bg-neon-pink hover:text-white transition-all rounded-full"
-        >
-          {t.back}
-        </motion.button>
-      </div>
-
       {/* Tong-Gwan Yongshin Info Modal */}
       <AnimatePresence>
         {showTongGwanInfo && (
@@ -2352,6 +2376,180 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
           </div>
         )}
       </AnimatePresence>
+
+      {/* Soul Summary Report Card */}
+      <SoulSummaryCard result={result} lang={lang} />
+
+      <div className="flex justify-center pt-12 pb-20">
+        <motion.button 
+          whileTap={{ scale: 0.95 }}
+          onClick={onBack}
+          className="px-12 py-4 border border-neon-pink text-neon-pink text-sm font-bold tracking-[0.3em] hover:bg-neon-pink hover:text-white transition-all rounded-full"
+        >
+          {t.back}
+        </motion.button>
+      </div>
     </div>
   );
 }
+
+const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
+  const summary = React.useMemo(() => generateSoulSummary(result, lang), [result, lang]);
+  const dayPillar = result.pillars.find(p => p.title === 'Day');
+  const isMuO = dayPillar?.stem === '戊' && dayPillar?.branch === '午';
+  const isMuIn = dayPillar?.stem === '戊' && dayPillar?.branch === '寅';
+  const [isImageViewMode, setIsImageViewMode] = React.useState(false);
+  
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mt-12 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
+    >
+      <div className="bg-[#050505] rounded-[1.9rem] p-6 sm:p-10 border border-white/10 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
+        {(isMuO || isMuIn) && (
+          <button 
+            onClick={() => setIsImageViewMode(!isImageViewMode)}
+            className="absolute top-4 right-4 z-50 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-bold text-white/80 hover:text-white hover:bg-black/80 transition-all flex items-center gap-2"
+          >
+            {isImageViewMode ? (lang === 'KO' ? '이미지 닫기' : 'Close Image') : (lang === 'KO' ? '이미지 보기' : 'View Image')}
+          </button>
+        )}
+
+        {isMuO && (
+          <img 
+            src="https://i.imgur.com/6Kqibqt.jpeg"
+            alt="Mu-o Background"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ease-in-out ${isImageViewMode ? 'opacity-100' : 'opacity-40'}`}
+          />
+        )}
+        {isMuIn && (
+          <img 
+            src="https://i.imgur.com/msGP3dO.jpeg"
+            alt="Mu-in Background"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ease-in-out ${isImageViewMode ? 'opacity-100' : 'opacity-40'}`}
+          />
+        )}
+        {/* Decorative elements */}
+        <div className={`absolute top-0 right-0 w-64 h-64 bg-neon-pink/5 blur-[100px] -z-10 transition-opacity duration-700 ${isImageViewMode ? 'opacity-0' : 'opacity-100'}`} />
+        <div className={`absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/5 blur-[100px] -z-10 transition-opacity duration-700 ${isImageViewMode ? 'opacity-0' : 'opacity-100'}`} />
+        
+        <motion.div 
+          animate={{ 
+            opacity: isImageViewMode ? 0 : 1, 
+            scale: isImageViewMode ? 0.95 : 1,
+            pointerEvents: isImageViewMode ? 'none' : 'auto'
+          }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 flex flex-col items-center text-center space-y-6 w-full"
+        >
+          <div className="inline-block px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-[8px] border border-white/10 text-[10px] font-display font-bold tracking-[0.3em] text-white/40 uppercase shadow-lg">
+                Soul Summary Report
+              </div>
+              
+              <div className="space-y-2 w-full p-6 bg-black/30 backdrop-blur-[8px] border border-white/10 rounded-2xl shadow-lg">
+                <div className="text-neon-pink text-sm font-bold tracking-widest uppercase">{summary.iljuName}</div>
+                <h2 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
+                  "{summary.oneLineReview}"
+                </h2>
+                <div className="flex flex-wrap justify-center gap-2 mt-3">
+                  {summary.hashtags.map((tag, i) => (
+                    <span key={i} className="px-3 py-1 rounded-full bg-black/40 border border-gray-400/40 text-[11px] sm:text-xs text-[#39FF14] font-bold shadow-[0_0_8px_rgba(57,255,20,0.4)] tracking-wide">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
+              
+              <div className="max-w-2xl w-full space-y-4">
+                <div className="space-y-2 p-6 bg-black/30 backdrop-blur-[8px] border border-white/10 rounded-2xl shadow-lg">
+                  <p className="text-xs font-bold text-white/40 uppercase tracking-widest">
+                    {lang === 'KO' ? '가까이 해야할 핵심에너지' : 'Core Energy to Keep Close'}
+                  </p>
+                  <p className="text-xl sm:text-2xl text-neon-cyan font-bold">
+                    {summary.coreEnergy.element}
+                  </p>
+                  <p className="text-lg sm:text-xl text-white/90 font-medium leading-relaxed mt-2">
+                    {summary.coreEnergy.description}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-5 bg-black/30 backdrop-blur-[8px] rounded-2xl border border-white/10 shadow-lg text-left space-y-2">
+                    <div className="flex items-center gap-2 text-neon-pink">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="text-xs font-bold uppercase tracking-wider">{lang === 'KO' ? '이번 달 행동 처방전' : 'Action Prescription'}</span>
+                    </div>
+                    <p className="text-sm text-white/70 leading-relaxed">{summary.actionPrescription}</p>
+                  </div>
+                  
+                  <div className="p-5 bg-black/30 backdrop-blur-[8px] rounded-2xl border border-white/10 shadow-lg text-left space-y-2">
+                    <div className="flex items-center gap-2 text-neon-cyan">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wider">{lang === 'KO' ? '행운의 습관' : 'Lucky Habit'}</span>
+                </div>
+                <p className="text-sm text-white/70 leading-relaxed">{summary.coreEnergy.luckyHabit}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="w-full pt-4 space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col">
+                <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/60 uppercase self-center sm:self-start">
+                  {lang === 'KO' ? '행운의 아이템' : 'Lucky Items'}
+                </div>
+                <div className="space-y-3 flex-1">
+                  {summary.luckyItems.map((item, i) => (
+                    <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/10 text-left">
+                      <div className="text-[10px] text-neon-purple font-bold uppercase mb-1">{item.name}</div>
+                      <p className="text-[11px] text-white/70 leading-snug">{item.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col justify-center">
+                <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/60 uppercase self-center">
+                  {lang === 'KO' ? '오행 밸런스 요약' : 'Elemental Balance'}
+                </div>
+                <div className="grid grid-cols-5 gap-2 mt-4">
+                  {summary.elementStrengths.map((es, i) => (
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <div className="w-full bg-white/5 rounded-full h-16 relative overflow-hidden">
+                        <motion.div 
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${Math.min(es.percentage, 100)}%` }}
+                          className="absolute bottom-0 left-0 w-full"
+                          style={{ backgroundColor: es.color }}
+                        />
+                      </div>
+                      <span className="text-[8px] font-bold text-white/40">{es.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="pt-4 w-full">
+            <button 
+              disabled
+              className="w-full py-4 bg-black/40 backdrop-blur-md border border-dashed border-white/20 rounded-2xl text-white/30 text-sm font-display tracking-widest uppercase cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
+            >
+              <Share2 className="w-4 h-4" />
+              {lang === 'KO' ? '리포트 공유하기 (준비 중)' : 'Share Report (Coming Soon)'}
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};

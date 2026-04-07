@@ -64,19 +64,19 @@ export const calculateAdvancedAnalysis = (
         let elementSpecificEn = '';
         if (dmElement === 'Wood') {
           elementSpecific = '토(土) 재성이 없어 현실적인 안정감이나 부동산 축적에 대한 감각이 다소 늦게 깨어날 수 있습니다.';
-          elementSpecificEn = 'Missing Earth Wealth, so your sense of practical stability or real estate accumulation may awaken somewhat late.';
+          elementSpecificEn = 'Missing Earth Maverick/Architect, so your sense of practical stability or real estate accumulation may awaken somewhat late.';
         } else if (dmElement === 'Fire') {
           elementSpecific = '금(金) 재성이 없어 분별력과 사리판단을 통한 결과 도출에 시간이 걸릴 수 있습니다.';
-          elementSpecificEn = 'Missing Metal Wealth, so it may take time to derive results through discernment and logical judgment.';
+          elementSpecificEn = 'Missing Metal Maverick/Architect, so it may take time to derive results through discernment and logical judgment.';
         } else if (dmElement === 'Earth') {
           elementSpecific = '수(水) 재성이 없어 실속 있는 현금 흐름이나 유동 자산을 숨겨서 운용하는 지혜가 필요합니다.';
-          elementSpecificEn = 'Missing Water Wealth, so you need the wisdom to secretly manage substantial cash flow or liquid assets.';
+          elementSpecificEn = 'Missing Water Maverick/Architect, so you need the wisdom to secretly manage substantial cash flow or liquid assets.';
         } else if (dmElement === 'Metal') {
           elementSpecific = '목(木) 재성이 없어 사람을 다루거나 객관적인 가치 판단을 내리는 데 어려움을 겪을 수 있습니다.';
-          elementSpecificEn = 'Missing Wood Wealth, so you may experience difficulties in managing people or making objective value judgments.';
+          elementSpecificEn = 'Missing Wood Maverick/Architect, so you may experience difficulties in managing people or making objective value judgments.';
         } else if (dmElement === 'Water') {
           elementSpecific = '화(火) 재성이 없어 직관적인 타이밍 포착이나 무형의 자산(주식 등) 운용에 서툴 수 있습니다.';
-          elementSpecificEn = 'Missing Fire Wealth, so you might be clumsy at catching intuitive timing or managing intangible assets (like stocks).';
+          elementSpecificEn = 'Missing Fire Maverick/Architect, so you might be clumsy at catching intuitive timing or managing intangible assets (like stocks).';
         }
 
         if (inSeongRatio > 30) {
@@ -196,7 +196,7 @@ export const calculateAdvancedAnalysis = (
   // 2.5 Gwan-sal Hon-jap Analysis
   if (isGwanSalHonJap) {
     const honJapKo = '사주 내에 안정적인 "정관(正官)"과 모험적인 "편관(偏官)"이 함께 섞여 있는 상태입니다. 이 두 가지 상반된 기운이 혼재되어 있으면 어떤 선택을 내릴 때 극심하게 헷갈리며 결정 장애를 겪게 되는 것이 가장 핵심적인 특징입니다. 정관은 안정을 추구하는 보편적인 환경을, 편관은 리스크와 모험이 따르는 환경을 의미하는데, 이 두 성향이 모두 자신에게 맞는 것처럼 느껴져 어느 하나를 쉽게 포기하지 못하고 내적 갈등에 빠지기 쉽습니다. 주변 환경이나 타인에게 휘둘리지 않도록 명확한 기준을 세우는 것이 중요합니다.';
-    const honJapEn = 'Mixed Authority (Gwan-sal Hon-jap) detected. You have both Direct Officer (Jeong-gwan) and Seven Killings (Pyeon-gwan). This often leads to decision paralysis and internal conflict between stability and adventure. You may feel that both paths suit you, making it hard to choose and leading to being swayed by others. Setting clear personal standards is vital.';
+    const honJapEn = 'Mixed Authority (Gwan-sal Hon-jap) detected. You have both Direct Officer (Jeong-gwan) and Strong Warrior force (Pyeon-gwan). This often leads to decision paralysis and internal conflict between stability and adventure. You may feel that both paths suit you, making it hard to choose and leading to being swayed by others. Setting clear personal standards is vital.';
     
     daJaRon.push({
       title: lang === 'KO' ? '관살혼잡(官殺混雜) 분석' : 'Mixed Authority Analysis',
@@ -266,7 +266,7 @@ export const calculateAdvancedAnalysis = (
     } else if (hasJaeGeukIn) {
       parentsDesc = lang === 'KO'
         ? '재극인(財剋印)의 양상으로, 현실적인 이익과 본인의 신념/학문 사이에서 갈등이 잦을 수 있습니다. 부모님의 조언이 지나치게 현실적이거나 결과 중심적이어서 본인의 순수한 열정과 충돌할 수 있습니다. 물질적 지원은 있으나 정신적 공감이 부족할 수 있으니 적절한 거리두기가 필요합니다.'
-        : 'A pattern of "Wealth controlling Wisdom." Frequent conflicts may arise between practical interests and your beliefs. Parental advice might be overly realistic or result-oriented, clashing with your pure passion. Material support exists, but lack of emotional empathy may require some distance.';
+        : 'A pattern of "Maverick/Architect controlling Mystic/Sage." Frequent conflicts may arise between practical interests and your beliefs. Parental advice might be overly realistic or result-oriented, clashing with your pure passion. Material support exists, but lack of emotional empathy may require some distance.';
     } else if (monthBranchTenGod.includes('인성')) {
       parentsDesc = lang === 'KO'
         ? '부모 자리에 나를 생하는 기운(인성)이 뚜렷합니다. 어머니의 헌신적인 사랑이나 윗사람의 전폭적인 지지를 받으며 성장하는 구조입니다. 정서적 안정감이 높고 학문적 성취를 돕는 환경이 조성되어 있습니다.'
@@ -291,10 +291,76 @@ export const calculateAdvancedAnalysis = (
     const spouseGodRatio = gender === 'male' ? gods.JaeSeong : gods.GwanSeong;
     let spouseDesc = '';
     
-    if (dayBranchTenGod.includes('편관')) {
+    // Advanced Spouse Separation Indicators
+    const stemEl = BAZI_MAPPING.stems[dayPillar?.stem as keyof typeof BAZI_MAPPING.stems]?.element;
+    const branchEl = BAZI_MAPPING.branches[dayPillar?.branch as keyof typeof BAZI_MAPPING.branches]?.element;
+    const isGanYeoJiDong = stemEl === branchEl;
+
+    const dayBranch = dayPillar?.branch || '';
+    const isJinSulChukMi = ['辰', '戌', '丑', '未'].includes(dayBranch);
+    const isHurtingOfficerDay = gender === 'female' && dayBranchTenGod.includes('상관');
+    
+    const dayPillarKey = `${dayPillar?.stem}${dayPillar?.branch}`;
+    const isBaekho = ['甲辰', '乙未', '丙戌', '丁丑', '戊辰', '壬戌', '癸丑'].includes(dayPillarKey);
+    const isGoegang = ['戊戌', '戊辰', '庚戌', '庚辰', '壬戌', '壬辰'].includes(dayPillarKey);
+
+    // Check for Clash/Punishment on Day Branch
+    const hasDayClash = pillars.some((p, i) => i !== 1 && (
+      (dayBranch === '子' && p.branch === '午') || (dayBranch === '午' && p.branch === '子') ||
+      (dayBranch === '丑' && p.branch === '未') || (dayBranch === '未' && p.branch === '丑') ||
+      (dayBranch === '寅' && p.branch === '申') || (dayBranch === '申' && p.branch === '寅') ||
+      (dayBranch === '卯' && p.branch === '酉') || (dayBranch === '酉' && p.branch === '卯') ||
+      (dayBranch === '辰' && p.branch === '戌') || (dayBranch === '戌' && p.branch === '辰') ||
+      (dayBranch === '巳' && p.branch === '亥') || (dayBranch === '亥' && p.branch === '巳')
+    ));
+    const hasDayPunishment = pillars.some((p, i) => i !== 1 && (
+      (dayBranch === '寅' && p.branch === '巳') || (dayBranch === '巳' && p.branch === '申') || (dayBranch === '申' && p.branch === '寅') ||
+      (dayBranch === '丑' && p.branch === '戌') || (dayBranch === '戌' && p.branch === '未') || (dayBranch === '未' && p.branch === '丑') ||
+      (dayBranch === '子' && p.branch === '卯') || (dayBranch === '卯' && p.branch === '子')
+    ));
+
+    // Tomb/Storage check (Im-myo)
+    const getSpouseTombInfo = (dm: string, gen: string) => {
+      const dmEl = BAZI_MAPPING.stems[dm as keyof typeof BAZI_MAPPING.stems]?.element;
+      let spouseEl = '';
+      let tombBr = '';
+      if (dmEl === 'Wood') { spouseEl = gen === 'male' ? 'Earth' : 'Metal'; tombBr = gen === 'male' ? '辰' : '丑'; }
+      else if (dmEl === 'Fire') { spouseEl = gen === 'male' ? 'Metal' : 'Water'; tombBr = gen === 'male' ? '丑' : '辰'; }
+      else if (dmEl === 'Earth') { spouseEl = gen === 'male' ? 'Water' : 'Wood'; tombBr = gen === 'male' ? '辰' : '未'; }
+      else if (dmEl === 'Metal') { spouseEl = gen === 'male' ? 'Wood' : 'Fire'; tombBr = gen === 'male' ? '未' : '戌'; }
+      else if (dmEl === 'Water') { spouseEl = gen === 'male' ? 'Fire' : 'Earth'; tombBr = gen === 'male' ? '戌' : '辰'; }
+      return { spouseEl, tombBr };
+    };
+    const { spouseEl, tombBr } = getSpouseTombInfo(dayMaster, gender);
+    const hasSpouseStar = pillars.some(p => 
+      BAZI_MAPPING.stems[p.stem as keyof typeof BAZI_MAPPING.stems]?.element === spouseEl ||
+      BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element === spouseEl
+    );
+    const hasTombBranch = pillars.some(p => p.branch === tombBr);
+    const isSpouseInTomb = hasSpouseStar && hasTombBranch;
+    const isBiGyeopDaJa = gods.BiGyeop > 30;
+
+    const riskFactors = [];
+    if (isGanYeoJiDong) riskFactors.push(lang === 'KO' ? '간여지동' : 'Gan-yeo-ji-dong');
+    if (hasDayClash || hasDayPunishment) riskFactors.push(lang === 'KO' ? '일지 형충' : 'Day Branch Clash/Punishment');
+    if (isSpouseInTomb) riskFactors.push(lang === 'KO' ? '부성/처성임묘' : 'Spouse Star in Tomb');
+    if (isHurtingOfficerDay) riskFactors.push(lang === 'KO' ? '일지 상관' : 'Hurting Officer on Day Branch');
+    if (isJinSulChukMi) riskFactors.push(lang === 'KO' ? '일지 진술축미' : 'Earth Branch on Day');
+    if (isBaekho || isGoegang) riskFactors.push(lang === 'KO' ? '백호/괴강살' : 'Baekho/Goegang-sal');
+    if (isBiGyeopDaJa) riskFactors.push(lang === 'KO' ? '비겁다자' : 'Excessive Bi-gyeop');
+
+    if (riskFactors.length >= 2) {
+      spouseDesc = lang === 'KO'
+        ? `배우자 운에서 주의가 필요한 신호들이 여러 개 관찰됩니다. 특히 ${riskFactors.join(', ')} 등의 기운이 겹쳐 있어 배우자와의 관계에서 갈등이나 이별의 기운이 강할 수 있습니다. 이는 배우자 자리가 불안정하거나 본인의 기운이 너무 강해 배우자가 머물기 힘든 환경임을 의미합니다. 무조건적인 불운으로 받아들이기보다, 서로의 독립성을 존중하고 주말 부부나 각자의 전문 영역을 확실히 갖는 '업상대체'를 통해 에너지를 분산시키는 지혜가 필요합니다.`
+        : `Multiple signs requiring caution are observed in spouse luck. Specifically, the combination of ${riskFactors.join(', ')} suggests potential for conflict or separation. This means the spouse palace is unstable or your own energy is too strong for a partner to settle easily. Rather than viewing it as pure misfortune, you need the wisdom to disperse this energy through "Up-sang-dae-che" (career substitution) or respecting each other's independence.`;
+    } else if (riskFactors.length === 1) {
+      spouseDesc = lang === 'KO'
+        ? `배우자 운에서 ${riskFactors[0]}의 기운이 관찰됩니다. 배우자 자리에 변화가 잦거나 본인의 주관이 강해 충돌이 생길 수 있는 구조입니다. 서로의 다름을 인정하고 적절한 거리감을 유지할 때 관계가 더욱 건강해질 수 있습니다.`
+        : `The energy of ${riskFactors[0]} is observed in your spouse luck. This structure suggests frequent changes in the spouse palace or potential for conflict due to your strong subjective views. The relationship can become healthier when you acknowledge each other's differences and maintain appropriate distance.`;
+    } else if (dayBranchTenGod.includes('편관')) {
       spouseDesc = lang === 'KO'
         ? '배우자 자리에 나를 통제하려는 강한 힘(편관)이 들어와 있습니다. 친구 같은 인연보다는 내가 존경할 수 있거나, 혹은 나를 강하게 리드하는 카리스마 있는 사람과 인연이 깊습니다. 서로의 주관이 뚜렷해 충돌이 잦을 수 있으니 "존중"과 "거리두기"가 관계 유지의 핵심입니다.'
-        : 'A strong controlling force (Seven Killings) is in the Spouse Palace. You are drawn to charismatic partners you can respect or who lead you strongly. Since both have clear views, conflicts may be frequent; "respect" and "personal space" are keys to the relationship.';
+        : 'A strong controlling force (Strong Warrior force) is in the Spouse Palace. You are drawn to charismatic partners you can respect or who lead you strongly. Since both have clear views, conflicts may be frequent; "respect" and "personal space" are keys to the relationship.';
     } else if (dayBranchTenGod.includes('비견') || dayBranchTenGod.includes('겁재')) {
       spouseDesc = lang === 'KO'
         ? '배우자 자리에 나와 같은 기운(비겁)이 있습니다. 친구처럼 편안하고 동등한 관계를 추구하지만, 때로는 서로 양보하지 않는 고집으로 인해 갈등이 생길 수 있습니다. 배우자가 나의 경쟁자이자 동반자 역할을 동시에 수행하는 구조입니다.'
@@ -310,7 +376,7 @@ export const calculateAdvancedAnalysis = (
     } else if (dayBranchTenGod.includes('재성')) {
       spouseDesc = lang === 'KO'
         ? '배우자 자리에 내가 관리하는 기운(재성)이 있습니다. 현실적이고 경제 관념이 뚜렷한 배우자와 인연이 깊으며, 결혼 후 재산 축적에 배우자의 도움이 큽니다. 남성에게는 현모양처, 여성에게는 살림을 잘 돕는 남편의 형국입니다.'
-        : 'Wealth energy is in the Spouse Palace. You have ties with a realistic partner with a strong sense of economy. Your spouse helps greatly in accumulating wealth after marriage. It signifies a supportive and practical partner.';
+        : 'Maverick/Architect energy is in the Spouse Palace. You have ties with a realistic partner with a strong sense of economy. Your spouse helps greatly in accumulating wealth after marriage. It signifies a supportive and practical partner.';
     } else {
       spouseDesc = lang === 'KO'
         ? '배우자 운이 안정적이며 서로의 역할을 충실히 수행합니다. 사주 전체의 조화에 따라 배우자가 나의 부족한 기운을 채워주는 든든한 조력자가 됩니다.'
@@ -329,8 +395,33 @@ export const calculateAdvancedAnalysis = (
     let childrenDesc = '';
     
     const hourStemTenGod = hourPillar?.stemKoreanName || '';
+    const hourBranch = hourPillar?.branch || '';
     
-    if (hourBranchTenGod.includes('인성') || hourStemTenGod.includes('인성')) {
+    // Check for Clash/Punishment on Hour Branch (Si-ju)
+    const hasHourClash = pillars.some((p, i) => i !== 3 && (
+      (hourBranch === '子' && p.branch === '午') || (hourBranch === '午' && p.branch === '子') ||
+      (hourBranch === '丑' && p.branch === '未') || (hourBranch === '未' && p.branch === '丑') ||
+      (hourBranch === '寅' && p.branch === '申') || (hourBranch === '申' && p.branch === '寅') ||
+      (hourBranch === '卯' && p.branch === '酉') || (hourBranch === '酉' && p.branch === '卯') ||
+      (hourBranch === '辰' && p.branch === '戌') || (hourBranch === '戌' && p.branch === '辰') ||
+      (hourBranch === '巳' && p.branch === '亥') || (hourBranch === '亥' && p.branch === '巳')
+    ));
+
+    if (childrenGodRatio === 0) {
+      if (hasHourClash) {
+        childrenDesc = lang === 'KO'
+          ? '자녀를 상징하는 기운이 보이지 않고 말년의 자리가 충돌하고 있습니다. 자녀와의 인연이 다소 늦거나 멀어질 수 있는 흐름입니다. 자녀에게 기대를 걸기보다 본인의 독립적인 노후를 설계하는 것이 관계를 더욱 편안하게 만듭니다.'
+          : 'The children star is absent and the late-life palace is clashing. Ties with children may be delayed or distant. Designing your own independent retirement rather than relying on children will make the relationship more comfortable.';
+      } else {
+        childrenDesc = lang === 'KO'
+          ? '자녀를 상징하는 십성이 드러나지는 않았으나 말년의 자리가 평온합니다. 자녀가 일찍 독립하여 각자의 길을 걷게 되는 흐름이며, 본인 또한 자녀의 간섭 없이 자유로운 노후를 보내게 됩니다. 실속 있는 마무리가 예상됩니다.'
+          : 'The children star is not revealed, but the late-life palace is peaceful. Children are likely to be independent early, and you will enjoy a free retirement without interference. A substantial conclusion is expected.';
+      }
+    } else if (hasHourClash) {
+      childrenDesc = lang === 'KO'
+        ? '자녀를 상징하는 기운은 뚜렷하나 말년의 자리가 충돌하고 있습니다. 자녀의 성장은 빠르나 그 과정에서 잦은 의견 대립이나 변화가 예상됩니다. 자녀의 개성을 존중하고 적절한 거리를 유지할 때 비로소 결실이 안정됩니다.'
+        : 'The children star is clear, but the late-life palace is clashing. Children will grow fast, but frequent disagreements or changes are expected. The results will stabilize only when you respect their individuality and maintain distance.';
+    } else if (hourBranchTenGod.includes('인성') || hourStemTenGod.includes('인성')) {
       childrenDesc = lang === 'KO'
         ? '말년과 자식 자리에 따뜻하고 수용적인 기운(인성)이 들어와 있습니다. 결과물을 만들어내는 과정은 치열했을지라도, 최종적인 마무리는 본인을 편안하게 해주는 결실로 이어지는 흐름입니다. 효심 깊은 자녀를 두거나 노후에 학문/예술적 성취를 이룰 복이 있습니다.'
         : 'Warm and receptive Wisdom energy is in the Hour Pillar (Late Life/Children). Even if the process was fierce, the final conclusion leads to results that make you comfortable. You may have filial children or achieve academic/artistic success in old age.';
@@ -345,7 +436,7 @@ export const calculateAdvancedAnalysis = (
     } else if (hourBranchTenGod.includes('재성') || hourStemTenGod.includes('재성')) {
       childrenDesc = lang === 'KO'
         ? '말년 자리에 재물과 결과(재성)가 있습니다. 평생 노력한 대가가 노후에 확실한 자산으로 축적되는 흐름입니다. 자녀가 경제적으로 자립심이 강하며, 본인 또한 실속 있는 노후를 보내게 됩니다.'
-        : 'Wealth and results are in the Hour Pillar. The rewards of lifelong effort accumulate as solid assets in old age. Children are economically independent, and you will have a substantial retirement.';
+        : 'Maverick/Architect and results are in the Hour Pillar. The rewards of lifelong effort accumulate as solid assets in old age. Children are economically independent, and you will have a substantial retirement.';
     } else {
       childrenDesc = lang === 'KO'
         ? '자녀와의 관계가 원만하며 본인의 노력이 헛되지 않은 결실을 맺습니다. 자녀의 성장이 본인에게 큰 보람이 되며 안정적인 미래를 암시합니다.'

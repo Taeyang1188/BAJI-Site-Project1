@@ -333,7 +333,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   pillars.forEach(p => {
     if (p.element) elementCounts[p.element]++;
     const branchElement = BRANCHES_INFO[p.branch]?.element;
-    if (branchElement) elementCounts[branchElement as keyof typeof elementCounts]++;
+    if (branchElement) elementCounts[branchElement as keyof typeof elementCounts as keyof typeof elementCounts]++;
+  });
+
+  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0);
+  const elementRatios: Record<string, number> = {};
+  Object.entries(elementCounts).forEach(([el, count]) => {
+    elementRatios[el] = totalElements > 0 ? Math.round((count / totalElements) * 100) : 20;
   });
 
   const geJu = calculateGeJu(dayGan, monthZhi, lang);
@@ -358,13 +364,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   let translatedElement = yongshinDetail.primary.element;
   
   if (lang === 'EN') {
-    if (translatedGod === "식상/재성/관성") translatedGod = "Output/Wealth/Power";
-    else if (translatedGod === "인성/비겁") translatedGod = "Wisdom/Self";
-    else if (translatedGod === "인성") translatedGod = "Wisdom";
-    else if (translatedGod === "비겁") translatedGod = "Self";
-    else if (translatedGod === "식상") translatedGod = "Output";
-    else if (translatedGod === "재성") translatedGod = "Wealth";
-    else if (translatedGod === "관성") translatedGod = "Power";
+    if (translatedGod === "식상/재성/관성") translatedGod = "Artist/Rebel, Maverick/Architect, Warrior/Judge";
+    else if (translatedGod === "인성/비겁") translatedGod = "Mystic/Sage, Mirror/Rival";
+    else if (translatedGod === "인성") translatedGod = "Mystic/Sage";
+    else if (translatedGod === "비겁") translatedGod = "Mirror/Rival";
+    else if (translatedGod === "식상") translatedGod = "Artist/Rebel";
+    else if (translatedGod === "재성") translatedGod = "Maverick/Architect";
+    else if (translatedGod === "관성") translatedGod = "Warrior/Judge";
   } else if (lang === 'KO') {
     const elementKoMap: Record<string, string> = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
     if (translatedElement.includes('/')) {
@@ -392,6 +398,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       dayMasterStrength: strength,
       yongshinDetail,
       structureDetail,
+      elementRatios,
       ...advancedAnalysis
     }
   };

@@ -130,5 +130,10 @@ export interface BaZiResult {
     geokGukDetail?: { geonRok: boolean; yangIn: boolean; description: string };
     personalizedInsights?: Record<string, { ko: string; en: string }>;
     dayMasterElement?: string;
+    strength?: {
+      level: number;
+      score: number;
+    };
+    elementRatios?: Record<string, number>;
   };
 }
