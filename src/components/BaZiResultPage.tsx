@@ -12,25 +12,125 @@ import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/ba
 import { ChevronDown, ChevronUp, MessageSquare, Sun, Moon, HelpCircle, X, Zap, BookOpen, Clock } from 'lucide-react';
 
 const TypingText = ({ text, speed = 30 }: { text: string, speed?: number }) => {
-  const [displayedText, setDisplayedText] = React.useState('');
+  const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [showCursor, setShowCursor] = React.useState(true);
+
+  // Blinking cursor effect
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const charInfos = React.useMemo(() => {
+    if (!text) return [];
+    
+    const infos: { char: string, delay: number, color?: string, isBlinking?: boolean }[] = [];
+    const effectNames = ["식상생재", "재생관", "살인상생", "식신제살", "관인상생", "상관패인", "재극인", "아능생모", "겁재탈재"];
+    
+    const closingRemarks = [
+      "이제 네 독설조차 고귀한 비평으로 대접받을거야.",
+      "이제 그 감각을 통장 잔고로 증명할 시간이야, 후훗.",
+      "어둠 속에서 더 빛나는 법이지.",
+      "이제 네 실력을 똑똑히 보여줘.",
+      "세상이 널 위해 레드카펫을 깔아주는 기분이랄까?",
+      "명예도 좋지만, 가끔은 속물적인 성공도 달콤한 법이지."
+    ];
+
+    for (let i = 0; i < text.length; i++) {
+      const foundRemark = closingRemarks.find(remark => text.substring(i).startsWith(remark));
+      if (foundRemark) {
+        infos.push({ char: '\n', delay: speed });
+        infos.push({ char: '', delay: 2500, isBlinking: true });
+        
+        for (let j = 0; j < foundRemark.length; j++) {
+          infos.push({ char: foundRemark[j], delay: speed });
+        }
+        i += foundRemark.length - 1;
+        continue;
+      }
+
+      const yearMatch = text.substring(i).match(/^\d{4}(년)?/);
+      if (yearMatch) {
+        const yearStr = yearMatch[0];
+        for (let j = 0; j < yearStr.length; j++) {
+          infos.push({ char: yearStr[j], delay: speed, color: '#00F2FF' });
+        }
+        i += yearStr.length - 1;
+        continue;
+      }
+
+      if (text[i] === "'") {
+        const endQuoteIndex = text.indexOf("'", i + 1);
+        if (endQuoteIndex !== -1) {
+          const quotedText = text.substring(i + 1, endQuoteIndex);
+          const multiplier = 3; // 3x slower as requested
+          
+          infos.push({ char: "'", delay: speed * multiplier });
+          for (let j = 0; j < quotedText.length; j++) {
+            infos.push({ char: quotedText[j], delay: speed * multiplier });
+          }
+          infos.push({ char: "'", delay: speed * multiplier });
+          
+          i = endQuoteIndex;
+          continue;
+        }
+      }
+
+      const char = text[i];
+      let delay = speed;
+      if (char === ',') delay = 1500;
+      else if (char === '.') {
+        delay = 2000;
+        infos.push({ char, delay });
+        // Add line break after period for better layout
+        if (i < text.length - 1 && text[i+1] !== '\n') {
+          infos.push({ char: '\n', delay: speed });
+          // Skip next space if it exists to keep alignment clean
+          if (text[i+1] === ' ') i++;
+        }
+        continue;
+      }
+      else if (char === '\n') delay = speed * 15;
+
+      infos.push({ char, delay });
+    }
+    return infos;
+  }, [text, speed]);
 
   React.useEffect(() => {
-    if (currentIndex < text.length) {
-      const char = text[currentIndex];
-      const isLineBreak = char === '\n';
-      const delay = isLineBreak ? speed * 15 : speed; // Pause at line breaks
+    if (currentIndex < charInfos.length) {
+      const info = charInfos[currentIndex];
+      // Logic: Wait based on the PREVIOUS character's delay requirement.
+      // This ensures the current character (like a comma) is shown FIRST, then we wait.
+      const prevInfo = currentIndex > 0 ? charInfos[currentIndex - 1] : null;
+      const currentDelay = prevInfo ? prevInfo.delay : speed;
 
       const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + char);
+        if (info.char !== '') {
+          setDisplayedElements(prev => [
+            ...prev, 
+            <span key={currentIndex} style={{ color: info.color }}>{info.char}</span>
+          ]);
+        }
         setCurrentIndex(prev => prev + 1);
-      }, delay);
+      }, currentDelay);
       return () => clearTimeout(timeout);
     }
-  }, [currentIndex, text, speed]);
+  }, [currentIndex, charInfos, speed]);
 
-  return <span className="whitespace-pre-wrap">{displayedText}</span>;
+  return (
+    <span className="whitespace-pre-wrap">
+      {displayedElements}
+      {currentIndex < charInfos.length && (
+        <span className={`${showCursor ? "opacity-100" : "opacity-0"} inline-block w-[2px] h-[1.2em] bg-neon-pink ml-1 align-middle shadow-[0_0_8px_rgba(255,20,147,0.8)]`}></span>
+      )}
+    </span>
+  );
 };
+
 
 const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
   const gongmang = result.analysis.gongmang;
@@ -793,7 +893,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                 </p>
               ) : (
                 <p className="text-lg font-display italic text-white leading-relaxed">
-                  "<TypingText text={cycleVibe} />"
+                  <TypingText text={cycleVibe} />
                 </p>
               )}
             </div>

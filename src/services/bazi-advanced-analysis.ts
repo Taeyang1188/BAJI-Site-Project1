@@ -217,24 +217,35 @@ export const calculateAdvancedAnalysis = (
       InSeong: getRatio('인성', 'Wisdom', 'Mystic'),
     };
 
-    const dayBranch = pillars[1]?.branch;
-    const monthBranch = pillars[2]?.branch;
-    const yearBranch = pillars[3]?.branch;
+    const hourPillar = pillars[0];
+    const dayPillar = pillars[1];
+    const monthPillar = pillars[2];
+    const yearPillar = pillars[3];
 
-    // Colleagues/Siblings (Mirror)
+    const dayBranchTenGod = dayPillar?.branchKoreanName || '';
+    const hourBranchTenGod = hourPillar?.branchKoreanName || '';
+    const monthBranchTenGod = monthPillar?.branchKoreanName || '';
+
+    // 1. Colleagues/Siblings (Mirror/Rival) - Position: Year/Month/Day
     let colleaguesDesc = '';
-    if (gods.BiGyeop < 15 && !isStrong) {
-      colleaguesDesc = lang === 'KO' 
-        ? '주변에 사람은 많아 보일 수 있으나 정작 내가 기댈 곳은 적은 \'자수성가형\' 흐름입니다. 동료와의 협업보다는 본인만의 독보적인 기술력을 바탕으로 독립적인 전문가로 인정받는 전략이 유리합니다.'
-        : 'You may seem surrounded by people, but you have few to lean on; a "self-made" path. Rather than collaboration, focus on being recognized as an independent expert through your unique skills.';
+    if (gods.BiGyeop < 10) {
+      if (dayBranchTenGod.includes('편관') || dayBranchTenGod.includes('정관')) {
+        colleaguesDesc = lang === 'KO'
+          ? '사주에 비겁(나의 기운)이 적고 일지(나의 환경)에 관성이 자리 잡고 있습니다. 이는 주변에 사람은 많으나 나를 엄격하게 대하거나 통제하려는 환경에 놓여 있어, 심리적 고립감을 느끼기 쉬운 구조입니다. 단순히 도움이 없는 것이 아니라, 스스로를 지켜내야 하는 치열한 환경 속에서 자수성가해야 하는 흐름입니다.'
+          : 'Low Mirror energy with Power in the Spouse Palace. You are surrounded by people, but in an environment that treats you strictly or tries to control you, leading to psychological isolation. It\'s not just a lack of help, but a "self-made" path where you must protect yourself in a fierce environment.';
+      } else {
+        colleaguesDesc = lang === 'KO'
+          ? '비겁의 기운이 약해 타인의 간섭을 받지 않는 독립적인 길을 선호합니다. 동료와의 협업보다는 본인만의 독보적인 기술력을 바탕으로 전문성을 인정받는 전략이 유리하며, 스스로를 믿고 나아가는 뚝심이 성공의 열쇠입니다.'
+          : 'Weak Mirror energy leads to preferring an independent path without interference. Rather than collaboration, focus on being recognized for your unique expertise. Trusting yourself is the key to success.';
+      }
     } else if (gods.BiGyeop > 30) {
       colleaguesDesc = lang === 'KO'
-        ? '주변에 사람이 많고 사교적이지만, 지나친 경쟁심이나 고집으로 갈등이 생길 수 있습니다. 동료는 도움을 주는 존재라기보다 내가 관리하고 책임져야 할 대상에 가깝습니다.'
-        : 'Social with many people, but excessive competition or stubbornness may cause conflict. Colleagues are more like people you must manage or take responsibility for rather than helpers.';
+        ? '주변에 사람이 넘치고 사교적이지만, 이는 곧 치열한 경쟁 환경을 의미하기도 합니다. 동료는 나를 돕는 존재라기보다 내가 관리하고 책임져야 하거나, 혹은 나의 몫을 나누어야 하는 경쟁자일 수 있습니다. "군겁쟁재"의 기운이 있으니 동업보다는 주도권을 쥐는 관계가 유리합니다.'
+        : 'Social with many people, but this also means a fierce competitive environment. Colleagues are competitors you must manage or share your portion with, rather than helpers. Since there\'s a hint of "competition for wealth," taking the lead is better than equal partnership.';
     } else {
       colleaguesDesc = lang === 'KO'
-        ? '주변인들과 적절한 유대감을 형성하며 협력과 경쟁의 균형을 잘 맞춥니다. 동료들과의 원만한 관계가 사회적 성공의 밑거름이 됩니다.'
-        : 'Forms appropriate bonds, balancing cooperation and competition well. Smooth relations with colleagues serve as a foundation for social success.';
+        ? '주변인들과 적절한 유대감을 형성하며 협력과 경쟁의 균형을 잘 맞춥니다. 월지나 일지에 비겁이 있다면 형제나 친구가 나의 든든한 뿌리가 되어주며, 원만한 대인관계가 사회적 성공의 밑거름이 됩니다.'
+        : 'Forms appropriate bonds, balancing cooperation and competition. If Mirror energy is in the Month or Day Zhi, siblings or friends serve as your strong roots, and smooth relations become the foundation for success.';
     }
 
     relationships.colleagues = {
@@ -243,27 +254,31 @@ export const calculateAdvancedAnalysis = (
       description: colleaguesDesc
     };
 
-    // Parents (Sage/Architect)
+    // 2. Parents & Superiors (Sage/Architect) - Position: Month Pillar
     let parentsDesc = '';
-    const hasJaeGeukIn = gods.JaeSeong > 20 && gods.InSeong > 20;
     const hasGwanInSangSaeng = gods.GwanSeong > 20 && gods.InSeong > 20;
+    const hasJaeGeukIn = gods.JaeSeong > 25 && gods.InSeong > 20;
 
     if (hasGwanInSangSaeng) {
       parentsDesc = lang === 'KO'
-        ? '단순한 지원을 넘어, 본인의 명예를 세워주기 위해 헌신하는 윗사람의 덕이 있습니다. 엄격하지만 나를 성장시키는 윗사람의 존재가 뚜렷합니다.'
-        : 'Beyond simple support, you have the virtue of superiors who dedicate themselves to building your honor. There is a clear presence of a strict but growth-oriented mentor.';
+        ? '관인상생(官印相生)의 흐름으로, 단순한 경제적 지원을 넘어 사회적 체면과 명예를 중시하는 부모/상사의 영향력이 매우 강합니다. 이는 본인에게 든든한 배경이 되기도 하지만, 동시에 그들의 높은 기대치에 부응해야 한다는 중압감으로 작용할 수 있습니다. 예의와 격식을 갖춘 관계에서 큰 덕을 입습니다.'
+        : 'A flow of "Power generating Wisdom." Beyond simple support, the influence of parents/superiors who value social face and honor is very strong. This provides a solid background but also acts as pressure to meet high expectations. You benefit greatly from formal and respectful relationships.';
     } else if (hasJaeGeukIn) {
       parentsDesc = lang === 'KO'
-        ? '현실적인 이익(재성)과 본인의 신념(인성)이 충돌할 때 윗사람의 조언이 다소 강압적으로 느껴질 수 있습니다. 물질적 지원과 정신적 가치 사이의 조율이 중요합니다.'
-        : 'When realistic interests (Wealth) and your beliefs (Wisdom) clash, advice from superiors may feel coercive. Balancing material support and spiritual values is key.';
-    } else if (gods.InSeong === 0) {
+        ? '재극인(財剋印)의 양상으로, 현실적인 이익과 본인의 신념/학문 사이에서 갈등이 잦을 수 있습니다. 부모님의 조언이 지나치게 현실적이거나 결과 중심적이어서 본인의 순수한 열정과 충돌할 수 있습니다. 물질적 지원은 있으나 정신적 공감이 부족할 수 있으니 적절한 거리두기가 필요합니다.'
+        : 'A pattern of "Wealth controlling Wisdom." Frequent conflicts may arise between practical interests and your beliefs. Parental advice might be overly realistic or result-oriented, clashing with your pure passion. Material support exists, but lack of emotional empathy may require some distance.';
+    } else if (monthBranchTenGod.includes('인성')) {
       parentsDesc = lang === 'KO'
-        ? '부모님의 후원이나 윗사람의 도움이 다소 부족할 수 있으나, 그만큼 독립심이 강합니다. 스스로 자격을 갖추고 권리를 확보하는 노력이 필요합니다.'
-        : 'Support from superiors may be lacking, but this fosters strong independence. Effort to gain qualifications and secure rights through documentation is needed.';
+        ? '부모 자리에 나를 생하는 기운(인성)이 뚜렷합니다. 어머니의 헌신적인 사랑이나 윗사람의 전폭적인 지지를 받으며 성장하는 구조입니다. 정서적 안정감이 높고 학문적 성취를 돕는 환경이 조성되어 있습니다.'
+        : 'Wisdom energy is clear in the Parent Palace. You grow under the dedicated love of your mother or full support from superiors. Emotional stability is high, and the environment helps academic achievement.';
+    } else if (monthBranchTenGod.includes('관성')) {
+      parentsDesc = lang === 'KO'
+        ? '부모 자리에 나를 통제하는 기운(관성)이 있습니다. 엄격한 가풍이나 원칙을 중시하는 부모님 밑에서 자랐을 가능성이 높습니다. 이는 본인에게 강한 책임감과 도덕성을 심어주지만, 때로는 억압감을 느낄 수 있습니다.'
+        : 'Power energy is in the Parent Palace. You likely grew up under strict family traditions or parents who value principles. This instills strong responsibility and morality but can sometimes feel oppressive.';
     } else {
       parentsDesc = lang === 'KO'
-        ? '윗사람의 도움을 잘 활용하며 안정적인 지원 속에서 성장합니다. 학문이나 자격증을 통해 사회적 지위를 공고히 하는 힘이 있습니다.'
-        : 'Utilizes help from superiors well and grows under stable support. Has the strength to solidify social status through study or certification.';
+        ? '윗사람과의 관계에서 본인의 주도권이 강한 편입니다. 일방적인 도움보다는 서로의 역할을 존중하는 수평적인 관계에서 편안함을 느낍니다. 스스로 자격을 갖추어 윗사람에게 인정받는 스타일입니다.'
+        : 'You tend to have strong initiative in relations with superiors. You feel comfortable in horizontal relationships respecting each other\'s roles rather than one-sided help. You gain recognition by proving your own qualifications.';
     }
 
     relationships.parents = {
@@ -272,60 +287,75 @@ export const calculateAdvancedAnalysis = (
       description: parentsDesc
     };
 
-    // Spouse (Male: Architect, Female: Warrior)
-    const spouseGod = gender === 'male' ? gods.JaeSeong : gods.GwanSeong;
+    // 3. Spouse & Partner (Day Zhi) - Position: Day Zhi
+    const spouseGodRatio = gender === 'male' ? gods.JaeSeong : gods.GwanSeong;
     let spouseDesc = '';
     
-    // Check if Warrior is in Spouse Palace (Day Zhi)
-    const isWarriorInSpousePalace = dayBranch === '寅' || dayBranch === '申' || dayBranch === '巳' || dayBranch === '亥'; // Simplified check for Warrior/Power energy
-    
-    if (isWarriorInSpousePalace && !isStrong) {
+    if (dayBranchTenGod.includes('편관')) {
       spouseDesc = lang === 'KO'
-        ? '나를 편안하게 해주는 친구 같은 인연보다는, 나를 긴장시키고 단련시키는 \'카리스마 있는 배우자\'와 인연이 깊습니다. 서로의 독립적인 영역을 존중할 때 관계가 안정됩니다.'
-        : 'Rather than a friend-like partner who makes you comfortable, you have deep ties with a "charismatic spouse" who keeps you tense and disciplines you. Stability is found in respecting independence.';
-    } else if (spouseGod === 0) {
+        ? '배우자 자리에 나를 통제하려는 강한 힘(편관)이 들어와 있습니다. 친구 같은 인연보다는 내가 존경할 수 있거나, 혹은 나를 강하게 리드하는 카리스마 있는 사람과 인연이 깊습니다. 서로의 주관이 뚜렷해 충돌이 잦을 수 있으니 "존중"과 "거리두기"가 관계 유지의 핵심입니다.'
+        : 'A strong controlling force (Seven Killings) is in the Spouse Palace. You are drawn to charismatic partners you can respect or who lead you strongly. Since both have clear views, conflicts may be frequent; "respect" and "personal space" are keys to the relationship.';
+    } else if (dayBranchTenGod.includes('비견') || dayBranchTenGod.includes('겁재')) {
       spouseDesc = lang === 'KO'
-        ? '사주에 배우자 기운이 드러나지 않아 인연이 늦게 닿거나 평범하지 않은 만남이 예상됩니다. 상대방의 조건보다는 내면의 가치를 중시하는 것이 좋습니다.'
-        : 'Karmic ties may arrive late or involve unusual encounters. Focus on inner values rather than external conditions.';
+        ? '배우자 자리에 나와 같은 기운(비겁)이 있습니다. 친구처럼 편안하고 동등한 관계를 추구하지만, 때로는 서로 양보하지 않는 고집으로 인해 갈등이 생길 수 있습니다. 배우자가 나의 경쟁자이자 동반자 역할을 동시에 수행하는 구조입니다.'
+        : 'Mirror energy is in the Spouse Palace. You pursue a comfortable, equal relationship like friends, but stubbornness can cause clashes. Your spouse acts as both a competitor and a companion.';
+    } else if (dayBranchTenGod.includes('인성')) {
+      spouseDesc = lang === 'KO'
+        ? '배우자 자리에 나를 돕는 기운(인성)이 있습니다. 나를 어머니처럼 챙겨주거나 정신적으로 의지가 되는 사람과 인연이 깊습니다. 배우자의 배려와 수용 덕분에 가정에서 정서적 안정을 찾을 수 있는 복이 있습니다.'
+        : 'Wisdom energy is in the Spouse Palace. You have deep ties with someone who cares for you like a mother or is mentally dependable. You find emotional stability at home thanks to your spouse\'s consideration.';
+    } else if (dayBranchTenGod.includes('식상')) {
+      spouseDesc = lang === 'KO'
+        ? '배우자 자리에 나의 에너지가 빠져나가는 기운(식상)이 있습니다. 내가 배우자를 자식처럼 챙겨주거나, 배우자가 매우 창의적이고 표현력이 풍부한 사람일 가능성이 높습니다. 자녀 출산 후 배우자보다 자녀에게 집중하게 되는 경향이 있으니 주의가 필요합니다.'
+        : 'Output energy is in the Spouse Palace. You might care for your spouse like a child, or your spouse is highly creative and expressive. Be careful as you may focus more on children than your spouse after childbirth.';
+    } else if (dayBranchTenGod.includes('재성')) {
+      spouseDesc = lang === 'KO'
+        ? '배우자 자리에 내가 관리하는 기운(재성)이 있습니다. 현실적이고 경제 관념이 뚜렷한 배우자와 인연이 깊으며, 결혼 후 재산 축적에 배우자의 도움이 큽니다. 남성에게는 현모양처, 여성에게는 살림을 잘 돕는 남편의 형국입니다.'
+        : 'Wealth energy is in the Spouse Palace. You have ties with a realistic partner with a strong sense of economy. Your spouse helps greatly in accumulating wealth after marriage. It signifies a supportive and practical partner.';
     } else {
       spouseDesc = lang === 'KO'
-        ? '안정적인 배우자 운을 가지고 있으며 서로를 보완하는 관계를 형성합니다. 가정의 평화가 사회적 성공의 든든한 버팀목이 됩니다.'
-        : 'Possesses stable spouse luck and forms a mutually complementary relationship. Domestic peace serves as a strong support for social success.';
+        ? '배우자 운이 안정적이며 서로의 역할을 충실히 수행합니다. 사주 전체의 조화에 따라 배우자가 나의 부족한 기운을 채워주는 든든한 조력자가 됩니다.'
+        : 'Spouse luck is stable, and both fulfill their roles faithfully. Depending on the chart\'s harmony, your spouse becomes a strong helper filling your missing energies.';
     }
 
     relationships.spouse = {
       title: lang === 'KO' ? '배우자 및 연인' : 'Spouse & Partner',
       godName: gender === 'male' ? (lang === 'KO' ? '재성' : 'Architect') : (lang === 'KO' ? '관성' : 'Warrior'),
-      ratio: spouseGod,
+      ratio: spouseGodRatio,
       description: spouseDesc
     };
 
-    // Children (Male: Warrior, Female: Artist)
-    const childrenGod = gender === 'male' ? gods.GwanSeong : gods.SikSang;
+    // 4. Children & Outcomes (Hour Pillar) - Position: Hour Pillar
+    const childrenGodRatio = gender === 'male' ? gods.GwanSeong : gods.SikSang;
     let childrenDesc = '';
     
-    // Check for Wonjin/Gwimun (In-Yu, Myo-Shin, etc.) between Output and Power
-    const hasWonjin = (dayBranch === '寅' && yearBranch === '酉') || (dayBranch === '酉' && yearBranch === '寅') ||
-                      (monthBranch === '寅' && yearBranch === '酉') || (monthBranch === '酉' && yearBranch === '寅');
-
-    if (hasWonjin) {
+    const hourStemTenGod = hourPillar?.stemKoreanName || '';
+    
+    if (hourBranchTenGod.includes('인성') || hourStemTenGod.includes('인성')) {
       childrenDesc = lang === 'KO'
-        ? '결과물을 만들어내는 과정에서 스스로를 강하게 몰아붙이는 완벽주의적 기질이 강합니다. 결과물에 대한 집착과 그로 인한 스트레스 관리가 성공의 핵심입니다.'
-        : 'You have a strong perfectionist streak, pushing yourself hard in the process of creating results. Managing obsession with outcomes and resulting stress is key to success.';
-    } else if (childrenGod === 0) {
+        ? '말년과 자식 자리에 따뜻하고 수용적인 기운(인성)이 들어와 있습니다. 결과물을 만들어내는 과정은 치열했을지라도, 최종적인 마무리는 본인을 편안하게 해주는 결실로 이어지는 흐름입니다. 효심 깊은 자녀를 두거나 노후에 학문/예술적 성취를 이룰 복이 있습니다.'
+        : 'Warm and receptive Wisdom energy is in the Hour Pillar (Late Life/Children). Even if the process was fierce, the final conclusion leads to results that make you comfortable. You may have filial children or achieve academic/artistic success in old age.';
+    } else if (hourBranchTenGod.includes('관성') || hourStemTenGod.includes('관성')) {
       childrenDesc = lang === 'KO'
-        ? '자녀와의 인연이 다소 늦거나, 결과물을 얻기까지 인내심이 필요합니다. 서두르지 않고 내실을 기한다면 때가 되었을 때 큰 결실을 맺을 수 있습니다.'
-        : 'Karmic ties with children may be late, or patience is needed for outcomes. If you focus on inner substance without rushing, you will reap great rewards.';
+        ? '말년 자리에 명예와 규칙(관성)이 자리 잡고 있습니다. 자녀가 사회적으로 성공하거나 가문의 명예를 높이는 역할을 할 가능성이 큽니다. 본인 또한 노후까지 사회적 직함이나 명예를 유지하며 존경받는 삶을 살게 됩니다.'
+        : 'Honor and rules (Power) are in the Hour Pillar. Children are likely to succeed socially or enhance family honor. You will also maintain social titles or honor and live a respected life into old age.';
+    } else if (hourBranchTenGod.includes('식상') || hourStemTenGod.includes('식상')) {
+      childrenDesc = lang === 'KO'
+        ? '자식 자리에 표현과 재능(식상)이 뚜렷합니다. 자녀가 다재다능하고 창의적인 성향을 띠며, 본인 또한 노후에 새로운 취미나 활동으로 활기찬 삶을 보냅니다. 자녀와 친구처럼 소통하며 즐거움을 나누는 구조입니다.'
+        : 'Expression and talent (Output) are clear in the Child Palace. Children are versatile and creative, and you will spend your old age vibrantly with new hobbies. It\'s a structure of communicating with children like friends.';
+    } else if (hourBranchTenGod.includes('재성') || hourStemTenGod.includes('재성')) {
+      childrenDesc = lang === 'KO'
+        ? '말년 자리에 재물과 결과(재성)가 있습니다. 평생 노력한 대가가 노후에 확실한 자산으로 축적되는 흐름입니다. 자녀가 경제적으로 자립심이 강하며, 본인 또한 실속 있는 노후를 보내게 됩니다.'
+        : 'Wealth and results are in the Hour Pillar. The rewards of lifelong effort accumulate as solid assets in old age. Children are economically independent, and you will have a substantial retirement.';
     } else {
       childrenDesc = lang === 'KO'
-        ? '자녀와 원만한 관계를 유지하며 노력한 만큼의 결실을 맺는 구조입니다. 자녀의 성장이 본인에게도 큰 기쁨과 보람이 됩니다.'
-        : 'Maintains smooth relations with children and reaps fruits proportional to effort. Children\'s growth brings great joy and fulfillment.';
+        ? '자녀와의 관계가 원만하며 본인의 노력이 헛되지 않은 결실을 맺습니다. 자녀의 성장이 본인에게 큰 보람이 되며 안정적인 미래를 암시합니다.'
+        : 'Relations with children are smooth, and your efforts bear fruit. Children\'s growth brings great fulfillment and suggests a stable future.';
     }
 
     relationships.children = {
       title: lang === 'KO' ? '자식 및 결과물' : 'Children & Outcomes',
       godName: gender === 'male' ? (lang === 'KO' ? '관성' : 'Warrior') : (lang === 'KO' ? '식상' : 'Artist'),
-      ratio: childrenGod,
+      ratio: childrenGodRatio,
       description: childrenDesc
     };
 
@@ -359,7 +389,7 @@ export const calculateAdvancedAnalysis = (
       Output: { ko: '꽃을 피우는 표현력 (식상 - 화(火))', en: 'Expressive power to bloom (Artist/Rebel - Fire(火))' },
       Wealth: { ko: '부동산 및 현실적 안정감 (재성 - 토(土))', en: 'Real estate and realistic stability (Maverick/Architect - Earth(土))' },
       Power: { ko: '나를 다듬는 절제력 (관성 - 금(金))', en: 'Self-discipline to refine me (Warrior/Judge - Metal(金))' },
-      Wisdom: { ko: '나를 키우는 자양분 (인성 - 수(水))', en: 'Nutrients that grow me (Mystic/Sage - Water(水))' }
+      Wisdom: { ko: '나를 키우는 자양분 (인성 - 수(水))', en: 'Nutrients that grow me (Mystic/Sage - Water(수))' }
     },
     Fire: {
       Self: { ko: '나의 열정과 에너지 (비겁 - 화(火))', en: 'My passion and energy (Mirror/Rival - Fire(火))' },
