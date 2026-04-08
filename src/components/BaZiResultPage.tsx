@@ -779,9 +779,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const currentMonth = new Date().getMonth() + 1;
   const currentDay = new Date().getDate();
   const currentAnnualPillar = React.useMemo(() => {
+    if (result.currentYearPillar) return result.currentYearPillar;
     if (!currentCycle.annualPillars) return null;
     return currentCycle.annualPillars.find(ap => ap.year === currentYear) || currentCycle.annualPillars[0];
-  }, [currentCycle, currentYear]);
+  }, [currentCycle, currentYear, result.currentYearPillar]);
 
   const tenGod = React.useMemo(() => {
     return calculateTenGods(dayMaster, currentCycle.element);
@@ -893,17 +894,17 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
             <MessageSquare className="w-6 h-6 text-neon-pink" />
           </div>
           <div className="space-y-1 flex-1">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="text-[11px] font-display font-medium text-white/50 uppercase tracking-[0.2em]">{t.seasonVibe}</div>
-                <div className="text-[10px] text-white/30 italic">{t.seasonVibeDisclaimer}</div>
+            <div className="flex flex-wrap items-start sm:items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 flex-1 min-w-0">
+                <div className="text-[10px] sm:text-[11px] font-display font-medium text-white/50 uppercase tracking-[0.1em] sm:tracking-[0.2em] whitespace-nowrap shrink-0">{t.seasonVibe}</div>
+                <div className="text-[9px] sm:text-[10px] text-white/30 italic truncate sm:whitespace-normal">{t.seasonVibeDisclaimer}</div>
               </div>
               <button 
                 onClick={() => setIsCycleVibeExpanded(!isCycleVibeExpanded)}
-                className="text-[10px] font-bold text-neon-pink/60 hover:text-neon-pink transition-colors flex items-center gap-1 uppercase tracking-widest"
+                className="text-[10px] font-bold text-neon-pink/60 hover:text-neon-pink transition-colors flex items-center gap-1 uppercase tracking-widest shrink-0 whitespace-nowrap"
               >
                 {isCycleVibeExpanded ? (lang === 'KO' ? '접기' : 'COLLAPSE') : (lang === 'KO' ? '펼치기' : 'EXPAND')}
-                {isCycleVibeExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                {isCycleVibeExpanded ? <ChevronUp className="w-3 h-3 shrink-0" /> : <ChevronDown className="w-3 h-3 shrink-0" />}
               </button>
             </div>
             
@@ -2423,7 +2424,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
             alt="Mu-o Background"
             loading="lazy"
             referrerPolicy="no-referrer"
-            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ease-in-out ${isImageViewMode ? 'opacity-100' : 'opacity-40'}`}
+            className={`absolute inset-0 w-full h-full z-0 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain' : 'opacity-40 object-cover'}`}
           />
         )}
         {isMuIn && (
@@ -2432,7 +2433,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
             alt="Mu-in Background"
             loading="lazy"
             referrerPolicy="no-referrer"
-            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ease-in-out ${isImageViewMode ? 'opacity-100' : 'opacity-40'}`}
+            className={`absolute inset-0 w-full h-full z-0 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain' : 'opacity-40 object-cover'}`}
           />
         )}
         {/* Decorative elements */}

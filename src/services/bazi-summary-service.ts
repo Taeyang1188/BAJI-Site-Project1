@@ -382,21 +382,29 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   const dmIdx = elementsOrder.indexOf(dmElement);
 
   let yongShen = result.analysis?.yongShen || 'Wood';
-  // Ensure yongShen is a valid element key (Strip terminology if present in analysis)
-  if (yongShen.includes('비겁')) yongShen = elementsOrder[dmIdx];
-  else if (yongShen.includes('식상')) yongShen = elementsOrder[(dmIdx + 1) % 5];
-  else if (yongShen.includes('재성')) yongShen = elementsOrder[(dmIdx + 2) % 5];
-  else if (yongShen.includes('관성')) yongShen = elementsOrder[(dmIdx + 3) % 5];
-  else if (yongShen.includes('인성')) yongShen = elementsOrder[(dmIdx + 4) % 5];
+  
+  // Extract base element if it contains English terminology (e.g., "Water (Maverick/Architect)")
+  let baseElement = yongShen;
+  const enElementMatch = yongShen.match(/(Wood|Fire|Earth|Metal|Water)/);
+  if (enElementMatch) {
+    baseElement = enElementMatch[1];
+  }
+
+  // Ensure baseElement is a valid element key (Strip terminology if present in analysis)
+  if (baseElement.includes('비겁')) baseElement = elementsOrder[dmIdx];
+  else if (baseElement.includes('식상')) baseElement = elementsOrder[(dmIdx + 1) % 5];
+  else if (baseElement.includes('재성')) baseElement = elementsOrder[(dmIdx + 2) % 5];
+  else if (baseElement.includes('관성')) baseElement = elementsOrder[(dmIdx + 3) % 5];
+  else if (baseElement.includes('인성')) baseElement = elementsOrder[(dmIdx + 4) % 5];
 
   // Core Energy (Use Yong-shin as the key energy to utilize)
-  const rawElemKo = BAZI_MAPPING.elements[yongShen as keyof typeof BAZI_MAPPING.elements]?.ko || yongShen;
+  const rawElemKo = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.ko || baseElement;
   const coreElemKo = rawElemKo.split(' ')[0]; // Strip terminology
-  const hanja = BAZI_MAPPING.elements[yongShen as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
+  const hanja = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
   const displayElem = lang === 'KO' ? `${coreElemKo}(${hanja})` : yongShen;
 
   // Core Energy logic based on Yong-shin's role (Ten Gods)
-  const yongShenRoleIdx = (elementsOrder.indexOf(yongShen) - dmIdx + 5) % 5;
+  const yongShenRoleIdx = (elementsOrder.indexOf(baseElement) - dmIdx + 5) % 5;
   const roles = ["비겁", "식상", "재성", "관성", "인성"];
   const role = roles[yongShenRoleIdx];
 
@@ -494,7 +502,7 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     ]
   };
 
-  const luckyItems = luckyItemsMap[yongShen] || luckyItemsMap["Earth"];
+  const luckyItems = luckyItemsMap[baseElement] || luckyItemsMap["Earth"];
 
   // Element Strengths
   const elementRatios = result.analysis?.elementRatios || { 'Wood': 20, 'Fire': 20, 'Earth': 20, 'Metal': 20, 'Water': 20 };

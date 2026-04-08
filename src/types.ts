@@ -87,6 +87,7 @@ export interface BaZiResult {
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];
   currentCycleIndex: number;
+  currentYearPillar?: any;
   timeCorrectionMessages?: string[];
   analysis?: {
     geJu: string;

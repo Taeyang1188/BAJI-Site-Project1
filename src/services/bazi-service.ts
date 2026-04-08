@@ -227,54 +227,68 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       const startYear = birth.year + startAge;
       const gTenGod = getTenGod(dayGan, gan, zhi);
 
-      if (currentAge >= startAge) {
-        currentCycleIndex = idx;
-      }
-
-      // Calculate annual pillars (Se-Un) for this Grand Cycle using LiuNian
-      const liuNian = dy.getLiuNian();
-      const annualPillars = liuNian.map((ln: any) => {
-        const lnGanZhi = ln.getGanZhi();
-        const lnGan = lnGanZhi[0];
-        const lnZhi = lnGanZhi[1];
+      // Calculate annual pillars (Se-Un) for this Grand Cycle manually to match custom startYear
+      const annualPillars = Array.from({ length: 10 }).map((_, i) => {
+        const year = startYear + i;
+        
+        // Get Year GanZhi (use June 1st to safely get the year's GanZhi)
+        const solar = Solar.fromYmd(year, 6, 1);
+        const lunar = solar.getLunar();
+        const baZi = lunar.getEightChar();
+        const lnGan = baZi.getYearGan();
+        const lnZhi = baZi.getYearZhi();
         const lnTenGod = getTenGod(dayGan, lnGan, lnZhi);
         
-        // Calculate monthly pillars (Wol-Un) for this year using LiuYue
-        const liuYue = ln.getLiuYue();
-        const monthlyPillars = liuYue.map((ly: any, monthIdx: number) => {
-          const lyGanZhi = ly.getGanZhi();
-          const lyGan = lyGanZhi[0];
-          const lyZhi = lyGanZhi[1];
+        // Calculate monthly pillars (Wol-Un) for this year
+        const monthlyPillars = Array.from({ length: 12 }).map((_, monthIdx) => {
+          // Solar months roughly start around the 4th-8th of each Gregorian month.
+          // Solar month 1 (Yin) is roughly Feb 4 to Mar 5.
+          // So Gregorian month 2 (Feb) 15th is safely in Solar month 1.
+          let gMonth = monthIdx + 2; 
+          let gYear = year;
+          if (gMonth > 12) {
+            gMonth -= 12;
+            gYear += 1;
+          }
+          
+          const mSolar = Solar.fromYmd(gYear, gMonth, 15);
+          const mLunar = mSolar.getLunar();
+          const mBaZi = mLunar.getEightChar();
+          const lyGan = mBaZi.getMonthGan();
+          const lyZhi = mBaZi.getMonthZhi();
           const lyTenGod = getTenGod(dayGan, lyGan, lyZhi);
 
           // Calculate daily pillars for the month
           const dailyPillars: any[] = [];
-          const year = ln.getYear();
-          const month = monthIdx + 1;
+          const uiMonth = monthIdx + 1;
           
           // Get number of days in the month
-          const daysInMonth = new Date(year, month, 0).getDate();
+          const daysInMonth = new Date(year, uiMonth, 0).getDate();
           
           for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month - 1, day);
-            const solar = Solar.fromDate(date);
-            const lunar = Lunar.fromDate(date);
-            const baZi = lunar.getEightChar();
-            
-            const dGan = baZi.getDayGan();
-            const dZhi = baZi.getDayZhi();
-            const dTenGod = getTenGod(dayGan, dGan, dZhi);
-            
-            dailyPillars.push({
-              day,
-              stem: dGan,
-              branch: dZhi,
-              ...dTenGod
-            });
+            try {
+              const date = new Date(year, uiMonth - 1, day);
+              const dSolar = Solar.fromDate(date);
+              const dLunar = dSolar.getLunar();
+              const dBaZi = dLunar.getEightChar();
+              
+              const dGan = dBaZi.getDayGan();
+              const dZhi = dBaZi.getDayZhi();
+              const dTenGod = getTenGod(dayGan, dGan, dZhi);
+              
+              dailyPillars.push({
+                day,
+                stem: dGan,
+                branch: dZhi,
+                ...dTenGod
+              });
+            } catch (e) {
+              // Skip invalid dates
+            }
           }
 
           return {
-            month: monthIdx + 1,
+            month: uiMonth,
             stem: lyGan,
             branch: lyZhi,
             element: BAZI_MAPPING.stems[lyGan as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth',
@@ -284,8 +298,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
         });
 
         return {
-          year: ln.getYear(),
-          age: startAge + (ln.getYear() - startYear),
+          year: year,
+          age: startAge + i,
           stem: lnGan,
           branch: lnZhi,
           element: BAZI_MAPPING.stems[lnGan as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth',
@@ -293,6 +307,11 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
           monthlyPillars
         };
       });
+
+      const currentYear = new Date().getFullYear();
+      if (annualPillars.some((ap: any) => ap.year === currentYear)) {
+        currentCycleIndex = idx;
+      }
 
       return {
         age: startAge,
@@ -380,12 +399,41 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     }
   }
 
+  if (currentCycleIndex === -1) {
+    currentCycleIndex = 0;
+  }
+
+  // Calculate the actual current year's pillar (Se-Un) regardless of DaYun
+  const currentYear = new Date().getFullYear();
+  let currentYearPillar = null;
+  
+  try {
+    // Use June 1st to safely get the year's GanZhi (avoids LiChun boundary issues)
+    const solar = Solar.fromYmd(currentYear, 6, 1);
+    const lunar = solar.getLunar();
+    const baZi = lunar.getEightChar();
+    const yGan = baZi.getYearGan();
+    const yZhi = baZi.getYearZhi();
+    const yTenGod = getTenGod(dayGan, yGan, yZhi);
+    
+    currentYearPillar = {
+      year: currentYear,
+      stem: yGan,
+      branch: yZhi,
+      element: BAZI_MAPPING.stems[yGan as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth',
+      ...yTenGod
+    };
+  } catch (e) {
+    console.error("Error calculating current year pillar:", e);
+  }
+
   const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength);
   
   return {
     pillars,
     grandCycles,
     currentCycleIndex,
+    currentYearPillar,
     timeCorrectionMessages: timeResult.messages,
     analysis: {
       geJu,
