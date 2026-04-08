@@ -291,7 +291,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "壬戌": { 
     ko: "임술일주는 책임감이 강하고 영감이 뛰어나. 조직을 위해 헌신하면서도 자신의 자리를 지키는 힘이 있지.", 
     en: "Im-sul is responsible and highly inspired. You dedicate to organizations while keeping your place.",
-    impression: "책임감이 꽤 무겁네. 남들의 기대를 저버리지 않으려고 스스로를 너무 몰아세우는 거 아냐?"
+    impression: "책임감이 꽤 무겁네. 남들의 기대를 저버리지 않으려고 스스로를 너무 몰아세우는 거 아냐?",
+    cardBg: "https://i.imgur.com/SEA2W5v.jpeg",
+    detailImg: "https://i.imgur.com/MoO8bhP.jpeg"
   },
   "癸酉": { 
     ko: "계유일주는 총명하고 섬세해. 맑은 샘물처럼 깨끗한 심성과 예리한 통찰력을 지닌 지혜로운 타입이지.", 
