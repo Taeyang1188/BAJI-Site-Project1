@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock } from 'lucide-react';
 import { Language, UserInput, BaZiResult } from './types';
 import { TRANSLATIONS } from './constants';
@@ -619,6 +619,8 @@ export default function App() {
                 result={result} 
                 lang={lang} 
                 userName={userInput.name}
+                gender={userInput.gender}
+                city={userInput.city}
                 onBack={() => setPage(2)} 
               />
             </motion.div>

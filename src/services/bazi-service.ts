@@ -72,6 +72,26 @@ const getTenGod = (dayGan: string, targetGan: string, targetZhi: string) => {
 /**
  * Calculate BaZi (Saju) using lunar-typescript.
  */
+export const getTodayPillar = (dayMaster: string) => {
+  const today = new Date();
+  const solar = Solar.fromDate(today);
+  const lunar = solar.getLunar();
+  const baZi = lunar.getEightChar();
+  
+  const stem = baZi.getDayGan();
+  const branch = baZi.getDayZhi();
+  const tenGod = getTenGod(dayMaster, stem, branch);
+  
+  return {
+    stem,
+    branch,
+    stemTenGodKo: tenGod.stemTenGodKo,
+    branchTenGodKo: tenGod.branchTenGodKo,
+    stemTenGodEn: tenGod.stemTenGodEn,
+    branchTenGodEn: tenGod.branchTenGodEn,
+  };
+};
+
 export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, lang: Language): BaZiResult => {
   try {
     let solarYear = 0, solarMonth = 0, solarDay = 0;

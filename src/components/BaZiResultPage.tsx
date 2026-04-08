@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
@@ -22,10 +22,101 @@ import {
   Clock,
   CheckCircle2,
   Sparkles,
-  Share2
+  Share2,
+  ChevronRight
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
+import { getTodayPillar } from '../services/bazi-service';
+import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
+
+const WeatherWidget = ({ city, lang }: { city: string; lang: Language }) => {
+  const [location, setLocation] = React.useState<{ lat: number; lon: number } | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported');
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        });
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
+  }, []);
+
+  // Mock weather data based on location or city
+  const weatherData = React.useMemo(() => {
+    // In a real app, we'd fetch from an API using location or city
+    return {
+      temp: { high: 22, low: 14 },
+      rainProb: 15,
+      condition: 'Sunny',
+      locationName: location ? (lang === 'KO' ? '현재 위치' : 'Current Location') : city
+    };
+  }, [location, city, lang]);
+
+  const weatherComment = React.useMemo(() => {
+    if (lang !== 'KO') return '';
+    if (weatherData.rainProb > 50) return '비가 오네. 이런 날엔 실내에서 네 내면의 목소리에 집중해봐.';
+    if (weatherData.temp.high > 28) return '날씨가 꽤 덥네. 열기에 휩쓸리지 말고 차분함을 유지하는 게 좋겠어.';
+    if (weatherData.temp.low < 5) return '공기가 꽤 차가워. 몸을 따뜻하게 하고 네 에너지를 아껴둬.';
+    return '날씨가 꽤 쾌적하네. 가벼운 산책이라도 하면서 영감을 얻어보는 건 어때?';
+  }, [weatherData, lang]);
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+        <Sun className="w-4 h-4 text-yellow-400" />
+        <span className="text-[11px] font-mono text-white/80">
+          {weatherData.temp.high}° / {weatherData.temp.low}°
+        </span>
+        <div className="w-[1px] h-3 bg-white/20" />
+        <span className="text-[11px] font-mono text-white/80">
+          {weatherData.rainProb}% ☔
+        </span>
+        <div className="w-[1px] h-3 bg-white/20" />
+        <span className="text-[10px] font-display text-white/60 uppercase tracking-tighter">
+          {loading ? '...' : weatherData.locationName}
+        </span>
+      </div>
+      <span className="text-[10px] font-display italic text-white/40">{weatherComment}</span>
+    </div>
+  );
+};
+
+const TEN_GODS_HANJA: Record<string, string> = {
+  "비견": "比肩", "겁재": "劫財", "식신": "食神", "상관": "傷官",
+  "편재": "偏財", "정재": "正財", "편관": "偏官", "정관": "正官",
+  "편인": "偏印", "정인": "正印"
+};
+
+const CITY_META_TABLE: Record<string, { keywords: string; vibe: string; point: string }> = {
+  "강릉시": { keywords: "바다, 커피, 경포대, 정동진", vibe: "낭만적인, 푸른, 여유로운", point: "푸른 파도와 커피 향" },
+  "부산시": { keywords: "항구, 역동적, 마천루, 사투리", vibe: "거친, 에너제틱한, 화려한", point: "거친 파도와 도시의 소음" },
+  "춘천시": { keywords: "호수, 안개, 닭갈비, 소양강", vibe: "몽환적인, 잔잔한, 서정적인", point: "안개 낀 호수와 새벽 공기" },
+  "경주시": { keywords: "고분, 신라, 역사, 황리단길", vibe: "신비로운, 오래된, 정갈한", point: "천 년의 세월이 흐르는 땅" },
+  "제주시": { keywords: "바람, 돌, 한라산, 이국적", vibe: "자유로운, 거친, 신비로운", point: "현무암 사이를 지나는 바람" },
+  "서울": { keywords: "남산타워, 한강, 빌딩숲, 잠들지 않는 도시", vibe: "세련된, 바쁜, 화려한", point: "잠들지 않는 도시의 불빛" }
+};
+
+const getGanYeoJiDong = (stem: string, branch: string) => {
+  const stemEl = STEM_ELEMENTS[stem as keyof typeof STEM_ELEMENTS];
+  const branchEl = BRANCH_ELEMENTS[branch as keyof typeof BRANCH_ELEMENTS];
+  return stemEl === branchEl;
+};
 
 const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 30 }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
@@ -84,6 +175,32 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
         continue;
       }
 
+      if (text[i] === '[') {
+        const endBracketIndex = text.indexOf(']', i + 1);
+        if (endBracketIndex !== -1) {
+          const tagContent = text.substring(i + 1, endBracketIndex);
+          if (tagContent.startsWith('delay:')) {
+            const ms = parseInt(tagContent.split(':')[1]);
+            if (!isNaN(ms)) {
+              infos.push({ char: '', delay: ms });
+            }
+            i = endBracketIndex;
+            continue;
+          }
+          const colonIndex = tagContent.indexOf(':');
+          if (colonIndex !== -1) {
+            const color = tagContent.substring(0, colonIndex);
+            const content = tagContent.substring(colonIndex + 1);
+            
+            for (let j = 0; j < content.length; j++) {
+              infos.push({ char: content[j], delay: speed, color });
+            }
+            i = endBracketIndex;
+            continue;
+          }
+        }
+      }
+
       if (text[i] === "'") {
         const endQuoteIndex = text.indexOf("'", i + 1);
         if (endQuoteIndex !== -1) {
@@ -107,12 +224,6 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
       else if (char === '.') {
         delay = 2000;
         infos.push({ char, delay });
-        // Add line break after period for better layout
-        if (i < text.length - 1 && text[i+1] !== '\n') {
-          infos.push({ char: '\n', delay: speed });
-          // Skip next space if it exists to keep alignment clean
-          if (text[i+1] === ' ') i++;
-        }
         continue;
       }
       else if (char === '\n') delay = speed * 15;
@@ -277,6 +388,8 @@ interface BaZiResultPageProps {
   result: BaZiResult;
   lang: Language;
   userName: string;
+  gender: string;
+  city: string;
   onBack: () => void;
 }
 
@@ -406,8 +519,16 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
   );
 };
 
-export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiResultPageProps) {
+export default function BaZiResultPage({ result, lang, userName, gender, city, onBack }: BaZiResultPageProps) {
   const t = TRANSLATIONS[lang].result as any;
+  const dayMaster = result.pillars[1].stem;
+  const currentCycle = result.grandCycles[result.currentCycleIndex];
+  const currentAnnualPillar = result.currentYearPillar;
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const currentDay = now.getDate();
 
   const renderPillarText = (type: 'stem' | 'branch', value: string) => {
     const mapping = (type === 'stem' ? BAZI_MAPPING.stems : BAZI_MAPPING.branches) as any;
@@ -436,6 +557,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
   const [showMuJaDaJaHelp, setShowMuJaDaJaHelp] = useState(false);
   const [isCycleVibeExpanded, setIsCycleVibeExpanded] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [showDailyVibe, setShowDailyVibe] = useState(false);
 
   const elementData = useMemo(() => {
     const counts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
@@ -607,6 +729,10 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
     };
   };
 
+  const getVibeColor = (element: string) => {
+    return ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+  };
+
   const renderTitle = () => {
     return (
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
@@ -629,240 +755,375 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
     );
   };
 
-  const formatName = (name: string) => {
-    if (lang === 'KO') return name;
-    return name.startsWith('The ') ? name.slice(4) : name;
-  };
-
-  const getDetailedTenGod = (dm: string, target: string) => {
-    const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-    const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
-    
-    const dmIdx = stems.indexOf(dm);
-    const targetIdx = stems.indexOf(target);
-    
-    if (dmIdx === -1 || targetIdx === -1) return { ko: '?', en: '?' };
-    
-    const dmElemIdx = Math.floor(dmIdx / 2);
-    const targetElemIdx = Math.floor(targetIdx / 2);
-    
-    const diff = (targetElemIdx - dmElemIdx + 5) % 5;
-    const samePolarity = (dmIdx % 2) === (targetIdx % 2);
-    
-    const tenGodsMap: Record<number, [string, string]> = {
-      0: samePolarity ? ['비견', 'Mirror'] : ['겁재', 'Rival'],
-      1: samePolarity ? ['식신', 'Artist'] : ['상관', 'Rebel'],
-      2: samePolarity ? ['편재', 'Maverick'] : ['정재', 'Architect'],
-      3: samePolarity ? ['편관', 'Warrior'] : ['정관', 'Judge'],
-      4: samePolarity ? ['편인', 'Mystic'] : ['정인', 'Sage'],
-    };
-    
-    const [ko, en] = tenGodsMap[diff] || ['?', '?'];
-    return { ko, en };
-  };
-
-  const getTenGodColor = (name: string) => {
-    return TEN_GOD_COLORS[name as keyof typeof TEN_GOD_COLORS] || '#FFFFFF';
-  };
-
-  const colorizeAdvancedAnalysis = (text: string) => {
-    if (!text) return text;
-    let colorized = text;
-    const dayMaster = result.pillars[1].stem;
-    const dmElement = STEM_ELEMENTS[dayMaster];
-    const cycle = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
-    const dmIdx = cycle.indexOf(dmElement);
-
-    const elements = {
-      BiGyeop: cycle[dmIdx],
-      SikSang: cycle[(dmIdx + 1) % 5],
-      JaeSeong: cycle[(dmIdx + 2) % 5],
-      GwanSeong: cycle[(dmIdx + 3) % 5],
-      InSeong: cycle[(dmIdx + 4) % 5]
+    const formatName = (name: string) => {
+      if (lang === 'KO') return name;
+      return name.startsWith('The ') ? name.slice(4) : name;
     };
 
-    const tenGodsMap = {
-      '비겁': elements.BiGyeop,
-      '비견': elements.BiGyeop,
-      '겁재': elements.BiGyeop,
-      'Self': elements.BiGyeop,
-      'Mirror/Rival': elements.BiGyeop,
-      'Mirror': elements.BiGyeop,
-      'Rival': elements.BiGyeop,
-      '식상': elements.SikSang,
-      '식신': elements.SikSang,
-      '상관': elements.SikSang,
-      'Output': elements.SikSang,
-      'Artist/Rebel': elements.SikSang,
-      'Artist': elements.SikSang,
-      'Rebel': elements.SikSang,
-      '재성': elements.JaeSeong,
-      '편재': elements.JaeSeong,
-      '정재': elements.JaeSeong,
-      'Wealth': elements.JaeSeong,
-      'Maverick/Architect': elements.JaeSeong,
-      'Maverick': elements.JaeSeong,
-      'Architect': elements.JaeSeong,
-      '관성': elements.GwanSeong,
-      '편관': elements.GwanSeong,
-      '정관': elements.GwanSeong,
-      'Power': elements.GwanSeong,
-      'Warrior/Judge': elements.GwanSeong,
-      'Warrior': elements.GwanSeong,
-      'Judge': elements.GwanSeong,
-      '인성': elements.InSeong,
-      '편인': elements.InSeong,
-      '정인': elements.InSeong,
-      'Wisdom': elements.InSeong,
-      'Mystic/Sage': elements.InSeong,
-      'Mystic': elements.InSeong,
-      'Sage': elements.InSeong,
-      '무재': elements.JaeSeong,
-      '무관': elements.GwanSeong,
-      '무인': elements.InSeong,
-      '무식상': elements.SikSang,
-      '무비겁': elements.BiGyeop,
+    const getDetailedTenGod = (dm: string, target: string) => {
+      const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+      const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+      
+      const dmIdx = stems.indexOf(dm);
+      const targetIdx = stems.indexOf(target);
+      
+      if (dmIdx === -1 || targetIdx === -1) return { ko: '?', en: '?' };
+      
+      const dmElemIdx = Math.floor(dmIdx / 2);
+      const targetElemIdx = Math.floor(targetIdx / 2);
+      
+      const diff = (targetElemIdx - dmElemIdx + 5) % 5;
+      const samePolarity = (dmIdx % 2) === (targetIdx % 2);
+      
+      const tenGodsMap: Record<number, [string, string]> = {
+        0: samePolarity ? ['비견', 'Mirror'] : ['겁재', 'Rival'],
+        1: samePolarity ? ['식신', 'Artist'] : ['상관', 'Rebel'],
+        2: samePolarity ? ['편재', 'Maverick'] : ['정재', 'Architect'],
+        3: samePolarity ? ['편관', 'Warrior'] : ['정관', 'Judge'],
+        4: samePolarity ? ['편인', 'Mystic'] : ['정인', 'Sage'],
+      };
+      
+      const [ko, en] = tenGodsMap[diff] || ['?', '?'];
+      return { ko, en };
     };
 
-    const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    // First, protect '천재성' by replacing it with a placeholder
-    const placeholder = "__GENIUS_PLACEHOLDER__";
-    colorized = colorized.replace(/천재성/g, placeholder);
-
-    // Sort keys by length descending to match longer terms first
-    const sortedEntries = Object.entries(tenGodsMap).sort((a, b) => b[0].length - a[0].length);
-
-    // Colorize Ten Gods
-    sortedEntries.forEach(([god, element]) => {
-      const color = ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS];
-      const isEnglish = /^[A-Za-z]/.test(god);
-      const regex = isEnglish ? new RegExp(`\\b${escapeRegex(god)}\\b`, 'g') : new RegExp(escapeRegex(god), 'g');
-      colorized = colorized.replace(regex, (match) => `<span style="color: ${color}; font-weight: bold;">${match}</span>`);
-    });
-
-    // Restore '천재성'
-    colorized = colorized.replace(new RegExp(placeholder, 'g'), '천재성');
-
-    // Colorize Elements
-    const elementNames = {
-      '목(木)': 'Wood',
-      '화(火)': 'Fire',
-      '토(土)': 'Earth',
-      '금(金)': 'Metal',
-      '수(水)': 'Water',
-      'Wood(木)': 'Wood',
-      'Fire(火)': 'Fire',
-      'Earth(土)': 'Earth',
-      'Metal(金)': 'Metal',
-      'Water(水)': 'Water',
-      'Wood': 'Wood',
-      'Fire': 'Fire',
-      'Earth': 'Earth',
-      'Metal': 'Metal',
-      'Water': 'Water',
+    const getTenGodColor = (name: string) => {
+      return TEN_GOD_COLORS[name as keyof typeof TEN_GOD_COLORS] || '#FFFFFF';
     };
 
-    Object.entries(elementNames).forEach(([el, element]) => {
-      const color = ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS];
-      const regex = new RegExp(`\\b(${escapeRegex(el)})\\b|(${escapeRegex(el)})`, 'g');
-      colorized = colorized.replace(regex, (match) => `<span style="color: ${color}; font-weight: bold;">${match}</span>`);
-    });
+    const colorizeAdvancedAnalysis = (text: string) => {
+      if (!text) return text;
+      let colorized = text;
+      const terms = [
+        { key: '목', color: 'text-green-400' },
+        { key: '화', color: 'text-red-400' },
+        { key: '토', color: 'text-yellow-400' },
+        { key: '금', color: 'text-gray-300' },
+        { key: '수', color: 'text-blue-400' },
+      ];
+      terms.forEach(term => {
+        const regex = new RegExp(term.key, 'g');
+        colorized = colorized.replace(regex, `<span class="${term.color}">${term.key}</span>`);
+      });
+      return colorized;
+    };
 
-    return colorized;
-  };
+    const formatGod = (god: string, stemOrBranch: string) => {
+      if (lang !== 'KO') return god;
+      const base = god.substring(0, 2);
+      const hanja = TEN_GODS_HANJA[base] || '';
+      const element = BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems]?.element || 
+                      BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches]?.element || '';
+      const color = getVibeColor(element);
+      return `[${color}:${base}(${hanja})]`;
+    };
 
-  const currentCycle = result.grandCycles[result.currentCycleIndex] || result.grandCycles[0];
-  const dayMaster = result.pillars[1].stem;
-  
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-  const currentDay = new Date().getDate();
-  const currentAnnualPillar = React.useMemo(() => {
-    if (result.currentYearPillar) return result.currentYearPillar;
-    if (!currentCycle.annualPillars) return null;
-    return currentCycle.annualPillars.find(ap => ap.year === currentYear) || currentCycle.annualPillars[0];
-  }, [currentCycle, currentYear, result.currentYearPillar]);
+    const cycleVibe = React.useMemo(() => {
+    const isSinGang = result.analysis.shinGangShinYak?.isStrong ?? (result.analysis.dayMasterStrength === 'Strong');
+    const tenGodsRatio = result.analysis?.tenGodsRatio || {};
+    const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
+    const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
 
-  const tenGod = React.useMemo(() => {
-    return calculateTenGods(dayMaster, currentCycle.element);
-  }, [dayMaster, currentCycle.element]);
+    const daewunStem = currentCycle.stem;
+    const daewunBranch = currentCycle.branch;
+    const daewunStemGodKo = currentCycle.stemTenGodKo;
+    const daewunBranchGodKo = currentCycle.branchTenGodKo;
+    const daewunStemGodEn = currentCycle.stemTenGodEn;
+    const daewunBranchGodEn = currentCycle.branchTenGodEn;
+    
+    const seunStem = currentAnnualPillar?.stem || '';
+    const seunBranch = currentAnnualPillar?.branch || '';
+    const seunStemGodKo = currentAnnualPillar?.stemTenGodKo || '';
+    const seunBranchGodKo = currentAnnualPillar?.branchTenGodKo || '';
+    const seunStemGodEn = currentAnnualPillar?.stemTenGodEn || '';
+    const seunBranchGodEn = currentAnnualPillar?.branchTenGodEn || '';
 
-  const cycleVibe = React.useMemo(() => {
-    if (!currentAnnualPillar) {
-      return ((t.comments[currentCycle.element as keyof typeof t.comments] as any)?.[tenGod] || 
-              (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean);
+    const luckGods = [daewunStemGodKo, daewunBranchGodKo, seunStemGodKo, seunBranchGodKo];
+
+    // Name Processing
+    let processedName = userName;
+    if (lang === 'KO' && userName.length === 3) {
+      processedName = userName.substring(1);
+    } else if (lang === 'EN' && userName.includes(' ')) {
+      processedName = userName.split(' ')[0];
     }
 
-    const daewoonGodEn = currentCycle.stemTenGodEn || '';
-    const daewoonGodKo = currentCycle.stemTenGodKo || '';
-    const sewoonGodEn = currentAnnualPillar.stemTenGodEn || '';
-    const sewoonGodKo = currentAnnualPillar.stemTenGodKo || '';
+    const userRef = lang === 'KO' ? (gender === 'female' ? '언니' : '오빠') : (gender === 'female' ? 'girl' : 'you');
 
-    const d = `${daewoonGodEn} ${daewoonGodKo}`;
-    const s = `${sewoonGodEn} ${sewoonGodKo}`;
+    const ilju = result.pillars[1].stem + result.pillars[1].branch;
+    const iljuInfo = ILJU_DESCRIPTIONS[ilju as keyof typeof ILJU_DESCRIPTIONS] || { ko: '', en: '', impression: '' };
+    const iljuImpression = lang === 'KO' ? iljuInfo.impression : '';
 
-    // Check for specific interactions between Daewoon and Sewoon
-    const interactions = [
-      {
-        // 상관패인: 상관(Rebel) + 인성(Sage/Mystic)
-        condition: (d: string, s: string) => 
-          ((d.includes('Rebel') || d.includes('상관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
-          ((s.includes('Rebel') || s.includes('상관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
-        key: 'SangGwanPaeIn'
-      },
-      {
-        // 재극인: 재성(Maverick/Architect) + 인성(Sage/Mystic)
-        condition: (d: string, s: string) => 
-          ((d.includes('Maverick') || d.includes('Architect') || d.includes('편재') || d.includes('정재')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
-          ((s.includes('Maverick') || s.includes('Architect') || s.includes('편재') || s.includes('정재')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
-        key: 'JaeGeukIn'
-      },
-      {
-        // 식상생재: 식상(Artist/Rebel) + 재성(Maverick/Architect)
-        condition: (d: string, s: string) => 
-          ((d.includes('Artist') || d.includes('Rebel') || d.includes('식신') || d.includes('상관')) && (s.includes('Maverick') || s.includes('Architect') || s.includes('편재') || s.includes('정재'))) || 
-          ((s.includes('Artist') || s.includes('Rebel') || s.includes('식신') || s.includes('상관')) && (d.includes('Maverick') || d.includes('Architect') || d.includes('편재') || d.includes('정재'))),
-        key: 'SikSangSaengJae'
-      },
-      {
-        // 관인상생: 관성(Warrior/Judge) + 인성(Sage/Mystic)
-        condition: (d: string, s: string) => 
-          ((d.includes('Warrior') || d.includes('Judge') || d.includes('편관') || d.includes('정관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
-          ((s.includes('Warrior') || s.includes('Judge') || s.includes('편관') || s.includes('정관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
-        key: 'GwanInSangSaeng'
-      },
-      {
-        // 식신제살: 식신(Artist) + 편관(Warrior)
-        condition: (d: string, s: string) => 
-          ((d.includes('Artist') || d.includes('식신')) && (s.includes('Warrior') || s.includes('편관'))) || 
-          ((s.includes('Artist') || s.includes('식신')) && (d.includes('Warrior') || d.includes('편관'))),
-        key: 'SikSinJeSal'
-      },
-      {
-        // 살인상생: 편관(Warrior) + 인성(Sage/Mystic)
-        condition: (d: string, s: string) => 
-          ((d.includes('Warrior') || d.includes('편관')) && (s.includes('Sage') || s.includes('Mystic') || s.includes('정인') || s.includes('편인'))) || 
-          ((s.includes('Warrior') || s.includes('편관')) && (d.includes('Sage') || d.includes('Mystic') || d.includes('정인') || d.includes('편인'))),
-        key: 'SalInSangSaeng'
+    // 1. Intro: Birthplace Insight
+    let cityInsight = '';
+    if (lang === 'KO') {
+      const matchedCity = Object.keys(CITY_META_TABLE).find(c => city.includes(c));
+      if (matchedCity) {
+        const meta = CITY_META_TABLE[matchedCity as keyof typeof CITY_META_TABLE];
+        cityInsight = `${matchedCity}에서 태어났네? ${meta.point} 때문인지 너의 원국에서도 ${meta.vibe} 특성이 느껴지는 것 같아. `;
+      } else if (city) {
+        cityInsight = `${city}에서 태어났네? 그곳만의 독특한 기운이 네 사주에 스며들어 네 영혼의 색깔을 더 선명하게 만들었겠군. `;
       }
-    ];
+    }
 
-    for (const inter of interactions) {
-      if (inter.condition(d, s)) {
-        const msg = (TRANSLATIONS.INTERACTION_MESSAGES as any)[lang][inter.key];
-        if (msg) {
-          if (lang === 'KO') {
-            return `있잖아, 지금 네 대운의 '${daewoonGodKo}'이랑 올해 세운의 '${sewoonGodKo}'이 만났어. 그래서 ${currentAnnualPillar.year}년인 올해 너는 '${msg.title}'의 효과를 제대로 받고 있는 중이야. ${msg.detail}`;
-          }
-          return `Hey, your Major Cycle's '${daewoonGodEn}' met this year's '${sewoonGodEn}'. So in ${currentAnnualPillar.year}, you're feeling the effects of '${msg.title}'. ${msg.detail}`;
+    // 2. Bazi Combinations (Combos)
+    const combos: { id: string; priority: number; name: string; desc: string }[] = [];
+    if (lang === 'KO') {
+      const hasSikSinLuck = luckGods.some(g => g === '식신');
+      const hasSangGwanLuck = luckGods.some(g => g === '상관');
+      const hasPyeonJaeLuck = luckGods.some(g => g === '편재');
+      const hasJeongJaeLuck = luckGods.some(g => g === '정재');
+      const hasPyeonGwanLuck = luckGods.some(g => g === '편관');
+      const hasJeongGwanLuck = luckGods.some(g => g === '정관');
+      const hasPyeonInLuck = luckGods.some(g => g === '편인');
+      const hasJeongInLuck = luckGods.some(g => g === '정인');
+
+      const hasSikSangLuck = hasSikSinLuck || hasSangGwanLuck;
+      const hasJaeSeongLuck = hasPyeonJaeLuck || hasJeongJaeLuck;
+      const hasGwanSeongLuck = hasPyeonGwanLuck || hasJeongGwanLuck;
+      const hasInSeongLuck = hasPyeonInLuck || hasJeongInLuck;
+
+      const hasSikSangBase = overflow.some(o => o.includes('식상')) || tenGodsRatio['식상 (Artist/Rebel)'] > 15;
+      const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || tenGodsRatio['재성 (Maverick/Architect)'] > 15;
+      const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || tenGodsRatio['관성 (Warrior/Judge)'] > 15;
+      const hasInSeongBase = overflow.some(o => o.includes('인성')) || tenGodsRatio['인성 (Mystic/Sage)'] > 15;
+
+      // Priority Logic
+      if (hasSangGwanLuck && (hasInSeongBase || hasInSeongLuck)) {
+        combos.push({ id: '상관패인', priority: 100, name: '상관패인(傷官佩印)', desc: `기발하고 날카로운 아이디어(상관)가 인성이라는 품격 있는 고삐를 만났어. 거친 재능이 다듬어져 세상의 인정을 받기 좋은 시기야.` });
+      }
+      if (hasSikSinLuck && (hasGwanSeongBase || hasGwanSeongLuck)) {
+        combos.push({ id: '식신제살', priority: 95, name: '식신제살(食神制殺)', desc: `너를 괴롭히던 난관을 너만의 실력으로 시원하게 해결해버리는 시기야. 위기 돌파 능력이 빛을 발할 거야.` });
+      }
+      if (hasPyeonGwanLuck && (hasInSeongBase || hasInSeongLuck)) {
+        combos.push({ id: '살인상생', priority: 90, name: '살인상생(殺印相生)', desc: `강력한 난관(편관)을 지혜와 학문(인성)으로 녹여내어 오히려 큰 기회로 바꾸는 시기야. 위기를 기회로 만드는 반전의 드라마가 펼쳐질 거야.` });
+      }
+      if (hasSikSangLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
+        combos.push({ id: '식상생재', priority: 85, name: '식상생재(食傷生財)', desc: `재능이 곧바로 결과물로 이어지는 흐름이야. 머릿속 계획들이 실질적인 성과로 변하는 생산적인 시기지.` });
+      }
+      if (hasGwanSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
+        combos.push({ id: '관인상생', priority: 80, name: '관인상생(官印相生)', desc: `조직의 혜택이나 윗사람의 끌어줌이 있는 시기야. 노력이 공식적으로 인정받고 명예가 올라가는 흐름이지.` });
+      }
+      if (hasJaeSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
+        combos.push({ id: '재극인', priority: 70, name: '재극인(財剋印)', desc: `현실적인 이익과 신념이 충돌하고 있어. 당장의 이익 때문에 소중한 가치를 버리지 않게 조심해.` });
+      }
+      if (hasGwanSeongLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
+        combos.push({ id: '재생관', priority: 60, name: '재생관(財生官)', desc: `쌓아온 자산이나 노력이 사회적 지위로 연결되는 흐름이야. 내실을 다져 더 높은 곳으로 올라갈 발판을 마련하게 될 거야.` });
+      }
+
+      combos.sort((a, b) => b.priority - a.priority);
+      if (combos.length > 2) combos.splice(2);
+    }
+
+    let comboInsight = '';
+    if (combos.length > 0) {
+      if (combos.length === 1) {
+        comboInsight = `이번 시기는 **'${combos[0].name}'**의 격을 갖췄어. ${combos[0].desc}`;
+      } else {
+        comboInsight = `**'${combos[0].name}'**의 흐름이 주도적이지만, 동시에 **'${combos[1].name}'**의 영향도 무시할 수 없어. \n\n${combos[0].desc} ${combos[1].desc}`;
+      }
+    }
+
+    // 3. Intro Construction
+    let intro = '';
+    if (lang === 'KO') {
+      const sortedElements = [...elementData].sort((a, b) => b.value - a.value);
+      const dominantElement = sortedElements[0]?.name.split('(')[0] || '';
+      const strengthComment = isSinGang ? '에너지가 꽤 넘치는 편이네?' : '섬세하고 차분한 에너지가 느껴져.';
+      const elementComment = `${dominantElement}의 기운이 강해서 그런지 분위기가 묘하게 끌리네.`;
+      const impression = iljuImpression.replace('너만의', `${processedName}만의`);
+      
+      intro = `${cityInsight}흠.. ${impression} \n게다가 ${strengthComment} ${elementComment} 이런 다양한 매력이 더해지면 ${processedName}는 너만의 색깔이 뚜렷할 거야 분명히. \n\n이번에는 대운과 세운의 흐름을 좀 볼까? 보채지는 말아줘`;
+    } else {
+      const sortedElements = [...elementData].sort((a, b) => b.value - a.value);
+      const dominantElement = sortedElements[0]?.name.split('(')[0] || '';
+      intro = `${processedName}, ${iljuInfo.en} Your boundaries are firm. Plus, you have ${isSinGang ? 'plenty of' : 'delicate'} energy. With the strong ${dominantElement} vibe, your unique color will definitely shine. \n\nLet's look at your cycles. Don't rush me.`;
+    }
+
+    let cycleIntro = lang === 'KO' ? `\n\n요번 ${currentAnnualPillar?.year || new Date().getFullYear()}년도는... ${daewunStem}${daewunBranch} 대운과 ${seunStem}${seunBranch} 세운이 만나는 시기네! [delay:4000]\n\n` : `\n\nThis cycle is a mix of Daewun and Seun... [delay:4000]\n\n`;
+    
+    // 4. Main Construction
+    let main = '';
+    if (lang === 'KO') {
+      main = `${userRef}한테는 대운에서 ${formatGod(daewunStemGodKo, daewunStem)}·${formatGod(daewunBranchGodKo, daewunBranch)}, 그리고 세운에서 ${formatGod(seunStemGodKo, seunStem)}·${formatGod(seunBranchGodKo, seunBranch)}의 기운이 들어오고 있어. `;
+      
+      if (comboInsight) {
+        let detailedEffect = '';
+        const interactions = result.analysis.interactions || [];
+        const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
+        const seunInteractions = interactions.filter(i => i.note?.includes(seunStem) || i.note?.includes(seunBranch));
+        const allLuckInteractions = [...daewunInteractions, ...seunInteractions];
+        
+        const hasClash = allLuckInteractions.some(i => i.type.includes('충'));
+        const hasPunishment = allLuckInteractions.some(i => i.type.includes('형'));
+        const hasHap = allLuckInteractions.some(i => i.type.includes('합'));
+
+        if (isSinGang) {
+          detailedEffect += `넘치는 에너지를 통제할 강력한 고삐가 필요한 시점이야. `;
+        } else {
+          detailedEffect += `에너지가 섬세한 편이라 들어오는 기운들이 다소 버거울 수 있어. 실속을 챙기는 게 우선이야. `;
+        }
+
+        const comboIds = combos.map(c => c.id);
+        if (comboIds.includes('상관패인')) detailedEffect += `상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
+        if (comboIds.includes('식상생재')) detailedEffect += `원국에 ${overflow.some(o => o.includes('재성')) ? '재성이 이미 풍부해서' : '재성이 부족했는데'} 이번 운에서 식상이 길을 열어주니 결과물이 쏠쏠하겠어. `;
+        if (comboIds.includes('재극인')) detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어를 건드릴 수 있어. 계산기보다 양심을 먼저 두드려봐. `;
+        if (comboIds.includes('관인상생')) detailedEffect += `조직의 보호 아래서 가치를 증명하기 좋아. 승진이나 합격 소식을 기대해봐. `;
+        if (comboIds.includes('식신제살')) detailedEffect += `골치 아픈 일들이 네 실력 앞에서 하나둘 해결될 거야. `;
+        if (comboIds.includes('재생관')) detailedEffect += `기반이 튼튼해지면서 자연스럽게 명예도 따라오는 형국이야. `;
+
+        if (hasClash) detailedEffect += `과정에서 환경의 변화나 마찰은 감수해야 할 거야. `;
+        if (hasPunishment) detailedEffect += `결과물을 챙길 때 법적인 부분이나 서류는 꼼꼼히 봐. `;
+        if (hasHap) detailedEffect += `새로운 인연이나 협력 제안이 올 수도 있어. `;
+        
+        main += `\n\n${comboInsight}\n\n${detailedEffect}`;
+      } else {
+        const isMissingInDaewun = missing.some(m => daewunStemGodKo.includes(m) || daewunBranchGodKo.includes(m));
+        const isOverflowInDaewun = overflow.some(o => daewunStemGodKo.includes(o) || daewunBranchGodKo.includes(o));
+
+        if (isMissingInDaewun) {
+          main += `평소에 ${userRef}한테 부족했던 ${BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || ''}의 기운이 대운과 세운에서 동시에 보강되면서, 멈춰있던 엔진이 다시 돌아가는 기분일 거야. `;
+        } else if (isOverflowInDaewun) {
+          main += `이미 넘치는 기운이 또 들어와서 에너지가 좀 과부하될 수 있어. ${isSinGang ? '자기 주장이 너무 강해질 수 있으니' : '생각이 너무 많아질 수 있으니'} 속도 조절이 필요해! `;
+        } else {
+          const dominantLuckElement = BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || '';
+          const elementAdvice: Record<string, string> = {
+            'Wood': '성장과 확장의 기운이 강해지는 시기야. 새로운 프로젝트를 시작하거나 배움을 넓히기에 아주 좋겠어.',
+            'Fire': '열정과 에너지가 솟구치는 때네. 네 존재감을 드러내고 화려하게 활동할 기회가 많아질 거야.',
+            'Earth': '안정과 내실을 기하는 흐름이야. 서두르기보다는 기반을 튼튼히 다지고 주변을 정리하는 게 이득이지.',
+            'Metal': '결실과 정리가 필요한 시점이야. 불필요한 것들은 과감히 쳐내고 핵심적인 성과에 집중해봐.',
+            'Water': '지혜와 유연함이 필요한 시기네. 겉으로 드러나는 활동보다는 내면의 깊이를 더하고 흐름에 몸을 맡겨봐.'
+          };
+          main += elementAdvice[dominantLuckElement] || `원국의 균형을 크게 흔들지 않으면서도 적절한 자극이 되어주는 운이야. 평소보다 조금 더 과감하게 움직여봐도 좋겠어. `;
         }
       }
+    } else {
+      const daewunColor = getVibeColor(BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || '');
+      main = `For you, it brings a combination of [${daewunColor}:${daewunStemGodEn}/${daewunBranchGodEn}] and [${daewunColor}:${seunStemGodEn}/${seunBranchGodEn}] energy. `;
+      main += `A fresh yet familiar vibe is waking you up. `;
     }
 
-    return ((t.comments[currentCycle.element as keyof typeof t.comments] as any)?.[tenGod] || 
-            (t.comments[currentCycle.element as keyof typeof t.comments] as any)?.BiGyean);
-  }, [currentCycle, currentAnnualPillar, tenGod, lang]);
+    let but = lang === 'KO' ? `\n\n근데.. [delay:2500]\n\n` : `\n\nBut.. [delay:2500]\n\n`;
+
+    let glitch = '';
+    if (lang === 'KO') {
+      const interactions = result.analysis.interactions || [];
+      const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
+      
+      const hasClash = daewunInteractions.some(i => i.type.includes('충') || i.type.includes('Clash'));
+      const hasPunishment = daewunInteractions.some(i => i.type.includes('형') || i.type.includes('Punishment'));
+      const hasHarm = daewunInteractions.some(i => i.type.includes('해') || i.type.includes('Harm'));
+      
+      if (hasClash) {
+        glitch = `대운에서 충(沖)이 들어오네. 환경이 급격하게 변하거나 이동수가 있을 수 있어. 특히 인간관계에서 부딪힘이 생길 수 있으니 유연하게 대처하는 게 필요해. `;
+      } else if (hasPunishment) {
+        glitch = `형(刑)의 기운이 섞여 있네. 관재수나 건강 문제를 조심해야 해. 법적인 일이나 시비에 휘말리지 않게 행동 하나하나 신중하게! `;
+      } else if (hasHarm) {
+        glitch = `해(害)의 기운이 있네. 믿었던 사람에게 배신감을 느끼거나 사소한 오해로 관계가 틀어질 수 있어. 감정 소모 조심해. `;
+      } else if (daewunStemGodKo.includes('재성') && overflow.some(o => o.includes('비겁'))) {
+        glitch = `돈이 보인다고 너무 방심하진 마. 주변에 숟가락 얹으려는 사람들이 많아지는 '군비쟁재' 타이밍이거든. 돈 빌려주는 건 절대 금지! `;
+      } else if (daewunStemGodKo.includes('관성') && overflow.some(o => o.includes('식상'))) {
+        glitch = `하고 싶은 말은 많은데 사회적 시선이나 규칙이 ${userRef}를 옥죄는 기분일 거야. '상관견관'의 기운이니 구설수 조심하고 선 넘지 않게 주의해! `;
+      } else if (daewunStemGodKo.includes('인성') && overflow.some(o => o.includes('재성'))) {
+        glitch = `'재극인'의 부작용이 우려돼. 판단력이 흐려져서 잘못된 계약을 하거나, 공부보다는 당장의 이익에 눈이 멀어 중요한 걸 놓칠 수 있어. `;
+      } else if (daewunStemGodKo.includes('식상') && overflow.some(o => o.includes('관성'))) {
+        glitch = `자유롭고 싶은 마음이 커지면서 기존의 틀을 깨고 싶어질 거야. 근데 그게 자칫하면 공들여 쌓은 탑을 무너뜨리는 '상관견관'이 될 수 있으니 조심! `;
+      } else {
+        const interactions = result.analysis.interactions || [];
+        const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
+        const seunInteractions = interactions.filter(i => i.note?.includes(seunStem) || i.note?.includes(seunBranch));
+        const allLuckInteractions = [...daewunInteractions, ...seunInteractions];
+        
+        const hasClash = allLuckInteractions.some(i => i.type.includes('충'));
+        const hasPunishment = allLuckInteractions.some(i => i.type.includes('형'));
+
+        if (hasClash || hasPunishment) {
+          glitch = `운의 흐름에서 ${hasClash ? '충(沖)' : ''}${hasClash && hasPunishment ? '과 ' : ''}${hasPunishment ? '형(刑)' : ''}의 기운이 섞여 있어. 예상치 못한 곳에서 렉이 걸리거나 마찰이 생길 수 있으니, 돌다리도 두들겨 보고 가자! `;
+        } else {
+          glitch = `운의 흐름이 비교적 매끄럽지만, 너무 자만하면 사소한 실수가 생길 수 있어. 네 페이스를 유지하는 게 중요해. `;
+        }
+      }
+    } else {
+      if (daewunStemGodEn.includes('Maverick') || daewunBranchGodEn.includes('Maverick')) {
+        if (overflow.some(o => o.includes('Mirror'))) glitch = `Money is visible, but don't let your guard down. Too many people might try to take a piece of your pie. No lending money! `;
+      } else {
+        glitch = `The flow of luck is changing rapidly, and you might experience unexpected glitches. Better safe than sorry! `;
+      }
+    }
+
+    let closing = '';
+    if (lang === 'KO') {
+      const yongshin = result.analysis.yongShen;
+      const isYongshinInDaewun = daewunStemGodKo.includes(yongshin) || daewunBranchGodKo.includes(yongshin);
+      
+      if (isYongshinInDaewun) {
+        closing = `\n\n결론적으로 이번 운은 네가 기다려온 '용신'의 타이밍이야. 네 능력을 세상에 증명하고 실질적인 성취를 거두기 딱 좋지. 망설이지 말고 네 바이브를 보여줘!`;
+      } else if (daewunStemGodKo.includes('재성')) {
+        closing = `\n\n결론적으로 이번 운에서는 현실적인 결과물과 경제적 성취에 집중하는 게 베스트야. 뜬구름 잡는 소리보다는 손에 잡히는 성과를 만들어봐.`;
+      } else if (daewunStemGodKo.includes('관성')) {
+        closing = `\n\n결론적으로 이번 운에서는 사회적 위치와 명예를 다지는 데 집중해봐. 네가 속한 조직이나 사회에서 네 존재감을 확실히 각인시킬 기회야.`;
+      } else if (daewunStemGodKo.includes('식상')) {
+        closing = `\n\n결론적으로 이번 운에서는 네 창의성과 자기 표현을 극대화하는 게 좋아. 남들 눈치 보지 말고 네가 하고 싶은 걸 마음껏 펼쳐봐.`;
+      } else if (daewunStemGodKo.includes('인성')) {
+        closing = `\n\n결론적으로 이번 운에서는 내면의 성찰과 지식 습득에 집중해봐. 당장의 성과보다는 미래를 위한 씨앗을 심는 시기라고 생각하면 편해.`;
+      } else {
+        closing = `\n\n결론적으로 이번 운에서는 ${isSinGang ? '네 넘치는 에너지를 생산적인 곳에 쏟아붓는 게' : '네 페이스를 유지하며 내실을 다지는 게'} 베스트야. 너무 조급해하지 말고 네 바이브로 멋지게 헤쳐나가보자!`;
+      }
+    } else {
+      closing = `\n\nOverall, focusing on ${daewunStemGodEn.includes('Maverick') ? 'practical results' : 'your own expression'} is the best move. Go get 'em with your unique vibe!`;
+    }
+
+    return `${intro}${cycleIntro}${main}${but}${glitch}${closing}`;
+  }, [currentCycle, currentAnnualPillar, lang, result, userName, gender, city]);
+
+  const dailyVibe = React.useMemo(() => {
+    const todayPillar = getTodayPillar(dayMaster);
+    const tenGodsRatio = result.analysis?.tenGodsRatio || {};
+    const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
+    const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
+
+    const stemGod = lang === 'KO' ? todayPillar.stemTenGodKo : todayPillar.stemTenGodEn;
+    const branchGod = lang === 'KO' ? todayPillar.branchTenGodKo : todayPillar.branchTenGodEn;
+    const stemColor = getVibeColor(STEM_ELEMENTS[todayPillar.stem as keyof typeof STEM_ELEMENTS]);
+    const branchColor = getVibeColor(BRANCH_ELEMENTS[todayPillar.branch as keyof typeof BRANCH_ELEMENTS]);
+
+    // Name Processing
+    let processedName = userName;
+    if (lang === 'KO' && userName.length === 3) {
+      processedName = userName.substring(1);
+    } else if (lang === 'EN' && userName.includes(' ')) {
+      processedName = userName.split(' ')[0];
+    }
+
+    const address = gender === 'female' ? (lang === 'KO' ? '언니' : 'sis') : (lang === 'KO' ? '오빠' : 'bro');
+    const userRef = lang === 'KO' ? (gender === 'female' ? '언니' : '오빠') : (gender === 'female' ? 'girl' : 'you');
+
+    const isGanYeoJiDong = getGanYeoJiDong(todayPillar.stem, todayPillar.branch);
+    const ganYeoComment = isGanYeoJiDong ? (lang === 'KO' ? ' 오, 같은 글자가 두 번이나 나왔네?' : ' Oh, the same energy appeared twice?') : '';
+
+    let main = '';
+    if (lang === 'KO') {
+      const stemKo = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko;
+      const branchKo = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko;
+      
+      main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. `;
+      if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) main += `헐, 평소에 ${userRef}한테 없던 낯선 에너지가 훅 들어오는 날이야. 새로운 영감이 떠오를지도? `;
+      else if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) main += `에너지 과부하 주의! 이미 넘치는 기운이 또 들어와서 좀 예민해질 수 있어. 릴렉스하자. `;
+      else main += `전체적으로 에너지가 조화롭게 흐르는 날이야. 평소처럼만 해도 충분해! `;
+      
+      if (stemGod.includes('재성')) main += `특히 오늘은 소소하게라도 득템하거나 결과가 나오는 날이니까 기대해봐!`;
+      else if (stemGod.includes('식상')) main += `말빨이나 창의력이 폭발하는 날이니까 아이디어 있으면 바로 공유 고고!`;
+    } else {
+      main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. `;
+      main += `A day where your unique energy flows smoothly. Trust your gut!`;
+    }
+
+    return main;
+  }, [dayMaster, result, lang, userName, gender]);
+
+  const handleShowDailyVibe = () => {
+    setShowDailyVibe(true);
+  };
 
   const getLifeStage = (age: number) => {
     const stages = t.lifeStages;
@@ -916,9 +1177,35 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                     : `What do you think your luck for ${new Date().getFullYear()} will be? Shall we test it?`}
                 </p>
               ) : (
-                <p className="text-lg font-display italic text-white leading-relaxed">
-                  <TypingText key={lang + cycleVibe} text={cycleVibe} />
-                </p>
+                <div className="space-y-6">
+                  <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                    <TypingText key={lang + cycleVibe} text={cycleVibe} speed={20} />
+                  </p>
+                  
+                  {!showDailyVibe ? (
+                    <button 
+                      onClick={handleShowDailyVibe}
+                      className="mt-4 px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-sm text-white/80 transition-all duration-300 flex items-center space-x-2"
+                    >
+                      <span>{lang === 'KO' ? '오늘 하루는 어떨까?' : 'How about today?'}</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <div className="mt-6 p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-neon-pink" />
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-neon-pink font-display font-bold flex items-center space-x-2">
+                          <Sparkles className="w-5 h-5" />
+                          <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
+                        </h4>
+                        <WeatherWidget city={city} lang={lang} />
+                      </div>
+                      <p className="text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
+                        <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} />
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -967,6 +1254,8 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
               (pillar.title === 'Year' ? '연주' : pillar.title === 'Month' ? '월주' : pillar.title === 'Day' ? '일주' : '시주') : 
               (pillar.title === 'Hour' ? 'Time Pillar' : `${pillar.title} Pillar`);
 
+            const iljuData = isDayPillar ? ILJU_DESCRIPTIONS[pillar.hanja] : null;
+
             return (
               <div key={`pillar-${i}`} className="flex flex-col gap-1 sm:gap-2 h-full">
                 <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest ${isDayPillar ? 'text-neon-cyan' : 'text-white/40'}`}>
@@ -977,10 +1266,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''}`}
-                  style={{ borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''} relative`}
+                  style={{ 
+                    borderColor: ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FF007A'
+                  }}
                 >
-                  <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
                     <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
                       <PolarityIcon polarity={pillar.stemPolarity} size={8} />
                     </div>
@@ -1017,6 +1309,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                       {lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)}
                     </span>
                   </div>
+                </div>
                 </motion.div>
 
                 {/* Branch Card */}
@@ -1024,10 +1317,13 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: (i + 4) * 0.05 }}
-                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/10' : ''}`}
-                  style={{ borderColor: ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A' }}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden flex-1 ${isDayPillar ? 'ring-1 ring-neon-cyan/10 bg-neon-cyan/5' : ''} relative`}
+                  style={{ 
+                    borderColor: ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A'
+                  }}
                 >
-                  <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-full p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
                     <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
                       <PolarityIcon polarity={pillar.branchPolarity} size={8} />
                     </div>
@@ -1064,6 +1360,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
                       {lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)}
                     </span>
                   </div>
+                </div>
                 </motion.div>
 
                 {/* Hidden Stems (지장간) */}
@@ -2397,8 +2694,7 @@ export default function BaZiResultPage({ result, lang, userName, onBack }: BaZiR
 const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
   const summary = React.useMemo(() => generateSoulSummary(result, lang), [result, lang]);
   const dayPillar = result.pillars.find(p => p.title === 'Day');
-  const isMuO = dayPillar?.stem === '戊' && dayPillar?.branch === '午';
-  const isMuIn = dayPillar?.stem === '戊' && dayPillar?.branch === '寅';
+  const iljuData = dayPillar ? ILJU_DESCRIPTIONS[dayPillar.hanja] : null;
   const [isImageViewMode, setIsImageViewMode] = React.useState(false);
   
   return (
@@ -2409,7 +2705,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
       className="mt-12 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
     >
       <div className="bg-[#050505] rounded-[1.9rem] p-6 sm:p-10 border border-white/10 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
-        {(isMuO || isMuIn) && (
+        {iljuData?.detailImg && (
           <button 
             onClick={() => setIsImageViewMode(!isImageViewMode)}
             className="absolute top-4 right-4 z-50 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] sm:text-xs font-bold text-white/80 hover:text-white hover:bg-black/80 transition-all flex items-center gap-2"
@@ -2418,19 +2714,10 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
           </button>
         )}
 
-        {isMuO && (
+        {iljuData?.detailImg && (
           <img 
-            src="https://i.imgur.com/6Kqibqt.jpeg"
-            alt="Mu-o Background"
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            className={`absolute inset-0 w-full h-full z-0 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain' : 'opacity-40 object-cover'}`}
-          />
-        )}
-        {isMuIn && (
-          <img 
-            src="https://i.imgur.com/msGP3dO.jpeg"
-            alt="Mu-in Background"
+            src={isImageViewMode ? iljuData.detailImg : (iljuData.cardBg || iljuData.detailImg)}
+            alt={`${dayPillar?.hanja} Background`}
             loading="lazy"
             referrerPolicy="no-referrer"
             className={`absolute inset-0 w-full h-full z-0 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain' : 'opacity-40 object-cover'}`}
