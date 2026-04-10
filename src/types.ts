@@ -138,5 +138,13 @@ export interface BaZiResult {
       score: number;
     };
     elementRatios?: Record<string, number>;
+    balanceWarnings?: {
+      title: string;
+      titleEn: string;
+      description: string;
+      enDescription: string;
+      type: 'warning' | 'danger';
+      element: string;
+    }[];
   };
 }

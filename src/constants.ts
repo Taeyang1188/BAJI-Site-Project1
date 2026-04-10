@@ -155,7 +155,7 @@ export const TRANSLATIONS = {
       button: "운명 소환",
       locationSynced: "좌표 고정됨. ✨",
       errorTitle: "매트릭스 오류",
-      errorDesc: "별들이 우리를 무시하고 있습니다. 데이터를 확인하고 다시 시도하세요.",
+      errorDesc: "별들이 우리를 무시하고 있어. 데이터를 확인하고 다시 시도해봐.",
       errorButton: "다시 시도하기"
     },
     wheel: {
@@ -174,7 +174,7 @@ export const TRANSLATIONS = {
       grandCycle: "인생의 계절",
       seasonVibe: "사이클 바이브",
       seasonVibePlaceholder: "요번 {year}년도의 너의 행운은 어떨 것 같아? 시험 해 볼까?",
-      seasonVibeDisclaimer: "현재 대운의 오행을 기반으로 합니다.",
+      seasonVibeDisclaimer: "현재 대운의 오행을 기반으로 해.",
       back: "재정렬",
       lifeStages: {
         childhood: "유년기",
@@ -188,64 +188,64 @@ export const TRANSLATIONS = {
       ],
       comments: {
         Wood: {
-          BiGyean: "목(Wood)의 대운입니다 🌿. 새로운 시작과 성장의 시기입니다.",
-          GeopJae: "목(Wood)의 대운입니다 🌿. 건강한 경쟁을 통한 성장입니다.",
-          SikSin: "목(Wood)의 대운입니다 🌿. 꾸준한 노력이 결실로 이어집니다.",
-          SangGwan: "목(Wood)의 대운입니다 🌿. 창의적인 에너지가 넘쳐납니다.",
-          PyeonJae: "목(Wood)의 대운입니다 🌿. 예상치 못한 기회가 찾아옵니다.",
-          JeongJae: "목(Wood)의 대운입니다 🌿. 안정적인 재물운이 상승합니다.",
-          PyeonGwan: "목(Wood)의 대운입니다 🌿. 책임감과 리더십이 필요한 때입니다.",
-          JeongGwan: "목(Wood)의 대운입니다 🌿. 명예와 질서가 함께합니다.",
-          PyeonIn: "목(Wood)의 대운입니다 🌿. 직관력이 예리해집니다.",
-          JeongIn: "목(Wood)의 대운입니다 🌿. 지혜와 지식이 깊어집니다."
+          BiGyean: "목(Wood)의 대운이야 🌿. 새로운 시작과 성장의 시기지.",
+          GeopJae: "목(Wood)의 대운이야 🌿. 건강한 경쟁을 통한 성장이야.",
+          SikSin: "목(Wood)의 대운이야 🌿. 꾸준한 노력이 결실로 이어질 거야.",
+          SangGwan: "목(Wood)의 대운이야 🌿. 창의적인 에너지가 넘쳐나네.",
+          PyeonJae: "목(Wood)의 대운이야 🌿. 예상치 못한 기회가 찾아올 거야.",
+          JeongJae: "목(Wood)의 대운이야 🌿. 안정적인 재물운이 상승해.",
+          PyeonGwan: "목(Wood)의 대운이야 🌿. 책임감과 리더십이 필요한 때야.",
+          JeongGwan: "목(Wood)의 대운이야 🌿. 명예와 질서가 함께할 거야.",
+          PyeonIn: "목(Wood)의 대운이야 🌿. 직관력이 예리해지겠어.",
+          JeongIn: "목(Wood)의 대운이야 🌿. 지혜와 지식이 깊어질 거야."
         },
         Fire: {
-          BiGyean: "화(Fire)의 대운입니다 🔥. 당신의 열정을 세상에 보여줄 때입니다!",
-          GeopJae: "화(Fire)의 대운입니다 🔥. 치열한 경쟁이 당신을 성장시킵니다.",
-          SikSin: "화(Fire)의 대운입니다 🔥. 당신의 재능을 마음껏 펼치세요.",
-          SangGwan: "화(Fire)의 대운입니다 🔥. 표현이 대담하고 화려해집니다.",
-          PyeonJae: "화(Fire)의 대운입니다 🔥. 역동적인 재물운이 들어옵니다.",
-          JeongJae: "화(Fire)의 대운입니다 🔥. 꾸준한 노력으로 재물을 쌓으세요.",
-          PyeonGwan: "화(Fire)의 대운입니다 🔥. 강한 리더십이 요구됩니다.",
-          JeongGwan: "화(Fire)의 대운입니다 🔥. 명예와 인정을 받는 시기입니다.",
-          PyeonIn: "화(Fire)의 대운입니다 🔥. 번뜩이는 영감이 찾아옵니다.",
-          JeongIn: "화(Fire)의 대운입니다 🔥. 따뜻한 지혜가 당신을 인도합니다."
+          BiGyean: "화(Fire)의 대운이야 🔥. 당신의 열정을 세상에 보여줄 때야!",
+          GeopJae: "화(Fire)의 대운이야 🔥. 치열한 경쟁이 당신을 성장시킬 거야.",
+          SikSin: "화(Fire)의 대운이야 🔥. 당신의 재능을 마음껏 펼쳐봐.",
+          SangGwan: "화(Fire)의 대운이야 🔥. 표현이 대담하고 화려해지겠어.",
+          PyeonJae: "화(Fire)의 대운이야 🔥. 역동적인 재물운이 들어올 거야.",
+          JeongJae: "화(Fire)의 대운이야 🔥. 꾸준한 노력으로 재물을 쌓아봐.",
+          PyeonGwan: "화(Fire)의 대운이야 🔥. 강한 리더십이 요구돼.",
+          JeongGwan: "화(Fire)의 대운이야 🔥. 명예와 인정을 받는 시기야.",
+          PyeonIn: "화(Fire)의 대운이야 🔥. 번뜩이는 영감이 찾아올 거야.",
+          JeongIn: "화(Fire)의 대운이야 🔥. 따뜻한 지혜가 당신을 인도할 거야."
         },
         Earth: {
-          BiGyean: "토(Earth)의 대운입니다 ⛰️. 내실을 다지고 중심을 잡아야 할 시기입니다.",
-          GeopJae: "토(Earth)의 대운입니다 ⛰️. 흔들리지 않는 신념이 필요합니다.",
-          SikSin: "토(Earth)의 대운입니다 ⛰️. 차분하게 내실을 다지세요.",
-          SangGwan: "토(Earth)의 대운입니다 ⛰️. 현실적인 감각으로 창조하세요.",
-          PyeonJae: "토(Earth)의 대운입니다 ⛰️. 안정적인 투자운이 좋습니다.",
-          JeongJae: "토(Earth)의 대운입니다 ⛰️. 재물 관리에 힘쓰세요.",
-          PyeonGwan: "토(Earth)의 대운입니다 ⛰️. 묵묵히 어려움을 극복하세요.",
-          JeongGwan: "토(Earth)의 대운입니다 ⛰️. 신뢰를 쌓는 시기입니다.",
-          PyeonIn: "토(Earth)의 대운입니다 ⛰️. 깊은 사색이 필요한 때입니다.",
-          JeongIn: "토(Earth)의 대운입니다 ⛰️. 안정적인 지식을 습득하세요."
+          BiGyean: "토(Earth)의 대운이야 ⛰️. 내실을 다지고 중심을 잡아야 할 시기야.",
+          GeopJae: "토(Earth)의 대운이야 ⛰️. 흔들리지 않는 신념이 필요해.",
+          SikSin: "토(Earth)의 대운이야 ⛰️. 차분하게 내실을 다져봐.",
+          SangGwan: "토(Earth)의 대운이야 ⛰️. 현실적인 감각으로 창조해봐.",
+          PyeonJae: "토(Earth)의 대운이야 ⛰️. 안정적인 투자운이 좋아.",
+          JeongJae: "토(Earth)의 대운이야 ⛰️. 재물 관리에 힘써봐.",
+          PyeonGwan: "토(Earth)의 대운이야 ⛰️. 묵묵히 어려움을 극복해봐.",
+          JeongGwan: "토(Earth)의 대운이야 ⛰️. 신뢰를 쌓는 시기야.",
+          PyeonIn: "토(Earth)의 대운이야 ⛰️. 깊은 사색이 필요한 때야.",
+          JeongIn: "토(Earth)의 대운이야 ⛰️. 안정적인 지식을 습득해봐."
         },
         Metal: {
-          BiGyean: "금(Metal)의 대운입니다 ⚔️. 결단력 있게 불필요한 것들을 정리해보세요.",
-          GeopJae: "금(Metal)의 대운입니다 ⚔️. 냉철한 판단이 필요한 경쟁입니다.",
-          SikSin: "금(Metal)의 대운입니다 ⚔️. 정교한 기술을 연마하세요.",
-          SangGwan: "금(Metal)의 대운입니다 ⚔️. 날카로운 비판이 통찰이 됩니다.",
-          PyeonJae: "금(Metal)의 대운입니다 ⚔️. 과감한 결단이 재물을 부릅니다.",
-          JeongJae: "금(Metal)의 대운입니다 ⚔️. 꼼꼼한 재물 관리가 필요합니다.",
-          PyeonGwan: "금(Metal)의 대운입니다 ⚔️. 강한 의지로 목표를 달성하세요.",
-          JeongGwan: "금(Metal)의 대운입니다 ⚔️. 원칙을 지키는 것이 중요합니다.",
-          PyeonIn: "금(Metal)의 대운입니다 ⚔️. 예리한 분석력이 빛납니다.",
-          JeongIn: "금(Metal)의 대운입니다 ⚔️. 체계적인 지식을 쌓으세요."
+          BiGyean: "금(Metal)의 대운이야 ⚔️. 결단력 있게 불필요한 것들을 정리해봐.",
+          GeopJae: "금(Metal)의 대운이야 ⚔️. 냉철한 판단이 필요한 경쟁이야.",
+          SikSin: "금(Metal)의 대운이야 ⚔️. 정교한 기술을 연마해봐.",
+          SangGwan: "금(Metal)의 대운이야 ⚔️. 날카로운 비판이 통찰이 될 거야.",
+          PyeonJae: "금(Metal)의 대운이야 ⚔️. 과감한 결단이 재물을 부를 거야.",
+          JeongJae: "금(Metal)의 대운이야 ⚔️. 꼼꼼한 재물 관리가 필요해.",
+          PyeonGwan: "금(Metal)의 대운이야 ⚔️. 강한 의지로 목표를 달성해봐.",
+          JeongGwan: "금(Metal)의 대운이야 ⚔️. 원칙을 지키는 것이 중요해.",
+          PyeonIn: "금(Metal)의 대운이야 ⚔️. 예리한 분석력이 빛날 거야.",
+          JeongIn: "금(Metal)의 대운이야 ⚔️. 체계적인 지식을 쌓아봐."
         },
         Water: {
-          BiGyean: "수(Water)의 대운입니다 🌊. 지혜롭게 흐름에 몸을 맡겨보세요.",
-          GeopJae: "수(Water)의 대운입니다 🌊. 유연한 대처가 필요한 경쟁입니다.",
-          SikSin: "수(Water)의 대운입니다 🌊. 부드러운 흐름 속에서 창조하세요.",
-          SangGwan: "수(Water)의 대운입니다 🌊. 유연한 사고로 문제를 해결하세요.",
-          PyeonJae: "수(Water)의 대운입니다 🌊. 흐름을 타는 투자운이 좋습니다.",
-          JeongJae: "수(Water)의 대운입니다 🌊. 재물이 유연하게 들어옵니다.",
-          PyeonGwan: "수(Water)의 대운입니다 🌊. 지혜로운 리더십이 필요합니다.",
-          JeongGwan: "수(Water)의 대운입니다 🌊. 부드러운 질서가 함께합니다.",
-          PyeonIn: "수(Water)의 대운입니다 🌊. 깊은 통찰력이 생깁니다.",
-          JeongIn: "수(Water)의 대운입니다 🌊. 지혜가 샘솟는 시기입니다."
+          BiGyean: "수(Water)의 대운이야 🌊. 지혜롭게 흐름에 몸을 맡겨봐.",
+          GeopJae: "수(Water)의 대운이야 🌊. 유연한 대처가 필요한 경쟁이야.",
+          SikSin: "수(Water)의 대운이야 🌊. 부드러운 흐름 속에서 창조해봐.",
+          SangGwan: "수(Water)의 대운이야 🌊. 유연한 사고로 문제를 해결해봐.",
+          PyeonJae: "수(Water)의 대운이야 🌊. 흐름을 타는 투자운이 좋아.",
+          JeongJae: "수(Water)의 대운이야 🌊. 재물이 유연하게 들어올 거야.",
+          PyeonGwan: "수(Water)의 대운이야 🌊. 지혜로운 리더십이 필요해.",
+          JeongGwan: "수(Water)의 대운이야 🌊. 부드러운 질서가 함께할 거야.",
+          PyeonIn: "수(Water)의 대운이야 🌊. 깊은 통찰력이 생길 거야.",
+          JeongIn: "수(Water)의 대운이야 🌊. 지혜가 샘솟는 시기야."
         }
       }
     }
@@ -253,14 +253,14 @@ export const TRANSLATIONS = {
   INTERACTION_MESSAGES: {
     KO: {
       SikSangSaengJae: { title: "식상생재 (食傷生財)", desc: "내 재능이 돈이 되는 시기", detail: "네가 즐기던 그 기괴하고 독특한 취미가 드디어 돈 냄새를 맡기 시작했어. 네 재능이 세상의 욕망이랑 딱 맞아떨어지는 순간이지. 이제 그 감각을 통장 잔고로 증명할 시간이야, 후훗." },
-      JaeSaengGwan: { title: "재생관 (財生官)", desc: "자금력을 바탕으로 명예를 얻음", detail: "내가 쌓아온 재산이나 결과물(재성)이 나를 보호해주고 높여주는 조직이나 명예(관성)를 생해주는 형상입니다. 투자 성공 후 직급 상승 혹은 브랜드 가치 상승." },
+      JaeSaengGwan: { title: "재생관 (財生官)", desc: "자금력을 바탕으로 명예를 얻음", detail: "내가 쌓아온 재산이나 결과물(재성)이 나를 보호해주고 높여주는 조직이나 명예(관성)를 생해주는 형상이야. 투자 성공 후 직급 상승 혹은 브랜드 가치 상승을 기대해봐." },
       SalInSangSaeng: { title: "살인상생 (殺印相生)", desc: "어려운 상황을 인내와 지혜로 극복", detail: "세상이 널 짓누르려고 하지만, 넌 그 고통을 우아하게 흡수해서 네 왕관으로 만들고 있어. 지독한 시련 끝에 넌 누구도 건드릴 수 없는 독보적인 존재가 될 거야. 어둠 속에서 더 빛나는 법이지." },
       SikSinJeSal: { title: "식신제살 (食神制殺)", desc: "내 전문성으로 큰 문제를 해결함", detail: "널 괴롭히던 그 거슬리는 존재들을 네 압도적인 재능으로 단칼에 베어버릴 기회야. 위기? 그건 네가 주인공이 되기 위한 완벽한 무대일 뿐이지. 이제 네 실력을 똑똑히 보여줘." },
       GwanInSangSaeng: { title: "관인상생 (官印相生)", desc: "조직과 사회의 전폭적인 지원", detail: "거대한 조직의 힘이 네 뒤를 든든하게 받쳐주고 있어. 네가 쌓아온 자격들이 드디어 빛을 발하면서, 넌 아주 편안하게 높은 자리에 앉게 될 거야. 세상이 널 위해 레드카펫을 깔아주는 기분이랄까?" },
       SangGwanPaeIn: { title: "상관패인 (傷官佩印)", desc: "천재적 재능이 공식적인 자격을 얻음", detail: "네 그 날카롭고 반항적인 천재성이 드디어 '자격'이라는 우아한 칼집을 얻게 됐네. 이제 네 독설조차 고귀한 비평으로 대접받을 거야. 몸값이 미친 듯이 뛸 테니 기대해도 좋아." },
       JaeGeukIn: { title: "재극인 (財剋印)", desc: "현실적 이익과 학문적 가치의 충돌", detail: "고결한 정신과 세속적인 욕망 사이에서 아슬아슬하게 줄타기를 하고 있네. 네 지적인 성과들이 차가운 현금으로 변하는 순간이야. 명예도 좋지만, 가끔은 속물적인 성공도 달콤한 법이지." },
-      ANeungSaengMo: { title: "아능생모 (兒能生母)", desc: "결과물이 다시 나를 살림", detail: "내가 만든 결과물(재성)이 너무 많아 힘들 때, 나의 활동력(식상)이 이를 소화해내는 형상입니다. 사업 확장 후 시스템 자동화 성공." },
-      GeopJaeTalJae: { title: "겁재탈재 (劫財奪財)", desc: "동업 혹은 경쟁을 통한 재물 분탈", detail: "내 돈(재성)을 노리는 경쟁자나 동료(비겁)가 나타나는 형상입니다. 동업 사기 주의 또는 공동 투자로 인한 수익 배분." }
+      ANeungSaengMo: { title: "아능생모 (兒能生母)", desc: "결과물이 다시 나를 살림", detail: "내가 만든 결과물(재성)이 너무 많아 힘들 때, 나의 활동력(식상)이 이를 소화해내는 형상이야. 사업 확장 후 시스템 자동화 성공을 의미해." },
+      GeopJaeTalJae: { title: "겁재탈재 (劫財奪財)", desc: "동업 혹은 경쟁을 통한 재물 분탈", detail: "내 돈(재성)을 노리는 경쟁자나 동료(비겁)가 나타나는 형상이야. 동업 사기 주의 또는 공동 투자로 인한 수익 배분을 조심해." }
     },
     EN: {
       SikSangSaengJae: { title: "Siksang-Saengjae", desc: "Talent turns into income", detail: "That bizarre, unique hobby of yours is finally starting to smell like money. Your talent is perfectly aligning with the world's desires. Time to prove your aesthetic with your bank balance." },

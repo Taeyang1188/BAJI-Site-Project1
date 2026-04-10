@@ -107,13 +107,18 @@ export const determineStructure = (
   const totalWeight = Object.values(elementRatio).reduce((a, b) => a + b, 0);
   const dmElementRatio = (elementRatio[dmElement] / totalWeight) * 100;
 
+  // 1.5 Check for Frozen Chart (Jo-hu Priority)
+  const waterRatio = (elementRatio['Water'] / totalWeight) * 100;
+  const metalRatio = (elementRatio['Metal'] / totalWeight) * 100;
+  const isFrozen = (waterRatio + metalRatio > 50) && ['丑', '子', '亥'].includes(monthZhi);
+
   if (dmElementRatio > 75 && strength.score > 80) {
     const monarchMap: Record<string, string> = {
       'Wood': '곡직격', 'Fire': '염상격', 'Earth': '가색격', 'Metal': '종혁격', 'Water': '윤하격'
     };
     structureKey = monarchMap[dmElement];
     logicNote = lang === 'KO' 
-      ? `일간의 오행(${dmElement})이 사주 전체의 75% 이상을 차지하여 해당 기운으로 모든 것이 집중된 전왕격으로 판정되었습니다.`
+      ? `일간의 오행(${dmElement})이 사주 전체의 75% 이상을 차지하여 해당 기운으로 모든 것이 집중된 전왕격으로 판정됐어.`
       : `The Day Master's element (${dmElement}) accounts for over 75% of the chart, concentrating all energy into a Monarch Alignment.`;
   }
 
@@ -135,7 +140,7 @@ export const determineStructure = (
     if (hasResourceRoot || hasResourceSupport) {
       canBeJong = false;
       guardrailNote = lang === 'KO' 
-        ? "지지에 인성의 뿌리가 있거나 월간/시간의 인성이 일간을 돕고 있어 종격이 아닌 내격(극약)으로 유지됩니다."
+        ? "지지에 인성의 뿌리가 있거나 월간/시간의 인성이 일간을 돕고 있어 종격이 아닌 내격(극약)으로 유지돼."
         : "Maintained as Standard Alignment (Extreme Weak) because of Resource roots in branches or support from Month/Hour stems.";
     }
 
@@ -149,7 +154,7 @@ export const determineStructure = (
     if (canBeJong && hasBiGeopRoot) {
       canBeJong = false;
       guardrailNote = lang === 'KO'
-        ? "지지에 일간의 뿌리(비겁)가 존재하여 종격으로 흐르지 않고 내격으로 남습니다."
+        ? "지지에 일간의 뿌리(비겁)가 존재하여 종격으로 흐르지 않고 내격으로 남게 돼."
         : "Remains a Standard Alignment because a Bi-geop root exists in the branches.";
     }
 
@@ -157,7 +162,7 @@ export const determineStructure = (
     if (canBeJong && isYangGan && strength.score > 12) {
       canBeJong = false;
       guardrailNote = lang === 'KO'
-        ? "양간(Yang Stem)은 쉽게 종하지 않는 특성이 있어, 현재 점수(12점 초과)로는 내격으로 판정합니다."
+        ? "양간(Yang Stem)은 쉽게 종하지 않는 특성이 있어, 현재 점수(12점 초과)로는 내격으로 판정해."
         : "Yang Stems do not easily adapt; since the score is above 12, it is judged as a Standard Alignment.";
     }
 
@@ -174,7 +179,7 @@ export const determineStructure = (
       categories.sort((a, b) => b.ratio - a.ratio);
       structureKey = categories[0].key;
       logicNote = lang === 'KO'
-        ? `일간이 극히 약하고 뿌리가 없어 가장 강한 세력인 [${structureKey}]에 순응하는 종격으로 판정되었습니다.`
+        ? `일간이 극히 약하고 뿌리가 없어 가장 강한 세력인 [${structureKey}]에 순응하는 종격으로 판정됐어.`
         : `Judged as an Adaptive Alignment (Jong-gyeok) following the strongest force [${structureKey}] due to an extremely weak Day Master with no roots.`;
     } else {
       logicNote = guardrailNote;
@@ -186,15 +191,22 @@ export const determineStructure = (
     const standardGeJu = calculateGeJu(dayGan, monthZhi, lang);
     if (!logicNote) {
       logicNote = lang === 'KO'
-        ? "전통적인 월지 지장간 투출 원리에 따른 내격 구조입니다."
+        ? "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."
         : "A standard alignment structure based on the traditional principle of Month Branch hidden stems.";
     }
     
     // For marketing tone of "Extreme Weak Nae-gyeok"
     let marketingMessage = "";
     let enMarketingMessage = "";
-    if (strength.score < 20) {
-      marketingMessage = "위기를 돌파하는 전문성: 극한의 상황에서도 자신을 지켜내는 독보적인 전문 기술과 끈기를 가졌습니다.";
+    
+    if (isFrozen) {
+      marketingMessage = "해동의 기적: 꽁꽁 얼어붙어 있던 당신의 재능이 따뜻한 불(火)을 만나 드디어 세상의 빛을 보게 될 거야. 버거워하지 말고 기지개를 켜봐.";
+      enMarketingMessage = "The Miracle of Thawing: Your frozen talents are finally meeting the warm Fire and seeing the light of day. Don't be overwhelmed; it's time to stretch and shine.";
+      logicNote = lang === 'KO'
+        ? "조후가 매우 차갑고 습한 '동결된 사주'야. 일반적인 관인상생보다 '해동(解凍)'이 최우선 과제인 특수 상황으로 판정됐어."
+        : "A 'Frozen Chart' that is extremely cold and wet. Thawing (Jo-hu resolution) is the top priority, overriding standard structural flows.";
+    } else if (strength.score < 20) {
+      marketingMessage = "위기를 돌파하는 전문성: 극한의 상황에서도 자신을 지켜내는 독보적인 전문 기술과 끈기를 가졌어.";
       enMarketingMessage = "Expertise that breaks through crises: Possesses unique technical skills and persistence to protect oneself even in extreme situations.";
     }
 

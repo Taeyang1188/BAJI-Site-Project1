@@ -98,7 +98,7 @@ export function getPreciseSajuTime(
   }
 
   if (standardLongitude === 127.5 || isSummerTime) {
-    messages.push("해당 시기의 특수한 표준시/서머타임 정책을 반영하여 보정되었습니다.");
+    messages.push("해당 시기의 특수한 표준시/서머타임 정책을 반영하여 보정했어.");
   }
 
   const correctedDt = dt.plus({ minutes: offsetMinutes });
@@ -107,13 +107,13 @@ export function getPreciseSajuTime(
   let isNextDay = false;
 
   if (hour === 23 || hour === 0 || (hour === 1 && minute <= 30)) {
-    messages.push(`입력하신 시간(${inputTime})은 자시(23:00~01:30) 부근입니다. 정확한 경도와 표준시를 반영한 실제 태양시(${correctedSolarTime})를 기준으로 시주가 계산되었습니다.`);
+    messages.push(`입력하신 시간(${inputTime})은 자시(23:00~01:30) 부근이야. 정확한 경도와 표준시를 반영한 실제 태양시(${correctedSolarTime})를 기준으로 시주를 계산했어.`);
   }
 
   if (correctedDt.hour === 23) {
     if (correctedDt.plus({ days: 1 }).toFormat('yyyy-MM-dd') > dt.toFormat('yyyy-MM-dd')) {
       isNextDay = true;
-      messages.push("정통 명리학 원리(조자시)에 따라 자시(밤 11시 이후) 출생은 익일 일주로 계산됩니다.");
+      messages.push("정통 명리학 원리(조자시)에 따라 자시(밤 11시 이후) 출생은 익일 일주로 계산해.");
     }
   }
 

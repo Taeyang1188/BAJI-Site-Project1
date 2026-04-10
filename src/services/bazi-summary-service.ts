@@ -408,63 +408,72 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   const roles = ["비겁", "식상", "재성", "관성", "인성"];
   const role = roles[yongShenRoleIdx];
 
+  const elementMetaphors: Record<string, { ko: string, en: string }> = {
+    "Wood": { ko: "거목처럼 흔들림 없이", en: "like a deeply rooted tree" },
+    "Fire": { ko: "불꽃처럼 강렬하게", en: "like a blazing fire" },
+    "Earth": { ko: "대지처럼 묵묵하게", en: "like the solid earth" },
+    "Metal": { ko: "단단한 금속처럼 예리하게", en: "like sharp, refined metal" },
+    "Water": { ko: "물처럼 유연하게", en: "like flowing water" }
+  };
+  const metaphor = elementMetaphors[baseElement] || { ko: "자연스럽게", en: "naturally" };
+
   const coreEnergyMap: Record<string, any> = {
     "인성": {
       ko: {
-        description: `비옥한 대지처럼 모든 지식을 흡수하고, 당신만의 전문 자격과 지식 스택을 쌓는 것이 개운의 핵심입니다.`,
-        practicalAdvice: `이론에 그치지 말고 자격증이나 결과물로 '전문가 포스'를 증명하세요.`,
+        description: `${metaphor.ko} 모든 지식을 흡수하고, 당신만의 전문 자격과 지식 스택을 쌓는 것이 개운의 핵심이야.`,
+        practicalAdvice: `이론에 그치지 말고 자격증이나 결과물로 '전문가 포스'를 증명해봐.`,
         luckyHabit: `매일 30분, 나만의 전문 분야 딥다이브로 뇌 근육 키우기`
       },
       en: {
-        description: `Like a sponge, absorbing knowledge and building your own unique skill stack is the ultimate cheat code.`,
+        description: `Absorbing knowledge ${metaphor.en} and building your own unique skill stack is the ultimate cheat code.`,
         practicalAdvice: `Talk is cheap. Flex your 'Expert Vibe' with actual receipts (certs, projects, results).`,
         luckyHabit: `30 mins of daily deep-diving into your hyper-fixation to build that brain muscle.`
       }
     },
     "비겁": {
       ko: {
-        description: `거대한 바위처럼 자신을 믿고 뚝심 있게 밀어붙이는 강한 자존감이 필요합니다.`,
-        practicalAdvice: `타인의 시선은 '노이즈'일 뿐, 나의 내면 목소리에 집중하세요.`,
+        description: `${metaphor.ko} 자신을 믿고 뚝심 있게 밀어붙이는 강한 자존감이 필요해.`,
+        practicalAdvice: `타인의 시선은 '노이즈'일 뿐, 나의 내면 목소리에 집중해봐.`,
         luckyHabit: `거울 보며 '오늘도 내가 최고다' 3번 외치기`
       },
       en: {
-        description: `You need that unbothered, main character energy to trust yourself and push through.`,
+        description: `You need that unbothered, main character energy to trust yourself and push through ${metaphor.en}.`,
         practicalAdvice: `Other people's opinions are just background noise. Focus on your own plotline.`,
         luckyHabit: `Looking in the mirror and saying 'I am the moment' 3 times.`
       }
     },
     "식상": {
       ko: {
-        description: `물처럼 유연하게 당신의 재능과 아이디어를 세상에 화려하게 표출하세요.`,
-        practicalAdvice: `머릿속 구상을 즉각 행동으로 옮기는 '광속 실행력'이 답입니다.`,
+        description: `${metaphor.ko} 당신의 재능과 아이디어를 세상에 화려하게 표출해봐.`,
+        practicalAdvice: `머릿속 구상을 즉각 행동으로 옮기는 '광속 실행력'이 답이야.`,
         luckyHabit: `새로운 아이디어 떠오를 때마다 바로 메모하고 1개라도 실행하기`
       },
       en: {
-        description: `Flex your talents and let your ideas flow into the world like water. Don't hold back.`,
+        description: `Flex your talents and let your ideas flow into the world ${metaphor.en}. Don't hold back.`,
         practicalAdvice: `Stop overthinking. 'Light-speed execution' is your best friend right now.`,
         luckyHabit: `Jotting down every random 3 AM idea and actually doing one of them.`
       }
     },
     "재성": {
       ko: {
-        description: `끝없이 펼쳐진 황금 들판처럼 현실적인 목표를 세우고 결과물을 만들어내는 감각을 키우세요.`,
-        practicalAdvice: `막연한 꿈보다 '통장 잔고'나 '구체적 숫자'로 성과를 확인하세요.`,
+        description: `${metaphor.ko} 현실적인 목표를 세우고 결과물을 만들어내는 감각을 키워봐.`,
+        practicalAdvice: `막연한 꿈보다 '통장 잔고'나 '구체적 숫자'로 성과를 확인해봐.`,
         luckyHabit: `가계부 작성이나 투자 포트폴리오 점검하며 자산 감각 깨우기`
       },
       en: {
-        description: `Time to secure the bag. Set realistic goals and develop a radar for actual results.`,
+        description: `Time to secure the bag. Set realistic goals and develop a radar for actual results ${metaphor.en}.`,
         practicalAdvice: `Dreams are cool, but numbers don't lie. Track your wins with actual data (and bank balances).`,
         luckyHabit: `Checking your budget or portfolio to keep that financial energy high.`
       }
     },
     "관성": {
       ko: {
-        description: `날카로운 칼날처럼 자신만의 규칙과 절제로 사회적 명예를 쌓아가는 힘이 필요합니다.`,
-        practicalAdvice: `루틴을 지키고 책임감 있는 모습으로 '신뢰 자본'을 쌓으세요.`,
+        description: `${metaphor.ko} 자신만의 규칙과 절제로 사회적 명예를 쌓아가는 힘이 필요해.`,
+        practicalAdvice: `루틴을 지키고 책임감 있는 모습으로 '신뢰 자본'을 쌓아봐.`,
         luckyHabit: `정해진 시간에 기상하고 하루 계획 100% 완수 도전하기`
       },
       en: {
-        description: `Channel your inner boss. You need discipline and your own set of rules to level up your status.`,
+        description: `Channel your inner boss. You need discipline and your own set of rules to level up your status ${metaphor.en}.`,
         practicalAdvice: `Build that 'trust capital' by sticking to your routines and actually showing up.`,
         luckyHabit: `Waking up on time and speed-running your daily to-do list.`
       }
@@ -481,24 +490,24 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   // Lucky Items
   const luckyItemsMap: Record<string, { name: string, description: string }[]> = {
     "Wood": [
-      { name: lang === 'KO' ? "초록색 식물" : "Green Plant", description: lang === 'KO' ? "성장판 자극하는 초록 에너지를 곁에 두세요. (물 주는 건 잊지 말기!)" : "Keep that green energy close to stimulate growth. (Don't forget to water it, though!)" },
-      { name: lang === 'KO' ? "나무 재질 펜" : "Wooden Pen", description: lang === 'KO' ? "내 안의 창의력을 깨울 마법의 지팡이입니다. 아날로그 감성은 덤!" : "A magic wand to wake up your inner creative genius. Analog vibes included." }
+      { name: lang === 'KO' ? "초록색 식물" : "Green Plant", description: lang === 'KO' ? "성장판 자극하는 초록 에너지를 곁에 둬봐. (물 주는 건 잊지 말기!)" : "Keep that green energy close to stimulate growth. (Don't forget to water it, though!)" },
+      { name: lang === 'KO' ? "나무 재질 펜" : "Wooden Pen", description: lang === 'KO' ? "내 안의 창의력을 깨울 마법의 지팡이야. 아날로그 감성은 덤!" : "A magic wand to wake up your inner creative genius. Analog vibes included." }
     ],
     "Fire": [
-      { name: lang === 'KO' ? "붉은색 지갑" : "Red Wallet", description: lang === 'KO' ? "재물을 끌어당기는 자석! 열정 만수르를 위한 핫한 아이템입니다." : "A literal magnet for wealth. A hot item for your passionate era." },
-      { name: lang === 'KO' ? "향수" : "Signature Scent", description: lang === 'KO' ? "세상의 주인공이 된 것 같은 아우라를 선사합니다. 향기로 압도하세요." : "Gives you that 'main character' aura. Overwhelm them with your vibe." }
+      { name: lang === 'KO' ? "붉은색 지갑" : "Red Wallet", description: lang === 'KO' ? "재물을 끌어당기는 자석! 열정 만수르를 위한 핫한 아이템이야." : "A literal magnet for wealth. A hot item for your passionate era." },
+      { name: lang === 'KO' ? "향수" : "Signature Scent", description: lang === 'KO' ? "세상의 주인공이 된 것 같은 아우라를 선사해. 향기로 압도해봐." : "Gives you that 'main character' aura. Overwhelm them with your vibe." }
     ],
     "Earth": [
-      { name: lang === 'KO' ? "황토색 머그컵" : "Earthy Mug", description: lang === 'KO' ? "내 멘탈을 잡아줄 든든한 버팀목! 따뜻한 차 한 잔으로 평온을 찾으세요." : "A solid anchor for your mental health. Find your zen with a warm cup of tea." },
-      { name: lang === 'KO' ? "가죽 지갑" : "Leather Wallet", description: lang === 'KO' ? "통장 잔고를 지켜줄 든든한 가드! 재물을 담아두는 튼튼한 대지입니다." : "A heavy-duty guard for your bank balance. Solid ground to hold your bag." }
+      { name: lang === 'KO' ? "황토색 머그컵" : "Earthy Mug", description: lang === 'KO' ? "내 멘탈을 잡아줄 든든한 버팀목! 따뜻한 차 한 잔으로 평온을 찾아봐." : "A solid anchor for your mental health. Find your zen with a warm cup of tea." },
+      { name: lang === 'KO' ? "가죽 지갑" : "Leather Wallet", description: lang === 'KO' ? "통장 잔고를 지켜줄 든든한 가드! 재물을 담아두는 튼튼한 대지야." : "A heavy-duty guard for your bank balance. Solid ground to hold your bag." }
     ],
     "Metal": [
-      { name: lang === 'KO' ? "실버 액세서리" : "Silver Jewelry", description: lang === 'KO' ? "결단력 200% 충전! 우유부단함을 날려버릴 시크한 아이템입니다." : "Decisiveness charged to 200%! A chic item to banish your indecision." },
-      { name: lang === 'KO' ? "화이트 셔츠" : "Crisp White Shirt", description: lang === 'KO' ? "복잡한 머릿속을 정리해줄 마법의 유니폼! 깔끔한 시작을 도와줍니다." : "A magic uniform to clear your cluttered mind. Perfect for a fresh start." }
+      { name: lang === 'KO' ? "실버 액세서리" : "Silver Jewelry", description: lang === 'KO' ? "결단력 200% 충전! 우유부단함을 날려버릴 시크한 아이템이야." : "Decisiveness charged to 200%! A chic item to banish your indecision." },
+      { name: lang === 'KO' ? "화이트 셔츠" : "Crisp White Shirt", description: lang === 'KO' ? "복잡한 머릿속을 정리해줄 마법의 유니폼! 깔끔한 시작을 도와줘." : "A magic uniform to clear your cluttered mind. Perfect for a fresh start." }
     ],
     "Water": [
-      { name: lang === 'KO' ? "블루 텀블러" : "Blue Tumbler", description: lang === 'KO' ? "지혜가 샘솟는 블루 에너지! 유연한 사고를 돕는 필수템입니다." : "Blue energy overflowing with wisdom. An absolute must-have for flexible thinking." },
-      { name: lang === 'KO' ? "검정색 다이어리" : "Black Journal", description: lang === 'KO' ? "유연한 대처 능력을 기록하세요. 당신의 지혜를 담는 보물상자입니다." : "Write down your big brain moments. A treasure chest for your wisdom." }
+      { name: lang === 'KO' ? "블루 텀블러" : "Blue Tumbler", description: lang === 'KO' ? "지혜가 샘솟는 블루 에너지! 유연한 사고를 돕는 필수템이야." : "Blue energy overflowing with wisdom. An absolute must-have for flexible thinking." },
+      { name: lang === 'KO' ? "검정색 다이어리" : "Black Journal", description: lang === 'KO' ? "유연한 대처 능력을 기록해봐. 당신의 지혜를 담는 보물상자야." : "Write down your big brain moments. A treasure chest for your wisdom." }
     ]
   };
 

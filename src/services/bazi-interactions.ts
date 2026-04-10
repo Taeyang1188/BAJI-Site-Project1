@@ -121,16 +121,16 @@ function generateCombinationNote(
   
   let koDesc = "";
   if (type === "육합") {
-    koDesc = `육합은 부부나 연인처럼 다정한 합입니다. ${koPillarMeanings}가 합을 하고 있어 정서적인 안정감을 줍니다. 또한 ${koTenGods}이 합을 하므로, 해당 십성들의 에너지가 서로 긍정적으로 연결되어 시너지를 냅니다.`;
+    koDesc = `육합은 부부나 연인처럼 다정한 합이야. ${koPillarMeanings}가 합을 하고 있어 정서적인 안정감을 줘. 또한 ${koTenGods}이 합을 하므로, 해당 십성들의 에너지가 서로 긍정적으로 연결되어 시너지를 내.`;
   } else if (type === "삼합" || type === "반합") {
-    koDesc = `${type}은 사회적인 목적을 위한 강력한 결속입니다. ${koPillarMeanings}가 합을 하여 ${getElementKo(resultElement)}의 기운을 만들어냅니다. ${koTenGods}이 결합하여 사회적 성취와 목적 달성을 향한 강한 원동력이 됩니다.`;
+    koDesc = `${type}은 사회적인 목적을 위한 강력한 결속이야. ${koPillarMeanings}가 합을 하여 ${getElementKo(resultElement)}의 기운을 만들어내. ${koTenGods}이 결합하여 사회적 성취와 목적 달성을 향한 강한 원동력이 돼.`;
   } else if (type === "방합" || type === "준방합") {
-    koDesc = `${type}은 같은 계절(방향)의 강력한 세력입니다. ${koPillarMeanings}가 모여 ${getElementKo(resultElement)}의 기운을 증폭시킵니다. ${koTenGods}이 무리를 지어 해당 분야에서 폭발적인 에너지와 추진력을 발휘하게 됩니다.`;
+    koDesc = `${type}은 같은 계절(방향)의 강력한 세력이야. ${koPillarMeanings}가 모여 ${getElementKo(resultElement)}의 기운을 증폭시켜. ${koTenGods}이 무리를 지어 해당 분야에서 폭발적인 에너지와 추진력을 발휘하게 돼.`;
   } else if (type === "암합") {
-    koDesc = `암합은 지장간 내부에서 일어나는 은밀한 합입니다. ${koPillarMeanings} 사이에 보이지 않는 강한 끌림과 결속력이 존재하며, ${koTenGods} 간의 은밀한 조력이나 연결고리가 있음을 암시합니다.`;
+    koDesc = `암합은 지장간 내부에서 일어나는 은밀한 합이야. ${koPillarMeanings} 사이에 보이지 않는 강한 끌림과 결속력이 존재하며, ${koTenGods} 간의 은밀한 조력이나 연결고리가 있음을 암시해.`;
   }
 
-  const koNote = `<div class="space-y-2"><b>${type}: ${combBranches.join('-')}</b><br/><b>위치:</b> ${koPositions}<br/><b>성격:</b> ${getElementKo(resultElement)}의 기운을 강화합니다.<br/><b>영향:</b> ${koDesc}</div>`;
+  const koNote = `<div class="space-y-2"><b>${type}: ${combBranches.join('-')}</b><br/><b>위치:</b> ${koPositions}<br/><b>성격:</b> ${getElementKo(resultElement)}의 기운을 강화해.<br/><b>영향:</b> ${koDesc}</div>`;
 
   const enPositions = indices.map(idx => `${getPillarName(idx, 'EN')} (${combBranches[indices.indexOf(idx)]})`).join(' and ');
   const enTenGods = indices.map(idx => `${pillars[idx].branchEnglishName} (${combBranches[indices.indexOf(idx)]})`).join(' and ');
@@ -173,19 +173,19 @@ function generateStemInteractionNote(
   let enEffect = "";
 
   if (type.includes("합")) {
-    koEffect = `${koPillarMeanings} 간의 정신적 결합입니다. ${koTenGods}이 서로 합을 하여 지향하는 가치가 일치함을 의미합니다.`;
+    koEffect = `${koPillarMeanings} 간의 정신적 결합이야. ${koTenGods}이 서로 합을 하여 지향하는 가치가 일치함을 의미해.`;
     enEffect = `Mental combination between ${enPillarMeanings}. Represents alignment of values between ${enTenGods}.`;
   } else if (type === "천간충") {
-    koEffect = `${koPillarMeanings} 간의 정신적 충돌입니다. ${koTenGods}이 서로 부딪혀 생각의 차이나 목표의 갈등이 생길 수 있습니다.`;
+    koEffect = `${koPillarMeanings} 간의 정신적 충돌이야. ${koTenGods}이 서로 부딪혀 생각의 차이나 목표의 갈등이 생길 수 있어.`;
     enEffect = `Mental conflict between ${enPillarMeanings}. Suggests differences in thoughts or goals between ${enTenGods}.`;
   } else if (type === "격충") {
-    koEffect = `${koPillarMeanings} 간의 간접적인 정신적 충돌입니다. ${koTenGods}이 서로 부딪혀 생각의 차이가 생길 수 있으나 제한적입니다.`;
+    koEffect = `${koPillarMeanings} 간의 간접적인 정신적 충돌이야. ${koTenGods}이 서로 부딪혀 생각의 차이가 생길 수 있으나 제한적이야.`;
     enEffect = `Indirect mental conflict between ${enPillarMeanings}. Suggests differences in thoughts between ${enTenGods} but with limited impact.`;
   } else if (type === "원충") {
-    koEffect = `${koPillarMeanings} 간의 먼 정신적 충돌입니다. ${koTenGods}이 서로 부딪히나 그 영향은 미미합니다.`;
+    koEffect = `${koPillarMeanings} 간의 먼 정신적 충돌이야. ${koTenGods}이 서로 부딪히나 그 영향은 미미해.`;
     enEffect = `Remote mental conflict between ${enPillarMeanings}. Suggests differences in thoughts between ${enTenGods} but with minimal impact.`;
   } else {
-    koEffect = `${koPillarMeanings} 간의 정신적 충돌입니다. ${koTenGods}이 서로 부딪혀 생각의 차이나 목표의 갈등이 생길 수 있습니다.`;
+    koEffect = `${koPillarMeanings} 간의 정신적 충돌이야. ${koTenGods}이 서로 부딪혀 생각의 차이나 목표의 갈등이 생길 수 있어.`;
     enEffect = `Mental conflict between ${enPillarMeanings}. Suggests differences in thoughts or goals between ${enTenGods}.`;
   }
 
@@ -220,28 +220,28 @@ function generateInteractionNote(
   let enEffect = "";
 
   if (type === "지지충") {
-    koEffect = `${koPillarMeanings} 간의 정면 충돌입니다. ${koTenGods}이 서로 부딪혀 해당 영역에서의 급격한 변화나 갈등이 예상됩니다.`;
+    koEffect = `${koPillarMeanings} 간의 정면 충돌이야. ${koTenGods}이 서로 부딪혀 해당 영역에서의 급격한 변화나 갈등이 예상돼.`;
     enEffect = `Direct collision between ${enPillarMeanings}. Rapid changes or friction expected between ${enTenGods}.`;
   } else if (type === "격충") {
-    koEffect = `${koPillarMeanings} 간의 간접적인 충돌입니다. ${koTenGods}이 서로 부딪혀 갈등이 예상되나 그 영향은 제한적입니다.`;
+    koEffect = `${koPillarMeanings} 간의 간접적인 충돌이야. ${koTenGods}이 서로 부딪혀 갈등이 예상되나 그 영향은 제한적이야.`;
     enEffect = `Indirect collision between ${enPillarMeanings}. Friction expected between ${enTenGods} but with limited impact.`;
   } else if (type === "원충") {
-    koEffect = `${koPillarMeanings} 간의 먼 충돌입니다. ${koTenGods}이 서로 부딪히나 그 영향은 미미합니다.`;
+    koEffect = `${koPillarMeanings} 간의 먼 충돌이야. ${koTenGods}이 서로 부딪히나 그 영향은 미미해.`;
     enEffect = `Remote collision between ${enPillarMeanings}. Friction expected between ${enTenGods} but with minimal impact.`;
   } else if (type === "삼형" || type === "반형") {
-    koEffect = `${koPillarMeanings} 간의 형(刑) 작용입니다. ${koTenGods} 사이의 조정이나 법적/심리적 압박이 있을 수 있으니 세밀한 관리가 필요합니다.`;
+    koEffect = `${koPillarMeanings} 간의 형(刑) 작용이야. ${koTenGods} 사이의 조정이나 법적/심리적 압박이 있을 수 있으니 세밀한 관리가 필요해.`;
     enEffect = `Punishment between ${enPillarMeanings}. May lead to adjustments or legal/psychological pressure between ${enTenGods}.`;
   } else if (type === "자형") {
-    koEffect = `${koPillarMeanings}에서 스스로를 볶는 기운이 강해집니다. ${koTenGods}의 에너지가 과잉되어 스스로 심리적 압박을 가할 수 있으니 주의가 필요합니다.`;
+    koEffect = `${koPillarMeanings}에서 스스로를 볶는 기운이 강해져. ${koTenGods}의 에너지가 과잉되어 스스로 심리적 압박을 가할 수 있으니 주의가 필요해.`;
     enEffect = `Self-punishment in ${enPillarMeanings}. Overactive energy of ${enTenGods} may cause internal stress.`;
   } else if (type === "복음") {
-    koEffect = `${koPillarMeanings}에 같은 기운이 중첩되었습니다. ${koTenGods}의 에너지가 정체되거나 중복된 고민이 생길 수 있는 시기입니다.`;
+    koEffect = `${koPillarMeanings}에 같은 기운이 중첩됐어. ${koTenGods}의 에너지가 정체되거나 중복된 고민이 생길 수 있는 시기야.`;
     enEffect = `Overlapping energy in ${enPillarMeanings}. Stagnation or repetitive concerns related to ${enTenGods}.`;
   } else if (type === "파") {
-    koEffect = `${koPillarMeanings} 간의 파괴 작용입니다. ${koTenGods} 사이의 관계나 일의 마무리에 있어 균열이 생기지 않도록 주의해야 합니다.`;
+    koEffect = `${koPillarMeanings} 간의 파괴 작용이야. ${koTenGods} 사이의 관계나 일의 마무리에 있어 균열이 생기지 않도록 주의해야 해.`;
     enEffect = `Destruction between ${enPillarMeanings}. Caution needed in relationships or finalizing tasks between ${enTenGods}.`;
   } else if (type === "해") {
-    koEffect = `${koPillarMeanings} 간의 해로움입니다. ${koTenGods} 사이의 보이지 않는 방해나 시기, 질투로 인한 갈등을 경계해야 합니다.`;
+    koEffect = `${koPillarMeanings} 간의 해로움이야. ${koTenGods} 사이의 보이지 않는 방해나 시기, 질투로 인한 갈등을 경계해야 해.`;
     enEffect = `Harm between ${enPillarMeanings}. Guard against invisible interference or jealousy between ${enTenGods}.`;
   }
 

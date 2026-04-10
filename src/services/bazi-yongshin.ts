@@ -241,6 +241,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   return { 
     score, 
     level, 
+    isStrong: score > 52,
     breakdown: { 
       self: Math.round(selfScore), 
       wisdom: Math.round(wisdomScore), 
@@ -271,6 +272,57 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     return ELEMENT_CYCLE[targetIdx];
   };
 
+  // 0. Threshold Logic for Extreme Elemental Dominance (>= 60%)
+  // If one element is overwhelming, normal balance (Eok-bu) logic fails and can be dangerous.
+  const elementRatios = strength.elementScores || {};
+  const totalScore = Object.values(elementRatios).reduce((a: any, b: any) => a + b, 0) as number;
+  
+  let extremeElement = "";
+  let extremeRatio = 0;
+  
+  for (const [el, score] of Object.entries(elementRatios)) {
+    const ratio = ((score as number) / totalScore) * 100;
+    if (ratio >= 60) {
+      extremeElement = el;
+      extremeRatio = ratio;
+      break;
+    }
+  }
+
+  if (extremeElement) {
+    method = "전왕격용신"; // Treat as Monarch/Extreme logic
+    const mIdx = ELEMENT_CYCLE.indexOf(extremeElement);
+    
+    // For extreme dominance, we follow the flow (Sun-eung)
+    // Useful = Output (Draining), Supporting = Dominant (Mirror), Danger = Clashing (Wang-shin-chung-bal)
+    primary = { 
+      god: extremeElement === dmElement ? "비겁" : "인성", // Simplified mapping
+      element: ELEMENT_CYCLE[(mIdx + 1) % 5], // Earth if Fire is extreme
+      reason: `${extremeElement} 기운이 ${Math.round(extremeRatio)}%로 압도적임. 강한 기운을 설기(泄氣)해야 함.`,
+      reasonEn: `${extremeElement} energy is overwhelming at ${Math.round(extremeRatio)}%. Must drain (leak) the strong energy.`
+    };
+
+    // User requested mapping for extreme Fire: [Fire=Hee, Earth=Yong, Metal=Hee/Han, Water=Gi(Danger), Wood=Gu]
+    heeShin = { 
+      god: "비겁, 재성", 
+      element: `${extremeElement}, ${ELEMENT_CYCLE[(mIdx + 2) % 5]}` 
+    };
+    giShin = { 
+      god: "관성", 
+      element: ELEMENT_CYCLE[(mIdx + 3) % 5] // Water if Fire is extreme
+    };
+    guShin = { 
+      god: "인성", 
+      element: ELEMENT_CYCLE[(mIdx + 4) % 5] // Wood if Fire is extreme
+    };
+    const hanShin = {
+      god: "식상",
+      element: ELEMENT_CYCLE[(mIdx + 1) % 5] // Earth (Primary is already Earth)
+    };
+
+    return { primary, heeShin, giShin, guShin, hanShin, method, byeongYak: null, tongGwan: null, eokbu: null };
+  }
+
   // 0. Special Structure Handling (Jong-gyeok / Jeon-wang-gyeok)
   if (structureDetail && structureDetail.category === 'Adaptive') {
     method = "종격용신";
@@ -299,18 +351,50 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     }
   } else if (structureDetail && structureDetail.category === 'Monarch') {
     method = "전왕격용신";
-    primary = { god: "비겁", element: dmElement, reason: "전왕격 → 비겁용신", reasonEn: "Monarch Alignment → Mirror/Rival Useful God" };
-    heeShin = { god: "인성", element: getElementByRel('Wisdom') };
-    giShin = { god: "관성", element: getElementByRel('Power') };
-    guShin = { god: "재성", element: getElementByRel('Wealth') };
+    const monarchEl = structureDetail.mainElement || dmElement;
+    const mIdx = ELEMENT_CYCLE.indexOf(monarchEl);
+    
+    primary = { god: "비겁", element: monarchEl, reason: "전왕격 → 비겁용신", reasonEn: "Monarch Alignment → Mirror/Rival Useful God" };
+    
+    // User requested mapping for Monarch structures:
+    // [Monarch=Hee, Output=Hee, Wealth=Han, Power=Gi, Resource=Gu]
+    // Example Fire Monarch: Fire=Hee, Earth=Hee, Metal=Han, Water=Gi, Wood=Gu
+    
+    heeShin = { 
+      god: "비겁, 식상", 
+      element: `${monarchEl}, ${ELEMENT_CYCLE[(mIdx + 1) % 5]}` 
+    };
+    giShin = { 
+      god: "관성", 
+      element: ELEMENT_CYCLE[(mIdx + 3) % 5] 
+    };
+    guShin = { 
+      god: "인성", 
+      element: ELEMENT_CYCLE[(mIdx + 4) % 5] 
+    };
+    const hanShin = {
+      god: "재성",
+      element: ELEMENT_CYCLE[(mIdx + 2) % 5]
+    };
+    return { primary, heeShin, giShin, guShin, hanShin, method, byeongYak: null, tongGwan: null, eokbu: null };
   } else if (structureDetail && structureDetail.category === 'Image') {
     method = "특수격용신";
     const title = structureDetail.title;
     const targetEl = structureDetail.mainElement || dmElement;
     const targetIdx = ELEMENT_CYCLE.indexOf(targetEl);
     
+    const rel = getRelationship(dmElement, targetEl);
+    const godMap: Record<string, string> = {
+      'Self': '비겁',
+      'Artist': '식상',
+      'Wealth': '재성',
+      'Power': '관성',
+      'Wisdom': '인성'
+    };
+    const god = godMap[rel] || "특수";
+
     primary = { 
-      god: "특수", 
+      god, 
       element: targetEl, 
       reason: `${title} → ${targetEl} 용신`, 
       reasonEn: `${title} → ${targetEl} Useful God` 
@@ -399,7 +483,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
       eokbu = {
         type: 'weakening',
         elements: [artistEl, wealthEl, powerEl],
-        note: `일간이 강하므로 기운을 빼주는 식상, 재성, 관성(${elementsStr})이 용신으로 작용합니다.`,
+        note: `일간이 강하므로 기운을 빼주는 식상, 재성, 관성(${elementsStr})이 용신으로 작용해.`,
         noteEn: `Since the Day Master is strong, the elements that weaken it (${elementsEnStr}) act as the Useful God.`
       };
     } else {
@@ -416,7 +500,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
       eokbu = {
         type: 'strengthening',
         elements: [wisdomEl, selfEl],
-        note: `일간이 약하므로 기운을 보태주는 인성, 비겁(${elementsStr})이 용신으로 작용합니다.`,
+        note: `일간이 약하므로 기운을 보태주는 인성, 비겁(${elementsStr})이 용신으로 작용해.`,
         noteEn: `Since the Day Master is weak, the elements that strengthen it (${elementsEnStr}) act as the Useful God.`
       };
     }
@@ -448,14 +532,35 @@ export function checkByeongYak(stems: string[], branches: string[], yongshin: an
   });
 
   if (byeong) {
+    // For Monarch structures, we don't treat the dominant element as a "disease" to be cured by clashing.
+    const isMonarch = yongshin?.method === "전왕격용신" || yongshin?.method === "특수격용신";
+    if (isMonarch) {
+      const monarchEl = yongshin.primary.element;
+      const mIdx = ELEMENT_CYCLE.indexOf(monarchEl);
+      const drainEl = ELEMENT_CYCLE[(mIdx + 1) % 5]; // Output element
+      
+      const elementKoMap: Record<string, string> = { 
+        Wood: '목(식상)', 
+        Fire: '화(식상)', 
+        Earth: '토(식상)', 
+        Metal: '금(식상)', 
+        Water: '수(식상)' 
+      };
+      const koDrain = elementKoMap[drainEl] || drainEl;
+
+      return {
+        byeong: monarchEl,
+        yak: drainEl,
+        note: `전왕격은 강한 기운을 거스르면 안 돼. ${koDrain}으로 기운을 부드럽게 설기하는 것이 좋아.`,
+        noteEn: `Monarch structures should not be clashed. It is best to gently drain the energy with ${drainEl} (Artist/Rebel).`
+      };
+    }
+
     // Identify "약" (Medicine) - element that overcomes the disease
     const byeongIdx = ELEMENT_CYCLE.indexOf(byeong);
-    const yakIdx = (byeongIdx + 3) % 5; // Keuk relationship: Wood -> Earth -> Water -> Fire -> Metal -> Wood
-    // Wait, Keuk is: Wood keuk Earth (2), Earth keuk Water (2), Water keuk Fire (2), Fire keuk Metal (2), Metal keuk Wood (2)
-    // Actually, (byeongIdx + 2) % 5 is what byeong keuks. 
-    // What keuks byeong is (byeongIdx + 3) % 5.
+    const yakIdx = (byeongIdx + 3) % 5; 
     const yakElement = ELEMENT_CYCLE[yakIdx];
-    
+
     if (counts[yakElement] >= 1) {
       return { 
         byeong, 
@@ -518,6 +623,72 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
       if (s.dm.includes(dayMaster)) {
         const score = ratios[s.element];
         if (score >= 80) {
+          // --- Rejection Logic (기각 로직) Start ---
+          
+          // 1. Hidden Root of Day Master (일간의 생존 본능 - 가종격 판별)
+          // If the DM has a root in the month or day branch, it won't "follow" easily.
+          const rooting = ROOTING_DATA[dayMaster];
+          const monthBranch = branches[2];
+          const dayBranch = branches[1];
+          const hasStrongRoot = rooting && (rooting.strong.includes(monthBranch) || rooting.strong.includes(dayBranch));
+          
+          if (hasStrongRoot) {
+            return {
+              name: '가종격(극신약)',
+              nameEn: 'Fake Follow (Extreme Weakness)',
+              category: 'Standard',
+              mainElement: s.element,
+              confidence: 40,
+              description: "세력이 강해 보이나 일간의 뿌리가 살아있어 전왕격으로 종하지 않아. 극신약 사주로 분류돼.",
+              enDescription: "Momentum is strong but the Day Master's root remains; it does not follow the Monarch structure. Classified as Extreme Weakness."
+            };
+          }
+
+          // 2. Heavenly Stem Opponent (천간의 방해자 - 가식 로직)
+          const dmIdx = ELEMENT_CYCLE.indexOf(s.element);
+          const powerEl = ELEMENT_CYCLE[(dmIdx + 3) % 5];
+          const wealthEl = ELEMENT_CYCLE[(dmIdx + 2) % 5];
+          
+          const hasOpponentInStem = stems.some((stem, idx) => {
+            if (idx === 1) return false; // Skip DM
+            const el = STEM_ELEMENTS[stem];
+            return el === powerEl || el === wealthEl;
+          });
+
+          if (hasOpponentInStem) {
+            return {
+              name: '가종격(불순)',
+              nameEn: 'Fake Special (Impure)',
+              category: 'Standard',
+              mainElement: s.element,
+              confidence: 50,
+              description: "천간에 방해하는 기운이 떠 있어 전왕격의 순수성이 깨졌어. 일반격으로 간명해.",
+              enDescription: "Opposing elements in the Heavenly Stems break the purity of the Monarch structure. Treated as a Standard structure."
+            };
+          }
+
+          // 3. Seasonal Support (월령의 배신)
+          const isSeasonal = s.element === monthElement || 
+                            (s.element === 'Earth' && ['辰', '戌', '丑', '未'].includes(monthZhi)) ||
+                            (s.element === 'Wood' && ['寅', '卯'].includes(monthZhi)) ||
+                            (s.element === 'Fire' && ['巳', '午'].includes(monthZhi)) ||
+                            (s.element === 'Metal' && ['申', '酉'].includes(monthZhi)) ||
+                            (s.element === 'Water' && ['亥', '子'].includes(monthZhi));
+
+          if (!isSeasonal) {
+            return {
+              name: '오행편중(병)',
+              nameEn: 'Elemental Overload (Burden)',
+              category: 'Standard',
+              mainElement: s.element,
+              confidence: 30,
+              description: "오행은 많으나 계절의 도움을 받지 못해 격국이 아닌 병(病)이 된 상태야.",
+              enDescription: "Elements are numerous but lack seasonal support; it is a burden (disease) rather than a structure."
+            };
+          }
+
+          // --- Rejection Logic End ---
+
           let hasHap = false;
           if (s.samhap) {
             const present = s.samhap.filter(b => branches.includes(b));

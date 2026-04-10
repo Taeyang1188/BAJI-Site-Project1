@@ -129,16 +129,16 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
 
   // Strength text
   const strengthTextKo = isStrong 
-    ? '사회의 요구에 당당히 맞서며 주도권을 잡으려 합니다. ("내가 이 판의 주인공이다.")'
-    : '사회의 요구가 버거워 눈치를 보거나 시스템에 의존하려 합니다. ("나를 좀 도와달라.")';
+    ? '사회의 요구에 당당히 맞서며 주도권을 잡으려 해. ("내가 이 판의 주인공이야.")'
+    : '사회의 요구가 버거워 눈치를 보거나 시스템에 의존하려 해. ("나를 좀 도와줘.")';
   const strengthTextEn = isStrong
     ? 'Confidently faces societal demands and tries to take the initiative. ("I am the main character here.")'
     : 'Finds societal demands overwhelming and tends to rely on the system. ("Please help me.")';
 
   // Season text
   const seasonTextKo = (season === 'spring' || season === 'summer')
-    ? '사회가 나에게 성장과 확장을 기대합니다. (활발함, 시작)'
-    : '사회가 나에게 수확과 정리, 내실을 기대합니다. (냉철함, 완성)';
+    ? '사회가 나에게 성장과 확장을 기대해. (활발함, 시작)'
+    : '사회가 나에게 수확과 정리, 내실을 기대해. (냉철함, 완성)';
   const seasonTextEn = (season === 'spring' || season === 'summer')
     ? 'Society expects growth and expansion from you. (Activity, Beginning)'
     : 'Society expects harvest, organization, and substance from you. (Cool-headedness, Completion)';
@@ -188,23 +188,23 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
   }
 
   if (isOverload) {
-    tempDiffTextKo = "⚠️ 과부하 경고: 열기가 너무 강해 폭발할 위험이 있습니다. 냉정이 필요합니다.";
+    tempDiffTextKo = "⚠️ 과부하 경고: 열기가 너무 강해 폭발할 위험이 있어. 냉정이 필요해.";
     tempDiffTextEn = "⚠️ Overload Warning: Heat is too intense, risk of explosion. Coolness is required.";
   } else if (hasWeapon) {
-    tempDiffTextKo = "스트레스는 크지만 극복할 무기가 있습니다. 위기를 기회로 바꿉니다.";
+    tempDiffTextKo = "스트레스는 크지만 극복할 무기가 있어. 위기를 기회로 바꿔봐.";
     tempDiffTextEn = "Stress is high, but you have weapons to overcome it. Turn crisis into opportunity.";
   } else if (tempDiff > 40) {
-    tempDiffTextKo = "사회적 요구와 내 본심이 정면충돌하여 스트레스가 높습니다.";
+    tempDiffTextKo = "사회적 요구와 내 본심이 정면충돌하여 스트레스가 높은 편이야.";
     tempDiffTextEn = "Societal demands and your true self clash head-on, resulting in high stress.";
   } else if (tempDiff < 20) {
-    tempDiffTextKo = "사회적 역할과 나의 적성이 찰떡궁합입니다. 사회생활이 즐겁습니다.";
+    tempDiffTextKo = "사회적 역할과 나의 적성이 찰떡궁합이야. 사회생활이 즐거울 거야.";
     tempDiffTextEn = "Your social role and aptitude are a perfect match. Social life is enjoyable.";
   } else {
-    tempDiffTextKo = "사회적 요구와 내 본심이 적절한 균형을 이루고 있습니다.";
+    tempDiffTextKo = "사회적 요구와 내 본심이 적절한 균형을 이루고 있어.";
     tempDiffTextEn = "There is a proper balance between societal demands and your true self.";
   }
 
-  subTextKo = "월지(세상)와 일간(나)의 온도차가 클수록, 당신은 세상을 살아가기 위해 더 많은 '배터리'를 소모하고 있습니다.";
+  subTextKo = "월지(세상)와 일간(나)의 온도차가 클수록, 당신은 세상을 살아가기 위해 더 많은 '배터리'를 소모하고 있어.";
   subTextEn = "The larger the temperature difference between the world (Month) and yourself (DM), the more 'battery' you consume to live in society.";
 
   const geJuName = result.analysis.structureDetail 
@@ -248,7 +248,7 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
               </h4>
               <p className="text-white/90 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(
                 lang === 'KO' 
-                  ? `"당신은 이 세상의 '${currentTenGod.personaKo}'(으)로 캐스팅되었습니다."`
+                  ? `"당신은 이 세상의 '${currentTenGod.personaKo}'(으)로 캐스팅됐어."`
                   : `"You have been cast as the '${currentTenGod.personaEn}' of this world."`
               )}} />
             </div>
@@ -256,7 +256,7 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
             <div className="space-y-3 text-sm text-white/80 leading-relaxed">
               <p dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(
                 lang === 'KO'
-                  ? `<strong class="text-white">사회의 시선 (월지 ${baseTenGod}):</strong> 사회는 나를 <strong>'${currentTenGod.roleKo}'</strong>로 봅니다. 사람들은 당신을 보며 "${currentTenGod.keywordKo}"을 기대합니다.`
+                  ? `<strong class="text-white">사회의 시선 (월지 ${baseTenGod}):</strong> 사회는 나를 <strong>'${currentTenGod.roleKo}'</strong>로 봐. 사람들은 당신을 보며 "${currentTenGod.keywordKo}"을 기대해.`
                   : `<strong class="text-white">Society's View (Month ${baseTenGodEn}):</strong> Society sees me as <strong>'${currentTenGod.roleEn}'</strong>. People expect "${currentTenGod.keywordEn}" from you.`
               )}} />
               

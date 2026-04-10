@@ -23,7 +23,8 @@ import {
   CheckCircle2,
   Sparkles,
   Share2,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
@@ -119,7 +120,7 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   return stemEl === branchEl;
 };
 
-const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 30 }) => {
+const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void }> = ({ text, speed = 30, onComplete }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [showCursor, setShowCursor] = React.useState(true);
@@ -201,8 +202,10 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
         setCurrentIndex(prev => prev + 1);
       }, currentDelay);
       return () => clearTimeout(timeout);
+    } else if (currentIndex === charInfos.length && charInfos.length > 0) {
+      onComplete?.();
     }
-  }, [currentIndex, charInfos]);
+  }, [currentIndex, charInfos, onComplete]);
 
   return (
     <span className="whitespace-pre-wrap">
@@ -258,8 +261,8 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
             <>
               <p>
                 <strong className="text-white/90">공망의 3대 핵심 작용:</strong><br/>
-                1. <strong>허망함과 집착:</strong> 비어 있기 때문에 오히려 그것을 채우려 하는 강한 집착이 생깁니다. {gongmangTenGods.length > 0 && `현재 원국에서는 [${gongmangTenGods.join(', ')}]에 공망이 들어, 해당 십성이 상징하는 영역에 대한 갈증이 남들보다 클 수 있습니다.`}<br/>
-                2. <strong>변질과 비정상성:</strong> 해당 글자가 가진 본래의 기능이 정상적으로 작동하지 않아, 인연이 박하거나 덕을 보기 어려운 상황으로 나타날 수 있습니다.<br/>
+                1. <strong>허망함과 집착:</strong> 비어 있기 때문에 오히려 그것을 채우려 하는 강한 집착이 생겨. {gongmangTenGods.length > 0 && `현재 원국에서는 [${gongmangTenGods.join(', ')}]에 공망이 들어, 해당 십성이 상징하는 영역에 대한 갈증이 남들보다 클 수 있어.`}<br/>
+                2. <strong>변질과 비정상성:</strong> 해당 글자가 가진 본래의 기능이 정상적으로 작동하지 않아, 인연이 박하거나 덕을 보기 어려운 상황으로 나타날 수 있어.<br/>
                 3. <strong>정신적/형이상학적 발달:</strong> 현실적인 힘은 약해지지만, 대신 정신적, 철학적, 예술적 기운이 맑아집니다.
               </p>
               
@@ -269,19 +272,19 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
                   <strong className="text-white/90">궁성(자리)에 따른 나의 공망 의미:</strong>
                 </div>
                 <ul className="list-disc pl-4 space-y-2">
-                  {affectedPillars.includes('년주') && <li><strong className="text-neon-pink/90">년주(Year):</strong> 조상의 덕이 부족하거나 고향을 떠나 자수성가해야 할 수 있습니다.</li>}
-                  {affectedPillars.includes('월주') && <li><strong className="text-neon-pink/90">월주(Month):</strong> 부모, 형제의 덕이 약하며 사회 생활이나 직장 운에서 정착이 어려울 수 있습니다.</li>}
-                  {affectedPillars.includes('일주') && <li><strong className="text-neon-pink/90">일주(Day):</strong> 본인의 내면적 공허함이 있거나 배우자와의 인연이 약할 수 있습니다.</li>}
-                  {affectedPillars.includes('시주') && <li><strong className="text-neon-pink/90">시주(Hour):</strong> 노년의 고독이나 자식과의 인연이 박할 수 있으며, 일의 최종 결과물이 허무할 수 있습니다.</li>}
+                  {affectedPillars.includes('년주') && <li><strong className="text-neon-pink/90">년주(Year):</strong> 조상의 덕이 부족하거나 고향을 떠나 자수성가해야 할 수 있어.</li>}
+                  {affectedPillars.includes('월주') && <li><strong className="text-neon-pink/90">월주(Month):</strong> 부모, 형제의 덕이 약하며 사회 생활이나 직장 운에서 정착이 어려울 수 있어.</li>}
+                  {affectedPillars.includes('일주') && <li><strong className="text-neon-pink/90">일주(Day):</strong> 본인의 내면적 공허함이 있거나 배우자와의 인연이 약할 수 있어.</li>}
+                  {affectedPillars.includes('시주') && <li><strong className="text-neon-pink/90">시주(Hour):</strong> 노년의 고독이나 자식과의 인연이 박할 수 있으며, 일의 최종 결과물이 허무할 수 있어.</li>}
                 </ul>
               </div>
 
               <div className="p-3 bg-black/30 rounded border border-white/5">
                 <strong className="text-white/90">탈공(脫空) 여부:</strong><br/>
                 {isResolved ? (
-                  <span className="text-neon-blue">원국 내에 공망된 글자를 깨우는 합(合)이나 충(沖)이 존재하여, 공망의 작용이 일시적으로 해소(탈공)되는 긍정적인 구조입니다. 비어있던 글자를 써먹을 수 있게 됩니다.</span>
+                  <span className="text-neon-blue">원국 내에 공망된 글자를 깨우는 합(合)이나 충(沖)이 존재하여, 공망의 작용이 일시적으로 해소(탈공)되는 긍정적인 구조야. 비어있던 글자를 써먹을 수 있게 돼.</span>
                 ) : (
-                  <span>현재 원국 내에서는 합(合)이나 충(沖)으로 인한 탈공이 뚜렷하지 않습니다. 하지만 대운이나 세운에서 공망인 글자가 직접 들어오거나 합/충하는 운이 올 때 공망의 굴레에서 벗어나 실체를 가지게 됩니다.</span>
+                  <span>현재 원국 내에서는 합(合)이나 충(沖)으로 인한 탈공이 뚜렷하지 않아. 하지만 대운이나 세운에서 공망인 글자가 직접 들어오거나 합/충하는 운이 올 때 공망의 굴레에서 벗어나 실체를 가지게 돼.</span>
                 )}
               </div>
             </>
@@ -513,6 +516,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
   const [isCycleVibeExpanded, setIsCycleVibeExpanded] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showDailyVibe, setShowDailyVibe] = useState(false);
+  const [vibePhase, setVibePhase] = useState<'intro' | 'question' | 'analysis'>('intro');
+  const [isQuestionPromptComplete, setIsQuestionPromptComplete] = useState(false);
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
+  
+  // Romance specific states
+  const [romanceStep, setRomanceStep] = useState<'marital' | 'children' | 'final'>('marital');
+  const [maritalStatus, setMaritalStatus] = useState<string | null>(null);
+  const [hasChildren, setHasChildren] = useState<boolean | null>(null);
+  
+  const [showAllThemes, setShowAllThemes] = useState(false);
 
   const elementData = useMemo(() => {
     const counts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
@@ -539,7 +552,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       const missing = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].filter(e => !elementData.find(d => d.name && d.name.includes(e)));
       
       if (lang === 'KO') {
-        return `당신의 영혼 매트릭스는 ${dominant.name}의 기운이 지배적입니다. 사이버네틱 코어에 각인된 이 강력한 에너지는 당신을 끊임없이 움직이게 하지만, ${missing.length > 0 ? missing.map(m => m === 'Wood' ? '목' : m === 'Fire' ? '화' : m === 'Earth' ? '토' : m === 'Metal' ? '금' : '수').join(', ') + '의 결핍이 시스템의 과부하를 초래할 수 있습니다.' : '모든 원소가 균형을 이루어 안정적인 출력을 자랑합니다.'} 충돌하는 기운을 제어하고 당신만의 네온 불빛을 밝히십시오.`;
+        return `당신의 영혼 매트릭스는 ${dominant.name}의 기운이 지배적이야. 사이버네틱 코어에 각인된 이 강력한 에너지는 당신을 끊임없이 움직이게 하지만, ${missing.length > 0 ? missing.map(m => m === 'Wood' ? '목' : m === 'Fire' ? '화' : m === 'Earth' ? '토' : m === 'Metal' ? '금' : '수').join(', ') + '의 결핍이 시스템의 과부하를 초래할 수 있어.' : '모든 원소가 균형을 이루어 안정적인 출력을 자랑해.'} 충돌하는 기운을 제어하고 당신만의 네온 불빛을 밝혀봐.`;
       } else {
         return `Your soul matrix is dominated by the energy of ${dominant.name}. This powerful force engraved in your cybernetic core drives you relentlessly, but ${missing.length > 0 ? 'the lack of ' + missing.join(', ') + ' may cause system overloads.' : 'all elements are balanced, boasting stable output.'} Control the clashing energies and ignite your own neon lights.`;
       }
@@ -547,12 +560,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     const { geJu, yongShen, structureDetail } = result.analysis;
     if (structureDetail) {
       if (lang === 'KO') {
-        return `${structureDetail.title} (${structureDetail.category === 'Standard' ? '내격' : '종격'})으로 태어났습니다. ${structureDetail.marketingMessage} ${yongShen}을 삶의 핵심 에너지로 사용합니다.`;
+        return `${structureDetail.title} (${structureDetail.category === 'Standard' ? '내격' : '종격'})으로 태어났어. ${structureDetail.marketingMessage} ${yongShen}을 삶의 핵심 에너지로 사용해.`;
       }
       return `Born with ${structureDetail.enTitle} (${structureDetail.category} Alignment). ${structureDetail.enMarketingMessage} Utilizing ${yongShen} as your primary cosmic driver.`;
     }
     if (lang === 'KO') {
-      return `${geJu}으로 태어나 ${yongShen}을 삶의 핵심 에너지로 사용합니다.`;
+      return `${geJu}으로 태어나 ${yongShen}을 삶의 핵심 에너지로 사용해.`;
     }
     const gejuInfo = BAZI_MAPPING.geju[geJu as keyof typeof BAZI_MAPPING.geju];
     const gejuEn = gejuInfo?.en || geJu;
@@ -561,7 +574,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
   const getYongshinName = (god: string) => {
     if (lang === 'KO') return god;
-    return BAZI_MAPPING.yongshin[god as keyof typeof BAZI_MAPPING.yongshin]?.en || god;
+    const parts = god.split(/[,/]/).map(s => s.trim());
+    return parts.map(p => BAZI_MAPPING.yongshin[p as keyof typeof BAZI_MAPPING.yongshin]?.en || p).join(', ');
   };
 
   const getStrengthLevel = (level: string) => {
@@ -588,26 +602,37 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       "인성": 4,
     };
 
-    const offset = godOffsets[godCategory];
-    if (offset === undefined) return null;
+    const categories = godCategory.split(/[,/]/).map(s => s.trim());
+    const results = categories.map(cat => {
+      const offset = godOffsets[cat];
+      if (offset === undefined) return null;
 
-    const targetElement = elementsOrder[(dmIdx + offset) % 5];
-    const stemsMap: Record<string, string[]> = {
-      "Wood": ["甲", "乙"],
-      "Fire": ["丙", "丁"],
-      "Earth": ["戊", "己"],
-      "Metal": ["庚", "辛"],
-      "Water": ["壬", "癸"],
-    };
-    const stems = stemsMap[targetElement];
+      const targetElement = elementsOrder[(dmIdx + offset) % 5];
+      const stemsMap: Record<string, string[]> = {
+        "Wood": ["甲", "乙"],
+        "Fire": ["丙", "丁"],
+        "Earth": ["戊", "己"],
+        "Metal": ["庚", "辛"],
+        "Water": ["壬", "癸"],
+      };
+      const stems = stemsMap[targetElement];
 
-    const elementKo = BAZI_MAPPING.elements[targetElement as keyof typeof BAZI_MAPPING.elements]?.ko.split(' ')[0];
-    const elementEn = targetElement;
+      const elementKo = BAZI_MAPPING.elements[targetElement as keyof typeof BAZI_MAPPING.elements]?.ko.split(' ')[0];
+      const elementEn = targetElement;
+
+      return {
+        elementKo,
+        elementEn,
+        stems: stems || []
+      };
+    }).filter(r => r !== null) as { elementKo: string; elementEn: string; stems: string[] }[];
+
+    if (results.length === 0) return null;
 
     return {
-      elementKo,
-      elementEn,
-      stems: stems || []
+      elementKo: Array.from(new Set(results.map(r => r.elementKo))).join(', '),
+      elementEn: Array.from(new Set(results.map(r => r.elementEn))).join(', '),
+      stems: Array.from(new Set(results.flatMap(r => r.stems)))
     };
   };
 
@@ -788,9 +813,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     };
 
   const cycleVibe = React.useMemo(() => {
-    const vibe = generateCycleVibe(result, lang, userName, gender, city);
-    return `${vibe.intro}${vibe.cycleIntro}${vibe.main}\n\n근데.. [delay:2500]\n\n${vibe.glitch}`;
-  }, [result, lang, userName, gender, city]);
+    return generateCycleVibe(result, lang, userName, gender, city, { maritalStatus, hasChildren });
+  }, [result, lang, userName, gender, city, maritalStatus, hasChildren]);
 
   const dailyVibe = React.useMemo(() => {
     const todayPillar = getTodayPillar(dayMaster);
@@ -980,19 +1004,217 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 </p>
               ) : (
                 <div className="space-y-6">
-                  <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                    <TypingText key={lang + cycleVibe} text={cycleVibe} speed={20} />
-                  </p>
+                  {vibePhase === 'intro' && (
+                    <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                      <TypingText 
+                        key={lang + cycleVibe.intro} 
+                        text={cycleVibe.intro} 
+                        speed={20} 
+                        onComplete={() => setVibePhase('question')}
+                      />
+                    </p>
+                  )}
+
+                  {(vibePhase === 'question' || vibePhase === 'analysis') && (
+                    <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                      {cycleVibe.intro}
+                    </p>
+                  )}
+
+                  {vibePhase === 'question' && (
+                    <div className="space-y-4">
+                      <p className="text-lg font-display italic text-neon-pink leading-relaxed whitespace-pre-wrap">
+                        <TypingText 
+                          key={lang + cycleVibe.questionPrompt} 
+                          text={cycleVibe.questionPrompt} 
+                          speed={20} 
+                          onComplete={() => setIsQuestionPromptComplete(true)}
+                        />
+                      </p>
+                      
+                      <AnimatePresence>
+                        {isQuestionPromptComplete && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"
+                          >
+                            {(showAllThemes ? cycleVibe.themes : cycleVibe.themes.slice(0, 3)).map((theme) => (
+                              <motion.button
+                                key={theme.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                  setSelectedThemeId(theme.id);
+                                  if (theme.id === 'romance' || theme.id === 'secrets') {
+                                    setRomanceStep('marital');
+                                  } else {
+                                    setRomanceStep('final');
+                                  }
+                                  setVibePhase('analysis');
+                                }}
+                                className="p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-left transition-all group"
+                              >
+                                <div className="text-neon-pink text-xs font-bold mb-1 uppercase tracking-widest">{theme.title}</div>
+                                <div className="text-white/80 text-sm leading-snug group-hover:text-white">{theme.question}</div>
+                              </motion.button>
+                            ))}
+                            
+                            {!showAllThemes && cycleVibe.themes.length > 3 && (
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setShowAllThemes(true)}
+                                className="p-4 bg-white/5 hover:bg-white/10 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center gap-1 transition-all group"
+                              >
+                                <div className="w-8 h-8 rounded-full bg-neon-pink/20 flex items-center justify-center group-hover:bg-neon-pink/30 transition-colors">
+                                  <span className="text-neon-pink text-xl font-bold">+</span>
+                                </div>
+                                <div className="text-white/40 text-[10px] font-bold uppercase tracking-widest group-hover:text-white/60">
+                                  {lang === 'KO' ? '더 많은 질문 보기' : 'SEE MORE QUESTIONS'}
+                                </div>
+                              </motion.button>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+
+                  {vibePhase === 'analysis' && selectedThemeId && (
+                    <div className="space-y-6">
+                      {(selectedThemeId === 'romance' || selectedThemeId === 'secrets') && romanceStep !== 'final' ? (
+                        <div className="p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-2xl space-y-6">
+                          {romanceStep === 'marital' && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                              <p className="text-lg font-display italic text-white">
+                                {result.currentYearPillar?.age < 30 ? (lang === 'KO' ? '아직 자기는 어리긴 하지만 혹시 몰라서 물어볼게. ' : 'You are still young, but just in case. ') : ''}
+                                {lang === 'KO' ? '먼저 자기, 혹시 결혼은 했어?' : 'First, are you married?'}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {[
+                                  { ko: '미혼', en: 'Single' },
+                                  { ko: '기혼', en: 'Married' },
+                                  { ko: '돌싱', en: 'Single Again' }
+                                ].map((status) => (
+                                  <button
+                                    key={status.ko}
+                                    onClick={() => {
+                                      setMaritalStatus(status.ko);
+                                      setRomanceStep('children');
+                                    }}
+                                    className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                  >
+                                    {lang === 'KO' ? status.ko : status.en}
+                                  </button>
+                                ))}
+                                <button
+                                  onClick={() => {
+                                    setMaritalStatus('비공개');
+                                    setRomanceStep('children');
+                                  }}
+                                  className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-white/60 transition-all"
+                                >
+                                  {lang === 'KO' ? '말하기 싫어' : 'Prefer not to say'}
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                          
+                          {romanceStep === 'children' && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                              <p className="text-lg font-display italic text-white">
+                                {lang === 'KO' ? '그럼 자녀는 있어?' : 'Do you have children?'}
+                              </p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    setHasChildren(true);
+                                    setRomanceStep('final');
+                                  }}
+                                  className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                >
+                                  {lang === 'KO' ? '응, 있어' : 'Yes, I do'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setHasChildren(false);
+                                    setRomanceStep('final');
+                                  }}
+                                  className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                >
+                                  {lang === 'KO' ? '아니, 없어' : 'No, I don\'t'}
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-neon-pink/10 border border-neon-pink/30 rounded-xl">
+                          <div className="text-neon-pink text-xs font-bold mb-2 uppercase tracking-widest">
+                            {cycleVibe.themes.find(t => t.id === selectedThemeId)?.title || '[운명의 대답]'}
+                          </div>
+                          <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                            <TypingText 
+                              key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
+                              text={cycleVibe.themeAnalyses[selectedThemeId].main} 
+                              speed={20} 
+                            />
+                          </p>
+                          <div className="mt-4 pt-4 border-t border-neon-pink/20">
+                            <p className={`text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
+                              {cycleVibe.themeAnalyses[selectedThemeId].glitch}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cycleVibe.themeAnalyses[selectedThemeId].nextHook && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl"
+                        >
+                          <p className="text-sm font-display text-white/90 italic mb-3">
+                            {cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text}
+                          </p>
+                          <button
+                            onClick={() => {
+                              const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
+                              if (nextId) setSelectedThemeId(nextId);
+                            }}
+                            className="text-xs font-bold text-neon-cyan hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1"
+                          >
+                            {lang === 'KO' ? '비밀의 페이지 열기' : 'OPEN THE SECRET PAGE'}
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        </motion.div>
+                      )}
+
+                      <div className="flex flex-wrap gap-2">
+                        <button 
+                          onClick={() => {
+                            setVibePhase('question');
+                            setSelectedThemeId(null);
+                          }}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-xs text-white/60 transition-all"
+                        >
+                          {lang === 'KO' ? '다른 질문 하기' : 'ASK ANOTHER QUESTION'}
+                        </button>
+                        {!showDailyVibe && (
+                          <button 
+                            onClick={handleShowDailyVibe}
+                            className="px-4 py-2 bg-neon-pink/10 hover:bg-neon-pink/20 border border-neon-pink/30 rounded-full text-xs text-neon-pink transition-all flex items-center gap-2"
+                          >
+                            <span>{lang === 'KO' ? '오늘 하루는 어떨까?' : 'How about today?'}</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
-                  {!showDailyVibe ? (
-                    <button 
-                      onClick={handleShowDailyVibe}
-                      className="mt-4 px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-sm text-white/80 transition-all duration-300 flex items-center space-x-2"
-                    >
-                      <span>{lang === 'KO' ? '오늘 하루는 어떨까?' : 'How about today?'}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  ) : (
+                  {showDailyVibe && (
                     <div className="mt-6 p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-1 h-full bg-neon-pink" />
                       <div className="flex items-center justify-between mb-4">
@@ -1208,7 +1430,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       <div className="space-y-6">
         <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center flex items-center justify-center gap-2">
           {t.grandCycle}
-          <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'입니다. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년입니다.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'입니다. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생깁니다.", en: "Daewoon (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
+          <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'야. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년이지.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'이야. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생겨.", en: "Daewoon (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
             <HelpCircle className="w-3 h-3 cursor-help" />
           </BaziTooltip>
         </h3>
@@ -1634,6 +1856,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             <div className="text-xs text-neon-pink/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.eokbu.note : result.analysis.yongshinDetail.eokbu.noteEn}</div>
                           </div>
                         )}
+                        {result.analysis?.balanceWarnings && result.analysis.balanceWarnings.length > 0 && (
+                          <div className="pt-2 border-t border-white/5 space-y-2">
+                            {result.analysis.balanceWarnings.map((warning, idx) => (
+                              <div key={idx} className={`p-2 rounded border ${warning.type === 'danger' ? 'bg-red-500/10 border-red-500/30' : 'bg-orange-500/10 border-orange-500/30'} space-y-1`}>
+                                <div className="flex items-center gap-2">
+                                  <AlertTriangle className={`w-3 h-3 ${warning.type === 'danger' ? 'text-red-400' : 'text-orange-400'}`} />
+                                  <span className={`text-[10px] font-bold uppercase tracking-wider ${warning.type === 'danger' ? 'text-red-400' : 'text-orange-400'}`}>
+                                    {lang === 'KO' ? warning.title : warning.titleEn}
+                                  </span>
+                                </div>
+                                <p className="text-[10px] leading-relaxed text-white/80">
+                                  {lang === 'KO' ? warning.description : warning.enDescription}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                         <div className="pt-4 border-t border-white/5 space-y-2">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
@@ -1651,7 +1890,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               <HelpCircle className="w-3 h-3" />
                             </motion.button>
                           </div>
-                          <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-2 gap-2">
                             <div className="flex flex-col items-center">
                               <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '희신' : 'HeeShin'}</span>
                               {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god)}
@@ -1662,7 +1901,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                 renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god)
                               ) : (
                                 <div className="text-[10px] text-white/60 italic mt-1 text-center">
-                                  {lang === 'KO' ? '해당 국격은 기신이 없습니다.' : 'No GiShin for this structure.'}
+                                  {lang === 'KO' ? '해당 국격은 기신이 없어.' : 'No GiShin for this structure.'}
                                 </div>
                               )}
                             </div>
@@ -1670,6 +1909,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '구신' : 'GuShin'}</span>
                               {renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god)}
                             </div>
+                            {result.analysis.yongshinDetail.hanShin && (
+                              <div className="flex flex-col items-center">
+                                <span className="text-[9px] text-white/40 uppercase">{lang === 'KO' ? '한신' : 'HanShin'}</span>
+                                {renderYongshinWithElement(result.analysis.yongshinDetail.hanShin.god)}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1786,7 +2031,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             })}
                           </div>
                         ) : (
-                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '특별한 충돌이나 결합이 없습니다.' : 'No significant interactions.'}</span>
+                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '특별한 충돌이나 결합이 없어.' : 'No significant interactions.'}</span>
                         )}
                         
                         {(result.analysis?.conflicts || []).length > 0 && (
@@ -1937,7 +2182,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             })}
                           </div>
                         ) : (
-                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 없습니다.' : 'No major divine stars present.'}</span>
+                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 없어.' : 'No major divine stars present.'}</span>
                         )}
                         
                         <div className="pt-2 border-t border-white/5">
@@ -2007,7 +2252,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 <div className="text-sm text-white/80 space-y-4 leading-relaxed">
                   <p>
                     {lang === 'KO' 
-                      ? '대립하는 두 기운 사이를 이어주어 소통시키는 오행입니다.' 
+                      ? '대립하는 두 기운 사이를 이어주어 소통시키는 오행이야.' 
                       : 'An element that bridges two opposing forces, enabling smooth energy flow.'}
                   </p>
 
@@ -2164,7 +2409,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
               <div className="pt-4 border-t border-white/10">
                 <p className="text-[10px] text-white/40 text-center italic">
-                  {lang === 'KO' ? '*이 해석은 사주의 전체적인 흐름과 조화를 고려한 맞춤형 분석입니다.' : '*This interpretation is a customized analysis considering the overall flow and harmony of the chart.'}
+                  {lang === 'KO' ? '*이 해석은 사주의 전체적인 흐름과 조화를 고려한 맞춤형 분석이야.' : '*This interpretation is a customized analysis considering the overall flow and harmony of the chart.'}
                 </p>
               </div>
             </div>
@@ -2204,7 +2449,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <p className="text-sm font-bold text-red-400">{lang === 'KO' ? '1. 무자론 (無字論): 결핍이 곧 잠재력' : '1. Absence Theory: Absence as Potential'}</p>
                   <p className="text-xs leading-relaxed text-white/70">
                     {lang === 'KO' 
-                      ? '사주에 특정 십성이 아예 없는 경우를 말합니다. 이는 단순히 해당 에너지가 결핍된 것이 아니라, 오히려 그 에너지를 "한계 없이" 쓰거나, 혹은 그 에너지에 대한 집착이 강할 수 있음을 의미합니다. 없는 글자가 당신의 가장 큰 무기가 될 수 있습니다.'
+                      ? '사주에 특정 십성이 아예 없는 경우를 말해. 이는 단순히 해당 에너지가 결핍된 것이 아니라, 오히려 그 에너지를 "한계 없이" 쓰거나, 혹은 그 에너지에 대한 집착이 강할 수 있음을 의미해. 없는 글자가 당신의 가장 큰 무기가 될 수 있어.'
                       : 'Refers to the complete absence of a specific Ten God. This doesn\'t just mean a lack; it means you can use that energy "without limits" or may have a strong obsession with it. The missing element can become your greatest weapon.'}
                   </p>
                 </div>
@@ -2213,7 +2458,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <p className="text-sm font-bold text-purple-400">{lang === 'KO' ? '2. 다자론 (多者論): 과유불급의 원리' : '2. Excess Theory: The Principle of Excess'}</p>
                   <p className="text-xs leading-relaxed text-white/70">
                     {lang === 'KO'
-                      ? '특정 십성이 3개 이상(비율 30% 초과)인 경우입니다. 해당 에너지가 과다하여 삶의 균형이 깨지기 쉽고, 그 십성이 상징하는 육친이나 사회적 관계에서 스트레스를 받을 수 있음을 의미합니다. 넘치는 에너지를 어떻게 조절하느냐가 핵심입니다.'
+                      ? '특정 십성이 3개 이상(비율 30% 초과)인 경우야. 해당 에너지가 과다하여 삶의 균형이 깨지기 쉽고, 그 십성이 상징하는 육친이나 사회적 관계에서 스트레스를 받을 수 있음을 의미해. 넘치는 에너지를 어떻게 조절하느냐가 핵심이야.'
                       : 'Refers to having 3 or more of a specific Ten God (over 30%). Excessive energy can easily disrupt life balance and cause stress in related social or familial relationships. The key is how to regulate this overflowing energy.'}
                   </p>
                 </div>
@@ -2222,7 +2467,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <p className="text-sm font-bold text-neon-pink">{lang === 'KO' ? '3. 무비겁 (無比劫): 독자적인 개척자' : '3. No Bi-Geop: Independent Pioneer'}</p>
                   <p className="text-xs leading-relaxed text-white/70">
                     {lang === 'KO'
-                      ? '비견과 겁재가 없는 경우입니다. 타인의 시선에 민감하지 않고 독자적인 길을 가지만, 때로는 고립감을 느끼거나 경쟁 상황에서 쉽게 물러날 수 있습니다. 자신만의 뚝심을 기르는 것이 중요합니다.'
+                      ? '비견과 겁재가 없는 경우야. 타인의 시선에 민감하지 않고 독자적인 길을 가지만, 때로는 고립감을 느끼거나 경쟁 상황에서 쉽게 물러날 수 있어. 자신만의 뚝심을 기르는 것이 중요해.'
                       : 'Refers to the absence of Bi-Gyean and Geob-Jae. You walk your own path without being sensitive to others\' views, but may sometimes feel isolated or retreat easily in competitive situations. Cultivating your own inner strength is vital.'}
                   </p>
                 </div>
@@ -2279,7 +2524,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
               <div className="text-sm text-white/80 space-y-4 leading-relaxed max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 <p>
                   {lang === 'KO' 
-                    ? '사주의 균형을 잡아주는 핵심 에너지인 용신(用神)을 기준으로, 나에게 도움이 되는 기운과 방해가 되는 기운을 분류한 것입니다.' 
+                    ? '사주의 균형을 잡아주는 핵심 에너지인 용신(用神)을 기준으로, 나에게 도움이 되는 기운과 방해가 되는 기운을 분류한 거야.' 
                     : 'Based on the Yongshin (Useful God) which balances your chart, these represent the energies that either support or hinder you.'}
                 </p>
                 
@@ -2287,7 +2532,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <div className="bg-white/5 p-3 rounded-lg border border-green-400/30">
                     <h4 className="font-bold text-green-400 mb-1">{lang === 'KO' ? '희신 (喜神 - 기쁠 희, 귀신 신)' : 'HeeShin (喜神 - Joyful God)'}</h4>
                     <p className="text-xs text-white/70 mb-2">
-                      {lang === 'KO' ? '용신을 도와주는 긍정적인 에너지입니다. 용신이 힘을 잃지 않도록 보좌하는 역할을 합니다.' : 'Positive energy that supports the Yongshin. It assists the Useful God so it doesn\'t lose power.'}
+                      {lang === 'KO' ? '용신을 도와주는 긍정적인 에너지야. 용신이 힘을 잃지 않도록 보좌하는 역할을 해.' : 'Positive energy that supports the Yongshin. It assists the Useful God so it doesn\'t lose power.'}
                     </p>
                     <div className="text-xs bg-black/40 p-2 rounded text-green-400/90 flex items-center gap-2">
                       <span className="font-bold">{lang === 'KO' ? '나의 희신:' : 'Your HeeShin:'}</span>
@@ -2298,7 +2543,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <div className="bg-white/5 p-3 rounded-lg border border-red-400/30">
                     <h4 className="font-bold text-red-400 mb-1">{lang === 'KO' ? '기신 (忌神 - 꺼릴 기, 귀신 신)' : 'GiShin (忌神 - Taboo God)'}</h4>
                     <p className="text-xs text-white/70 mb-2">
-                      {lang === 'KO' ? '용신을 극(沖/剋)하여 방해하는 부정적인 에너지입니다. 이 기운이 강해지면 삶의 균형이 깨지기 쉽습니다.' : 'Negative energy that attacks or hinders the Yongshin. When this energy is strong, life\'s balance can easily be disrupted.'}
+                      {lang === 'KO' ? '용신을 극(沖/剋)하여 방해하는 부정적인 에너지야. 이 기운이 강해지면 삶의 균형이 깨지기 쉬워.' : 'Negative energy that attacks or hinders the Yongshin. When this energy is strong, life\'s balance can easily be disrupted.'}
                     </p>
                     <div className="text-xs bg-black/40 p-2 rounded text-red-400/90 flex items-center gap-2">
                       <span className="font-bold">{lang === 'KO' ? '나의 기신:' : 'Your GiShin:'}</span>
@@ -2309,13 +2554,26 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <div className="bg-white/5 p-3 rounded-lg border border-orange-400/30">
                     <h4 className="font-bold text-orange-400 mb-1">{lang === 'KO' ? '구신 (仇神 - 원수 구, 귀신 신)' : 'GuShin (仇神 - Enemy God)'}</h4>
                     <p className="text-xs text-white/70 mb-2">
-                      {lang === 'KO' ? '희신을 극하여 방해하거나, 기신을 도와주는 에너지입니다. 기신 다음으로 주의해야 할 기운입니다.' : 'Energy that attacks the HeeShin or supports the GiShin. It is the second most cautious energy after GiShin.'}
+                      {lang === 'KO' ? '희신을 극하여 방해하거나, 기신을 도와주는 에너지야. 기신 다음으로 주의해야 할 기운이야.' : 'Energy that attacks the HeeShin or supports the GiShin. It is the second most cautious energy after GiShin.'}
                     </p>
                     <div className="text-xs bg-black/40 p-2 rounded text-orange-400/90 flex items-center gap-2">
                       <span className="font-bold">{lang === 'KO' ? '나의 구신:' : 'Your GuShin:'}</span>
                       {renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god, true)}
                     </div>
                   </div>
+
+                  {result.analysis.yongshinDetail.hanShin && (
+                    <div className="bg-white/5 p-3 rounded-lg border border-blue-400/30">
+                      <h4 className="font-bold text-blue-400 mb-1">{lang === 'KO' ? '한신 (閑神 - 한가할 한, 귀신 신)' : 'HanShin (閑神 - Idle God)'}</h4>
+                      <p className="text-xs text-white/70 mb-2">
+                        {lang === 'KO' ? '용신에 큰 영향을 주지 않는 중립적인 에너지야. 상황에 따라 희신이나 기신을 돕기도 해.' : 'Neutral energy that doesn\'t significantly affect the Yongshin. It may support HeeShin or GiShin depending on the situation.'}
+                      </p>
+                      <div className="text-xs bg-black/40 p-2 rounded text-blue-400/90 flex items-center gap-2">
+                        <span className="font-bold">{lang === 'KO' ? '나의 한신:' : 'Your HanShin:'}</span>
+                        {renderYongshinWithElement(result.analysis.yongshinDetail.hanShin.god, true)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -2357,7 +2615,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 <div className="text-sm text-white/80 space-y-4 leading-relaxed">
                   <p>
                     {lang === 'KO' 
-                      ? '용신은 사주팔자의 균형을 맞추고, 부족한 기운을 보완하여 인생의 흐름을 원활하게 만드는 가장 필요한 오행입니다.' 
+                      ? '용신은 사주팔자의 균형을 맞추고, 부족한 기운을 보완하여 인생의 흐름을 원활하게 만드는 가장 필요한 오행이야.' 
                       : 'Yongshin is the most essential element that balances the BaZi chart, supplements weak energies, and facilitates the smooth flow of life.'}
                   </p>
                 </div>
@@ -2401,7 +2659,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 <div className="text-sm text-white/80 space-y-4 leading-relaxed">
                   <p>
                     {lang === 'KO' 
-                      ? '사주의 균형을 맞추기 위해, 너무 강한 기운은 억제(抑)하고 부족한 기운은 도와주는(扶) 오행입니다.' 
+                      ? '사주의 균형을 맞추기 위해, 너무 강한 기운은 억제(抑)하고 부족한 기운은 도와주는(扶) 오행이야.' 
                       : 'To balance the chart, Eokbu Yongshin suppresses (抑) overly strong elements and supports (扶) weak ones.'}
                   </p>
 
@@ -2409,7 +2667,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                     <h4 className="font-bold text-white/90">{lang === 'KO' ? '사용자 맞춤 분석' : 'Personalized Analysis'}</h4>
                     <p>
                       {lang === 'KO' 
-                        ? '사주 내에서 강한 기운을 조절하여 전체적인 균형을 잡는 역할을 합니다.'
+                        ? '사주 내에서 강한 기운을 조절하여 전체적인 균형을 잡는 역할을 해.'
                         : 'It plays a role in balancing the overall chart by regulating strong energies.'}
                     </p>
                     <p className="italic text-white/60">
@@ -2468,7 +2726,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                       </div>
                     </>
                   ) : (
-                    <p>{lang === 'KO' ? '상세 설명이 준비 중입니다.' : 'Detailed explanation is being prepared.'}</p>
+                    <p>{lang === 'KO' ? '상세 설명이 준비 중이야.' : 'Detailed explanation is being prepared.'}</p>
                   )}
                 </div>
               </div>

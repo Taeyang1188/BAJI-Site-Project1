@@ -7,6 +7,7 @@ import { calculateInteractions as calculateDetailedInteractions } from './bazi-i
 import { detectShinsal } from './bazi-shinsal';
 import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan, analyzeSpecialStructure } from './bazi-yongshin';
 import { calculateAdvancedAnalysis } from './bazi-advanced-analysis';
+import { calculateBalanceWarnings } from './bazi-balance-analysis';
 
 import { getPreciseSajuTime } from './bazi-time';
 
@@ -141,6 +142,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   // lunar-typescript automatically handles Jo-ja-shi (advances day if hour >= 23)
   const dayGan = baZi.getDayGan();
   const dayZhi = baZi.getDayZhi();
+  const dmElement = BAZI_MAPPING.stems[dayGan as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth';
   const timeGan = baZi.getTimeGan();
   const timeZhi = baZi.getTimeZhi();
   
@@ -420,13 +422,21 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   let translatedElement = yongshinDetail.primary.element;
   
   if (lang === 'EN') {
-    if (translatedGod === "식상/재성/관성") translatedGod = "Artist/Rebel, Maverick/Architect, Warrior/Judge";
-    else if (translatedGod === "인성/비겁") translatedGod = "Mystic/Sage, Mirror/Rival";
-    else if (translatedGod === "인성") translatedGod = "Mystic/Sage";
-    else if (translatedGod === "비겁") translatedGod = "Mirror/Rival";
-    else if (translatedGod === "식상") translatedGod = "Artist/Rebel";
-    else if (translatedGod === "재성") translatedGod = "Maverick/Architect";
-    else if (translatedGod === "관성") translatedGod = "Warrior/Judge";
+    const enMap: Record<string, string> = {
+      "비겁": "Mirror/Rival",
+      "식상": "Artist/Rebel",
+      "재성": "Maverick/Architect",
+      "관성": "Warrior/Judge",
+      "인성": "Mystic/Sage",
+      "식상/재성/관성": "Artist/Rebel, Maverick/Architect, Warrior/Judge",
+      "인성/비겁": "Mystic/Sage, Mirror/Rival"
+    };
+    
+    if (translatedGod.includes('/')) {
+      translatedGod = translatedGod.split('/').map(g => enMap[g] || g).join(', ');
+    } else {
+      translatedGod = enMap[translatedGod] || translatedGod;
+    }
   } else if (lang === 'KO') {
     const elementKoMap: Record<string, string> = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
     if (translatedElement.includes('/')) {
@@ -465,6 +475,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   }
 
   const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength);
+  const balanceWarnings = calculateBalanceWarnings(elementRatios, tenGodsRatio, dmElement, lang);
   
   return {
     pillars,
@@ -474,7 +485,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     timeCorrectionMessages: timeResult.messages,
     analysis: {
       geJu,
-      yongShen: `${translatedElement} (${translatedGod})`,
+      yongShen: translatedGod ? `${translatedElement} (${translatedGod})` : translatedElement,
       interactions: interactionsResult.interactions,
       conflicts: interactionsResult.conflicts,
       shinsal: shinsalResult.shinsal,
@@ -484,6 +495,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       yongshinDetail,
       structureDetail,
       elementRatios,
+      balanceWarnings,
       ...advancedAnalysis
     }
   };

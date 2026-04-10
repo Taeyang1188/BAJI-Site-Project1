@@ -101,7 +101,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: foundBranches,
         severity: foundAt.length >= 2 ? "strong" : "present",
-        note: "최고의 길성, 어려움을 극복하게 함"
+        note: "최고의 길성이야. 어려움을 극복하게 도와줘."
       });
     }
   }
@@ -128,7 +128,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: foundBranches,
         severity: foundAt.length >= 2 ? "strong" : "present",
-        note: "학문과 예술에 재능이 있음"
+        note: "학문과 예술에 뛰어난 재능이 있어."
       });
     }
   }
@@ -155,7 +155,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: foundBranches,
         severity: foundAt.length >= 2 ? "strong" : "present",
-        note: "지적 능력이 뛰어나고 교육에 소질"
+        note: "지적 능력이 뛰어나고 가르치는 일에 소질이 있어."
       });
     }
   }
@@ -182,7 +182,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: foundBranches,
         severity: foundAt.length >= 2 ? "strong" : "present",
-        note: "귀한 대접을 받고 안락한 삶"
+        note: "귀한 대접을 받고 안락한 삶을 살게 돼."
       });
     }
   }
@@ -209,7 +209,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: foundBranches,
         severity: foundAt.length >= 2 ? "strong" : "present",
-        note: "강한 기질, 칼을 휘두르는 힘"
+        note: "강한 기질과 칼을 휘두르는 힘을 상징해."
       });
     }
   }
@@ -225,7 +225,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["일주"],
       branches: [dayBranch],
       severity: "present",
-      note: "강력한 카리스마와 리더십"
+      note: "강력한 카리스마와 리더십을 의미해."
     });
   }
 
@@ -239,7 +239,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["일주"],
       branches: [dayBranch],
       severity: "present",
-      note: "독립심이 강하고 자수성가할 힘"
+      note: "독립심이 강하고 스스로 일어설 힘이 있어."
     });
   }
 
@@ -260,7 +260,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["원국"],
       branches: branches.filter(b => foundGuiMen.some(p => p.includes(b))),
       severity: "present",
-      note: "집요함과 천재적 영감, 고도의 집중력"
+      note: "집요함과 천재적 영감, 고도의 집중력을 상징해."
     });
   }
 
@@ -280,7 +280,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["원국"],
       branches: branches.filter(b => foundWonJin.some(p => p.includes(b))),
       severity: "present",
-      note: "복잡한 인간관계와 깊은 감수성"
+      note: "복잡한 인간관계와 깊은 감수성을 의미해."
     });
   }
 
@@ -308,7 +308,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: [...new Set(foundHyeonChimAt)],
       branches: branches.filter(b => hyeonChimChars.includes(b)),
       severity: foundHyeonChimAt.length >= 4 ? "strong" : "present",
-      note: "날카로운 통찰력과 전문 기술"
+      note: "날카로운 통찰력과 전문적인 기술을 상징해."
     });
   }
 
@@ -334,7 +334,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: branches.filter(b => targets.includes(b)),
         severity: foundAt.length >= 3 ? "strong" : "present",
-        note: "욱하는 기질과 열정적인 변화"
+        note: "욱하는 기질과 열정적인 변화를 의미해."
       });
     }
   }
@@ -356,7 +356,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt: branches.map((b, i) => b === sol.goShin ? PILLAR_NAMES[i] : "").filter(Boolean),
         branches: [sol.goShin],
         severity: "present",
-        note: "자발적 고독과 내면의 탐구"
+        note: "자발적 고독과 내면의 탐구를 상징해."
       });
     }
     if (branches.includes(sol.gwaSuk)) {
@@ -367,7 +367,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt: branches.map((b, i) => b === sol.gwaSuk ? PILLAR_NAMES[i] : "").filter(Boolean),
         branches: [sol.gwaSuk],
         severity: "present",
-        note: "자기 주도적 삶과 독립성"
+        note: "자기 주도적 삶과 독립성을 의미해."
       });
     }
   }
@@ -394,7 +394,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: branches.filter(b => targets.includes(b)),
         severity: "present",
-        note: "시작과 끝이 좋고 큰 복록을 누림"
+        note: "시작과 끝이 좋고 큰 복록을 누리게 돼."
       });
     }
   }
@@ -417,7 +417,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: [target],
         severity: "present",
-        note: "보이지 않는 도움과 예상치 못한 횡재"
+        note: "보이지 않는 도움과 예상치 못한 횡재를 의미해."
       });
     }
   }
@@ -441,7 +441,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: branches.filter(b => b === target),
         severity: "present",
-        note: "하늘의 보살핌으로 흉이 길로 변함"
+        note: "하늘의 보살핌으로 흉한 일이 길하게 변해."
       });
     }
   }
@@ -465,7 +465,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt,
         branches: [],
         severity: "present",
-        note: "매사 순조롭고 인덕이 두터움"
+        note: "매사 순조롭고 인복이 두터운 기운이야."
       });
     }
   }
@@ -485,7 +485,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
         foundAt: [PILLAR_NAMES[idx]],
         branches: [branches[idx]],
         severity: "present",
-        note: "강한 에너지, 갑작스러운 변화"
+        note: "강한 에너지와 갑작스러운 변화를 상징해."
       });
     }
   });
@@ -500,7 +500,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["일주"],
       branches: [dayBranch],
       severity: "present",
-      note: "품격이 높고 귀한 인품"
+      note: "품격이 높고 귀한 인품을 상징해."
     });
   }
 
@@ -514,7 +514,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
       foundAt: ["일주"],
       branches: [dayBranch],
       severity: "present",
-      note: "자비롭고 덕망이 높음"
+      note: "자비롭고 덕망이 높은 성품이야."
     });
   }
 
@@ -541,10 +541,10 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
   let noteEn = "";
 
   if (!inChart) {
-    note = `공망에 해당하는 글자(${gongmangBranches.join(', ')})가 사주 원국에 없으므로 실질적인 공망의 피해나 영향이 거의 없습니다. 다만, 대운이나 세운에서 이 글자가 들어올 때는 해당 시기에 일시적인 지연이나 채워지지 않는 갈증을 느낄 수 있습니다.`;
+    note = `공망에 해당하는 글자(${gongmangBranches.join(', ')})가 사주 원국에 없으므로 실질적인 공망의 피해나 영향이 거의 없어. 다만, 대운이나 세운에서 이 글자가 들어올 때는 해당 시기에 일시적인 지연이나 채워지지 않는 갈증을 느낄 수 있어.`;
     noteEn = `The Void branches (${gongmangBranches.join(', ')}) are not present in your natal chart, so their practical negative impact is minimal. However, when these branches appear in your Grand Cycle (Daewun) or Annual Cycle (Sewun), you may experience temporary delays or a sense of unfulfillment during that period.`;
   } else {
-    note = `사주 원국의 ${affectedPillars.join(', ')}에 공망이 있어 해당 궁성이나 십성의 기운이 약화되거나 채워지지 않는 갈증을 느낄 수 있습니다.`;
+    note = `사주 원국의 ${affectedPillars.join(', ')}에 공망이 있어 해당 궁성이나 십성의 기운이 약화되거나 채워지지 않는 갈증을 느낄 수 있어.`;
     noteEn = `The Void branches affect your ${affectedPillars.join(', ')}, which may weaken the energy of those pillars or create a sense of unfulfillment in related aspects of life.`;
   }
 
