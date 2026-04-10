@@ -245,7 +245,7 @@ const getIljuCharacter = (key: string, lang: Language): { core: string, traits: 
 export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSummary {
   const dayPillar = result.pillars.find(p => p.title === 'Day');
   const iljuKey = dayPillar ? `${STEM_NAMES[dayPillar.stem] || ''}${BRANCH_NAMES[dayPillar.branch] || ''}` : "무인";
-  const iljuName = dayPillar ? (lang === 'KO' ? `${STEM_NAMES[dayPillar.stem] || dayPillar.stem}${BRANCH_NAMES[dayPillar.branch] || dayPillar.branch}일주` : `${dayPillar.stemEnglishName} ${dayPillar.branchEnglishName} Pillar`) : "무인일주";
+  const iljuName = dayPillar ? (lang === 'KO' ? `${STEM_NAMES[dayPillar.stem] || dayPillar.stem}${BRANCH_NAMES[dayPillar.branch] || dayPillar.branch}일주 (${dayPillar.hanja})` : `${dayPillar.stemEnglishName.toUpperCase()}-${dayPillar.branchEnglishName.toUpperCase()} (${dayPillar.hanja})`) : "MU-IN (戊寅)";
 
   const charData = getIljuCharacter(iljuKey, lang);
   const strength = result.analysis?.strength?.score ?? 50;

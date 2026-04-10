@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { BaZiResult, Language } from '../types';
-import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS } from '../constants';
+import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } from '../constants';
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
+import { generateCycleVibe, CycleVibeResult } from '../services/cycle-vibe-service';
 import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 
@@ -141,40 +142,9 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
     if (!text) return [];
     
     const infos: { char: string, delay: number, color?: string, isBlinking?: boolean }[] = [];
-    const effectNames = ["식상생재", "재생관", "살인상생", "식신제살", "관인상생", "상관패인", "재극인", "아능생모", "겁재탈재"];
     
-    const closingRemarks = [
-      "이제 네 독설조차 고귀한 비평으로 대접받을거야.",
-      "이제 그 감각을 통장 잔고로 증명할 시간이야, 후훗.",
-      "어둠 속에서 더 빛나는 법이지.",
-      "이제 네 실력을 똑똑히 보여줘.",
-      "세상이 널 위해 레드카펫을 깔아주는 기분이랄까?",
-      "명예도 좋지만, 가끔은 속물적인 성공도 달콤한 법이지."
-    ];
-
-    for (let i = 0; i < text.length; i++) {
-      const foundRemark = closingRemarks.find(remark => text.substring(i).startsWith(remark));
-      if (foundRemark) {
-        infos.push({ char: '\n', delay: speed });
-        infos.push({ char: '', delay: 2500, isBlinking: true });
-        
-        for (let j = 0; j < foundRemark.length; j++) {
-          infos.push({ char: foundRemark[j], delay: speed });
-        }
-        i += foundRemark.length - 1;
-        continue;
-      }
-
-      const yearMatch = text.substring(i).match(/^\d{4}(년)?/);
-      if (yearMatch) {
-        const yearStr = yearMatch[0];
-        for (let j = 0; j < yearStr.length; j++) {
-          infos.push({ char: yearStr[j], delay: speed, color: '#00F2FF' });
-        }
-        i += yearStr.length - 1;
-        continue;
-      }
-
+    let i = 0;
+    while (i < text.length) {
       if (text[i] === '[') {
         const endBracketIndex = text.indexOf(']', i + 1);
         if (endBracketIndex !== -1) {
@@ -184,7 +154,7 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
             if (!isNaN(ms)) {
               infos.push({ char: '', delay: ms });
             }
-            i = endBracketIndex;
+            i = endBracketIndex + 1;
             continue;
           }
           const colonIndex = tagContent.indexOf(':');
@@ -195,40 +165,23 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
             for (let j = 0; j < content.length; j++) {
               infos.push({ char: content[j], delay: speed, color });
             }
-            i = endBracketIndex;
+            i = endBracketIndex + 1;
             continue;
           }
         }
       }
 
-      if (text[i] === "'") {
-        const endQuoteIndex = text.indexOf("'", i + 1);
-        if (endQuoteIndex !== -1) {
-          const quotedText = text.substring(i + 1, endQuoteIndex);
-          const multiplier = 3; // 3x slower as requested
-          
-          infos.push({ char: "'", delay: speed * multiplier });
-          for (let j = 0; j < quotedText.length; j++) {
-            infos.push({ char: quotedText[j], delay: speed * multiplier });
-          }
-          infos.push({ char: "'", delay: speed * multiplier });
-          
-          i = endQuoteIndex;
-          continue;
-        }
-      }
-
-      const char = text[i];
+      // Handle normal character
       let delay = speed;
+      const char = text[i];
       if (char === ',') delay = 1500;
       else if (char === '.') {
         delay = 2000;
-        infos.push({ char, delay });
-        continue;
       }
       else if (char === '\n') delay = speed * 15;
 
       infos.push({ char, delay });
+      i++;
     }
     return infos;
   }, [text, speed]);
@@ -236,10 +189,7 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
   React.useEffect(() => {
     if (currentIndex < charInfos.length) {
       const info = charInfos[currentIndex];
-      // Logic: Wait based on the PREVIOUS character's delay requirement.
-      // This ensures the current character (like a comma) is shown FIRST, then we wait.
-      const prevInfo = currentIndex > 0 ? charInfos[currentIndex - 1] : null;
-      const currentDelay = prevInfo ? prevInfo.delay : speed;
+      const currentDelay = info.delay;
 
       const timeout = setTimeout(() => {
         if (info.char !== '') {
@@ -252,7 +202,7 @@ const TypingText: React.FC<{ text: string, speed?: number }> = ({ text, speed = 
       }, currentDelay);
       return () => clearTimeout(timeout);
     }
-  }, [currentIndex, charInfos, speed]);
+  }, [currentIndex, charInfos]);
 
   return (
     <span className="whitespace-pre-wrap">
@@ -274,15 +224,20 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
   const interactions = result.analysis.interactions || [];
   
   // Check for Tal-gong (탈공)
-  const isResolved = interactions.some(interaction => 
-    (interaction.type.includes('합') || interaction.type.includes('충') || interaction.type.includes('Combine') || interaction.type.includes('Clash')) &&
-    interaction.branches && interaction.branches.some(b => gongmang.branches.includes(b))
-  );
+  const isResolved = interactions.some(interaction => {
+    const type = interaction.type || '';
+    const branches = interaction.branches || [];
+    const gongmangBranches = gongmang?.branches || [];
+    
+    return (type.includes('합') || type.includes('충') || type.includes('Combine') || type.includes('Clash')) &&
+    branches.some(b => gongmangBranches.includes(b));
+  });
 
   // Find Ten Gods for the Gongmang branches
   const gongmangTenGods: string[] = [];
+  const gongmangBranches = gongmang?.branches || [];
   result.pillars.forEach((p, idx) => {
-    if (idx < 4 && gongmang.branches.includes(p.branch)) {
+    if (idx < 4 && gongmangBranches.includes(p.branch)) {
       gongmangTenGods.push(lang === 'KO' ? p.branchKoreanName : p.branchEnglishName);
     }
   });
@@ -581,7 +536,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     if (!result.analysis) {
       const sorted = [...elementData].sort((a, b) => b.value - a.value);
       const dominant = sorted[0];
-      const missing = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].filter(e => !elementData.find(d => d.name.includes(e)));
+      const missing = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].filter(e => !elementData.find(d => d.name && d.name.includes(e)));
       
       if (lang === 'KO') {
         return `당신의 영혼 매트릭스는 ${dominant.name}의 기운이 지배적입니다. 사이버네틱 코어에 각인된 이 강력한 에너지는 당신을 끊임없이 움직이게 하지만, ${missing.length > 0 ? missing.map(m => m === 'Wood' ? '목' : m === 'Fire' ? '화' : m === 'Earth' ? '토' : m === 'Metal' ? '금' : '수').join(', ') + '의 결핍이 시스템의 과부하를 초래할 수 있습니다.' : '모든 원소가 균형을 이루어 안정적인 출력을 자랑합니다.'} 충돌하는 기운을 제어하고 당신만의 네온 불빛을 밝히십시오.`;
@@ -794,17 +749,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     const colorizeAdvancedAnalysis = (text: string) => {
       if (!text) return text;
       let colorized = text;
-      const terms = [
-        { key: '목', color: 'text-green-400' },
-        { key: '화', color: 'text-red-400' },
-        { key: '토', color: 'text-yellow-400' },
-        { key: '금', color: 'text-gray-300' },
-        { key: '수', color: 'text-blue-400' },
-      ];
-      terms.forEach(term => {
-        const regex = new RegExp(term.key, 'g');
-        colorized = colorized.replace(regex, `<span class="${term.color}">${term.key}</span>`);
+      
+      const godToCategory: Record<string, string> = {
+        '비견': '비겁', '겁재': '비겁', '비겁': '비겁',
+        '식신': '식상', '상관': '식상', '식상': '식상',
+        '편재': '재성', '정재': '재성', '재성': '재성',
+        '편관': '관성', '정관': '관성', '관성': '관성',
+        '편인': '인성', '정인': '인성', '인성': '인성'
+      };
+      
+      Object.keys(godToCategory).forEach(god => {
+        const category = godToCategory[god];
+        const info = getGodElementInfo(category);
+        if (info) {
+          const color = ELEMENT_COLORS[info.elementEn as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+          const regex = new RegExp(god, 'g');
+          colorized = colorized.replace(regex, `<span style="color: ${color}">${god}</span>`);
+        }
       });
+      
       return colorized;
     };
 
@@ -812,269 +775,22 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       if (lang !== 'KO') return god;
       const base = god.substring(0, 2);
       const hanja = TEN_GODS_HANJA[base] || '';
-      const element = BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems]?.element || 
-                      BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches]?.element || '';
-      const color = getVibeColor(element);
+      
+      let element = '';
+      if (BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems]) {
+        element = BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems].element;
+      } else if (BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches]) {
+        element = BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches].element;
+      }
+      
+      const color = ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
       return `[${color}:${base}(${hanja})]`;
     };
 
-    const cycleVibe = React.useMemo(() => {
-    const isSinGang = result.analysis.shinGangShinYak?.isStrong ?? (result.analysis.dayMasterStrength === 'Strong');
-    const tenGodsRatio = result.analysis?.tenGodsRatio || {};
-    const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
-    const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
-
-    const daewunStem = currentCycle.stem;
-    const daewunBranch = currentCycle.branch;
-    const daewunStemGodKo = currentCycle.stemTenGodKo;
-    const daewunBranchGodKo = currentCycle.branchTenGodKo;
-    const daewunStemGodEn = currentCycle.stemTenGodEn;
-    const daewunBranchGodEn = currentCycle.branchTenGodEn;
-    
-    const seunStem = currentAnnualPillar?.stem || '';
-    const seunBranch = currentAnnualPillar?.branch || '';
-    const seunStemGodKo = currentAnnualPillar?.stemTenGodKo || '';
-    const seunBranchGodKo = currentAnnualPillar?.branchTenGodKo || '';
-    const seunStemGodEn = currentAnnualPillar?.stemTenGodEn || '';
-    const seunBranchGodEn = currentAnnualPillar?.branchTenGodEn || '';
-
-    const luckGods = [daewunStemGodKo, daewunBranchGodKo, seunStemGodKo, seunBranchGodKo];
-
-    // Name Processing
-    let processedName = userName;
-    if (lang === 'KO' && userName.length === 3) {
-      processedName = userName.substring(1);
-    } else if (lang === 'EN' && userName.includes(' ')) {
-      processedName = userName.split(' ')[0];
-    }
-
-    const userRef = lang === 'KO' ? (gender === 'female' ? '언니' : '오빠') : (gender === 'female' ? 'girl' : 'you');
-
-    const ilju = result.pillars[1].stem + result.pillars[1].branch;
-    const iljuInfo = ILJU_DESCRIPTIONS[ilju as keyof typeof ILJU_DESCRIPTIONS] || { ko: '', en: '', impression: '' };
-    const iljuImpression = lang === 'KO' ? iljuInfo.impression : '';
-
-    // 1. Intro: Birthplace Insight
-    let cityInsight = '';
-    if (lang === 'KO') {
-      const matchedCity = Object.keys(CITY_META_TABLE).find(c => city.includes(c));
-      if (matchedCity) {
-        const meta = CITY_META_TABLE[matchedCity as keyof typeof CITY_META_TABLE];
-        cityInsight = `${matchedCity}에서 태어났네? ${meta.point} 때문인지 너의 원국에서도 ${meta.vibe} 특성이 느껴지는 것 같아. `;
-      } else if (city) {
-        cityInsight = `${city}에서 태어났네? 그곳만의 독특한 기운이 네 사주에 스며들어 네 영혼의 색깔을 더 선명하게 만들었겠군. `;
-      }
-    }
-
-    // 2. Bazi Combinations (Combos)
-    const combos: { id: string; priority: number; name: string; desc: string }[] = [];
-    if (lang === 'KO') {
-      const hasSikSinLuck = luckGods.some(g => g === '식신');
-      const hasSangGwanLuck = luckGods.some(g => g === '상관');
-      const hasPyeonJaeLuck = luckGods.some(g => g === '편재');
-      const hasJeongJaeLuck = luckGods.some(g => g === '정재');
-      const hasPyeonGwanLuck = luckGods.some(g => g === '편관');
-      const hasJeongGwanLuck = luckGods.some(g => g === '정관');
-      const hasPyeonInLuck = luckGods.some(g => g === '편인');
-      const hasJeongInLuck = luckGods.some(g => g === '정인');
-
-      const hasSikSangLuck = hasSikSinLuck || hasSangGwanLuck;
-      const hasJaeSeongLuck = hasPyeonJaeLuck || hasJeongJaeLuck;
-      const hasGwanSeongLuck = hasPyeonGwanLuck || hasJeongGwanLuck;
-      const hasInSeongLuck = hasPyeonInLuck || hasJeongInLuck;
-
-      const hasSikSangBase = overflow.some(o => o.includes('식상')) || tenGodsRatio['식상 (Artist/Rebel)'] > 15;
-      const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || tenGodsRatio['재성 (Maverick/Architect)'] > 15;
-      const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || tenGodsRatio['관성 (Warrior/Judge)'] > 15;
-      const hasInSeongBase = overflow.some(o => o.includes('인성')) || tenGodsRatio['인성 (Mystic/Sage)'] > 15;
-
-      // Priority Logic
-      if (hasSangGwanLuck && (hasInSeongBase || hasInSeongLuck)) {
-        combos.push({ id: '상관패인', priority: 100, name: '상관패인(傷官佩印)', desc: `기발하고 날카로운 아이디어(상관)가 인성이라는 품격 있는 고삐를 만났어. 거친 재능이 다듬어져 세상의 인정을 받기 좋은 시기야.` });
-      }
-      if (hasSikSinLuck && (hasGwanSeongBase || hasGwanSeongLuck)) {
-        combos.push({ id: '식신제살', priority: 95, name: '식신제살(食神制殺)', desc: `너를 괴롭히던 난관을 너만의 실력으로 시원하게 해결해버리는 시기야. 위기 돌파 능력이 빛을 발할 거야.` });
-      }
-      if (hasPyeonGwanLuck && (hasInSeongBase || hasInSeongLuck)) {
-        combos.push({ id: '살인상생', priority: 90, name: '살인상생(殺印相生)', desc: `강력한 난관(편관)을 지혜와 학문(인성)으로 녹여내어 오히려 큰 기회로 바꾸는 시기야. 위기를 기회로 만드는 반전의 드라마가 펼쳐질 거야.` });
-      }
-      if (hasSikSangLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
-        combos.push({ id: '식상생재', priority: 85, name: '식상생재(食傷生財)', desc: `재능이 곧바로 결과물로 이어지는 흐름이야. 머릿속 계획들이 실질적인 성과로 변하는 생산적인 시기지.` });
-      }
-      if (hasGwanSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
-        combos.push({ id: '관인상생', priority: 80, name: '관인상생(官印相生)', desc: `조직의 혜택이나 윗사람의 끌어줌이 있는 시기야. 노력이 공식적으로 인정받고 명예가 올라가는 흐름이지.` });
-      }
-      if (hasJaeSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
-        combos.push({ id: '재극인', priority: 70, name: '재극인(財剋印)', desc: `현실적인 이익과 신념이 충돌하고 있어. 당장의 이익 때문에 소중한 가치를 버리지 않게 조심해.` });
-      }
-      if (hasGwanSeongLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
-        combos.push({ id: '재생관', priority: 60, name: '재생관(財生官)', desc: `쌓아온 자산이나 노력이 사회적 지위로 연결되는 흐름이야. 내실을 다져 더 높은 곳으로 올라갈 발판을 마련하게 될 거야.` });
-      }
-
-      combos.sort((a, b) => b.priority - a.priority);
-      if (combos.length > 2) combos.splice(2);
-    }
-
-    let comboInsight = '';
-    if (combos.length > 0) {
-      if (combos.length === 1) {
-        comboInsight = `이번 시기는 **'${combos[0].name}'**의 격을 갖췄어. ${combos[0].desc}`;
-      } else {
-        comboInsight = `**'${combos[0].name}'**의 흐름이 주도적이지만, 동시에 **'${combos[1].name}'**의 영향도 무시할 수 없어. \n\n${combos[0].desc} ${combos[1].desc}`;
-      }
-    }
-
-    // 3. Intro Construction
-    let intro = '';
-    if (lang === 'KO') {
-      const sortedElements = [...elementData].sort((a, b) => b.value - a.value);
-      const dominantElement = sortedElements[0]?.name.split('(')[0] || '';
-      const strengthComment = isSinGang ? '에너지가 꽤 넘치는 편이네?' : '섬세하고 차분한 에너지가 느껴져.';
-      const elementComment = `${dominantElement}의 기운이 강해서 그런지 분위기가 묘하게 끌리네.`;
-      const impression = iljuImpression.replace('너만의', `${processedName}만의`);
-      
-      intro = `${cityInsight}흠.. ${impression} \n게다가 ${strengthComment} ${elementComment} 이런 다양한 매력이 더해지면 ${processedName}는 너만의 색깔이 뚜렷할 거야 분명히. \n\n이번에는 대운과 세운의 흐름을 좀 볼까? 보채지는 말아줘`;
-    } else {
-      const sortedElements = [...elementData].sort((a, b) => b.value - a.value);
-      const dominantElement = sortedElements[0]?.name.split('(')[0] || '';
-      intro = `${processedName}, ${iljuInfo.en} Your boundaries are firm. Plus, you have ${isSinGang ? 'plenty of' : 'delicate'} energy. With the strong ${dominantElement} vibe, your unique color will definitely shine. \n\nLet's look at your cycles. Don't rush me.`;
-    }
-
-    let cycleIntro = lang === 'KO' ? `\n\n요번 ${currentAnnualPillar?.year || new Date().getFullYear()}년도는... ${daewunStem}${daewunBranch} 대운과 ${seunStem}${seunBranch} 세운이 만나는 시기네! [delay:4000]\n\n` : `\n\nThis cycle is a mix of Daewun and Seun... [delay:4000]\n\n`;
-    
-    // 4. Main Construction
-    let main = '';
-    if (lang === 'KO') {
-      main = `${userRef}한테는 대운에서 ${formatGod(daewunStemGodKo, daewunStem)}·${formatGod(daewunBranchGodKo, daewunBranch)}, 그리고 세운에서 ${formatGod(seunStemGodKo, seunStem)}·${formatGod(seunBranchGodKo, seunBranch)}의 기운이 들어오고 있어. `;
-      
-      if (comboInsight) {
-        let detailedEffect = '';
-        const interactions = result.analysis.interactions || [];
-        const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
-        const seunInteractions = interactions.filter(i => i.note?.includes(seunStem) || i.note?.includes(seunBranch));
-        const allLuckInteractions = [...daewunInteractions, ...seunInteractions];
-        
-        const hasClash = allLuckInteractions.some(i => i.type.includes('충'));
-        const hasPunishment = allLuckInteractions.some(i => i.type.includes('형'));
-        const hasHap = allLuckInteractions.some(i => i.type.includes('합'));
-
-        if (isSinGang) {
-          detailedEffect += `넘치는 에너지를 통제할 강력한 고삐가 필요한 시점이야. `;
-        } else {
-          detailedEffect += `에너지가 섬세한 편이라 들어오는 기운들이 다소 버거울 수 있어. 실속을 챙기는 게 우선이야. `;
-        }
-
-        const comboIds = combos.map(c => c.id);
-        if (comboIds.includes('상관패인')) detailedEffect += `상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
-        if (comboIds.includes('식상생재')) detailedEffect += `원국에 ${overflow.some(o => o.includes('재성')) ? '재성이 이미 풍부해서' : '재성이 부족했는데'} 이번 운에서 식상이 길을 열어주니 결과물이 쏠쏠하겠어. `;
-        if (comboIds.includes('재극인')) detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어를 건드릴 수 있어. 계산기보다 양심을 먼저 두드려봐. `;
-        if (comboIds.includes('관인상생')) detailedEffect += `조직의 보호 아래서 가치를 증명하기 좋아. 승진이나 합격 소식을 기대해봐. `;
-        if (comboIds.includes('식신제살')) detailedEffect += `골치 아픈 일들이 네 실력 앞에서 하나둘 해결될 거야. `;
-        if (comboIds.includes('재생관')) detailedEffect += `기반이 튼튼해지면서 자연스럽게 명예도 따라오는 형국이야. `;
-
-        if (hasClash) detailedEffect += `과정에서 환경의 변화나 마찰은 감수해야 할 거야. `;
-        if (hasPunishment) detailedEffect += `결과물을 챙길 때 법적인 부분이나 서류는 꼼꼼히 봐. `;
-        if (hasHap) detailedEffect += `새로운 인연이나 협력 제안이 올 수도 있어. `;
-        
-        main += `\n\n${comboInsight}\n\n${detailedEffect}`;
-      } else {
-        const isMissingInDaewun = missing.some(m => daewunStemGodKo.includes(m) || daewunBranchGodKo.includes(m));
-        const isOverflowInDaewun = overflow.some(o => daewunStemGodKo.includes(o) || daewunBranchGodKo.includes(o));
-
-        if (isMissingInDaewun) {
-          main += `평소에 ${userRef}한테 부족했던 ${BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || ''}의 기운이 대운과 세운에서 동시에 보강되면서, 멈춰있던 엔진이 다시 돌아가는 기분일 거야. `;
-        } else if (isOverflowInDaewun) {
-          main += `이미 넘치는 기운이 또 들어와서 에너지가 좀 과부하될 수 있어. ${isSinGang ? '자기 주장이 너무 강해질 수 있으니' : '생각이 너무 많아질 수 있으니'} 속도 조절이 필요해! `;
-        } else {
-          const dominantLuckElement = BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || '';
-          const elementAdvice: Record<string, string> = {
-            'Wood': '성장과 확장의 기운이 강해지는 시기야. 새로운 프로젝트를 시작하거나 배움을 넓히기에 아주 좋겠어.',
-            'Fire': '열정과 에너지가 솟구치는 때네. 네 존재감을 드러내고 화려하게 활동할 기회가 많아질 거야.',
-            'Earth': '안정과 내실을 기하는 흐름이야. 서두르기보다는 기반을 튼튼히 다지고 주변을 정리하는 게 이득이지.',
-            'Metal': '결실과 정리가 필요한 시점이야. 불필요한 것들은 과감히 쳐내고 핵심적인 성과에 집중해봐.',
-            'Water': '지혜와 유연함이 필요한 시기네. 겉으로 드러나는 활동보다는 내면의 깊이를 더하고 흐름에 몸을 맡겨봐.'
-          };
-          main += elementAdvice[dominantLuckElement] || `원국의 균형을 크게 흔들지 않으면서도 적절한 자극이 되어주는 운이야. 평소보다 조금 더 과감하게 움직여봐도 좋겠어. `;
-        }
-      }
-    } else {
-      const daewunColor = getVibeColor(BAZI_MAPPING.stems[daewunStem as keyof typeof BAZI_MAPPING.stems]?.element || '');
-      main = `For you, it brings a combination of [${daewunColor}:${daewunStemGodEn}/${daewunBranchGodEn}] and [${daewunColor}:${seunStemGodEn}/${seunBranchGodEn}] energy. `;
-      main += `A fresh yet familiar vibe is waking you up. `;
-    }
-
-    let but = lang === 'KO' ? `\n\n근데.. [delay:2500]\n\n` : `\n\nBut.. [delay:2500]\n\n`;
-
-    let glitch = '';
-    if (lang === 'KO') {
-      const interactions = result.analysis.interactions || [];
-      const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
-      
-      const hasClash = daewunInteractions.some(i => i.type.includes('충') || i.type.includes('Clash'));
-      const hasPunishment = daewunInteractions.some(i => i.type.includes('형') || i.type.includes('Punishment'));
-      const hasHarm = daewunInteractions.some(i => i.type.includes('해') || i.type.includes('Harm'));
-      
-      if (hasClash) {
-        glitch = `대운에서 충(沖)이 들어오네. 환경이 급격하게 변하거나 이동수가 있을 수 있어. 특히 인간관계에서 부딪힘이 생길 수 있으니 유연하게 대처하는 게 필요해. `;
-      } else if (hasPunishment) {
-        glitch = `형(刑)의 기운이 섞여 있네. 관재수나 건강 문제를 조심해야 해. 법적인 일이나 시비에 휘말리지 않게 행동 하나하나 신중하게! `;
-      } else if (hasHarm) {
-        glitch = `해(害)의 기운이 있네. 믿었던 사람에게 배신감을 느끼거나 사소한 오해로 관계가 틀어질 수 있어. 감정 소모 조심해. `;
-      } else if (daewunStemGodKo.includes('재성') && overflow.some(o => o.includes('비겁'))) {
-        glitch = `돈이 보인다고 너무 방심하진 마. 주변에 숟가락 얹으려는 사람들이 많아지는 '군비쟁재' 타이밍이거든. 돈 빌려주는 건 절대 금지! `;
-      } else if (daewunStemGodKo.includes('관성') && overflow.some(o => o.includes('식상'))) {
-        glitch = `하고 싶은 말은 많은데 사회적 시선이나 규칙이 ${userRef}를 옥죄는 기분일 거야. '상관견관'의 기운이니 구설수 조심하고 선 넘지 않게 주의해! `;
-      } else if (daewunStemGodKo.includes('인성') && overflow.some(o => o.includes('재성'))) {
-        glitch = `'재극인'의 부작용이 우려돼. 판단력이 흐려져서 잘못된 계약을 하거나, 공부보다는 당장의 이익에 눈이 멀어 중요한 걸 놓칠 수 있어. `;
-      } else if (daewunStemGodKo.includes('식상') && overflow.some(o => o.includes('관성'))) {
-        glitch = `자유롭고 싶은 마음이 커지면서 기존의 틀을 깨고 싶어질 거야. 근데 그게 자칫하면 공들여 쌓은 탑을 무너뜨리는 '상관견관'이 될 수 있으니 조심! `;
-      } else {
-        const interactions = result.analysis.interactions || [];
-        const daewunInteractions = interactions.filter(i => i.note?.includes(daewunStem) || i.note?.includes(daewunBranch));
-        const seunInteractions = interactions.filter(i => i.note?.includes(seunStem) || i.note?.includes(seunBranch));
-        const allLuckInteractions = [...daewunInteractions, ...seunInteractions];
-        
-        const hasClash = allLuckInteractions.some(i => i.type.includes('충'));
-        const hasPunishment = allLuckInteractions.some(i => i.type.includes('형'));
-
-        if (hasClash || hasPunishment) {
-          glitch = `운의 흐름에서 ${hasClash ? '충(沖)' : ''}${hasClash && hasPunishment ? '과 ' : ''}${hasPunishment ? '형(刑)' : ''}의 기운이 섞여 있어. 예상치 못한 곳에서 렉이 걸리거나 마찰이 생길 수 있으니, 돌다리도 두들겨 보고 가자! `;
-        } else {
-          glitch = `운의 흐름이 비교적 매끄럽지만, 너무 자만하면 사소한 실수가 생길 수 있어. 네 페이스를 유지하는 게 중요해. `;
-        }
-      }
-    } else {
-      if (daewunStemGodEn.includes('Maverick') || daewunBranchGodEn.includes('Maverick')) {
-        if (overflow.some(o => o.includes('Mirror'))) glitch = `Money is visible, but don't let your guard down. Too many people might try to take a piece of your pie. No lending money! `;
-      } else {
-        glitch = `The flow of luck is changing rapidly, and you might experience unexpected glitches. Better safe than sorry! `;
-      }
-    }
-
-    let closing = '';
-    if (lang === 'KO') {
-      const yongshin = result.analysis.yongShen;
-      const isYongshinInDaewun = daewunStemGodKo.includes(yongshin) || daewunBranchGodKo.includes(yongshin);
-      
-      if (isYongshinInDaewun) {
-        closing = `\n\n결론적으로 이번 운은 네가 기다려온 '용신'의 타이밍이야. 네 능력을 세상에 증명하고 실질적인 성취를 거두기 딱 좋지. 망설이지 말고 네 바이브를 보여줘!`;
-      } else if (daewunStemGodKo.includes('재성')) {
-        closing = `\n\n결론적으로 이번 운에서는 현실적인 결과물과 경제적 성취에 집중하는 게 베스트야. 뜬구름 잡는 소리보다는 손에 잡히는 성과를 만들어봐.`;
-      } else if (daewunStemGodKo.includes('관성')) {
-        closing = `\n\n결론적으로 이번 운에서는 사회적 위치와 명예를 다지는 데 집중해봐. 네가 속한 조직이나 사회에서 네 존재감을 확실히 각인시킬 기회야.`;
-      } else if (daewunStemGodKo.includes('식상')) {
-        closing = `\n\n결론적으로 이번 운에서는 네 창의성과 자기 표현을 극대화하는 게 좋아. 남들 눈치 보지 말고 네가 하고 싶은 걸 마음껏 펼쳐봐.`;
-      } else if (daewunStemGodKo.includes('인성')) {
-        closing = `\n\n결론적으로 이번 운에서는 내면의 성찰과 지식 습득에 집중해봐. 당장의 성과보다는 미래를 위한 씨앗을 심는 시기라고 생각하면 편해.`;
-      } else {
-        closing = `\n\n결론적으로 이번 운에서는 ${isSinGang ? '네 넘치는 에너지를 생산적인 곳에 쏟아붓는 게' : '네 페이스를 유지하며 내실을 다지는 게'} 베스트야. 너무 조급해하지 말고 네 바이브로 멋지게 헤쳐나가보자!`;
-      }
-    } else {
-      closing = `\n\nOverall, focusing on ${daewunStemGodEn.includes('Maverick') ? 'practical results' : 'your own expression'} is the best move. Go get 'em with your unique vibe!`;
-    }
-
-    return `${intro}${cycleIntro}${main}${but}${glitch}${closing}`;
-  }, [currentCycle, currentAnnualPillar, lang, result, userName, gender, city]);
+  const cycleVibe = React.useMemo(() => {
+    const vibe = generateCycleVibe(result, lang, userName, gender, city);
+    return `${vibe.intro}${vibe.cycleIntro}${vibe.main}\n\n근데.. [delay:2500]\n\n${vibe.glitch}`;
+  }, [result, lang, userName, gender, city]);
 
   const dailyVibe = React.useMemo(() => {
     const todayPillar = getTodayPillar(dayMaster);
@@ -1082,8 +798,29 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
     const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
 
-    const stemGod = lang === 'KO' ? todayPillar.stemTenGodKo : todayPillar.stemTenGodEn;
-    const branchGod = lang === 'KO' ? todayPillar.branchTenGodKo : todayPillar.branchTenGodEn;
+    const isSinGang = result.analysis?.shinGangShinYak?.title ? result.analysis.shinGangShinYak.title.includes('강') : false;
+    const yongShin = result.analysis?.yongShen || '';
+    const todayStemElement = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || '';
+    const todayBranchElement = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.element || '';
+    const todayStemElementKo = BAZI_MAPPING.elements[todayStemElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
+    const todayBranchElementKo = BAZI_MAPPING.elements[todayBranchElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
+
+    // Daily Luck Score Calculation
+    let dailyLuckScore = 50;
+    if (yongShin.includes(todayStemElement) || (todayStemElementKo && yongShin.includes(todayStemElementKo))) dailyLuckScore += 15;
+    if (yongShin.includes(todayBranchElement) || (todayBranchElementKo && yongShin.includes(todayBranchElementKo))) dailyLuckScore += 5;
+
+    if (isSinGang) {
+      if (todayPillar.stemTenGodKo.match(/식상|재성|관성/)) dailyLuckScore += 10;
+    } else {
+      if (todayPillar.stemTenGodKo.match(/비겁|인성/)) dailyLuckScore += 10;
+    }
+
+    const isGanYeoJiDong = getGanYeoJiDong(todayPillar.stem, todayPillar.branch);
+    if (isGanYeoJiDong) dailyLuckScore += 5;
+
+    const stemGod = (lang === 'KO' ? todayPillar.stemTenGodKo : todayPillar.stemTenGodEn) || '';
+    const branchGod = (lang === 'KO' ? todayPillar.branchTenGodKo : todayPillar.branchTenGodEn) || '';
     const stemColor = getVibeColor(STEM_ELEMENTS[todayPillar.stem as keyof typeof STEM_ELEMENTS]);
     const branchColor = getVibeColor(BRANCH_ELEMENTS[todayPillar.branch as keyof typeof BRANCH_ELEMENTS]);
 
@@ -1095,27 +832,92 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       processedName = userName.split(' ')[0];
     }
 
-    const address = gender === 'female' ? (lang === 'KO' ? '언니' : 'sis') : (lang === 'KO' ? '오빠' : 'bro');
-    const userRef = lang === 'KO' ? (gender === 'female' ? '언니' : '오빠') : (gender === 'female' ? 'girl' : 'you');
+    const address = (() => {
+      if (gender === 'prefer-not-to-tell') return '';
+      if (lang === 'KO') {
+        if (gender === 'female') return '언니';
+        if (gender === 'male') return '친구';
+        if (gender === 'non-binary') return '자기';
+        return '';
+      } else {
+        if (gender === 'female') return 'sis';
+        if (gender === 'male') return 'bro';
+        if (gender === 'non-binary') return 'friend';
+        return '';
+      }
+    })();
 
-    const isGanYeoJiDong = getGanYeoJiDong(todayPillar.stem, todayPillar.branch);
-    const ganYeoComment = isGanYeoJiDong ? (lang === 'KO' ? ' 오, 같은 글자가 두 번이나 나왔네?' : ' Oh, the same energy appeared twice?') : '';
+    const userRef = (() => {
+      if (gender === 'prefer-not-to-tell') return lang === 'KO' ? '너' : 'you';
+      if (lang === 'KO') {
+        if (gender === 'female') return '언니';
+        if (gender === 'male') return '친구';
+        if (gender === 'non-binary') return '자기';
+        return '너';
+      } else {
+        if (gender === 'female') return 'girl';
+        if (gender === 'male') return 'guy';
+        if (gender === 'non-binary') return 'star';
+        return 'you';
+      }
+    })();
+
+    const ganYeoComment = isGanYeoJiDong ? (lang === 'KO' ? ' 오, 위아래로 같은 기운이 꽉 찼네? 에너지가 아주 선명해.' : ' Oh, the same energy is packed top to bottom. Very vivid.') : '';
 
     let main = '';
     if (lang === 'KO') {
       const stemKo = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko;
       const branchKo = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko;
       
-      main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. `;
-      if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) main += `헐, 평소에 ${userRef}한테 없던 낯선 에너지가 훅 들어오는 날이야. 새로운 영감이 떠오를지도? `;
-      else if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) main += `에너지 과부하 주의! 이미 넘치는 기운이 또 들어와서 좀 예민해질 수 있어. 릴렉스하자. `;
-      else main += `전체적으로 에너지가 조화롭게 흐르는 날이야. 평소처럼만 해도 충분해! `;
+      main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. \n\n`;
+
+      if (dailyLuckScore >= 75) {
+        main += `와, 오늘 컨디션 완전 최상인데? 네가 뭘 해도 우주가 도와주는 기분일 거야. 평소에 망설였던 일이 있다면 오늘이 바로 그날이야. 네 바이브를 믿고 질러봐! `;
+      } else if (dailyLuckScore >= 55) {
+        if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) {
+          main += `평소에 ${userRef}한테 부족했던 낯선 에너지가 훅 들어오는 날이야. 어색할 수도 있지만, 오히려 그게 새로운 돌파구가 될 수 있어. `;
+        } else {
+          main += `전체적으로 기운이 매끄럽게 흐르는 날이야. 큰 무리 없이 네 페이스대로 하루를 보낼 수 있을 거야. 소소한 행운도 기대해볼 만해. `;
+        }
+      } else if (dailyLuckScore >= 35) {
+        if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) {
+          main += `에너지 과부하 주의! 이미 넘치는 기운이 또 들어와서 좀 예민해지거나 고집이 세질 수 있어. 오늘은 한 템포 쉬어가면서 주변을 살피는 게 좋아. `;
+        } else {
+          main += `기운이 좀 정체된 느낌이 들 수 있어. 억지로 속도를 내기보다, 오늘은 내실을 다지면서 에너지를 비축하는 쪽으로 방향을 잡아봐. `;
+        }
+      } else {
+        main += `오늘은 에너지가 좀 요동치는 날이네. 예상치 못한 변수가 생길 수 있으니, 중요한 결정은 내일로 미루는 게 현명할 거야. 차분하게 네 중심을 지키는 게 제일 중요해. `;
+      }
       
-      if (stemGod.includes('재성')) main += `특히 오늘은 소소하게라도 득템하거나 결과가 나오는 날이니까 기대해봐!`;
-      else if (stemGod.includes('식상')) main += `말빨이나 창의력이 폭발하는 날이니까 아이디어 있으면 바로 공유 고고!`;
+      if (stemGod.includes('재성')) main += `\n\n특히 오늘은 돈 냄새가 좀 나는데? 소소한 득템이나 경제적인 성과가 있을 수 있으니 눈 크게 뜨고 있어봐.`;
+      else if (stemGod.includes('식상')) main += `\n\n말빨이나 창의력이 폭발하는 날이야. 아이디어가 떠오르면 바로 메모해두거나 공유해봐. 네 표현력이 빛을 발할 거야.`;
+      else if (stemGod.includes('관성')) main += `\n\n사회적인 인정이나 명예가 따르는 날이야. 네가 맡은 일에서 책임감 있게 행동하면 좋은 평가를 받을 수 있을 거야.`;
+      else if (stemGod.includes('인성')) main += `\n\n배움이나 성찰에 아주 좋은 날이야. 책을 읽거나 깊은 생각을 하면서 내면의 깊이를 더해보는 건 어때?`;
     } else {
-      main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. `;
-      main += `A day where your unique energy flows smoothly. Trust your gut!`;
+      main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. \n\n`;
+
+      if (dailyLuckScore >= 75) {
+        main += `Wow, your condition is peak today! You'll feel like the universe is backing whatever you do. If there's something you've been hesitating on, today is the day. Trust your vibe and go for it! `;
+      } else if (dailyLuckScore >= 55) {
+        if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) {
+          main += `A strange energy you usually lack is hitting you today. It might feel awkward, but it could be the breakthrough you need. `;
+        } else {
+          main += `Overall, the energy is flowing smoothly. You'll be able to spend the day at your own pace without much trouble. Expect some small luck! `;
+        }
+      } else if (dailyLuckScore >= 35) {
+        if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) {
+          main += `Energy overload alert! Already overflowing vibes are coming in, making you sensitive or stubborn. Take a breath and look around today. `;
+        } else {
+          main += `The energy might feel a bit stagnant. Instead of forcing speed, focus on solidifying your foundation and conserving energy. `;
+        }
+      } else {
+        main += `Energies are a bit volatile today. Unexpected variables might pop up, so it's wise to postpone big decisions. Staying calm and centered is key. `;
+      }
+
+      if (stemGod.includes('Maverick') || stemGod.includes('Architect')) main += `\n\nEspecially today, I smell some money. Keep your eyes open for small gains or financial results.`;
+      else if (stemGod.includes('Artist') || stemGod.includes('Rebel')) main += `\n\nYour creativity and wit are exploding today. If an idea hits, memo it or share it immediately. Your expression will shine.`;
+      else if (stemGod.includes('Judge') || stemGod.includes('Warrior')) main += `\n\nSocial recognition or honor is on the cards. Acting with responsibility in your tasks will lead to great evaluations.`;
+      else if (stemGod.includes('Mystic') || stemGod.includes('Sage')) main += `\n\nA great day for learning or reflection. How about deepening your inner world with a book or deep thought?`;
     }
 
     return main;
@@ -1789,7 +1591,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           </BaziTooltip>
                           <span className="text-white font-bold text-neon-pink text-right">{result.analysis.yongShen}</span>
                         </div>
-                        {result.analysis.yongshinDetail.byeongYak && (
+                        {result.analysis?.yongshinDetail?.byeongYak && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
                             <div className="flex items-center gap-2 mb-1">
                               <div className="h-[1px] w-4 bg-yellow-400/50"></div>
@@ -1798,7 +1600,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             <div className="text-xs text-yellow-400/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.byeongYak.note : result.analysis.yongshinDetail.byeongYak.noteEn}</div>
                           </div>
                         )}
-                        {result.analysis.yongshinDetail.tongGwan && (
+                        {result.analysis?.yongshinDetail?.tongGwan && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
                             <div className="flex items-center gap-2 mb-1">
                               <div className="h-[1px] w-4 bg-neon-cyan/50"></div>
@@ -1815,7 +1617,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             <div className="text-xs text-neon-cyan/80 italic">{lang === 'KO' ? result.analysis.yongshinDetail.tongGwan.note : result.analysis.yongshinDetail.tongGwan.noteEn}</div>
                           </div>
                         )}
-                        {result.analysis.yongshinDetail.eokbu && (
+                        {result.analysis?.yongshinDetail?.eokbu && (
                           <div className="pt-2 border-t border-white/5 space-y-1">
                             <div className="flex items-center gap-2 mb-1">
                               <div className="h-[1px] w-4 bg-neon-pink/50"></div>
@@ -1987,16 +1789,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           <span className="text-white/40 text-xs italic">{lang === 'KO' ? '특별한 충돌이나 결합이 없습니다.' : 'No significant interactions.'}</span>
                         )}
                         
-                        {result.analysis.conflicts.length > 0 && (
+                        {(result.analysis?.conflicts || []).length > 0 && (
                           <div className="pt-2 border-t border-white/5">
                             <div className="flex items-center gap-2 mb-2">
                               <div className="h-[1px] w-4 bg-red-400/50"></div>
                               <div className="text-[10px] font-display font-medium text-red-400/80 uppercase tracking-[0.2em]">{lang === 'KO' ? '주의할 충돌' : 'Conflicts'}</div>
                             </div>
                             <div className="space-y-1">
-                              {result.analysis.conflicts.map((c, i) => {
+                              {(result.analysis?.conflicts || []).map((c, i) => {
                                 let displayNote = c.note || '';
-                                if (displayNote.includes('|')) {
+                                if (displayNote && displayNote.includes('|')) {
                                   const [koNote, enNote] = displayNote.split('|');
                                   displayNote = lang === 'KO' ? koNote : enNote;
                                 }
@@ -2344,8 +2146,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${showMuJaDaJaInfo.title.includes('무') ? 'bg-red-500/20' : 'bg-purple-500/20'}`}>
-                  <Zap className={`w-6 h-6 ${showMuJaDaJaInfo.title.includes('무') ? 'text-red-400' : 'text-purple-400'}`} />
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${(showMuJaDaJaInfo.title && showMuJaDaJaInfo.title.includes('무')) ? 'bg-red-500/20' : 'bg-purple-500/20'}`}>
+                  <Zap className={`w-6 h-6 ${(showMuJaDaJaInfo.title && showMuJaDaJaInfo.title.includes('무')) ? 'text-red-400' : 'text-purple-400'}`} />
                 </div>
                 <div>
                   <h3 className="text-xl font-display font-bold text-white">{showMuJaDaJaInfo.title}</h3>

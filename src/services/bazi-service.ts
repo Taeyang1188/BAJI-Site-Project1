@@ -5,7 +5,7 @@ import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { calculateGeJu, calculateTenGodsRatio, determineStructure } from './bazi-analysis';
 import { calculateInteractions as calculateDetailedInteractions } from './bazi-interactions';
 import { detectShinsal } from './bazi-shinsal';
-import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan } from './bazi-yongshin';
+import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan, analyzeSpecialStructure } from './bazi-yongshin';
 import { calculateAdvancedAnalysis } from './bazi-advanced-analysis';
 
 import { getPreciseSajuTime } from './bazi-time';
@@ -387,7 +387,24 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   // New detailed calculations
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
   const strength = calcDayMasterStrength(allStems, allBranches);
-  const structureDetail = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
+  let structureDetail: any = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
+
+  // Analyze Special Structure (Jun-wang, Image, etc.)
+  const specialStructure = analyzeSpecialStructure(allStems, allBranches, strength.elementScores, lang);
+  if (specialStructure && specialStructure.confidence >= 70) {
+    structureDetail = {
+      title: specialStructure.name,
+      enTitle: specialStructure.nameEn,
+      category: specialStructure.category,
+      description: specialStructure.description,
+      enDescription: specialStructure.enDescription,
+      marketingMessage: "",
+      enMarketingMessage: "",
+      logicNote: `Confidence: ${specialStructure.confidence}%`,
+      isDirty: specialStructure.isDirty,
+      mainElement: (specialStructure as any).mainElement
+    };
+  }
 
   const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength, structureDetail);
   const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);

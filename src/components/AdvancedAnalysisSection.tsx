@@ -45,6 +45,42 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
         </div>
       )}
 
+      {/* Overload Analysis */}
+      {analysis.overloadAnalysis && analysis.overloadAnalysis.length > 0 && (
+        <div className="p-4 bg-red-900/20 rounded-xl border border-red-500/20">
+          <h4 className="text-sm font-display font-medium text-red-400 uppercase tracking-[0.2em] mb-2">
+            {lang === 'KO' ? '오행 과다 주의보' : 'Elemental Overload Warning'}
+          </h4>
+          <div className="space-y-3">
+            {analysis.overloadAnalysis.map((item, i) => (
+              <div key={i} className="text-xs text-white/70">
+                <div className="font-bold text-red-300 mb-1">{lang === 'KO' ? item.title : item.titleEn}</div>
+                <div>{lang === 'KO' ? item.description : item.enDescription}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Edge Cases */}
+      {analysis.advancedEdgeCases && analysis.advancedEdgeCases.length > 0 && (
+        <div className="p-4 bg-amber-900/20 rounded-xl border border-amber-500/20">
+          <h4 className="text-sm font-display font-medium text-amber-400 uppercase tracking-[0.2em] mb-2">
+            {lang === 'KO' ? '심층 엣지케이스 분석' : 'Advanced Edge Case Analysis'}
+          </h4>
+          <div className="space-y-3">
+            {analysis.advancedEdgeCases.map((item, i) => (
+              <div key={i} className="text-xs text-white/70">
+                <div className={`font-bold mb-1 ${item.type === 'warning' ? 'text-red-400' : 'text-amber-300'}`}>
+                  {item.title}
+                </div>
+                <div>{item.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Shin-Gang/Shin-Yak */}
       {analysis.shinGangShinYak && (
         <div className="p-4 bg-black/40 rounded-xl border border-white/5">

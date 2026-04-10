@@ -108,6 +108,8 @@ export interface BaZiResult {
       marketingMessage: string;
       enMarketingMessage: string;
       logicNote: string;
+      isDirty?: boolean;
+      mainElement?: string;
     };
     muJaRon?: { title: string; description: string; enDescription: string }[];
     daJaRon?: { title: string; description: string; enDescription: string }[];

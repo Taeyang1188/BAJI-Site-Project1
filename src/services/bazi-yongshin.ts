@@ -14,72 +14,242 @@ const BRANCH_ELEMENTS: Record<string, string> = {
 
 const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
 
+// 1. Rooting (Tong-geun) Data
+const ROOTING_DATA: Record<string, { strong: string[], mid: string[], weak: string[] }> = {
+  '甲': { strong: ['寅', '卯'], mid: ['亥', '未'], weak: ['辰'] },
+  '乙': { strong: ['卯', '寅'], mid: ['未', '辰'], weak: ['亥'] },
+  '丙': { strong: ['巳', '午'], mid: ['寅'], weak: ['戌', '未'] },
+  '丁': { strong: ['午', '巳'], mid: ['未', '戌'], weak: ['寅'] },
+  '戊': { strong: ['巳', '午', '辰', '戌'], mid: ['寅', '申'], weak: ['未', '丑'] },
+  '己': { strong: ['午', '未', '丑'], mid: ['巳'], weak: ['辰', '戌'] },
+  '庚': { strong: ['申', '酉'], mid: ['巳'], weak: ['戌', '丑'] },
+  '辛': { strong: ['酉', '申'], mid: ['丑', '戌'], weak: ['巳'] },
+  '壬': { strong: ['亥', '子'], mid: ['申'], weak: ['辰'] },
+  '癸': { strong: ['子', '亥'], mid: ['辰', '丑'], weak: ['申'] }
+};
+
+// 2. Combination (Hap) Data
+const COMBINATIONS = {
+  BANG_HAP: [
+    { branches: ['寅', '卯', '辰'], element: 'Wood' },
+    { branches: ['巳', '午', '未'], element: 'Fire' },
+    { branches: ['申', '酉', '戌'], element: 'Metal' },
+    { branches: ['亥', '子', '丑'], element: 'Water' }
+  ],
+  SAM_HAP: [
+    { branches: ['亥', '卯', '未'], element: 'Wood' },
+    { branches: ['寅', '午', '戌'], element: 'Fire' },
+    { branches: ['巳', '酉', '丑'], element: 'Metal' },
+    { branches: ['申', '子', '辰'], element: 'Water' }
+  ],
+  STEM_HAP: [
+    { stems: ['甲', '己'], element: 'Earth' },
+    { stems: ['乙', '庚'], element: 'Metal' },
+    { stems: ['丙', '辛'], element: 'Water' },
+    { stems: ['丁', '壬'], element: 'Fire' },
+    { stems: ['戊', '癸'], element: 'Fire' }
+  ]
+};
+
 function getRelationship(dmElement: string, targetElement: string): string {
   const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
   const targetIdx = ELEMENT_CYCLE.indexOf(targetElement);
-  const diff = (targetIdx - dmIdx + 5) % 5;
+  if (dmIdx === -1 || targetIdx === -1) return '';
   
-  const relationships = ['Self', 'Artist', 'Wealth', 'Power', 'Wisdom'];
-  return relationships[diff];
+  const diff = (targetIdx - dmIdx + 5) % 5;
+  if (diff === 0) return 'Self';
+  if (diff === 1) return 'Output';
+  if (diff === 2) return 'Wealth';
+  if (diff === 3) return 'Power';
+  if (diff === 4) return 'Wisdom';
+  return '';
 }
 
 export function calcDayMasterStrength(stems: string[], branches: string[]) {
   const dayMaster = stems[1]; // 일간
   const dmElement = STEM_ELEMENTS[dayMaster];
   const monthZhi = branches[2]; // 월지
+  const monthElement = BRANCH_ELEMENTS[monthZhi];
   
-  let score = 0;
-  let breakdown = { monthReign: 0, branchSupport: 0, stemSupport: 0 };
+  // 1. Base Element Scores
+  const elementScores: Record<string, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+  const floatingStems: string[] = [];
+  
+  // Stems: 10 points each (DM gets 20 for base presence)
+  stems.forEach((s, i) => {
+    const base = i === 1 ? 20 : 10;
+    
+    // Check for Floating Stems (Heo-bu)
+    const rooting = ROOTING_DATA[s];
+    const hasRoot = rooting && branches.some(b => 
+      rooting.strong.includes(b) || rooting.mid.includes(b) || rooting.weak.includes(b)
+    );
+    
+    if (!hasRoot) {
+      floatingStems.push(s);
+      elementScores[STEM_ELEMENTS[s]] += base * 0.3; // 70% reduction for floating stems
+    } else {
+      elementScores[STEM_ELEMENTS[s]] += base;
+    }
+  });
+  
+  // Branches: Using JIJANGAN for accurate distribution
+  branches.forEach((b, i) => {
+    const totalPoints = i === 2 ? 40 : 20;
+    const jijangan = JIJANGAN[b];
+    if (jijangan) {
+      jijangan.stems.forEach((stem, sIdx) => {
+        const ratio = jijangan.ratios[sIdx];
+        const el = STEM_ELEMENTS[stem];
+        elementScores[el] += totalPoints * ratio;
+      });
+    } else {
+      elementScores[BRANCH_ELEMENTS[b]] += totalPoints;
+    }
+  });
 
-  // 1. 월령득기 (Month Reign) - 40%
-  const monthJijangan = JIJANGAN[monthZhi];
-  if (monthJijangan) {
-    // Check if DM element is in month jijangan (Main Qi or others)
-    // Simplified: If DM element matches month branch element or is supported by it
-    const monthElement = BRANCH_ELEMENTS[monthZhi];
-    const rel = getRelationship(dmElement, monthElement);
-    if (rel === 'Self' || rel === 'Wisdom') {
-      score += 40;
-      breakdown.monthReign = 40;
+  // 2. Combination (Hap) Logic
+  const activeCombinations: any[] = [];
+  
+  // Check Bang-hap
+  COMBINATIONS.BANG_HAP.forEach(group => {
+    const present = group.branches.filter(b => branches.includes(b));
+    if (present.length === 3 || (present.length === 2 && present.includes(monthZhi))) {
+      const bonus = present.length === 3 ? 40 : 20;
+      elementScores[group.element] += bonus;
+      activeCombinations.push({ type: 'Bang-hap', element: group.element });
+    }
+  });
+
+  // Check Sam-hap
+  COMBINATIONS.SAM_HAP.forEach(group => {
+    const present = group.branches.filter(b => branches.includes(b));
+    const center = group.branches[1];
+    if (present.length === 3 || (present.length === 2 && branches.includes(center))) {
+      const bonus = present.length === 3 ? 30 : 15;
+      elementScores[group.element] += bonus;
+      activeCombinations.push({ type: 'Sam-hap', element: group.element });
+    }
+  });
+
+  // Stem Hap Transformation (Identity Crisis)
+  // Check for jaeng-hap (competition) - if multiple stems of same kind exist, transformation is hindered
+  const stemCounts: Record<string, number> = {};
+  stems.forEach(s => stemCounts[s] = (stemCounts[s] || 0) + 1);
+
+  COMBINATIONS.STEM_HAP.forEach(group => {
+    const s1 = group.stems[0];
+    const s2 = group.stems[1];
+    if (stems.includes(s1) && stems.includes(s2)) {
+      // Check for competition (Jaeng-hap)
+      if (stemCounts[s1] > 1 || stemCounts[s2] > 1) {
+        activeCombinations.push({ type: 'Jaeng-hap', stems: [s1, s2], note: 'Competition prevents full transformation' });
+        return;
+      }
+
+      // Transformation logic: -50% original, +50% new
+      const el1 = STEM_ELEMENTS[s1];
+      const el2 = STEM_ELEMENTS[s2];
+      const targetEl = group.element;
+      
+      const reduction1 = 10 * 0.5;
+      const reduction2 = 10 * 0.5;
+      elementScores[el1] -= reduction1;
+      elementScores[el2] -= reduction2;
+      elementScores[targetEl] += (reduction1 + reduction2);
+      
+      activeCombinations.push({ type: 'Stem-hap-trans', stems: [s1, s2], element: targetEl });
+    }
+  });
+
+  // 3. Rooting (Tong-geun) Logic
+  stems.forEach((s, i) => {
+    const rooting = ROOTING_DATA[s];
+    if (!rooting) return;
+
+    let maxMult = 0.5;
+    branches.forEach((b, bIdx) => {
+      let m = 0.5;
+      if (rooting.strong.includes(b)) m = 1.5;
+      else if (rooting.mid.includes(b)) m = 1.2;
+      else if (rooting.weak.includes(b)) m = 1.0;
+      if (m > maxMult) maxMult = m;
+    });
+    
+    const base = i === 1 ? 20 : 10;
+    const bonus = base * (maxMult - 1);
+    elementScores[STEM_ELEMENTS[s]] += bonus;
+    
+    if (i === 1) {
+      let strongRootCount = 0;
+      branches.forEach(b => {
+        if (rooting.strong.includes(b)) strongRootCount++;
+      });
+      if (strongRootCount >= 2) elementScores[dmElement] += 30;
+      else if (strongRootCount === 1) elementScores[dmElement] += 10;
+    }
+  });
+
+  // 3.5 Jo-hu (Seasonal Dominance) Logic
+  // Winter (Water month) without Fire: Wood/Earth activity reduced
+  if (monthElement === 'Water' && (elementScores['Fire'] || 0) < 15) {
+    elementScores['Wood'] *= 0.5;
+    elementScores['Earth'] *= 0.5;
+    activeCombinations.push({ type: 'Jo-hu', status: 'Cold', note: 'Frozen Wood/Earth' });
+  }
+  // Summer (Fire month) without Water: Metal/Wood activity reduced
+  if (monthElement === 'Fire' && (elementScores['Water'] || 0) < 15) {
+    elementScores['Metal'] *= 0.5;
+    elementScores['Wood'] *= 0.5;
+    activeCombinations.push({ type: 'Jo-hu', status: 'Hot', note: 'Dried Metal/Wood' });
+  }
+
+  // 4. Final Strength Calculation
+  const selfScore = elementScores[dmElement] || 0;
+  const wisdomElement = ELEMENT_CYCLE[(ELEMENT_CYCLE.indexOf(dmElement) + 4) % 5];
+  const wisdomScore = elementScores[wisdomElement] || 0;
+  
+  const supportScore = selfScore + wisdomScore;
+  const totalScore = Object.values(elementScores).reduce((a, b) => a + Math.max(0, b), 0);
+  
+  // Rooting correction: 3+ strong roots = Strong
+  let rootingCorrection = false;
+  const dmRooting = ROOTING_DATA[dayMaster];
+  if (dmRooting) {
+    const strongRoots = branches.filter(b => dmRooting.strong.includes(b));
+    if (strongRoots.length >= 3) {
+      rootingCorrection = true;
     }
   }
 
-  // 2. 지지 생조 (Branch Support) - 30%
-  // 4지지 중 일간과 같은 오행 또는 생해주는 오행 개수
-  let branchSupportCount = 0;
-  branches.forEach(b => {
-    const bElement = BRANCH_ELEMENTS[b];
-    const rel = getRelationship(dmElement, bElement);
-    if (rel === 'Self' || rel === 'Wisdom') {
-      branchSupportCount++;
-    }
-  });
-  const branchSupportScore = (branchSupportCount / 4) * 30;
-  score += branchSupportScore;
-  breakdown.branchSupport = branchSupportScore;
+  let score = Math.round((supportScore / totalScore) * 100);
+  if (score > 100) score = 100;
+  if (score < 0) score = 0;
 
-  // 3. 천간 생조 (Stem Support) - 30%
-  // 시·월·년간 중 일간 생조 천간 (일간 제외 3개)
-  let stemSupportCount = 0;
-  [stems[0], stems[2], stems[3]].forEach(s => {
-    const sElement = STEM_ELEMENTS[s];
-    const rel = getRelationship(dmElement, sElement);
-    if (rel === 'Self' || rel === 'Wisdom') {
-      stemSupportCount++;
-    }
-  });
-  const stemSupportScore = (stemSupportCount / 3) * 30;
-  score += stemSupportScore;
-  breakdown.stemSupport = stemSupportScore;
+  // Apply rooting correction if score is near neutral
+  if (rootingCorrection && score < 55) {
+    score = 55; // Force to 'Strong'
+  }
 
   let level = "";
-  if (score <= 30) level = "극약";
-  else if (score <= 45) level = "약";
-  else if (score <= 55) level = "중화";
-  else if (score <= 70) level = "강";
+  if (score <= 35) level = "극약";
+  else if (score <= 48) level = "약";
+  else if (score <= 52) level = "중화";
+  else if (score <= 65) level = "강";
   else level = "극강";
 
-  return { score, level, breakdown };
+  return { 
+    score, 
+    level, 
+    breakdown: { 
+      self: Math.round(selfScore), 
+      wisdom: Math.round(wisdomScore), 
+      total: Math.round(totalScore) 
+    },
+    activeCombinations,
+    floatingStems,
+    elementScores // Return raw scores for advanced analysis
+  };
 }
 
 export function determineYongshin(stems: string[], branches: string[], geju: string, strength: any, structureDetail?: any) {
@@ -133,6 +303,21 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     heeShin = { god: "인성", element: getElementByRel('Wisdom') };
     giShin = { god: "관성", element: getElementByRel('Power') };
     guShin = { god: "재성", element: getElementByRel('Wealth') };
+  } else if (structureDetail && structureDetail.category === 'Image') {
+    method = "특수격용신";
+    const title = structureDetail.title;
+    const targetEl = structureDetail.mainElement || dmElement;
+    const targetIdx = ELEMENT_CYCLE.indexOf(targetEl);
+    
+    primary = { 
+      god: "특수", 
+      element: targetEl, 
+      reason: `${title} → ${targetEl} 용신`, 
+      reasonEn: `${title} → ${targetEl} Useful God` 
+    };
+    heeShin = { god: "희신", element: ELEMENT_CYCLE[(targetIdx + 1) % 5] };
+    giShin = { god: "기신", element: ELEMENT_CYCLE[(targetIdx + 3) % 5] };
+    guShin = { god: "구신", element: ELEMENT_CYCLE[(targetIdx + 2) % 5] };
   }
   // 1. Standard Structure Logic
   else if (geju.includes("정관") || geju.includes("JUDGE")) {
@@ -305,4 +490,163 @@ export function checkTongGwan(stems: string[], branches: string[]) {
     }
   }
   return null;
+}
+
+export function analyzeSpecialStructure(stems: string[], branches: string[], elementScores: Record<string, number>, lang: any) {
+  const dayMaster = stems[1];
+  const dmElement = STEM_ELEMENTS[dayMaster];
+  const monthZhi = branches[2];
+  const monthElement = BRANCH_ELEMENTS[monthZhi];
+  
+  const total = Object.values(elementScores).reduce((a, b) => a + Math.max(0, b), 0);
+  const ratios: Record<string, number> = {};
+  Object.entries(elementScores).forEach(([el, score]) => {
+    ratios[el] = (score / total) * 100;
+  });
+
+  // 1. 전왕격 (Jun-wang) Logic
+  const checkJunWang = () => {
+    const structures = [
+      { name: '곡직격', nameEn: 'Bent and Straight (Wood Monarch)', element: 'Wood', dm: ['甲', '乙'], samhap: ['亥', '卯', '未'], banghap: ['寅', '卯', '辰'] },
+      { name: '염상격', nameEn: 'Blazing Up (Fire Monarch)', element: 'Fire', dm: ['丙', '丁'], samhap: ['寅', '午', '戌'], banghap: ['巳', '午', '未'] },
+      { name: '가색격', nameEn: 'Sowing and Reaping (Earth Monarch)', element: 'Earth', dm: ['戊', '己'], months: ['辰', '戌', '丑', '未'] },
+      { name: '종혁격', nameEn: 'Following Revolution (Metal Monarch)', element: 'Metal', dm: ['庚', '辛'], samhap: ['巳', '酉', '丑'], banghap: ['申', '酉', '戌'] },
+      { name: '윤하격', nameEn: 'Flowing Down (Water Monarch)', element: 'Water', dm: ['壬', '癸'], samhap: ['申', '子', '辰'], banghap: ['亥', '子', '丑'] }
+    ];
+
+    for (const s of structures) {
+      if (s.dm.includes(dayMaster)) {
+        const score = ratios[s.element];
+        if (score >= 80) {
+          let hasHap = false;
+          if (s.samhap) {
+            const present = s.samhap.filter(b => branches.includes(b));
+            if (present.length >= 2 && branches.includes(s.samhap[1])) hasHap = true;
+          }
+          if (s.banghap) {
+            const present = s.banghap.filter(b => branches.includes(b));
+            if (present.length >= 2 && branches.includes(monthZhi)) hasHap = true;
+          }
+          if (s.months && s.months.includes(monthZhi)) hasHap = true;
+
+          if (hasHap) {
+            // Check for opposing elements (Keuk)
+            const dmIdx = ELEMENT_CYCLE.indexOf(s.element);
+            const powerEl = ELEMENT_CYCLE[(dmIdx + 3) % 5];
+            const wealthEl = ELEMENT_CYCLE[(dmIdx + 2) % 5];
+            
+            const powerRatio = ratios[powerEl] || 0;
+            const wealthRatio = ratios[wealthEl] || 0;
+
+            // If opposing elements are too strong, it's not a Monarch structure
+            if (powerRatio > 20 || wealthRatio > 25) continue;
+
+            const isDirty = powerRatio > 10 || wealthRatio > 15;
+            
+            return {
+              name: s.name,
+              nameEn: s.nameEn,
+              category: 'Monarch',
+              mainElement: s.element,
+              confidence: isDirty ? 75 : 95,
+              isDirty,
+              description: isDirty 
+                ? "전왕격의 기세가 있으나 방해 요소가 섞여 탁(濁)함. 연마가 필요함."
+                : "기세가 한곳으로 쏠린 순수한 전왕격. 해당 오행의 기운을 따라야 함.",
+              enDescription: isDirty
+                ? "Has the momentum of a Monarch structure but is turbid (濁) due to impurities. Requires refinement."
+                : "A pure Monarch structure with energy focused in one direction. Must follow that element's flow."
+            };
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  // 2. 특수 이미지 격국 (Image Logic)
+  const checkImage = () => {
+    // 금수쌍청
+    if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '亥', '子'].includes(monthZhi)) {
+      if (ratios['Metal'] + ratios['Water'] >= 70) {
+        const isDirty = ratios['Earth'] > 10 || ratios['Fire'] > 15;
+        return {
+          name: '금수쌍청',
+          nameEn: 'Metal-Water Purity',
+          category: 'Image',
+          mainElement: 'Water',
+          confidence: isDirty ? 60 : 80,
+          isDirty,
+          description: "금과 수의 기운이 맑고 깨끗한 격국.",
+          enDescription: "A structure where Metal and Water energies are clear and pure."
+        };
+      }
+    }
+    // 목화통명
+    if (['甲', '乙'].includes(dayMaster) && ['寅', '卯', '辰', '巳', '午'].includes(monthZhi)) {
+      if (ratios['Wood'] + ratios['Fire'] >= 60) {
+        const isDirty = ratios['Water'] > 25 || ratios['Metal'] > 20;
+        return {
+          name: '목화통명',
+          nameEn: 'Wood-Fire Brilliance',
+          category: 'Image',
+          mainElement: 'Fire',
+          confidence: isDirty ? 60 : 80,
+          isDirty,
+          description: "나무가 불을 만나 밝게 빛나는 총명한 격국.",
+          enDescription: "A brilliant structure where Wood meets Fire and shines brightly."
+        };
+      }
+    }
+    // 수목청화
+    if (['壬', '癸'].includes(dayMaster) && ['亥', '子', '丑', '寅', '卯'].includes(monthZhi)) {
+      if (ratios['Water'] + ratios['Wood'] >= 60) {
+        const isDirty = ratios['Earth'] > 20 || ratios['Metal'] > 30;
+        return {
+          name: '수목청화',
+          nameEn: 'Water-Wood Purity',
+          category: 'Image',
+          mainElement: 'Wood',
+          confidence: isDirty ? 60 : 80,
+          isDirty,
+          description: "물과 나무가 어우러져 맑고 화사한 격국.",
+          enDescription: "A clear and radiant structure where Water and Wood harmonize."
+        };
+      }
+    }
+    // 금백수청
+    if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '戌', '亥', '子'].includes(monthZhi)) {
+      if (ratios['Metal'] >= 40 && ratios['Water'] >= 30) {
+        const isDirty = ratios['Earth'] > 10 || ratios['Fire'] > 15;
+        return {
+          name: '금백수청',
+          nameEn: 'Metal-White Water-Clear',
+          category: 'Image',
+          mainElement: 'Water',
+          confidence: isDirty ? 60 : 85,
+          isDirty,
+          description: "금은 하얗고 물은 맑으니 고결하고 깨끗한 격국.",
+          enDescription: "A noble and clean structure where Metal is white and Water is clear."
+        };
+      }
+    }
+    // 화토중탁
+    if (['丙', '丁', '戊', '己'].includes(dayMaster) && (monthElement === 'Fire' || ['辰', '戌', '丑', '未'].includes(monthZhi))) {
+      if (ratios['Fire'] + ratios['Earth'] >= 70 && ratios['Water'] < 10) {
+        return {
+          name: '화토중탁',
+          nameEn: 'Fire-Earth Heavy-Turbid',
+          category: 'Image',
+          mainElement: 'Earth',
+          confidence: 90,
+          isDirty: true,
+          description: "불과 흙이 뒤섞여 메마르고 탁해진 격국. 조후가 시급함.",
+          enDescription: "A dry and turbid structure where Fire and Earth are mixed. Urgent need for temperature balance."
+        };
+      }
+    }
+    return null;
+  };
+
+  return checkJunWang() || checkImage();
 }

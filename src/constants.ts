@@ -276,6 +276,41 @@ export const TRANSLATIONS = {
   }
 };
 
+export const ELEMENT_DESCRIPTIONS = {
+  Wood: {
+    comments: [
+      "콘크리트를 뚫고 나오는 새싹처럼, 무서울 정도의 추진력과 생동감이 느껴져.",
+      "좌우를 살피기보다 오직 위로만 뻗어 가려는 그 강직함이 참 귀하네."
+    ]
+  },
+  Fire: {
+    comments: [
+      "주변의 에너지를 단번에 상승시키는 힘이 느껴져.",
+      "어떻게든 주변을 밝히려는 그 결연함이 눈에 띄네.",
+      "비밀없는 솔직한 그 기운이 사람들을 끌어당기는 묘한 매력이 있어."
+    ]
+  },
+  Earth: {
+    comments: [
+      "폭풍 속에서도 흔들리지 않는 편안함, 그 안정감이 주변 사람들을 안심시키네.",
+      "무엇이든 묵묵하게 받아내고 기다려주는 깊은 인내심이 너의 가장 큰 무기일 것 같아."
+    ]
+  },
+  Metal: {
+    comments: [
+      "잘 벼려진 칼날처럼 서늘하고 명확한 기운이 네 말에 무게를 더하네.",
+      "불필요한 것을 단칼에 쳐내는 그 단호함에서 외로움과 동시에 고결함이 느껴져."
+    ]
+  },
+  Water: {
+    comments: [
+      "얼마나 많은 생각들이 내면에서 소용돌이 칠 지 궁금해지네.",
+      "적응력과 유연함이 무서울 정도로 뛰어나겠어.",
+      "바다처럼 차분하고 묵직한 기운으로 사람들을 압도하는 힘이 있네."
+    ]
+  }
+};
+
 export const ZODIAC_ANIMALS = [
   { id: 1, name: 'Rat', slug: 'za', hanja: '子', imgUrl: 'https://i.imgur.com/5AXZXiG.png' },
   { id: 2, name: 'Ox', slug: 'chuck', hanja: '丑', imgUrl: 'https://i.imgur.com/T6GPZ0J.png' },

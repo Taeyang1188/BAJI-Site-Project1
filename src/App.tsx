@@ -16,44 +16,100 @@ import { calculateRealBaZi } from './services/bazi-service';
 import { useMemo, useRef } from 'react';
 
 const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: string) => void, lang: Language }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    const prev = value;
-    const isDeleting = val.length < prev.length;
-    
-    let formatted = val;
-    if (isDeleting) {
-      // Backspace through separator: delete the character before it too
-      if (prev.endsWith(':') && val.length === 2) {
-        formatted = val.slice(0, -1);
+  // value is HH:MM (24h)
+  const [hour24, minute24] = value.split(':');
+  const h24 = parseInt(hour24);
+  const isPM = h24 >= 12;
+  
+  // Display value in 12h format: "HHMM"
+  const getDisplayValue = (h: number, m: string) => {
+    const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    return `${h12.toString().padStart(2, '0')}${m}`;
+  };
+
+  const [inputValue, setInputValue] = useState(getDisplayValue(h24, minute24));
+
+  // Sync with external value
+  useEffect(() => {
+    const [h, m] = value.split(':');
+    setInputValue(getDisplayValue(parseInt(h), m));
+  }, [value]);
+
+  const handleInputChange = (val: string) => {
+    const clean = val.replace(/\D/g, '').slice(0, 4);
+    setInputValue(clean);
+
+    if (clean.length === 4) {
+      let h = parseInt(clean.slice(0, 2));
+      let m = parseInt(clean.slice(2, 4));
+      
+      if (m > 59) m = 59;
+      
+      let newIsPM = isPM;
+      // Smart 24h detection
+      if (h >= 13 && h <= 23) {
+        h -= 12;
+        newIsPM = true;
+      } else if (h > 23) {
+        h = 11;
+        newIsPM = true;
       }
-    } else {
-      // Auto-formatting for typing/pasting
-      const digits = val.replace(/\D/g, '');
-      if (digits.length <= 2) {
-        formatted = digits;
-        if (digits.length === 2) formatted += ':';
+      if (h === 0) h = 12;
+      if (h > 12) h = 12;
+
+      let finalH24 = h;
+      if (newIsPM) {
+        finalH24 = (h === 12) ? 12 : h + 12;
       } else {
-        formatted = digits.slice(0, 2) + ':' + digits.slice(2);
+        finalH24 = (h === 12) ? 0 : h;
       }
-    }
-    
-    // Limit length to 5 (HH:MM)
-    if (formatted.length <= 5) {
+
+      const formatted = `${finalH24.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
       onChange(formatted);
     }
   };
 
+  const toggleAMPM = () => {
+    let finalH24 = h24;
+    if (isPM) {
+      finalH24 = (h24 === 12) ? 0 : h24 - 12;
+    } else {
+      finalH24 = (h24 === 0) ? 12 : h24 + 12;
+    }
+    const formatted = `${finalH24.toString().padStart(2, '0')}:${minute24}`;
+    onChange(formatted);
+  };
+
+  // Format display for the input: "HH : MM"
+  const displayString = inputValue.length >= 3 
+    ? `${inputValue.slice(0, 2)} : ${inputValue.slice(2)}`
+    : inputValue;
+
   return (
-    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus-within:border-neon-pink transition-all flex items-center">
+    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-2 text-sm focus-within:border-neon-pink transition-all flex items-center">
       <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+      
       <input 
         type="text"
-        placeholder="HH:MM (24h)"
-        value={value}
-        onChange={handleChange}
-        className="w-full bg-transparent text-white focus:outline-none placeholder:text-white/20"
+        inputMode="numeric"
+        value={displayString}
+        onChange={(e) => handleInputChange(e.target.value)}
+        onFocus={(e) => e.target.select()}
+        onBlur={() => {
+          // Ensure 4 digits on blur
+          const padded = inputValue.padEnd(4, '0');
+          handleInputChange(padded);
+        }}
+        className="flex-1 bg-transparent text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
+        placeholder="00 : 00"
       />
+
+      <button 
+        onClick={toggleAMPM}
+        className={`ml-auto px-3 py-1.5 rounded-xl text-[10px] font-black tracking-tighter transition-all shrink-0 ${isPM ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'}`}
+      >
+        {isPM ? 'PM' : 'AM'}
+      </button>
     </div>
   );
 };
@@ -182,7 +238,7 @@ export default function App() {
             const lat = place.geometry.location.lat();
             const lon = place.geometry.location.lng();
             setCoords({ lat, lon });
-            setUserInput(prev => ({ ...prev, city: place.name || '' }));
+            setUserInput(prev => ({ ...prev, city: inputRef.current?.value || place.name || '' }));
             setIsLocationSynced(true);
             setGreeting(t.input.locationSynced);
             setTimeout(() => setIsLocationSynced(false), 3000);
@@ -433,71 +489,117 @@ export default function App() {
                       />
                     </div>
 
-                    {/* Date & Calendar Type */}
-                    <div className="flex gap-2 items-center">
-                      <div className="relative flex-1">
-                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
-                        <input 
-                          type="text"
-                          placeholder="YYYY-MM-DD"
-                          value={userInput.birthDate}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            const prev = userInput.birthDate;
-                            const isDeleting = val.length < prev.length;
-                            let formatted = val;
+                    {/* Date & Time Section */}
+                    {lang === 'KO' ? (
+                      <>
+                        {/* Date Row (KO) */}
+                        <div className="flex gap-2 items-center">
+                          <div className="relative flex-1">
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+                            <input 
+                              type="text"
+                              placeholder="YYYY-MM-DD"
+                              value={userInput.birthDate}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const prev = userInput.birthDate;
+                                const isDeleting = val.length < prev.length;
+                                let formatted = val;
 
-                            if (isDeleting) {
-                              if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
-                                formatted = val.slice(0, -1);
-                              }
-                            } else {
-                              const digits = val.replace(/\D/g, '');
-                              if (digits.length <= 4) {
-                                formatted = digits;
-                                if (digits.length === 4) formatted += '-';
-                              } else if (digits.length <= 6) {
-                                formatted = digits.slice(0, 4) + '-' + digits.slice(4);
-                                if (digits.length === 6) formatted += '-';
-                              } else {
-                                formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
-                              }
-                            }
+                                if (isDeleting) {
+                                  if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
+                                    formatted = val.slice(0, -1);
+                                  }
+                                } else {
+                                  const digits = val.replace(/\D/g, '');
+                                  if (digits.length <= 4) {
+                                    formatted = digits;
+                                    if (digits.length === 4) formatted += '-';
+                                  } else if (digits.length <= 6) {
+                                    formatted = digits.slice(0, 4) + '-' + digits.slice(4);
+                                    if (digits.length === 6) formatted += '-';
+                                  } else {
+                                    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
+                                  }
+                                }
 
-                            if (formatted.length <= 10) {
-                              setUserInput({ ...userInput, birthDate: formatted });
-                            }
-                          }}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
-                        />
-                      </div>
-                      
-                      {lang === 'KO' && (
-                        <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[42px] items-center">
-                          <button 
-                            onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                            className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
-                          >
-                            {t.input.solar}
-                          </button>
-                          <button 
-                            onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                            className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
-                          >
-                            {t.input.lunar}
-                          </button>
+                                if (formatted.length <= 10) {
+                                  setUserInput({ ...userInput, birthDate: formatted });
+                                }
+                              }}
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                            />
+                          </div>
+                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[42px] items-center">
+                            <button 
+                              onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
+                              className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                            >
+                              {t.input.solar}
+                            </button>
+                            <button 
+                              onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
+                              className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                            >
+                              {t.input.lunar}
+                            </button>
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        {/* Time Row (KO) */}
+                        <TimeInput 
+                          value={userInput.birthTime}
+                          onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
+                          lang={lang}
+                        />
+                      </>
+                    ) : (
+                      /* Date & Time Row (EN) */
+                      <div className="flex gap-2">
+                        <div className="relative flex-[1.2]">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+                          <input 
+                            type="text"
+                            placeholder="YYYY-MM-DD"
+                            value={userInput.birthDate}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const prev = userInput.birthDate;
+                              const isDeleting = val.length < prev.length;
+                              let formatted = val;
 
-                    {/* Time */}
-                    <div className="relative">
-                      <TimeInput 
-                        value={userInput.birthTime}
-                        onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
-                        lang={lang}
-                      />
-                    </div>
+                              if (isDeleting) {
+                                if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
+                                  formatted = val.slice(0, -1);
+                                }
+                              } else {
+                                const digits = val.replace(/\D/g, '');
+                                if (digits.length <= 4) {
+                                  formatted = digits;
+                                  if (digits.length === 4) formatted += '-';
+                                } else if (digits.length <= 6) {
+                                  formatted = digits.slice(0, 4) + '-' + digits.slice(4);
+                                  if (digits.length === 6) formatted += '-';
+                                } else {
+                                  formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
+                                }
+                              }
+
+                              if (formatted.length <= 10) {
+                                setUserInput({ ...userInput, birthDate: formatted });
+                              }
+                            }}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <TimeInput 
+                            value={userInput.birthTime}
+                            onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
+                            lang={lang}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     {/* Gender Selection */}
                     <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl">
@@ -518,22 +620,18 @@ export default function App() {
                         >
                           {t.input.female}
                         </button>
-                        {lang === 'EN' && (
-                          <>
-                            <button 
-                              onClick={() => setUserInput({ ...userInput, gender: 'non-binary' })}
-                              className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
-                            >
-                              {t.input.nonBinary}
-                            </button>
-                            <button 
-                              onClick={() => setUserInput({ ...userInput, gender: 'prefer-not-to-tell' })}
-                              className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
-                            >
-                              {t.input.preferNotToTell}
-                            </button>
-                          </>
-                        )}
+                        <button 
+                          onClick={() => setUserInput({ ...userInput, gender: 'non-binary' })}
+                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                        >
+                          {t.input.nonBinary}
+                        </button>
+                        <button 
+                          onClick={() => setUserInput({ ...userInput, gender: 'prefer-not-to-tell' })}
+                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
+                        >
+                          {t.input.preferNotToTell}
+                        </button>
                       </div>
                     </div>
 

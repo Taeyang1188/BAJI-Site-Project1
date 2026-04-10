@@ -26,6 +26,20 @@ export const calculateAdvancedAnalysis = (
     return 0;
   };
 
+  const getElementKo = (elementEn: string) => {
+    const map: any = { 'Wood': '목(木)', 'Fire': '화(火)', 'Earth': '토(土)', 'Metal': '금(金)', 'Water': '수(水)' };
+    return map[elementEn] || elementEn;
+  };
+
+  const getRelationship = (dmEl: string, targetEl: string) => {
+    const cycle = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmIdx = cycle.indexOf(dmEl);
+    const targetIdx = cycle.indexOf(targetEl);
+    const diff = (targetIdx - dmIdx + 5) % 5;
+    const rels = ['Self', 'Output', 'Wealth', 'Power', 'Wisdom'];
+    return rels[diff];
+  };
+
   const isGwanSalHonJap = hasGod('정관') && hasGod('편관');
   
   // 1. Mu-Ja-Ron (Absence of Ten Gods)
@@ -454,6 +468,170 @@ export const calculateAdvancedAnalysis = (
   };
 
   const relationshipAnalysis = getRelationshipAnalysis();
+  
+  // 3.5 Elemental Overload Analysis (Warning/Special Cases)
+  const getElementalOverloadAnalysis = () => {
+    const elementPercentages: Record<string, number> = {};
+    const totalEnergy = Object.values(tenGodsRatio).reduce((a, b) => a + b, 0) || 100;
+    
+    // Convert Ten Gods ratios back to Elements
+    // This is a bit tricky because we need the actual element scores.
+    // However, we can use the strength object's breakdown or calculate it here.
+    // For simplicity, let's use the tenGodsRatio to infer element dominance.
+    
+    const elementDominance: Record<string, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+    
+    // Map Ten Gods to Elements based on Day Master
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const cycle = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmIdx = cycle.indexOf(dmElement);
+    
+    const godToElement = (god: string) => {
+      if (god.includes('비겁') || god.includes('Mirror')) return cycle[dmIdx];
+      if (god.includes('식상') || god.includes('Artist')) return cycle[(dmIdx + 1) % 5];
+      if (god.includes('재성') || god.includes('Maverick')) return cycle[(dmIdx + 2) % 5];
+      if (god.includes('관성') || god.includes('Warrior')) return cycle[(dmIdx + 3) % 5];
+      if (god.includes('인성') || god.includes('Mystic')) return cycle[(dmIdx + 4) % 5];
+      return '';
+    };
+
+    Object.entries(tenGodsRatio).forEach(([god, ratio]) => {
+      const el = godToElement(god);
+      if (el) elementDominance[el] += ratio;
+    });
+
+    const overloadInsights: any[] = [];
+    
+    Object.entries(elementDominance).forEach(([el, ratio]) => {
+      if (ratio >= 40) {
+        let titleKo = `${getElementKo(el)} 과다 (과유불급)`;
+        let titleEn = `${el} Overload`;
+        let descKo = '';
+        let descEn = '';
+
+        if (el === 'Wood') {
+          descKo = '목(木)의 기운이 너무 강해 화(火)를 질식시키거나(목다화식), 토(土)를 허물어뜨리고(목다토붕), 금(金)을 무디게(목다금결) 할 수 있습니다. 넘치는 생명력을 조절할 금(金)의 절제력이나 에너지를 발산할 화(火)의 배출구가 필요합니다.';
+          descEn = 'Wood energy is too strong, potentially smothering Fire (Wood-Fire-Suffocation), collapsing Earth (Wood-Earth-Collapse), or dulling Metal (Wood-Metal-Dulling). You need the discipline of Metal to control this vitality or the outlet of Fire to release it.';
+        } else if (el === 'Fire') {
+          descKo = '화(火)의 기운이 치솟아 목(木)을 태우고(화다목분), 토(土)를 메마르게 하며(화다토초), 금(金)을 녹이고(화다금용), 수(水)를 증발시킵니다(화다수증). 열기를 식혀줄 수(水)의 냉철함이나 화기를 흡수할 토(土)의 포용력이 절실합니다.';
+          descEn = 'Fire energy is soaring, burning Wood, parching Earth, melting Metal, and evaporating Water. You desperately need the coolness of Water to lower the heat or the tolerance of Earth to absorb the fire.';
+        } else if (el === 'Earth') {
+          descKo = '토(土)의 기운이 두터워 목(木)을 부러뜨리고(토다목절), 화(火)를 어둡게 하며(토다화회), 금(金)을 묻어버리고(토다금매), 수(水)를 가둡니다(토다수사). 굳어버린 토를 일깨울 목(木)의 소토(疏土) 작용이나 금(金)의 설기(洩氣)가 필요합니다.';
+          descEn = 'Earth energy is too thick, snapping Wood, dimming Fire, burying Metal (Earth-Metal-Burial), and trapping Water. You need the action of Wood to break the hardened Earth or Metal to drain its energy.';
+        } else if (el === 'Metal') {
+          descKo = '금(金)의 기운이 날카로워 목(木)을 꺾고(금다목절), 화(火)를 꺼뜨리며(금다화식), 토(土)를 변질시키고(금다토변), 수(水)를 탁하게 만듭니다(금다수탁). 강한 금기를 다듬어줄 화(火)의 제련이나 수(水)의 유연한 흐름이 필요합니다.';
+          descEn = 'Metal energy is too sharp, snapping Wood, extinguishing Fire, altering Earth, and muddying Water. You need the refining power of Fire to shape the strong Metal or the flexible flow of Water.';
+        } else if (el === 'Water') {
+          descKo = '수(水)의 기운이 범람하여 목(木)을 띄우고(수다목부), 화(火)를 끄며(수다화멸), 토(土)를 휩쓸어가고(수다토류), 금(金)을 가라앉힙니다(수다금침). 넘치는 물길을 막아줄 토(土)의 제방이나 수기를 흡수해 성장할 목(木)의 역할이 중요합니다.';
+          descEn = 'Water energy is overflowing, floating Wood, extinguishing Fire, washing away Earth, and sinking Metal. You need the embankment of Earth to block the flood or the role of Wood to absorb the water and grow.';
+        }
+
+        overloadInsights.push({ title: titleKo, titleEn, description: descKo, enDescription: descEn });
+      }
+    });
+
+    return overloadInsights;
+  };
+
+  const overloadAnalysis = getElementalOverloadAnalysis();
+
+  // 3.6 Advanced Edge Case Analysis (Wang-shin-chung-bal, Heo-bu, Jaeng-hap, Im-myo)
+  const getAdvancedEdgeCases = () => {
+    const cases: any[] = [];
+    const elementScores: Record<string, number> = strength.elementScores || {};
+    const totalScore = Object.values(elementScores).reduce((a: number, b: number) => a + Math.max(0, b), 0) || 1;
+    
+    // 1. Wang-shin-chung-bal (Explosive Clash)
+    const clashes = [
+      ['子', '午'], ['丑', '未'], ['寅', '申'], ['卯', '酉'], ['辰', '戌'], ['巳', '亥']
+    ];
+    const presentBranches = pillars.map(p => p.branch);
+    
+    Object.entries(elementScores).forEach(([el, score]) => {
+      const ratio = (score / totalScore) * 100;
+      if (ratio > 70) {
+        // Check if this strong element is being clashed
+        const elBranches: Record<string, string[]> = {
+          Wood: ['寅', '卯'], Fire: ['巳', '午'], Earth: ['辰', '戌', '丑', '未'],
+          Metal: ['申', '酉'], Water: ['亥', '子']
+        };
+        
+        const isClashed = clashes.some(([b1, b2]) => {
+          const hasB1 = presentBranches.includes(b1);
+          const hasB2 = presentBranches.includes(b2);
+          if (hasB1 && hasB2) {
+            return elBranches[el].includes(b1) || elBranches[el].includes(b2);
+          }
+          return false;
+        });
+
+        if (isClashed) {
+          cases.push({
+            title: lang === 'KO' ? '왕신충발(旺神衝發) 경고' : 'Explosive Clash Warning (Wang-shin-chung-bal)',
+            description: lang === 'KO' 
+              ? `${getElementKo(el)}의 기운이 극강한 상태에서 충(衝)이 발생했습니다. 이는 단순히 기운이 꺾이는 것이 아니라, 잠자던 사자를 건드린 격으로 갑작스러운 사고나 건강 악화, 혹은 감당하기 힘든 급격한 변화를 암시합니다. 극도로 신중한 처신이 필요합니다.`
+              : `A clash has occurred while the ${el} energy is extremely strong (>70%). This is not a normal clash; it's like "poking a sleeping lion," suggesting sudden accidents, health issues, or overwhelming rapid changes. Extreme caution is required.`,
+            type: 'warning'
+          });
+        }
+      }
+    });
+
+    // 2. Heo-bu (Floating Stems)
+    const floating = strength.floatingStems || [];
+    floating.forEach((s: string) => {
+      const el = BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems]?.element;
+      const rel = getRelationship(dmElement, el);
+      if (rel === 'Wealth') {
+        cases.push({
+          title: lang === 'KO' ? '재성허부(財星虛浮) - 뜬구름 재물' : 'Floating Wealth (Heo-bu)',
+          description: lang === 'KO'
+            ? `천간에 재성(${s})이 떠 있으나 지지에 뿌리가 전혀 없습니다. 이는 겉으로는 화려해 보이나 실속이 없거나, 큰 돈을 꿈꾸지만 현실적인 기반이 약해 '뜬구름 잡는 돈 걱정'에 머물기 쉬운 형국입니다. 실질적인 자산 관리에 집중해야 합니다.`
+            : `Wealth star (${s}) is in the stem but has no roots in the branches. This indicates a "floating wealth" situation where you might dream of big money but lack a realistic foundation, leading to empty financial worries. Focus on practical asset management.`,
+          type: 'info'
+        });
+      } else if (rel === 'Power') {
+        cases.push({
+          title: lang === 'KO' ? '관성허부(官星虛浮) - 명예의 허상' : 'Floating Power (Heo-bu)',
+          description: lang === 'KO'
+            ? `천간에 관성(${s})이 있으나 뿌리가 없습니다. 명예나 직함은 있으나 실질적인 권한이 약하거나, 남의 시선을 지나치게 의식하여 겉치레에 치중할 수 있습니다. 내실을 다지는 것이 중요합니다.`
+            : `Power star (${s}) is present but rootless. You may have titles or honor but lack real authority, or focus too much on appearances and others' opinions. Strengthening your inner substance is key.`,
+          type: 'info'
+        });
+      }
+    });
+
+    // 3. Jaeng-hap (Competition)
+    const jaengHap = (strength.activeCombinations || []).filter((c: any) => c.type === 'Jaeng-hap');
+    jaengHap.forEach((c: any) => {
+      cases.push({
+        title: lang === 'KO' ? '쟁합(爭合) - 에너지 분산' : 'Competition (Jaeng-hap)',
+        description: lang === 'KO'
+          ? `합을 해야 할 글자가 여러 개(${c.stems.join(', ')}) 있어 기운이 분산되고 있습니다. 이는 목표가 하나로 집중되지 못하거나, 인간관계에서 삼각관계나 경쟁 상황에 자주 놓이게 됨을 의미합니다. 선택과 집중이 필요합니다.`
+          : `Multiple stems (${c.stems.join(', ')}) are competing for a combination, scattering your energy. This suggests difficulty in focusing on one goal or frequently being placed in competitive/triangular relationships. Selection and focus are required.`,
+        type: 'info'
+      });
+    });
+
+    // 4. Im-myo (Storage/Tomb)
+    const tombs: Record<string, string> = { Wood: '未', Fire: '戌', Earth: '辰', Metal: '丑', Water: '辰' };
+    Object.entries(elementScores).forEach(([el, score]) => {
+      const ratio = (score / totalScore) * 100;
+      if (ratio > 30 && presentBranches.includes(tombs[el])) {
+        cases.push({
+          title: lang === 'KO' ? `${getElementKo(el)} 입묘(入墓)` : `${el} Entering Storage (Im-myo)`,
+          description: lang === 'KO'
+            ? `강한 ${getElementKo(el)}의 기운이 지지의 묘고(${tombs[el]}) 속으로 빨려 들어가 활동성이 급격히 위축되는 형국입니다. 잘 나가던 일이 갑자기 정체되거나, 자신의 능력을 마음껏 펼치지 못하고 갇혀 있는 느낌을 받을 수 있습니다.`
+            : `Strong ${el} energy is being sucked into its storage branch (${tombs[el]}), sharply reducing its activity. You may feel your progress suddenly stalling or your talents being trapped and unable to unfold freely.`,
+          type: 'info'
+        });
+      }
+    });
+
+    return cases;
+  };
+
+  const advancedEdgeCases = getAdvancedEdgeCases();
 
   // 4. Shin-Gang/Shin-Yak (Strength Analysis)
   const getShinGangShinYak = () => {
@@ -520,6 +698,8 @@ export const calculateAdvancedAnalysis = (
   return {
     muJaRon,
     daJaRon,
+    overloadAnalysis,
+    advancedEdgeCases,
     relationshipAnalysis,
     shinGangShinYak,
     personalizedInsights,
