@@ -7,6 +7,7 @@ import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } fr
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
+import { ParsedText } from './ParsedText';
 import { GeJuHelpModal } from './GeJuHelpModal';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { 
@@ -118,51 +119,6 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   const stemEl = STEM_ELEMENTS[stem as keyof typeof STEM_ELEMENTS];
   const branchEl = BRANCH_ELEMENTS[branch as keyof typeof BRANCH_ELEMENTS];
   return stemEl === branchEl;
-};
-
-const ParsedText: React.FC<{ text: string }> = ({ text }) => {
-  const elements: React.ReactNode[] = [];
-  let i = 0;
-  let currentText = '';
-  let keyCount = 0;
-
-  while (i < text.length) {
-    if (text[i] === '[') {
-      const endBracketIndex = text.indexOf(']', i + 1);
-      if (endBracketIndex !== -1) {
-        const tagContent = text.substring(i + 1, endBracketIndex);
-        
-        if (tagContent.startsWith('delay:')) {
-          if (currentText) {
-            elements.push(<span key={keyCount++}>{currentText}</span>);
-            currentText = '';
-          }
-          i = endBracketIndex + 1;
-          continue;
-        }
-        
-        const colonIndex = tagContent.indexOf(':');
-        if (colonIndex !== -1) {
-          if (currentText) {
-            elements.push(<span key={keyCount++}>{currentText}</span>);
-            currentText = '';
-          }
-          const color = tagContent.substring(0, colonIndex);
-          const content = tagContent.substring(colonIndex + 1);
-          elements.push(<span key={keyCount++} style={{ color }}>{content}</span>);
-          i = endBracketIndex + 1;
-          continue;
-        }
-      }
-    }
-    currentText += text[i];
-    i++;
-  }
-  if (currentText) {
-    elements.push(<span key={keyCount++}>{currentText}</span>);
-  }
-
-  return <>{elements}</>;
 };
 
 const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void }> = ({ text, speed = 30, onComplete }) => {
@@ -1009,7 +965,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       }
 
       // 2. Stem (Mind) vs Branch (Reality)
-      main += `\n\n[정신과 현실의 분리]\n`;
+      main += `\n\n${lang === 'KO' ? '그럼 이제 정신과 현실의 분리를 볼까?' : "Shall we look at the separation of mind and reality?"}\n`;
       if (isStemYongshin) {
         main += `오늘 천간(정신)의 기운이 네게 희신(좋은 기운)으로 작용해. 스트레스가 풀리고 심리적으로 아주 맑고 긍정적인 기분을 느낄 수 있어. `;
       } else if (isStemGishin) {
@@ -1032,35 +988,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       if (isSuHwaGiJe) {
         main += `\n\n[특수 기운: 수화기제]\n오늘은 수(水)와 화(火)가 만나는 '수화기제'의 날이야. 일이 완벽히 끝나는 건 아니지만, 막혔던 일이 일단락되고 매듭지어지며 다음 스텝을 도모할 수 있는 중요한 전환점이 될 거야.`;
       }
-
-      // 4. 10 Gods Filtering
-      main += `\n\n[오늘의 핵심 이벤트]\n`;
-      if (stemGod.includes('비견') || stemGod.includes('겁재')) {
-        main += `비견/겁재일: 재성(돈)을 극하는 날이라 지출이 생기거나 남에게 뺏길 확률이 높아. 대신 경쟁심과 욕심이 생기고 두려움이 없어지며(겁상실), 동등한 위치의 친구나 사람을 많이 만나게 될 거야.`;
-      } else if (stemGod.includes('식신') || stemGod.includes('상관')) {
-        main += `식신/상관일: 말문이 트이고 아이디어나 표현력이 강하게 발휘되는 날이야. 단, 다른 기운에 의해 막히면 오히려 답답해지고 혀가 꼬일 수 있으니 상황을 잘 살펴.`;
-      } else if (stemGod.includes('정인')) {
-        main += `정인일: 남들에게 정직하게 인정받고 싶어 하는 날이야. 엄마의 보살핌처럼 안정적이고 편안함을 느끼며, 누군가에게 밥을 얻어먹는 등 소소한 이득이 생길 수 있어.`;
-      } else if (stemGod.includes('편인')) {
-        main += `편인일: 긍정적인 생각보다 부정적인 생각과 의심, 잦은 실수가 유발되기 쉬워. 특히 식신(즐거움)을 극하는 '도식' 작용이 일어나 몸에 힘이 빠지고 만사가 귀찮아질 수 있으니 억지로라도 텐션을 올려봐.`;
-      } else if (stemGod.includes('편관')) {
-        main += `편관일: 무언가를 기필코 해내야겠다는 강한 의지와 목표 의식이 생겨. 하지만 이로 인해 정도를 벗어나거나 초조함, 강박을 심하게 느낄 수 있으니 릴렉스하는 게 중요해.`;
-      } else if (stemGod.includes('정관')) {
-        main += `정관일: 원칙과 규칙을 지키며 안정감을 느끼는 날이야. 명예나 직장운이 상승하고 바른 생활을 추구하게 돼.`;
-      } else if (stemGod.includes('정재') || stemGod.includes('편재')) {
-        main += `재성일: 현실 감각이 뛰어나고 결과물에 집중하는 날이야. 금전적인 흐름이 활발해지거나 이성과의 만남이 있을 수 있어.`;
-      }
-
-      // 5. Time-based Fortune
-      main += `\n\n[현재 시간대 길흉 판별]\n네가 이 운세를 확인하는 지금 이 시간(${currentHour}시), `;
-      if (isSaengBiJae) {
-        main += `시간의 기운이 너를 도와주는 '생비재'에 해당해! 지금 마주한 사건의 결과나 타이밍이 아주 긍정적(길)으로 흘러갈 확률이 높아. 기회를 잡아!`;
-      } else if (isGeukSeol) {
-        main += `시간의 기운이 너의 힘을 빼는 '극설'에 해당해. 지금은 섣불리 움직이면 손해나 어려움을 겪을 수 있으니(흉), 방어적인 태도를 취하는 게 안전해.`;
-      } else {
-        main += `시간의 기운이 중립적이야. 네 의지대로 상황을 이끌어갈 수 있어.`;
-      }
-
     } else {
       // English version
       main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. \n\n`;
@@ -1075,7 +1002,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
         main += `The overall base fortune is smooth and peaceful. `;
       }
 
-      main += `\n\n[Mind vs Reality]\n`;
+      main += `\n\nShall we look at the separation of mind and reality?\n`;
       if (isStemYongshin) {
         main += `Today's Heavenly Stem (mind) acts as a favorable energy. Stress will relieve, and you'll feel psychologically clear and positive. `;
       } else if (isStemGishin) {
@@ -1086,36 +1013,78 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
       if (samhapElement) {
         if (isSamhapYongshin) {
-          main += `\nAlso, a combination in the Earthly Branches (reality) is creating a favorable energy (${samhapElement}) for you. The events and results in reality are highly likely to turn out in your favor! `;
+          main += `\nAlso, a combination in the Earthly Branches (reality) is creating a favorable energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. The events and results in reality are highly likely to turn out in your favor! `;
         } else if (isSamhapGishin) {
-          main += `\nHowever, a combination in the Earthly Branches (reality) is forming an unfavorable energy (${samhapElement}) for you. Practical results or events might get tangled differently from your intentions, so be careful. `;
+          main += `\nHowever, a combination in the Earthly Branches (reality) is forming an unfavorable energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. Practical results or events might get tangled differently from your intentions, so be careful. `;
         } else {
-          main += `\nA combination in the Earthly Branches (reality) is creating a new energy (${samhapElement}). You might see some interesting changes in your surroundings or situations. `;
+          main += `\nA combination in the Earthly Branches (reality) is creating a new energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}). You might see some interesting changes in your surroundings or situations. `;
         }
       }
 
       if (isSuHwaGiJe) {
         main += `\n\n[Special Energy: Water-Fire Equilibrium]\nToday is a day where Water and Fire meet. Things might not finish perfectly, but blocked issues will be wrapped up, marking an important turning point for your next step.`;
       }
+    }
 
-      main += `\n\n[Today's Core Event]\n`;
-      if (stemGod.includes('Mirror') || stemGod.includes('Rival')) {
-        main += `Mirror/Rival Day: High chance of spending money or losing it. Instead, you'll feel competitive, fearless, and meet many friends or equals.`;
-      } else if (stemGod.includes('Artist') || stemGod.includes('Rebel')) {
-        main += `Artist/Rebel Day: You'll be talkative, and your ideas and expression will shine. But if blocked by other energies, you might feel frustrated and tongue-tied.`;
-      } else if (stemGod.includes('Sage')) {
-        main += `Proper Sage Day: You want honest recognition. You'll feel stable and comfortable like a mother's care, and might get small benefits like free meals.`;
-      } else if (stemGod.includes('Mystic')) {
-        main += `Mystic Day: Prone to negative thoughts, doubts, and frequent mistakes. Energy drains and you might feel lazy, so try to force your tension up.`;
-      } else if (stemGod.includes('Strong Warrior')) {
-        main += `Strong Warrior Day: Strong will and goal-oriented. However, this might cause you to deviate from the standard or feel severe anxiety and obsession. Relax.`;
-      } else if (stemGod.includes('Proper Warrior')) {
-        main += `Proper Warrior Day: A day of feeling stable by keeping rules. Honor or career luck rises, pursuing a righteous life.`;
-      } else if (stemGod.includes('Maverick') || stemGod.includes('Architect')) {
-        main += `Wealth Day: Excellent sense of reality, focusing on results. Financial flow becomes active, or you might meet potential partners.`;
+    // 4. 10 Gods Filtering & Over-saturation Check
+    main += `\n\n${lang === 'KO' ? '오늘은...' : "Today..."}\n`;
+    
+    const isOverloaded = overflow.some(o => stemGod.includes(o));
+    
+    if (isOverloaded) {
+      if (lang === 'KO') {
+        main += `오, 그런데 ${stemGod}의 기운이 이미 네 사주에 넘치고 있어! 오늘은 이 기운이 과해지면서 오히려 고집이 세지거나, 생각이 너무 많아져서 행동이 굼떠질 수 있으니 주의가 필요해. 객관성을 잃지 않도록 조심해.`;
+      } else {
+        main += `Oh, but the energy of ${stemGod} is already overflowing in your chart! Today, this energy might become excessive, making you stubborn or causing analysis paralysis. Be careful not to lose objectivity.`;
       }
+    } else {
+      if (lang === 'KO') {
+        if (stemGod.includes('비견') || stemGod.includes('겁재')) {
+          main += `비견/겁재일: 재성(돈)을 극하는 날이라 지출이 생기거나 남에게 뺏길 확률이 높아. 대신 경쟁심과 욕심이 생기고 두려움이 없어지며(겁상실), 동등한 위치의 친구나 사람을 많이 만나게 될 거야.`;
+        } else if (stemGod.includes('식신') || stemGod.includes('상관')) {
+          main += `식신/상관일: 말문이 트이고 아이디어나 표현력이 강하게 발휘되는 날이야. 단, 다른 기운에 의해 막히면 오히려 답답해지고 혀가 꼬일 수 있으니 상황을 잘 살펴.`;
+        } else if (stemGod.includes('정인')) {
+          main += `정인일: 남들에게 정직하게 인정받고 싶어 하는 날이야. 엄마의 보살핌처럼 안정적이고 편안함을 느끼며, 누군가에게 밥을 얻어먹는 등 소소한 이득이 생길 수 있어.`;
+        } else if (stemGod.includes('편인')) {
+          main += `편인일: 긍정적인 생각보다 부정적인 생각과 의심, 잦은 실수가 유발되기 쉬워. 특히 식신(즐거움)을 극하는 '도식' 작용이 일어나 몸에 힘이 빠지고 만사가 귀찮아질 수 있으니 억지로라도 텐션을 올려봐.`;
+        } else if (stemGod.includes('편관')) {
+          main += `편관일: 무언가를 기필코 해내야겠다는 강한 의지와 목표 의식이 생겨. 하지만 이로 인해 정도를 벗어나거나 초조함, 강박을 심하게 느낄 수 있으니 릴렉스하는 게 중요해.`;
+        } else if (stemGod.includes('정관')) {
+          main += `정관일: 원칙과 규칙을 지키며 안정감을 느끼는 날이야. 명예나 직장운이 상승하고 바른 생활을 추구하게 돼.`;
+        } else if (stemGod.includes('정재') || stemGod.includes('편재')) {
+          main += `재성일: 현실 감각이 뛰어나고 결과물에 집중하는 날이야. 금전적인 흐름이 활발해지거나 이성과의 만남이 있을 수 있어.`;
+        }
+      } else {
+        if (stemGod.includes('Mirror') || stemGod.includes('Rival')) {
+          main += `Mirror/Rival Day: High chance of spending money or losing it. Instead, you'll feel competitive, fearless, and meet many friends or equals.`;
+        } else if (stemGod.includes('Artist') || stemGod.includes('Rebel')) {
+          main += `Artist/Rebel Day: You'll be talkative, and your ideas and expression will shine. But if blocked by other energies, you might feel frustrated and tongue-tied.`;
+        } else if (stemGod.includes('Sage')) {
+          main += `Proper Sage Day: You want honest recognition. You'll feel stable and comfortable like a mother's care, and might get small benefits like free meals.`;
+        } else if (stemGod.includes('Mystic')) {
+          main += `Mystic Day: Prone to negative thoughts, doubts, and frequent mistakes. Energy drains and you might feel lazy, so try to force your tension up.`;
+        } else if (stemGod.includes('Strong Warrior')) {
+          main += `Strong Warrior Day: Strong will and goal-oriented. However, this might cause you to deviate from the standard or feel severe anxiety and obsession. Relax.`;
+        } else if (stemGod.includes('Proper Warrior')) {
+          main += `Proper Warrior Day: A day of feeling stable by keeping rules. Honor or career luck rises, pursuing a righteous life.`;
+        } else if (stemGod.includes('Maverick') || stemGod.includes('Architect')) {
+          main += `Wealth Day: Excellent sense of reality, focusing on results. Financial flow becomes active, or you might meet potential partners.`;
+        }
+      }
+    }
 
-      main += `\n\n[Time-based Fortune]\nAt this very moment (${currentHour}:00), `;
+    // 5. Time-based Fortune
+    if (lang === 'KO') {
+      main += `\n\n마지막으로 지금 이 시간은..\n네가 이 운세를 확인하는 지금 이 시간(${currentHour}시), `;
+      if (isSaengBiJae) {
+        main += `시간의 기운이 너를 도와주는 '생비재'에 해당해! 지금 마주한 사건의 결과나 타이밍이 아주 긍정적(길)으로 흘러갈 확률이 높아. 기회를 잡아!`;
+      } else if (isGeukSeol) {
+        main += `시간의 기운이 너의 힘을 빼는 '극설'에 해당해. 지금은 섣불리 움직이면 손해나 어려움을 겪을 수 있으니(흉), 방어적인 태도를 취하는 게 안전해.`;
+      } else {
+        main += `시간의 기운이 중립적이야. 네 의지대로 상황을 이끌어갈 수 있어.`;
+      }
+    } else {
+      main += `\n\nLastly, at this moment...\nAt this time (${currentHour}:00) when you check this fortune, `;
       if (isSaengBiJae) {
         main += `the time energy supports you! The outcome or timing of current events is highly likely to be positive. Grab the chance!`;
       } else if (isGeukSeol) {
@@ -1366,7 +1335,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             }}
                             className="text-xs font-bold text-neon-cyan hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1"
                           >
-                            {lang === 'KO' ? '비밀의 페이지 열기' : 'OPEN THE SECRET PAGE'}
+                            {(() => {
+                              const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
+                              if (nextId === 'marriage_timing') return lang === 'KO' ? '결혼운 확인하기' : 'CHECK MARRIAGE LUCK';
+                              if (nextId === 'romance') return lang === 'KO' ? '인연의 실타래 풀기' : 'UNTANGLE ROMANCE';
+                              return lang === 'KO' ? '비밀의 페이지 열기' : 'OPEN THE SECRET PAGE';
+                            })()}
                             <ChevronRight className="w-3 h-3" />
                           </button>
                         </motion.div>
@@ -1403,7 +1377,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           <Sparkles className="w-5 h-5" />
                           <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
                         </h4>
-                        <WeatherWidget city={city} lang={lang} />
+                        <div className="flex items-center gap-4">
+                          <WeatherWidget city={city} lang={lang} />
+                          <button onClick={() => setShowDailyVibe(false)} className="text-white/50 hover:text-white transition-colors">
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                       <p className="text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
                         <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} />

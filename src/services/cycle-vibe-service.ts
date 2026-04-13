@@ -2,6 +2,7 @@ import { BaZiResult, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { ELEMENT_COLORS, ELEMENT_DESCRIPTIONS } from '../constants';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
+import { Solar } from 'lunar-typescript';
 
 export interface ThemeOption {
   id: string;
@@ -21,12 +22,12 @@ export interface CycleVibeResult {
 
 const CITY_META_TABLE: Record<string, { impression: string, enImpression: string }> = {
   "강릉": { impression: "푸른 파도와 커피 향이 어우러진 낭만적인 곳이지. 언제 가도 마음이 탁 트이는 기분이야.", enImpression: "A romantic place where blue waves and coffee scent blend. It always makes you feel refreshed." },
-  "부산": { impression: "거친 파도와 역동적인 에너지가 넘치는 곳이지. 돼지국밥 한 그릇 뚝딱하고 싶네.", enImpression: "A place full of rough waves and dynamic energy. Makes me crave a bowl of Dwaeji Gukbap." },
+  "부산": { impression: "거친 파도와 역동적인 에너지가 넘치는 곳이지. 활기찬 기운이 여기까지 느껴지는 것 같아.", enImpression: "A place full of rough waves and dynamic energy. I can feel the vibrant energy from here." },
   "춘천": { impression: "안개 낀 호수와 서정적인 분위기가 매력적인 곳이지. 닭갈비 냄새가 여기까지 나는 것 같아.", enImpression: "A charming place with foggy lakes and a lyrical atmosphere. I can almost smell the Dakgalbi from here." },
   "경주": { impression: "천 년의 세월이 흐르는 신비로운 땅이지. 발길 닿는 곳마다 역사가 살아 숨 쉬는 기분이야.", enImpression: "A mysterious land where a thousand years of time flow. History breathes wherever you step." },
   "제주": { impression: "현무암 사이를 지나는 바람이 자유로운 곳이지. 이국적인 풍경에 훌쩍 떠나고 싶어지네.", enImpression: "A place where the wind blows freely through basalt rocks. The exotic scenery makes me want to just take off and go." },
-  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 당기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD?" },
-  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 당기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD?" }
+  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 대한민국의 심장부다운 에너지가 느껴져.", enImpression: "A modern place where vibrant energy and tradition blend well. I can feel the energy of the heart of Korea." },
+  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 대한민국의 심장부다운 에너지가 느껴져.", enImpression: "A modern place where vibrant energy and tradition blend well. I can feel the energy of the heart of Korea." }
 };
 
 const formatGod = (god: string, stemOrBranch: string, lang: Language) => {
@@ -364,7 +365,7 @@ export function generateCycleVibe(
       if (comboIds.includes('식상생재')) detailedEffect += `식상이 재성으로 이어지는 흐름이라 결과물이 쏠쏠하겠어. `;
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
-          detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어를 건드릴 수 있어. `;
+          detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어의 안정성이 흔들릴 수 있으니, 현실적인 이득과 명예 사이에서 균형을 잘 잡는 게 중요해. `;
         }
       }
       if (comboIds.includes('관인상생')) detailedEffect += `조직의 보호 아래서 가치를 증명하기 좋아. `;
@@ -591,6 +592,115 @@ export function generateCycleVibe(
     const glitch = lang === 'KO' ? 
       (score >= 70 ? '인연의 끈이 팽팽하게 당겨지고 있어. 기회를 놓치지 마.' : '지금은 누군가를 찾기보다 네 내면의 평화를 먼저 찾는 게 이득이야.') :
       (score >= 70 ? 'The string of fate is pulling tight. Don\'t miss the chance.' : 'It\'s better to find your inner peace first rather than looking for someone else.');
+
+    let nextHook;
+    if (marital === '미혼' && !children) {
+      nextHook = {
+        text: lang === 'KO' ? '결혼하는 운이 언제 들어올지도 궁금해?' : 'Are you curious when your marriage luck comes in?',
+        themeId: 'marriage_timing'
+      };
+    }
+
+    return { main, glitch, nextHook };
+  };
+
+  // --- Theme 1.5: Marriage Timing (결혼운) ---
+  const analyzeMarriageTiming = () => {
+    const currentYear = new Date().getFullYear();
+    let bestYear = 0;
+    let bestScore = -1;
+    let bestYearStem = '';
+    let bestYearBranch = '';
+    let bestYearReason = '';
+
+    const isFemale = gender === 'female';
+    const isMale = gender === 'male';
+    const dayMaster = result.pillars[1].stem;
+    const dayBranch = result.pillars[1].branch;
+    const yongShin = analysis.yongShen || '';
+
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
+    const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5]; // JaeSeong
+    const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5]; // GwanSeong
+    const drainsDm = ELEMENT_CYCLE[(dmIndex + 1) % 5]; // SikSang
+
+    for (let year = currentYear; year <= currentYear + 15; year++) {
+      const solar = Solar.fromYmd(year, 6, 1);
+      const lunar = solar.getLunar();
+      const baZi = lunar.getEightChar();
+      const yGan = baZi.getYearGan();
+      const yZhi = baZi.getYearZhi();
+      
+      const yGanElement = BAZI_MAPPING.stems[yGan as keyof typeof BAZI_MAPPING.stems]?.element;
+      const yZhiElement = BAZI_MAPPING.branches[yZhi as keyof typeof BAZI_MAPPING.branches]?.element;
+
+      let yearScore = 0;
+      let reason = '';
+
+      // Check Hap with Day Branch
+      const hasHap = (
+        (dayBranch === '子' && yZhi === '丑') || (dayBranch === '丑' && yZhi === '子') ||
+        (dayBranch === '寅' && yZhi === '亥') || (dayBranch === '亥' && yZhi === '寅') ||
+        (dayBranch === '卯' && yZhi === '戌') || (dayBranch === '戌' && yZhi === '卯') ||
+        (dayBranch === '辰' && yZhi === '酉') || (dayBranch === '酉' && yZhi === '辰') ||
+        (dayBranch === '巳' && yZhi === '申') || (dayBranch === '申' && yZhi === '巳') ||
+        (dayBranch === '午' && yZhi === '未') || (dayBranch === '未' && yZhi === '午') ||
+        // Samhap
+        ((dayBranch === '寅' || dayBranch === '午' || dayBranch === '戌') && (yZhi === '寅' || yZhi === '午' || yZhi === '戌') && dayBranch !== yZhi) ||
+        ((dayBranch === '申' || dayBranch === '子' || dayBranch === '辰') && (yZhi === '申' || yZhi === '子' || yZhi === '辰') && dayBranch !== yZhi) ||
+        ((dayBranch === '巳' || dayBranch === '酉' || dayBranch === '丑') && (yZhi === '巳' || yZhi === '酉' || yZhi === '丑') && dayBranch !== yZhi) ||
+        ((dayBranch === '亥' || dayBranch === '卯' || dayBranch === '未') && (yZhi === '亥' || yZhi === '卯' || yZhi === '未') && dayBranch !== yZhi)
+      );
+
+      const isYongShinLuck = yongShin.includes(yGanElement) || yongShin.includes(yZhiElement);
+      const hasJaeSeong = yGanElement === wealth || yZhiElement === wealth;
+      const hasGwanSeong = yGanElement === controlsDm || yZhiElement === controlsDm;
+      const hasSikSang = yGanElement === drainsDm || yZhiElement === drainsDm;
+
+      if (hasHap) yearScore += 30;
+      if (isYongShinLuck) yearScore += 20;
+
+      if (isMale && hasJaeSeong) {
+        yearScore += 20;
+        reason = lang === 'KO' ? '재성(이성운)이 들어오면서' : 'with Wealth (romance) energy coming in,';
+      } else if (isFemale && hasGwanSeong) {
+        yearScore += 20;
+        reason = lang === 'KO' ? '관성(이성운)이 들어오면서' : 'with Power (romance) energy coming in,';
+      } else if (isFemale && hasSikSang) {
+        yearScore += 15;
+        reason = lang === 'KO' ? '식상(자녀/연애운)이 들어오면서' : 'with Artist (romance/children) energy coming in,';
+      }
+
+      if (yearScore > bestScore && hasHap && (isYongShinLuck || (isMale && hasJaeSeong) || (isFemale && (hasGwanSeong || hasSikSang)))) {
+        bestScore = yearScore;
+        bestYear = year;
+        bestYearStem = yGan;
+        bestYearBranch = yZhi;
+        bestYearReason = reason;
+      }
+    }
+
+    let main = '';
+    let glitch = '';
+
+    if (bestYear > 0) {
+      const stemKo = BAZI_MAPPING.stems[bestYearStem as keyof typeof BAZI_MAPPING.stems]?.ko;
+      const branchKo = BAZI_MAPPING.branches[bestYearBranch as keyof typeof BAZI_MAPPING.branches]?.ko;
+      
+      main = lang === 'KO' ? 
+        `미래의 운의 흐름을 스캔해봤어. [delay:1500]\n\n가장 강력한 결혼운(또는 깊은 결합)이 들어오는 시점은 **${bestYear}년(${bestYearStem}${bestYearBranch}년, ${stemKo}${branchKo}의 해)**야.\n\n이 시기에는 ${bestYearReason} 일지(안방)의 문이 합(合)으로 열리게 돼. 단순한 연애를 넘어 실질적인 가정을 꾸리거나 동거 등 깊은 결합이 일어날 확률이 매우 높은 타이밍이지. 이 시기를 잘 기억해둬!` :
+        `I've scanned your future energy flow. [delay:1500]\n\nThe strongest marriage luck (or deep union) comes in **${bestYear} (${bestYearStem}${bestYearBranch} year)**.\n\nDuring this time, ${bestYearReason} the door to your spouse palace opens wide with a combination. It's a highly probable timing for a practical union like marriage or cohabitation beyond just romance. Keep this timing in mind!`;
+        
+      glitch = lang === 'KO' ? '운명은 준비된 자에게 찾아오는 법이야.' : 'Fate comes to those who are prepared.';
+    } else {
+      main = lang === 'KO' ? 
+        `미래의 운의 흐름을 스캔해봤어. [delay:1500]\n\n향후 15년 내에는 일지가 강하게 합으로 묶이면서 뚜렷한 이성운이 겹치는 '전형적인 결혼 타이밍'이 뚜렷하게 보이지는 않네.\n\n하지만 걱정 마. 사주에서 결혼운이 없다고 결혼을 못하는 게 아니야. 오히려 기존의 틀에 얽매이지 않고 자유로운 연애를 즐기거나, 운에 끌려가지 않고 스스로의 선택으로 인연을 만들어갈 수 있다는 뜻이기도 해.` :
+        `I've scanned your future energy flow. [delay:1500]\n\nWithin the next 15 years, a 'typical marriage timing' where your spouse palace strongly combines with romance luck isn't clearly visible.\n\nBut don't worry. Not having a strong marriage luck doesn't mean you can't marry. It means you can enjoy free romance without being bound by traditional frames, or create connections by your own choice rather than being dragged by fate.`;
+        
+      glitch = lang === 'KO' ? '결혼은 운명이 아니라 너의 선택이야.' : 'Marriage is your choice, not just fate.';
+    }
 
     return { main, glitch };
   };
@@ -892,25 +1002,117 @@ export function generateCycleVibe(
 
   // --- Theme 5: Moving (궤도의 이탈) ---
   const analyzeMoving = () => {
-    let text = '';
-    const hasYeokma = analysis.shinsal?.some((s: any) => s.name.includes('역마'));
-    const dayBranch = result.pillars[1].branch;
-    const monthBranch = result.pillars[2].branch;
-    const hasBranchChung = allInteractions.some((i: any) => (i.note.includes(dayBranch) || i.note.includes(monthBranch)) && i.type.includes('충'));
-    
-    if (hasYeokma && hasBranchChung) {
-      text = lang === 'KO' ? `역마의 기운이 충을 맞아 궤도를 이탈하려는 에너지가 폭발하고 있어. 이사나 이직, 혹은 완전히 새로운 환경으로의 이동이 강하게 예견돼. ` : `The energy of Yeokma (traveling star) is clashing, exploding the desire to break out of orbit. Moving, changing jobs, or shifting to a completely new environment is strongly predicted. `;
-    } else if (hasBranchChung) {
-      text = lang === 'KO' ? `지금 머무는 곳의 근간을 흔드는 기운이 들어왔네. 주변 환경이나 심경의 변화로 인해 문득 모든 걸 뒤로하고 새로운 곳으로 떠나고 싶다는 충동이 들지도 몰라. ` : `An energy that shakes the foundation of your current place has entered. Due to changes in your environment or state of mind, you might suddenly feel the urge to leave everything behind and head to a new place. `;
-    } else {
-      text = lang === 'KO' ? `이동보다는 현재의 자리를 지키며 내실을 다지는 게 유리한 흐름이야. ` : `It's a more favorable flow to keep your current position and build inner strength rather than moving. `;
+    const yearBranch = result.pillars[0].branch;
+    const monthBranch = result.pillars[1].branch;
+    const dayBranch = result.pillars[2].branch;
+    const hourBranch = result.pillars[3]?.branch;
+
+    const yearInteraction = allInteractions.filter(i => i.note.includes(yearBranch));
+    const monthInteraction = allInteractions.filter(i => i.note.includes(monthBranch));
+    const dayInteraction = allInteractions.filter(i => i.note.includes(dayBranch));
+    const hourInteraction = hourBranch ? allInteractions.filter(i => i.note.includes(hourBranch)) : [];
+
+    const hasYearMove = yearInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+    const hasMonthMove = monthInteraction.some(i => i.type.includes('충') || i.type.includes('형') || i.type.includes('합'));
+    const hasDayMove = dayInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+    const hasHourMove = hourInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+
+    // Rule 1: Palace-based
+    let moveType = '';
+    let moveCause = '';
+    let moveFortune = '';
+
+    if (hasYearMove) moveType = lang === 'KO' ? '주거지 이동(이사)' : 'Moving house';
+    if (hasMonthMove) moveType = moveType ? moveType + (lang === 'KO' ? ' 및 직장 변동' : ' and job change') : (lang === 'KO' ? '직장 및 사회적 환경 변동' : 'Job and social environment change');
+    if (hasDayMove) moveType = moveType ? moveType + (lang === 'KO' ? ', 신상 변화' : ', personal change') : (lang === 'KO' ? '개인 신상 및 배우자 관련 이동' : 'Personal and spouse-related movement');
+
+    // Rule 1-1: Conditional Expansion
+    const natalInteractions = result.analysis.interactions || [];
+    const monthHasNatalHap = natalInteractions.some((i: any) => i.note.includes(monthBranch) && (i.type.includes('삼합') || i.type.includes('방합')));
+    const monthHasChung = monthInteraction.some(i => i.type.includes('충'));
+    const isExpansion = monthHasNatalHap && monthHasChung;
+    if (isExpansion) {
+      moveCause += lang === 'KO' ? '이미 다져진 전문성과 실력을 바탕으로 한 긍정적인 확장 이동의 기운이야. ' : 'It\'s an energy of positive expansion move based on already established expertise and skills. ';
     }
 
-    const main = lang === 'KO' ? 
-      `지금 머무는 곳이 네 무덤일까, 아니면 발판일까? ${text} [delay:3000]\n\n새로운 궤도로 진입할 준비를 해.` :
-      `Is your current place a grave or a stepping stone? ${text} [delay:3000]\n\nPrepare to enter a new orbit.`;
+    // Rule 2: Ten Deities
+    const hasInseongLuck = luckGods.some(g => g.includes('인성'));
+    const hasJaeSeongLuck = luckGods.some(g => g.includes('재성'));
+    const hasBiGyeopLuck = luckGods.some(g => g.includes('비견') || g.includes('겁재'));
     
-    const glitch = lang === 'KO' ? '이동은 조후의 변화를 동반해. 방위를 잘 따져보고 움직여.' : 'Moving brings a change in temperature. Consider the direction carefully before moving.';
+    const originalGods = result.pillars.flatMap(p => [p.stemKoreanName, p.branchKoreanName]).filter(Boolean);
+    const hasOriginalInseong = originalGods.some(g => g?.includes('인성'));
+    const hasOriginalJae = originalGods.some(g => g?.includes('재성'));
+
+    if (hasInseongLuck && (hasYearMove || hasMonthMove || hasDayMove)) {
+      moveCause += lang === 'KO' ? '문서운(인성)이 들어오며 자리가 흔들리니, 계약을 통한 확실한 이동 타이밍이야. ' : 'Inseong (document luck) arrives and shakes your position, indicating a definite move through a contract. ';
+    }
+    if (hasJaeSeongLuck && hasOriginalInseong && (hasDayMove || hasHourMove)) {
+      moveCause += lang === 'KO' ? '재테크나 투자, 자산 증식을 목적으로 한 실속 있는 이동(손익 계산이 깔린 이사)이 예상돼. ' : 'A substantial move for the purpose of investment, wealth increase, or asset management is expected. ';
+    }
+    if (hasBiGyeopLuck && hasOriginalJae && hasMonthMove) {
+      moveCause += lang === 'KO' ? '주변과의 경쟁이나 갈등을 피해 무조건 벗어나고 싶은 도피성 혹은 환경 전환형 이동의 성격이 강해. ' : 'It has a strong character of an escape or environment-switching move to avoid competition or conflict with surroundings. ';
+    }
+    if (hasDayMove && hasHourMove) {
+      moveCause += lang === 'KO' ? '자녀의 교육이나 자녀의 신상 변화로 인한 가족 전체의 이동수가 보여. ' : 'A move for the entire family due to children\'s education or personal changes is visible. ';
+    }
+    if (hasMonthMove && hasDayMove) {
+      moveCause += lang === 'KO' ? '부부 관계나 부부의 직장 문제 등 복합적인 사유로 터전을 옮기게 될 거야. ' : 'You will move your base due to complex reasons involving marital relations or job issues. ';
+    }
+    if (hasMonthMove && !hasYearMove && !hasDayMove) {
+      moveCause += lang === 'KO' ? '이동해야 할 명분은 생겼지만, 실제로 옮길지 말지 심리적인 갈등이 깊은 상태네. ' : 'A reason to move has arisen, but you are in a state of deep psychological conflict about whether to actually move. ';
+    }
+
+    // Rule 3: Yeongma
+    const saengjis = ['寅', '申', '巳', '亥'];
+    const saengjiCount = result.pillars.filter(p => saengjis.includes(p.branch)).length;
+    const yeongmaActivated = saengjiCount >= 1 && allInteractions.some(i => saengjis.some(s => i.note.includes(s)) && (i.type.includes('충') || i.type.includes('형')));
+    if (yeongmaActivated) {
+      moveCause += lang === 'KO' ? '잠자던 역마의 기운이 폭발하며 아주 역동적이고 큰 폭의 직장 변동이나 이사운이 발생할 거야. ' : 'The sleeping energy of The Wanderer (Yeokma) explodes, causing a very dynamic and large-scale environmental change or job shift. ';
+    }
+
+    // Rule 4: Edge Cases
+    if (hasMonthMove && luckScore < 40) {
+      moveFortune = lang === 'KO' ? '이번 직장 변동은 승진보다는 부서 이동, 직위 강등(좌천), 혹은 밀려나는 형태가 될 수 있으니 방어적으로 대처하는 게 좋아. ' : 'This job change might be a demotion, push-out, or lateral move rather than a promotion, so handle it defensively. ';
+    }
+    
+    const monthZhi = result.pillars[1].branch;
+    const isSummerBorn = ['巳', '午', '未'].includes(monthZhi);
+    const isFireEarthOverload = (analysis.elementRatios?.Fire || 0) + (analysis.elementRatios?.Earth || 0) >= 60;
+    if (isSummerBorn && isFireEarthOverload) {
+      moveFortune += lang === 'KO' ? '현재 환경이 너무 뜨겁고 건조해. 내 의지와 상관없이 어쩔 수 없이 터전을 옮기게 되는 불가항력적 환경 변화가 예상돼. ' : 'The current environment is too hot and dry. A force majeure change where you are forced to move your base regardless of your will is expected. ';
+    }
+
+    if (luckScore >= 80 && (hasYearMove || hasMonthMove)) {
+      moveFortune += lang === 'KO' ? '현재 운의 흐름이 최상이니 섣부른 이동이나 확장은 절대 금물이야. 잘못 이동하면 잘 닦아온 운의 흐름이 꺾일 수 있어. ' : 'Since your current luck flow is at its peak, avoid hasty moves or expansions. It might break the well-established flow of luck. ';
+    } else if (luckScore <= 25) {
+      moveFortune = lang === 'KO' ? '현재 터전에서 되는 일이 하나도 없다면, 이동수 여부와 상관없이 과감하게 환경을 바꾸는 것이 오히려 긍정적인 돌파구가 될 거야. ' : 'If nothing is working in your current place, boldly changing your environment will be a positive breakthrough regardless of moving indicators. ';
+    }
+
+    // Timing Logic
+    const currentYear = new Date().getFullYear();
+    const isGoodYear = luckScore >= 60;
+    const moveTiming = lang === 'KO' ? 
+      `올해(${currentYear}년)는 ${seunStem}${seunBranch}년인데, ${moveType ? (isGoodYear ? '네게 유리한 기운이 들어와 있어 이사나 이직을 하기에 아주 적기야.' : '기운이 다소 불안정하니 이동을 하더라도 신중하게 결정하는 게 좋아.') : '지금은 큰 변화보다는 안정을 취하는 게 유리한 시기야.'} 특히 ${isGoodYear ? '상반기' : '하반기'}에 그 기운이 더 뚜렷해질 거야.` :
+      `This year (${currentYear}) is the year of ${seunStem}${seunBranch}. ${moveType ? (isGoodYear ? 'Favorable energy is coming in, making it a great time to move or change jobs.' : 'The energy is somewhat unstable, so it\'s better to decide carefully even if you move.') : 'It\'s a better time to seek stability rather than major changes.'} Especially in the ${isGoodYear ? 'first half' : 'second half'} of the year, that energy will be more distinct.`;
+
+    const finalMoveType = moveType || (lang === 'KO' ? '정적인 흐름' : 'Static flow');
+    const finalMoveCause = moveCause || (lang === 'KO' ? '현재의 자리를 지키며 내실을 다지는 시기야.' : 'It\'s a time to keep your current position and build inner strength.');
+    const finalMoveFortune = moveFortune || (lang === 'KO' ? '지금은 억지로 자리를 옮기기보다, 현재 맡은 일의 완성도를 높이면서 다음 기회를 기다리는 게 훨씬 실속 있어.' : 'Instead of forcing a move now, it\'s much more beneficial to focus on perfecting your current tasks and wait for the next opportunity.');
+
+    const main = lang === 'KO' ? 
+      `지금 머무는 곳이 네 무덤일까, 아니면 발판일까? [delay:1500]\n\n` +
+      `분석해보니 지금 너에게는 ${finalMoveType}의 기운이 강하게 들어와 있어. ` +
+      `${finalMoveCause} ` +
+      `${moveTiming} \n\n` +
+      `마지막으로 실질적인 조언을 하나 해주자면.. ${finalMoveFortune}` :
+      `Is your current place a grave or a stepping stone? [delay:1500]\n\n` +
+      `According to the analysis, the energy of ${finalMoveType} is strongly entering your life. ` +
+      `${finalMoveCause} ` +
+      `${moveTiming} \n\n` +
+      `Lastly, to give you some practical advice.. ${finalMoveFortune}`;
+    
+    const glitch = lang === 'KO' ? '이사나 이직은 단순히 장소를 바꾸는 게 아니라 네 에너지의 환경을 바꾸는 일이야. 단순히 방위만 따지기보다, 네 사주에 부족한 기운(예: 물이나 나무)을 채워줄 수 있는 동네인지 먼저 살펴봐.' : 'Moving is not just changing a place, but changing your energy environment. Rather than just directions, check if the new neighborhood can fill the energy lacking in your chart (e.g., Water or Wood).';
     return { main, glitch };
   };
 
@@ -924,6 +1126,7 @@ export function generateCycleVibe(
 
   // Populate Analyses
   themeAnalyses['romance'] = analyzeRomance();
+  themeAnalyses['marriage_timing'] = analyzeMarriageTiming();
   themeAnalyses['wealth'] = analyzeWealth();
   themeAnalyses['health'] = analyzeHealth();
   themeAnalyses['secrets'] = analyzeSecrets();

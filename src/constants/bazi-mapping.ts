@@ -148,11 +148,12 @@ export const BAZI_MAPPING = {
     "암록": { ko: "암록(暗祿)", en: "Hidden Prosperity", desc: "Hidden help and unexpected fortune. Secret support from others.", descKo: "보이지 않는 도움과 예상치 못한 횡재를 상징하며, 위기 상황에서 귀인을 만나." },
   },
   strength: {
-    "극약": { ko: "극약", en: "Extremely Weak" },
-    "약": { ko: "약", en: "Weak" },
-    "중화": { ko: "중화", en: "Balanced" },
-    "강": { ko: "강", en: "Strong" },
-    "극강": { ko: "극강", en: "Extremely Strong" },
+    "극신약": { ko: "극신약", en: "Extremely Weak" },
+    "신약": { ko: "신약", en: "Weak" },
+    "중화신약": { ko: "중화신약", en: "Balanced Weak" },
+    "중화신강": { ko: "중화신강", en: "Balanced Strong" },
+    "신강": { ko: "신강", en: "Strong" },
+    "극신강": { ko: "극신강", en: "Extremely Strong" },
   },
   yongshin: {
     "인성": { ko: "인성", en: "Mystic/Sage" },

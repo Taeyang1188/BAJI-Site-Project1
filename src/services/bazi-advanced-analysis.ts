@@ -513,8 +513,8 @@ export const calculateAdvancedAnalysis = (
     }
 
     const finalOverride = lang === 'KO'
-      ? '\n\n[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.'
-      : '\n\n[Note] Judging a child 100% based only on the parent\'s chart has limits. For the most perfect analysis, checking the mutual complementarity through a 1:1 compatibility reading with your child later is the ultimate conclusion.';
+      ? '\n\n[#f97316:[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.]'
+      : '\n\n[#f97316:[Note] Judging a child 100% based only on the parent\'s chart has limits. For the most perfect analysis, checking the mutual complementarity through a 1:1 compatibility reading with your child later is the ultimate conclusion.]';
 
     childrenDesc = `${baseChildDesc}${detailChildDesc}${finalOverride}`;
 
@@ -630,18 +630,68 @@ export const calculateAdvancedAnalysis = (
 
   // 4. Shin-Gang/Shin-Yak (Strength Analysis)
   const getShinGangShinYak = () => {
+    const level = strength.level;
+    const score = strength.score;
+    
+    let summaryKo = '';
+    let summaryEn = '';
+    let descKo = '';
+    let descEn = '';
+    let socialKo = '';
+    let socialEn = '';
+
+    if (level === '극신강') {
+      summaryKo = '자아의 기운이 폭발적으로 강해, 주변 환경을 압도하는 제왕의 기운이야.';
+      summaryEn = 'Explosive self-energy, a monarch-like vibe that overwhelms the surroundings.';
+      descKo = '자존심과 고집이 매우 강하며, 남의 밑에 있기 힘든 독립적인 성격이야. 강력한 추진력으로 불가능해 보이는 일도 해내는 힘이 있어.';
+      descEn = 'Very strong pride and stubbornness; an independent personality that finds it hard to be under others. Has the power to achieve seemingly impossible tasks with strong drive.';
+      socialKo = '전문직, 사업가, 혹은 한 분야의 독보적인 권위자로 성공할 확률이 매우 높아. 다만 독단적인 결정을 주의해야 해.';
+      socialEn = 'High probability of success as a professional, entrepreneur, or a unique authority in a field. However, beware of arbitrary decisions.';
+    } else if (level === '신강') {
+      summaryKo = '자아와 주관이 뚜렷하며, 외부의 압박에 잘 견디는 튼튼한 정신력을 가지고 있어.';
+      summaryEn = 'Strong sense of self and subjective views, with a resilient mindset that withstands external pressure.';
+      descKo = '자신감이 넘치고 독립심이 강해 스스로의 힘으로 인생을 개척해 나가는 스타일이야. 어려운 상황에서도 쉽게 꺾이지 않는 뚝심이 있어.';
+      descEn = 'Confident and independent, a style that pioneers life through one\'s own strength. Has the perseverance to not bend easily even in difficult situations.';
+      socialKo = '리더십과 추진력이 뛰어나 조직 내에서 핵심적인 역할을 하거나 자기 사업을 운영하기에 아주 적합해.';
+      socialEn = 'Excellent leadership and drive, very suitable for playing a key role within an organization or running your own business.';
+    } else if (level === '중화신강') {
+      summaryKo = '자아의 힘이 충분하면서도 주변과 조화를 이룰 줄 아는 이상적인 강함이야.';
+      summaryEn = 'Ideal strength where the self is sufficient yet knows how to harmonize with the surroundings.';
+      descKo = '주관은 뚜렷하지만 타인의 의견을 수용할 줄 아는 유연함을 갖췄어. 에너지가 안정적이라 기복이 적고 꾸준한 성취를 이뤄내.';
+      descEn = 'Clear subjective views but flexible enough to accept others\' opinions. Stable energy leads to consistent achievements with few ups and downs.';
+      socialKo = '어느 조직에서나 환영받는 리더이자 조율자야. 안정적인 사회생활과 성공을 동시에 거머쥘 수 있는 좋은 구조야.';
+      socialEn = 'A leader and mediator welcomed in any organization. A good structure to achieve both stable social life and success.';
+    } else if (level === '중화신약') {
+      summaryKo = '부드러운 카리스마를 지녔으며, 주변 환경을 자신에게 유리하게 활용할 줄 아는 지혜가 있어.';
+      summaryEn = 'Possesses soft charisma and the wisdom to utilize the surroundings to your advantage.';
+      descKo = '겉으로는 유연해 보이지만 내면에는 자신만의 기준이 확실해. 타인과 협력하여 더 큰 성과를 내는 데 탁월한 재능이 있어.';
+      descEn = 'Appears flexible on the outside but has clear internal standards. Outstanding talent for achieving greater results through cooperation.';
+      socialKo = '협상가나 전략가로서 빛을 발해. 사람 사이의 관계를 조율하며 실속을 차리는 능력이 뛰어나 사회적 성공이 빨라.';
+      socialEn = 'Shines as a negotiator or strategist. Excellent ability to coordinate relationships and gain substance, leading to fast social success.';
+    } else if (level === '신약') {
+      summaryKo = '타인에 대한 배려와 공감 능력이 뛰어나며, 주변 환경에 유연하게 적응하는 태도를 보여.';
+      summaryEn = 'Excellent empathy and consideration for others, showing an attitude of flexible adaptation to the surroundings.';
+      descKo = '겸손하고 협조적이며, 타인의 감정을 잘 읽어 대인관계가 원만해. 강하게 밀어붙이기보다 주변의 도움을 이끌어내어 목표를 달성해.';
+      descEn = 'Humble and cooperative, with smooth interpersonal relations by reading others\' emotions well. Achieves goals by drawing help rather than pushing forcefully.';
+      socialKo = '팀워크가 중시되는 조직이나 서비스, 교육 분야에서 큰 성과를 내. 주변의 신망을 얻어 안정적인 사회 기반을 닦아.';
+      socialEn = 'Achieves great results in team-oriented organizations, services, or education. Builds a stable social foundation by gaining trust.';
+    } else { // 극신약
+      summaryKo = '섬세하고 예민한 감수성을 지녔으며, 주변의 기운을 민감하게 받아들이는 유리잔 같은 사주야.';
+      summaryEn = 'Possesses delicate and sensitive sensibilities, a glass-like chart that sensitively absorbs surrounding energies.';
+      descKo = '타인의 시선을 많이 의식하고 거절을 어려워할 수 있어. 하지만 이는 곧 타인의 니즈를 완벽히 파악하는 능력이기도 해. 자신만의 보호막이 필요해.';
+      descEn = 'May be very conscious of others\' views and find it hard to say no. However, this is also the ability to perfectly grasp others\' needs. Needs a personal shield.';
+      socialKo = '참모, 비서, 혹은 고도의 집중력이 필요한 전문직에서 빛을 발해. 강한 사람이나 시스템에 의지할 때 오히려 더 큰 안전과 성공을 보장받아.';
+      socialEn = 'Shines as an advisor, secretary, or in professional roles requiring high focus. Guaranteed greater safety and success when relying on strong people or systems.';
+    }
+
     return {
       isStrong,
-      title: isStrong ? (lang === 'KO' ? '신강(身强) 사주' : 'Strong Day Master (Shin-Gang)') : (lang === 'KO' ? '신약(身弱) 사주' : 'Weak Day Master (Shin-Yak)'),
-      summary: lang === 'KO' 
-        ? '사주의 주체인 일간(나)의 기운이 주변 환경에 비해 얼마나 강한지를 나타내는 지표야.'
-        : 'An indicator of how strong the Day Master (Self) is compared to the surrounding environment.',
-      description: isStrong 
-        ? (lang === 'KO' ? '자아와 주관이 뚜렷하며, 외부의 압박에 잘 견디는 강한 정신력을 가지고 있어.' : 'You have a strong sense of self and subjective views, with a resilient mindset that withstands external pressure.')
-        : (lang === 'KO' ? '타인에 대한 배려와 공감 능력이 뛰어나며, 유연하고 협조적인 태도를 보여.' : 'You possess excellent empathy and consideration for others, showing a flexible and cooperative attitude.'),
-      socialContext: isStrong
-        ? (lang === 'KO' ? '현대 사회에서는 리더십과 추진력으로 발현되어 전문직이나 사업가로 성공할 가능성이 높아.' : 'In modern society, this manifests as leadership and drive, leading to success in professional or entrepreneurial roles.')
-        : (lang === 'KO' ? '현대 사회에서는 뛰어난 소통 능력과 조직 적응력으로 팀워크가 중시되는 분야에서 빛을 발해.' : 'In modern society, your superior communication and organizational adaptability make you shine in team-oriented fields.')
+      score,
+      level,
+      title: level,
+      summary: lang === 'KO' ? summaryKo : summaryEn,
+      description: lang === 'KO' ? descKo : descEn,
+      socialContext: lang === 'KO' ? socialKo : socialEn
     };
   };
 

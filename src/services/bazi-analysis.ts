@@ -205,9 +205,16 @@ export const determineStructure = (
       logicNote = lang === 'KO'
         ? "조후가 매우 차갑고 습한 '동결된 사주'야. 일반적인 관인상생보다 '해동(解凍)'이 최우선 과제인 특수 상황으로 판정됐어."
         : "A 'Frozen Chart' that is extremely cold and wet. Thawing (Jo-hu resolution) is the top priority, overriding standard structural flows.";
-    } else if (strength.score < 20) {
-      marketingMessage = "위기를 돌파하는 전문성: 극한의 상황에서도 자신을 지켜내는 독보적인 전문 기술과 끈기를 가졌어.";
-      enMarketingMessage = "Expertise that breaks through crises: Possesses unique technical skills and persistence to protect oneself even in extreme situations.";
+    } else if (strength.score < 35) {
+      const jaeRatio = tenGodsRatio['재성(Maverick/Architect)'] || tenGodsRatio['Maverick/Architect'] || 0;
+      if (jaeRatio > 40) {
+        marketingMessage = lang === 'KO' ? "재다신약의 지혜: 주변에 기회와 재물은 넘치나 내 몸이 감당하기 버거운 형국이야. 욕심을 줄이고 사람들과 나누며 건강을 챙기는 것이 최고의 개운법이야." : "Wisdom of Wealth-Heavy Weak: Opportunities and wealth overflow around you, but it's overwhelming for your strength. Reducing greed, sharing with others, and taking care of health is the best remedy.";
+        enMarketingMessage = "Wisdom of Wealth-Heavy Weak: Opportunities and wealth overflow around you, but it's overwhelming for your strength. Reducing greed, sharing with others, and taking care of health is the best remedy.";
+        logicNote = lang === 'KO' ? "일간이 약한 상태에서 재성(Wealth)의 기운이 40%를 초과하여 '재다신약(財多身弱)' 구조로 판정됐어." : "Judged as 'Jae-da-shin-yak' (Wealth-Heavy Weak) because Wealth energy exceeds 40% while the Day Master is weak.";
+      } else {
+        marketingMessage = "위기를 돌파하는 전문성: 극한의 상황에서도 자신을 지켜내는 독보적인 전문 기술과 끈기를 가졌어.";
+        enMarketingMessage = "Expertise that breaks through crises: Possesses unique technical skills and persistence to protect oneself even in extreme situations.";
+      }
     }
 
     return {

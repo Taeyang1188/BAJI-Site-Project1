@@ -65,6 +65,17 @@ function getRelationship(dmElement: string, targetElement: string): string {
   return '';
 }
 
+const STEM_HAP_ELEMENTS: Record<string, string> = {
+  '甲己': 'Earth', '乙庚': 'Metal', '丙辛': 'Water', '丁壬': 'Fire', '戊癸': 'Fire'
+};
+
+const STEM_CLASHES: Record<string, string> = {
+  '甲': '庚', '庚': '甲',
+  '乙': '辛', '辛': '乙',
+  '丙': '壬', '壬': '丙',
+  '丁': '癸', '癸': '丁'
+};
+
 export function calcDayMasterStrength(stems: string[], branches: string[]) {
   const dayMaster = stems[1]; // 일간
   const dmElement = STEM_ELEMENTS[dayMaster];
@@ -611,6 +622,82 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     ratios[el] = (score / total) * 100;
   });
 
+  // 0. Zero-Tolerance Filters (기각 로직)
+  const isYinGan = ['乙', '丁', '己', '辛', '癸'].includes(dayMaster);
+  const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
+  const artistEl = ELEMENT_CYCLE[(dmIdx + 1) % 5];
+  const wealthEl = ELEMENT_CYCLE[(dmIdx + 2) % 5];
+  const powerEl = ELEMENT_CYCLE[(dmIdx + 3) % 5];
+  const wisdomEl = ELEMENT_CYCLE[(dmIdx + 4) % 5];
+
+  // Filter 1: The Survivor Check (반대 세력의 생존력)
+  // Check if Sik/Jae/Gwan (Artist/Wealth/Power) has a functional root
+  const hasFunctionalOpponentRoot = branches.some((b, idx) => {
+    const el = BRANCH_ELEMENTS[b];
+    if (el !== powerEl && el !== wealthEl && el !== artistEl) return false;
+    
+    // Check if the root is "functional" or "attacked"
+    if (el === 'Metal' && ratios['Fire'] > 60) {
+      // Metal root in Fire-heavy chart
+      const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
+                         (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
+      if (hasMetalHap) return true; // Functional via combination (e.g., 1989's Sa-Yu)
+      return false; // Isolated Metal root is "melted" (e.g., 1992's Shin)
+    }
+    
+    if (el === 'Water' && ratios['Earth'] > 60) {
+      // Water root in Earth-heavy chart
+      const hasWaterHap = (branches.includes('子') && (branches.includes('申') || branches.includes('辰'))) ||
+                         (branches.includes('亥') && (branches.includes('寅') || branches.includes('卯')));
+      if (hasWaterHap) return true;
+      return false; // Isolated Water root is "blocked"
+    }
+
+    return true; // Other roots are generally functional
+  });
+
+  // Filter 3: Leakage Check (설기 유무)
+  // If Artist (Sik-sang) is in stems and has a functional root, it's a standard structure (Nae-gyeok)
+  const hasArtistInStem = stems.some((s, idx) => idx !== 1 && STEM_ELEMENTS[s] === artistEl);
+  if (hasArtistInStem && hasFunctionalOpponentRoot) {
+    // Check if the functional root belongs to the Artist element
+    const hasArtistRoot = branches.some(b => {
+      const el = BRANCH_ELEMENTS[b];
+      if (el === artistEl) return true;
+      // Special case: Earth DM with 酉 (Rooster) as Metal root
+      if (dmElement === 'Earth' && b === '酉') return true;
+      return false;
+    });
+    if (hasArtistRoot) return null; // Reject special structure (e.g., 1989's Gyeong-Metal with Yu-Rooster)
+  }
+
+  // Filter 2: Yin Stem Strictness (음간의 자존심)
+  // Yin stems are 20% more strict about following
+  const yinStrictnessRatio = isYinGan ? 1.2 : 1.0;
+
+  // Check for Jae/Gwan survival in stems with functional root
+  const hasStemOpponent = stems.some((s, idx) => idx !== 1 && (STEM_ELEMENTS[s] === powerEl || STEM_ELEMENTS[s] === wealthEl));
+  if (hasStemOpponent && hasFunctionalOpponentRoot) {
+    // If it's a Yang stem and the opponent is weak/clashed, we might still consider it (Fake Special)
+    // But for Yin stems, it's an immediate rejection
+    if (isYinGan) return null;
+    
+    // For Yang stems, check if the stem opponent is clashed (e.g., 1992's Im-Water vs Byeong-Fire)
+    const opponentIdx = stems.findIndex((s, idx) => idx !== 1 && (STEM_ELEMENTS[s] === powerEl || STEM_ELEMENTS[s] === wealthEl));
+    const isClashed = stems.some((s, idx) => idx !== 1 && idx !== opponentIdx && STEM_CLASHES[s] === stems[opponentIdx]);
+    
+    if (!isClashed) return null; // If not clashed and has root, reject
+  }
+
+  // Check for Samhap/Banghap that supports the DM (In-seong)
+  const wisdomHap = COMBINATIONS.SAM_HAP.find(h => h.element === wisdomEl) || COMBINATIONS.BANG_HAP.find(h => h.element === wisdomEl);
+  if (wisdomHap) {
+    const present = wisdomHap.branches.filter(b => branches.includes(b));
+    if (present.length >= 2) {
+      return null; // In-Bi-Tae-Wang (Standard Strong)
+    }
+  }
+
   // 1. 전왕격 (Jun-wang) Logic
   const checkJunWang = () => {
     const structures = [
@@ -627,47 +714,44 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         if (score >= 80) {
           // --- Rejection Logic (기각 로직) Start ---
           
-          // 1. Hidden Root of Day Master (일간의 생존 본능 - 가종격 판별)
-          // If the DM has a root in the month or day branch, it won't "follow" easily.
+          // 1. Hidden Root of Day Master (일간의 생존 본능)
           const rooting = ROOTING_DATA[dayMaster];
           const monthBranch = branches[2];
           const dayBranch = branches[1];
           const hasStrongRoot = rooting && (rooting.strong.includes(monthBranch) || rooting.strong.includes(dayBranch));
           
-          if (hasStrongRoot) {
-            return {
-              name: '가종격(극신약)',
-              nameEn: 'Fake Follow (Extreme Weakness)',
-              category: 'Standard',
-              mainElement: s.element,
-              confidence: 40,
-              description: "세력이 강해 보이나 일간의 뿌리가 살아있어 전왕격으로 종하지 않아. 극신약 사주로 분류돼.",
-              enDescription: "Momentum is strong but the Day Master's root remains; it does not follow the Monarch structure. Classified as Extreme Weakness."
-            };
+          if (hasStrongRoot) return null; // Reject if DM has its own strong root
+
+          // 2. Yin Stem Characteristic: Harder to follow
+          if (isYinGan && (ratios[powerEl] > 5 || ratios[wealthEl] > 5 || ratios[artistEl] > 15)) {
+            return null;
+          }
+          
+          // Apply Yin Strictness to ratio
+          if (score < 80 * yinStrictnessRatio) return null;
+
+          // 3. Earth DM Metal Filter: If Earth DM and Metal is strong (Sa-Yu-Chuk etc), it's not Jeon-Wang
+          if (dmElement === 'Earth' && (ratios['Metal'] > 25 || branches.some(b => b === '酉'))) {
+             const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑')));
+             if (hasMetalHap || ratios['Metal'] > 30) return null;
           }
 
-          // 2. Heavenly Stem Opponent (천간의 방해자 - 가식 로직)
-          const dmIdx = ELEMENT_CYCLE.indexOf(s.element);
-          const powerEl = ELEMENT_CYCLE[(dmIdx + 3) % 5];
-          const wealthEl = ELEMENT_CYCLE[(dmIdx + 2) % 5];
-          
-          const hasOpponentInStem = stems.some((stem, idx) => {
+          // 4. Heavenly Stem Opponent (천간의 방해자)
+          const hasFunctionalOpponentInStem = stems.some((stem, idx) => {
             if (idx === 1) return false; // Skip DM
             const el = STEM_ELEMENTS[stem];
-            return el === powerEl || el === wealthEl;
+            if (el !== powerEl && el !== wealthEl) return false;
+            
+            // Check if this opponent is clashed/neutralized by a neighbor
+            const prev = idx > 0 ? stems[idx - 1] : null;
+            const next = idx < stems.length - 1 ? stems[idx + 1] : null;
+            const isClashed = (prev && STEM_CLASHES[prev] === stem) || (next && STEM_CLASHES[next] === stem);
+            
+            if (isClashed) return false; // Neutralized
+            return true; // Functional opponent
           });
 
-          if (hasOpponentInStem) {
-            return {
-              name: '가종격(불순)',
-              nameEn: 'Fake Special (Impure)',
-              category: 'Standard',
-              mainElement: s.element,
-              confidence: 50,
-              description: "천간에 방해하는 기운이 떠 있어 전왕격의 순수성이 깨졌어. 일반격으로 간명해.",
-              enDescription: "Opposing elements in the Heavenly Stems break the purity of the Monarch structure. Treated as a Standard structure."
-            };
-          }
+          if (hasFunctionalOpponentInStem) return null;
 
           // 3. Seasonal Support (월령의 배신)
           const isSeasonal = s.element === monthElement || 
@@ -805,7 +889,59 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     }
     // 화토중탁
     if (['丙', '丁', '戊', '己'].includes(dayMaster) && (monthElement === 'Fire' || ['辰', '戌', '丑', '未'].includes(monthZhi))) {
-      if (ratios['Fire'] + ratios['Earth'] >= 70 && ratios['Water'] < 10) {
+      // Strict filter for Fire-Earth Turbid
+      const isYinEarth = dayMaster === '己';
+      const isJeongFire = dayMaster === '丁';
+      const fireEarthRatio = ratios['Fire'] + ratios['Earth'];
+      
+      // Filter 3: Leakage Check (Sik-sang Metal in stems with root)
+      const hasFunctionalMetalInStem = stems.some((s, idx) => {
+        if (idx === 1) return false;
+        if (STEM_ELEMENTS[s] !== 'Metal') return false;
+        
+        // Check for clash (e.g., Gyeong-Metal vs Gap-Wood is not a clash that destroys Metal)
+        // But check if it's functional
+        return true;
+      });
+      
+      const hasFunctionalMetalRoot = branches.some(b => {
+        const el = BRANCH_ELEMENTS[b];
+        if (el !== 'Metal') return false;
+        
+        // Metal root in Fire-heavy chart
+        if (ratios['Fire'] > 60) {
+          const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
+                             (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
+          if (hasMetalHap) return true;
+          return false; // Melted
+        }
+        return true;
+      });
+      
+      if (hasFunctionalMetalInStem && hasFunctionalMetalRoot) {
+        // If Metal is present and has functional root, it's not turbid
+        return null;
+      }
+
+      if (fireEarthRatio >= 75 && ratios['Water'] < 10) {
+        // Check for Water survival
+        const hasFunctionalWater = stems.some((s, idx) => {
+          if (idx === 1) return false;
+          if (STEM_ELEMENTS[s] !== 'Water') return false;
+          
+          // Check for clash (e.g., 1992's Im-Water vs Byeong-Fire)
+          const prev = idx > 0 ? stems[idx - 1] : null;
+          const next = idx < stems.length - 1 ? stems[idx + 1] : null;
+          const isClashed = (prev && STEM_CLASHES[prev] === s) || (next && STEM_CLASHES[next] === s);
+          if (isClashed) return false; // Evaporated
+          return true;
+        });
+
+        if (hasFunctionalWater) return null;
+
+        // Filter 2: Yin Stem Strictness
+        if ((isYinEarth || isJeongFire) && fireEarthRatio < 85) return null;
+        
         return {
           name: '화토중탁',
           nameEn: 'Fire-Earth Heavy-Turbid',
