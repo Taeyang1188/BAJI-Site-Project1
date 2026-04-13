@@ -180,15 +180,18 @@ export function generateCycleVibe(
   }
 
   let comboInsight = '';
-  if (combos.length > 0) {
+  const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
+
+  if (isFrozen && isFireLuck) {
+    comboInsight = `이번 시기는 **'해동(解凍)'**의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`;
+  }
+
+  if (combos.length > 0 && !comboInsight) {
     const isJeonWang = analysis.yongshinDetail?.method === "전왕격용신" || analysis.yongshinDetail?.method === "특수격용신";
     const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
     const is2026 = currentAnnualPillar?.year === 2026;
-    const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
 
-    if (isFrozen && isFireLuck) {
-      comboInsight = `이번 시기는 **'해동(解凍)'**의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. 관인상생이나 재극인 같은 복잡한 이론보다, "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`;
-    } else if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
+    if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
       comboInsight = `이번 시기는 **'화다금용(火多金鎔)'**의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
     } else if (combos.length === 1) {
       comboInsight = `이번 시기는 **'${combos[0].name}'**의 격을 갖췄어. ${combos[0].desc}`;
@@ -316,7 +319,7 @@ export function generateCycleVibe(
       const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
 
       if (isFrozen && isFireLuck) {
-        detailedEffect += `그동안 굳어있던 네 문서(인성)와 결과물(재성)이 드디어 가치를 발휘하기 시작할 거야. "커리어를 건드린다"는 식의 겁주는 말은 잊어버려. 지금은 돈이 되는 문서를 잡고, 차가운 뚝심이 세상의 빛을 보아 에너지가 폭발하는 시기니까. `;
+        detailedEffect += `그동안 굳어있던 네 문서(인성)와 결과물(재성)이 드디어 가치를 발휘하기 시작할 거야. 지금은 돈이 되는 문서를 잡고, 차가운 뚝심이 세상의 빛을 보아 에너지가 폭발하는 시기니까. `;
       } else if (isSinGang && !isFireExtreme) {
         detailedEffect += `넘치는 에너지를 통제하거나 발산할 강력한 통로가 필요한 시점이야. `;
       } else if (isNeutral) {
@@ -472,7 +475,11 @@ export function generateCycleVibe(
     } else {
       // Low luck score - refined logic
       if (isFireYear) {
-        glitch = `기운은 뜨겁게 타오르는데 네가 그 열기를 다 소화하지 못하고 있어. 겉으로만 화려해 보이고 실속이 없을 수 있으니, 에너지를 분산시키지 말고 한 곳에 집중해봐. `;
+        if (isFrozen) {
+          glitch = `그동안 얼어붙어 있던 네 재능이 따뜻한 불을 만나 드디어 기지개를 켜는 시기야. 망설이지 말고 네 능력을 세상에 마음껏 펼쳐봐. `;
+        } else {
+          glitch = `기운은 뜨겁게 타오르는데 네가 그 열기를 다 소화하지 못하고 있어. 겉으로만 화려해 보이고 실속이 없을 수 있으니, 에너지를 분산시키지 말고 한 곳에 집중해봐. `;
+        }
       } else if (isWaterYear) {
         glitch = `전체적으로 기운이 깊고 차분하게 가라앉아 있는 시기야. 억지로 뭔가를 바꾸려 하기보다, 지금 가진 걸 지키면서 내면의 지혜를 쌓는 쪽으로 방향을 잡아봐. `;
       } else if (isWoodYear) {

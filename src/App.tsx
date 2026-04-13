@@ -238,7 +238,9 @@ export default function App() {
             const lat = place.geometry.location.lat();
             const lon = place.geometry.location.lng();
             setCoords({ lat, lon });
-            setUserInput(prev => ({ ...prev, city: inputRef.current?.value || place.name || '' }));
+            // Use place.name for a cleaner display (e.g., "Busan" instead of "South Korea Busan")
+            const cityName = place.name || inputRef.current?.value || '';
+            setUserInput(prev => ({ ...prev, city: cityName }));
             setIsLocationSynced(true);
             setGreeting(t.input.locationSynced);
             setTimeout(() => setIsLocationSynced(false), 3000);

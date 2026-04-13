@@ -264,8 +264,8 @@ export const determineStructure = (
     let enMarketingMessage = "";
     
     if (isFrozen) {
-      marketingMessage = "해동의 기적: 꽁꽁 얼어붙어 있던 당신의 재능이 따뜻한 불(火)을 만나 드디어 세상의 빛을 보게 될 거야. 버거워하지 말고 기지개를 켜봐.";
-      enMarketingMessage = "The Miracle of Thawing: Your frozen talents are finally meeting the warm Fire and seeing the light of day. Don't be overwhelmed; it's time to stretch and shine.";
+      marketingMessage = "냉철한 잠재력: 차갑고 습한 기운 속에 보석 같은 재능을 품고 있어. 따뜻한 온기(火)를 통해 그 재능을 꽃피우는 것이 삶의 중요한 과제야.";
+      enMarketingMessage = "Cool Potential: You hold gem-like talents within cold and damp energy. Blooming those talents through warmth (Fire) is an important life task.";
       logicNote = lang === 'KO'
         ? "조후가 매우 차갑고 습한 '동결된 사주'야. 일반적인 관인상생보다 '해동(解凍)'이 최우선 과제인 특수 상황으로 판정됐어."
         : "A 'Frozen Chart' that is extremely cold and wet. Thawing (Jo-hu resolution) is the top priority, overriding standard structural flows.";
