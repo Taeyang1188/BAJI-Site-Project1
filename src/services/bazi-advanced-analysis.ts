@@ -273,26 +273,61 @@ export const calculateAdvancedAnalysis = (
     const hasGwanInSangSaeng = gods.GwanSeong > 20 && gods.InSeong > 20;
     const hasJaeGeukIn = gods.JaeSeong > 25 && gods.InSeong > 20;
 
-    if (hasGwanInSangSaeng) {
+    const monthStemTenGod = monthPillar?.stemKoreanName || '';
+    const isMonthBranchInSeong = monthBranchTenGod.includes('인성');
+    const isMonthStemJaeSeong = monthStemTenGod.includes('재성');
+    const isMonthStemInSeong = monthStemTenGod.includes('인성');
+    
+    // Phase 4: Clash with Year/Month, JinSulChukMi in Year
+    const yearBranch = yearPillar?.branch || '';
+    const dayBranch = dayPillar?.branch || '';
+    const hasYearMonthDayClash = [yearPillar, monthPillar].some((p) => p && (
+      (dayBranch === '子' && p.branch === '午') || (dayBranch === '午' && p.branch === '子') ||
+      (dayBranch === '丑' && p.branch === '未') || (dayBranch === '未' && p.branch === '丑') ||
+      (dayBranch === '寅' && p.branch === '申') || (dayBranch === '申' && p.branch === '寅') ||
+      (dayBranch === '卯' && p.branch === '酉') || (dayBranch === '酉' && p.branch === '卯') ||
+      (dayBranch === '辰' && p.branch === '戌') || (dayBranch === '戌' && p.branch === '辰') ||
+      (dayBranch === '巳' && p.branch === '亥') || (dayBranch === '亥' && p.branch === '巳')
+    ));
+    const isYearJinSulChukMi = ['辰', '戌', '丑', '未'].includes(yearBranch);
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const isMaeGeum = dmElement === 'Metal' && gods.InSeong > 40; // MaeGeum structure
+    const isInSeongOverwhelming = gods.InSeong > 40 && gods.JaeSeong < 15;
+    const isJaeSeongOverwhelming = gods.JaeSeong > 40 && gods.InSeong < 15;
+    const isNoInSeongNoJaeSeong = gods.InSeong === 0 && gods.JaeSeong === 0;
+
+    if (isMaeGeum) {
       parentsDesc = lang === 'KO'
-        ? '관인상생(官印相生)의 흐름으로, 단순한 경제적 지원을 넘어 사회적 체면과 명예를 중시하는 부모/상사의 영향력이 매우 강해. 이는 본인에게 든든한 배경이 되기도 하지만, 동시에 그들의 높은 기대치에 부응해야 한다는 중압감으로 작용할 수 있어. 예의와 격식을 갖춘 관계에서 큰 덕을 입을 거야.'
-        : 'A flow of "Power generating Wisdom." Beyond simple support, the influence of parents/superiors who value social face and honor is very strong. This provides a solid background but also acts as pressure to meet high expectations. You benefit greatly from formal and respectful relationships.';
-    } else if (hasJaeGeukIn) {
+        ? '[경고] 열매(자식)가 나뭇가지(부모)에 매달려 떨어지지 못하는 최악의 얽힘(매금) 상태야. 부모는 헌신한다고 착각하지만 사실상 너를 무능력하게 만들 수 있고, 너 역시 부모를 끊어내지 못해 끌려다닐 수 있어. 물리적인 거리두기(독립)가 최고의 개운법이야.'
+        : '[Warning] A severe entanglement where the fruit (child) cannot detach from the branch (parent). Parents may think they are devoted, but they might be making you incompetent, and you might be dragged along unable to cut ties. Physical distance (independence) is the best remedy.';
+    } else if (hasYearMonthDayClash || isYearJinSulChukMi) {
       parentsDesc = lang === 'KO'
-        ? '재극인(財剋印)의 양상으로, 현실적인 이익과 본인의 신념/학문 사이에서 갈등이 잦을 수 있어. 부모님의 조언이 지나치게 현실적이거나 결과 중심적이어서 본인의 순수한 열정과 충돌할 수 있어. 물질적 지원은 있으나 정신적 공감이 부족할 수 있으니 적절한 거리두기가 필요해.'
-        : 'A pattern of "Maverick/Architect controlling Mystic/Sage." Frequent conflicts may arise between practical interests and your beliefs. Parental advice might be overly realistic or result-oriented, clashing with your pure passion. Material support exists, but lack of emotional empathy may require some distance.';
-    } else if (monthBranchTenGod.includes('인성')) {
+        ? '부모와 가풍의 뜻을 따르지 않고, 부모의 업적을 묻어둔 채 고향을 떠나(외국 등) 전혀 다른 삶을 개척하려는 자수성가형 독립 운명이야.'
+        : 'You have a self-made, independent destiny, likely to leave your hometown (or go abroad) to pioneer a completely different life, disregarding family traditions and parental achievements.';
+    } else if (isInSeongOverwhelming) {
       parentsDesc = lang === 'KO'
-        ? '부모 자리에 나를 생하는 기운(인성)이 뚜렷해. 어머니의 헌신적인 사랑이나 윗사람의 전폭적인 지지를 받으며 성장하는 구조야. 정서적 안정감이 높고 학문적 성취를 돕는 환경이 조성되어 있어.'
-        : 'Wisdom energy is clear in the Parent Palace. You grow under the dedicated love of your mother or full support from superiors. Emotional stability is high, and the environment helps academic achievement.';
-    } else if (monthBranchTenGod.includes('관성')) {
+        ? '어머니의 치마폭에 싸여 과잉보호를 받는 온실 속 화초 환경일 수 있어. 애정은 넘치나 독립심과 경제/사회성(재성) 발달이 지연될 수 있으니 스스로 자립하려는 의지가 매우 중요해.'
+        : 'You might be in an overprotective greenhouse environment wrapped in your mother\'s apron strings. Affection overflows, but independence and economic/social development may be delayed, so the will to stand on your own is crucial.';
+    } else if (isJaeSeongOverwhelming || hasJaeGeukIn) {
       parentsDesc = lang === 'KO'
-        ? '부모 자리에 나를 통제하는 기운(관성)이 있어. 엄격한 가풍이나 원칙을 중시하는 부모님 밑에서 자랐을 가능성이 높아. 이는 본인에게 강한 책임감과 도덕성을 심어주지만, 때로는 억압감을 느낄 수 있어.'
-        : 'Power energy is in the Parent Palace. You likely grew up under strict family traditions or parents who value principles. This instills strong responsibility and morality but can sometimes feel oppressive.';
+        ? '아버지(가장)의 경제적/권위적 영향력이 너무 강해 정서적 따뜻함과 애정(어머니)이 억눌린 환경이야(재극인). 물질적 지원은 있으나 애정 결핍이나 정서적 삭막함이 우려되니 내면의 상처를 스스로 돌봐야 해.'
+        : 'The economic/authoritative influence of the father is so strong that emotional warmth and affection (mother) are suppressed. Material support exists, but emotional barrenness is a concern, so you must take care of your inner wounds.';
+    } else if (isNoInSeongNoJaeSeong) {
+      parentsDesc = lang === 'KO'
+        ? '애정이나 스킨십에 크게 집착하지 않으며, 부모에게 얽매이지 않고 일찍부터 자립하려는 독립적 성향이 강해. 부모의 혜택이 없어서가 아니라 스스로 개척하는 힘이 뛰어난 거야.'
+        : 'You don\'t obsess over affection and have a strong independent tendency to stand on your own early without being tied to parents. It\'s not a lack of parental benefits, but your outstanding ability to pioneer yourself.';
+    } else if (isMonthBranchInSeong && isMonthStemJaeSeong) {
+      parentsDesc = lang === 'KO'
+        ? '부모가 각자 가정적, 사회적 본분을 매우 충실하게 이행하는 안정적인 환경이야. 월간(아버지)과 월지(어머니)가 정위치에 있어 든든한 울타리가 되어줘.'
+        : 'A stable environment where parents faithfully fulfill their domestic and social duties. The Month Stem (Father) and Month Branch (Mother) are in their proper places, providing a solid fence.';
+    } else if (isMonthStemInSeong) {
+      parentsDesc = lang === 'KO'
+        ? '어머니(인성)가 아버지의 자리(월간)까지 올라가 영향력을 행사하므로, 어머니가 가장의 역할까지 대신하거나 가정을 주도하는 환경에서 자랐을 가능성이 높아.'
+        : 'Since the mother (Wisdom) has risen to the father\'s position (Month Stem), you likely grew up in an environment where the mother took on the role of the head of the household or led the family.';
     } else {
       parentsDesc = lang === 'KO'
-        ? '윗사람과의 관계에서 본인의 주도권이 강한 편이야. 일방적인 도움보다는 서로의 역할을 존중하는 수평적인 관계에서 편안함을 느껴. 스스로 자격을 갖추어 윗사람에게 인정받는 스타일이야.'
-        : 'You tend to have strong initiative in relations with superiors. You feel comfortable in horizontal relationships respecting each other\'s roles rather than one-sided help. You gain recognition by proving your own qualifications.';
+        ? '부모 및 윗사람과의 관계에서 일방적인 종속보다는 각자의 다름을 인정하는 객관적 거리가 필요해. 나이가 들수록 인성(부모)은 나를 돕는 인맥과 처세술로, 노년에는 나의 권리로 치환되니 유연하게 관계를 맺어봐.'
+        : 'In relations with parents and superiors, an objective distance acknowledging differences is needed rather than one-sided subordination. As you age, this energy transforms into helpful networks and your own rights, so build relationships flexibly.';
     }
 
     relationships.parents = {
@@ -310,7 +345,6 @@ export const calculateAdvancedAnalysis = (
     const branchEl = BAZI_MAPPING.branches[dayPillar?.branch as keyof typeof BAZI_MAPPING.branches]?.element;
     const isGanYeoJiDong = stemEl === branchEl;
 
-    const dayBranch = dayPillar?.branch || '';
     const isJinSulChukMi = ['辰', '戌', '丑', '未'].includes(dayBranch);
     const isHurtingOfficerDay = gender === 'female' && dayBranchTenGod.includes('상관');
     
@@ -405,7 +439,7 @@ export const calculateAdvancedAnalysis = (
     };
 
     // 4. Children & Outcomes (Hour Pillar) - Position: Hour Pillar
-    const childrenGodRatio = gender === 'male' ? gods.GwanSeong : gods.SikSang;
+    const targetChildGod = gender === 'female' ? gods.SikSang : gods.GwanSeong;
     let childrenDesc = '';
     
     const hourStemTenGod = hourPillar?.stemKoreanName || '';
@@ -421,46 +455,73 @@ export const calculateAdvancedAnalysis = (
       (hourBranch === '巳' && p.branch === '亥') || (hourBranch === '亥' && p.branch === '巳')
     ));
 
-    if (childrenGodRatio === 0) {
-      if (hasHourClash) {
-        childrenDesc = lang === 'KO'
-          ? '자녀를 상징하는 기운이 보이지 않고 말년의 자리가 충돌하고 있어. 자녀와의 인연이 다소 늦거나 멀어질 수 있는 흐름이야. 자녀에게 기대를 걸기보다 본인의 독립적인 노후를 설계하는 것이 관계를 더욱 편안하게 만들어.'
-          : 'The children star is absent and the late-life palace is clashing. Ties with children may be delayed or distant. Designing your own independent retirement rather than relying on children will make the relationship more comfortable.';
-      } else {
-        childrenDesc = lang === 'KO'
-          ? '자녀를 상징하는 십성이 드러나지는 않았으나 말년의 자리가 평온해. 자녀가 일찍 독립하여 각자의 길을 걷게 되는 흐름이며, 본인 또한 자녀의 간섭 없이 자유로운 노후를 보내게 될 거야. 실속 있는 마무리가 예상돼.'
-          : 'The children star is not revealed, but the late-life palace is peaceful. Children are likely to be independent early, and you will enjoy a free retirement without interference. A substantial conclusion is expected.';
-      }
-    } else if (hasHourClash) {
-      childrenDesc = lang === 'KO'
-        ? '자녀를 상징하는 기운은 뚜렷하나 말년의 자리가 충돌하고 있어. 자녀의 성장은 빠르나 그 과정에서 잦은 의견 대립이나 변화가 예상돼. 자녀의 개성을 존중하고 적절한 거리를 유지할 때 비로소 결실이 안정될 거야.'
-        : 'The children star is clear, but the late-life palace is clashing. Children will grow fast, but frequent disagreements or changes are expected. The results will stabilize only when you respect their individuality and maintain distance.';
-    } else if (hourBranchTenGod.includes('인성') || hourStemTenGod.includes('인성')) {
-      childrenDesc = lang === 'KO'
-        ? '말년과 자식 자리에 따뜻하고 수용적인 기운(인성)이 들어와 있어. 결과물을 만들어내는 과정은 치열했을지라도, 최종적인 마무리는 본인을 편안하게 해주는 결실로 이어지는 흐름이야. 효심 깊은 자녀를 두거나 노후에 학문/예술적 성취를 이룰 복이 있어.'
-        : 'Warm and receptive Wisdom energy is in the Hour Pillar (Late Life/Children). Even if the process was fierce, the final conclusion leads to results that make you comfortable. You may have filial children or achieve academic/artistic success in old age.';
-    } else if (hourBranchTenGod.includes('관성') || hourStemTenGod.includes('관성')) {
-      childrenDesc = lang === 'KO'
-        ? '말년 자리에 명예와 규칙(관성)이 자리 잡고 있어. 자녀가 사회적으로 성공하거나 가문의 명예를 높이는 역할을 할 가능성이 커. 본인 또한 노후까지 사회적 직함이나 명예를 유지하며 존경받는 삶을 살게 될 거야.'
-        : 'Honor and rules (Power) are in the Hour Pillar. Children are likely to succeed socially or enhance family honor. You will also maintain social titles or honor and live a respected life into old age.';
-    } else if (hourBranchTenGod.includes('식상') || hourStemTenGod.includes('식상')) {
-      childrenDesc = lang === 'KO'
-        ? '자식 자리에 표현과 재능(식상)이 뚜렷해. 자녀가 다재다능하고 창의적인 성향을 띠며, 본인 또한 노후에 새로운 취미나 활동으로 활기찬 삶을 보내게 될 거야. 자녀와 친구처럼 소통하며 즐거움을 나누는 구조야.'
-        : 'Expression and talent (Output) are clear in the Child Palace. Children are versatile and creative, and you will spend your old age vibrantly with new hobbies. It\'s a structure of communicating with children like friends.';
-    } else if (hourBranchTenGod.includes('재성') || hourStemTenGod.includes('재성')) {
-      childrenDesc = lang === 'KO'
-        ? '말년 자리에 재물과 결과(재성)가 있어. 평생 노력한 대가가 노후에 확실한 자산으로 축적되는 흐름이야. 자녀가 경제적으로 자립심이 강하며, 본인 또한 실속 있는 노후를 보내게 될 거야.'
-        : 'Maverick/Architect and results are in the Hour Pillar. The rewards of lifelong effort accumulate as solid assets in old age. Children are economically independent, and you will have a substantial retirement.';
+    const isChildStarInHour = (gender === 'female' && (hourBranchTenGod.includes('식신') || hourBranchTenGod.includes('상관') || hourStemTenGod.includes('식신') || hourStemTenGod.includes('상관'))) ||
+                              (gender === 'male' && (hourBranchTenGod.includes('정관') || hourBranchTenGod.includes('편관') || hourStemTenGod.includes('정관') || hourStemTenGod.includes('편관')));
+    const isInSeongInHour = hourBranchTenGod.includes('인성') || hourStemTenGod.includes('인성');
+    
+    const isChildStarInMonth = (gender === 'female' && (monthBranchTenGod.includes('식신') || monthBranchTenGod.includes('상관') || monthStemTenGod.includes('식신') || monthStemTenGod.includes('상관'))) ||
+                               (gender === 'male' && (monthBranchTenGod.includes('정관') || monthBranchTenGod.includes('편관') || monthStemTenGod.includes('정관') || monthStemTenGod.includes('편관')));
+
+    const hasInGeukSik = gender === 'female' && gods.InSeong > 30 && gods.SikSang > 0;
+
+    let baseChildDesc = '';
+    
+    if (targetChildGod === 0) {
+      baseChildDesc = lang === 'KO'
+        ? '원국에 자식 별이 뚜렷하게 드러나지 않았어. 이는 자식이 없다는 뜻이 아니라, 부모와 자식이 서로에게 얽매이지 않고 각자 독립적이고 자립적인 운명을 살아간다는 긍정적인 의미야.'
+        : 'The child star is not clearly revealed in your chart. This doesn\'t mean no children, but rather a positive sign that parent and child will live independent, self-reliant destinies without being tied down to each other.';
+    } else if (isChildStarInHour) {
+      baseChildDesc = lang === 'KO'
+        ? '자식 별이 온전하게 시주(말년/자식 자리)에 자리 잡고 있어. 자녀와 위계질서가 명확하며, 노년에도 든든한 관계를 맺거나 한 지붕 아래 살 가능성이 높은 최고점의 자식운이야.'
+        : 'The child star is perfectly placed in the Hour Pillar (Late Life/Child Palace). You have clear boundaries with your children and a high chance of maintaining a strong relationship or living together in your old age.';
+    } else if (isInSeongInHour) {
+      baseChildDesc = lang === 'KO'
+        ? '자식 자리에 나를 돕는 인성이 있으므로, 말년에 자녀로부터 부양과 혜택(효도)을 받을 확률이 매우 높아.'
+        : 'With Wisdom (supportive energy) in the Child Palace, there is a very high probability of receiving care and benefits (filial piety) from your children in your later years.';
+    } else if (isChildStarInMonth) {
+      baseChildDesc = lang === 'KO'
+        ? '자식 별이 청년기를 뜻하는 월주에 있어. 20~30대의 사회활동 시기에 안정적으로 자녀를 얻고 양육할 기반이 튼튼한 구조야.'
+        : 'The child star is in the Month Pillar representing youth. You have a solid foundation to stably have and raise children during your active 20s-30s.';
     } else {
-      childrenDesc = lang === 'KO'
-        ? '자녀와의 관계가 원만하며 본인의 노력이 헛되지 않은 결실을 맺을 거야. 자녀의 성장이 본인에게 큰 보람이 되며 안정적인 미래를 암시해.'
-        : 'Relations with children are smooth, and your efforts bear fruit. Children\'s growth brings great fulfillment and suggests a stable future.';
+      baseChildDesc = lang === 'KO'
+        ? '자식 별이 사주에 존재하여 자녀와의 인연이 이어지는 흐름이야. 자녀가 본인의 삶에 긍정적인 활력을 불어넣어 줄 거야.'
+        : 'The child star is present in your chart, indicating a connection with children. They will bring positive vitality to your life.';
     }
+
+    let detailChildDesc = '';
+    if (targetChildGod > 0) {
+      if (gods.SikSang > 20) {
+        detailChildDesc += lang === 'KO' 
+          ? ' 식상(친밀도)이 발달해 자녀가 나이를 먹어서도 스스럼없이 스킨십을 나눌 정도로 정서적, 물리적 친밀도가 매우 높아.' 
+          : ' With developed Output (intimacy), you share a very high emotional and physical closeness with your children, even as they grow older.';
+      }
+      if (gods.GwanSeong > 20) {
+        detailChildDesc += lang === 'KO'
+          ? ' 관성(사회적 능력)이 뚜렷해 남들에게 자랑할 만한 훌륭한 타이틀과 능력을 갖춘 자식을 둘 확률이 커.'
+          : ' With clear Power (social ability), you are highly likely to have children with excellent titles and abilities you can be proud of.';
+      }
+      if (hasHourClash || hasInGeukSik) {
+        detailChildDesc += lang === 'KO'
+          ? ' 다만 자식 별이나 자리에 충돌(훼손)이 감지되니, 양육 과정에서 정서적 갈등이나 예상치 못한 장애 요소가 있을 수 있어 세심한 주의가 필요해.'
+          : ' However, a clash (damage) is detected in the child star or palace, so careful attention is needed as there may be emotional conflicts or unexpected obstacles during parenting.';
+      }
+      if (gender === 'female' && gods.SikSang > 20) {
+        detailChildDesc += lang === 'KO'
+          ? ' 여성의 경우 자녀 출산을 기점으로 에너지가 자식에게 쏠리며 남편(관성)과 심리적으로 멀어지거나, 자녀를 매개로 주도권을 쥐게 되는 부부 역학의 변화가 생길 수 있어.'
+          : ' For women, after childbirth, energy shifts towards the child, which may create psychological distance from the husband (Power) or shift the relationship dynamic to taking the lead through the child.';
+      }
+    }
+
+    const finalOverride = lang === 'KO'
+      ? '\n\n[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.'
+      : '\n\n[Note] Judging a child 100% based only on the parent\'s chart has limits. For the most perfect analysis, checking the mutual complementarity through a 1:1 compatibility reading with your child later is the ultimate conclusion.';
+
+    childrenDesc = `${baseChildDesc}${detailChildDesc}${finalOverride}`;
 
     relationships.children = {
       title: lang === 'KO' ? '자식 및 결과물' : 'Children & Outcomes',
       godName: gender === 'male' ? (lang === 'KO' ? '관성' : 'Warrior') : (lang === 'KO' ? '식상' : 'Artist'),
-      ratio: childrenGodRatio,
+      ratio: targetChildGod,
       description: childrenDesc
     };
 

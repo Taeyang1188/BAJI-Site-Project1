@@ -232,15 +232,17 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   }
 
   let level = "";
-  if (score <= 35) level = "극약";
-  else if (score <= 48) level = "약";
-  else if (score <= 52) level = "중화";
-  else if (score <= 65) level = "강";
-  else level = "극강";
+  if (score <= 35) level = "극신약";
+  else if (score <= 48) level = "신약";
+  else if (score <= 52) level = "중화신약";
+  else if (score <= 56) level = "중화신강";
+  else if (score <= 65) level = "신강";
+  else level = "극신강";
 
   return { 
     score, 
     level, 
+    title: level,
     isStrong: score > 52,
     breakdown: { 
       self: Math.round(selfScore), 

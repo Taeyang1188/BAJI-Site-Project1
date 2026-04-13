@@ -120,6 +120,51 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   return stemEl === branchEl;
 };
 
+const ParsedText: React.FC<{ text: string }> = ({ text }) => {
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+  let currentText = '';
+  let keyCount = 0;
+
+  while (i < text.length) {
+    if (text[i] === '[') {
+      const endBracketIndex = text.indexOf(']', i + 1);
+      if (endBracketIndex !== -1) {
+        const tagContent = text.substring(i + 1, endBracketIndex);
+        
+        if (tagContent.startsWith('delay:')) {
+          if (currentText) {
+            elements.push(<span key={keyCount++}>{currentText}</span>);
+            currentText = '';
+          }
+          i = endBracketIndex + 1;
+          continue;
+        }
+        
+        const colonIndex = tagContent.indexOf(':');
+        if (colonIndex !== -1) {
+          if (currentText) {
+            elements.push(<span key={keyCount++}>{currentText}</span>);
+            currentText = '';
+          }
+          const color = tagContent.substring(0, colonIndex);
+          const content = tagContent.substring(colonIndex + 1);
+          elements.push(<span key={keyCount++} style={{ color }}>{content}</span>);
+          i = endBracketIndex + 1;
+          continue;
+        }
+      }
+    }
+    currentText += text[i];
+    i++;
+  }
+  if (currentText) {
+    elements.push(<span key={keyCount++}>{currentText}</span>);
+  }
+
+  return <>{elements}</>;
+};
+
 const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void }> = ({ text, speed = 30, onComplete }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -824,24 +869,81 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
     const isSinGang = result.analysis?.shinGangShinYak?.title ? result.analysis.shinGangShinYak.title.includes('강') : false;
     const yongShin = result.analysis?.yongShen || '';
+    const giShin = result.analysis?.yongshinDetail?.giShin?.element || '';
+    
     const todayStemElement = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || '';
     const todayBranchElement = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.element || '';
     const todayStemElementKo = BAZI_MAPPING.elements[todayStemElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
     const todayBranchElementKo = BAZI_MAPPING.elements[todayBranchElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
 
-    // Daily Luck Score Calculation
+    const dayBranch = result.pillars[1].branch;
+    
+    // 1. Yongshin/Gishin check
     let dailyLuckScore = 50;
-    if (yongShin.includes(todayStemElement) || (todayStemElementKo && yongShin.includes(todayStemElementKo))) dailyLuckScore += 15;
-    if (yongShin.includes(todayBranchElement) || (todayBranchElementKo && yongShin.includes(todayBranchElementKo))) dailyLuckScore += 5;
+    let isStemYongshin = yongShin.includes(todayStemElement) || (todayStemElementKo && yongShin.includes(todayStemElementKo));
+    let isStemGishin = giShin.includes(todayStemElement) || (todayStemElementKo && giShin.includes(todayStemElementKo));
+    let isBranchYongshin = yongShin.includes(todayBranchElement) || (todayBranchElementKo && yongShin.includes(todayBranchElementKo));
+    
+    if (isStemYongshin) dailyLuckScore += 15;
+    if (isStemGishin) dailyLuckScore -= 15;
+    if (isBranchYongshin) dailyLuckScore += 10;
 
-    if (isSinGang) {
-      if (todayPillar.stemTenGodKo.match(/식상|재성|관성/)) dailyLuckScore += 10;
-    } else {
-      if (todayPillar.stemTenGodKo.match(/비겁|인성/)) dailyLuckScore += 10;
-    }
+    // 2. Clash with Day Pillar
+    const hasDayClash = (
+      (dayBranch === '子' && todayPillar.branch === '午') || (dayBranch === '午' && todayPillar.branch === '子') ||
+      (dayBranch === '丑' && todayPillar.branch === '未') || (dayBranch === '未' && todayPillar.branch === '丑') ||
+      (dayBranch === '寅' && todayPillar.branch === '申') || (dayBranch === '申' && todayPillar.branch === '寅') ||
+      (dayBranch === '卯' && todayPillar.branch === '酉') || (dayBranch === '酉' && todayPillar.branch === '卯') ||
+      (dayBranch === '辰' && todayPillar.branch === '戌') || (dayBranch === '戌' && todayPillar.branch === '辰') ||
+      (dayBranch === '巳' && todayPillar.branch === '亥') || (dayBranch === '亥' && todayPillar.branch === '巳')
+    );
+    if (hasDayClash) dailyLuckScore -= 20;
 
-    const isGanYeoJiDong = getGanYeoJiDong(todayPillar.stem, todayPillar.branch);
-    if (isGanYeoJiDong) dailyLuckScore += 5;
+    // 2.5 Samhap (Ban-hap) with Day Branch
+    let samhapElement = '';
+    if ((dayBranch === '寅' || dayBranch === '午' || dayBranch === '戌') && (todayPillar.branch === '寅' || todayPillar.branch === '午' || todayPillar.branch === '戌') && dayBranch !== todayPillar.branch) samhapElement = 'Fire';
+    if ((dayBranch === '申' || dayBranch === '子' || dayBranch === '辰') && (todayPillar.branch === '申' || todayPillar.branch === '子' || todayPillar.branch === '辰') && dayBranch !== todayPillar.branch) samhapElement = 'Water';
+    if ((dayBranch === '巳' || dayBranch === '酉' || dayBranch === '丑') && (todayPillar.branch === '巳' || todayPillar.branch === '酉' || todayPillar.branch === '丑') && dayBranch !== todayPillar.branch) samhapElement = 'Metal';
+    if ((dayBranch === '亥' || dayBranch === '卯' || dayBranch === '未') && (todayPillar.branch === '亥' || todayPillar.branch === '卯' || todayPillar.branch === '未') && dayBranch !== todayPillar.branch) samhapElement = 'Wood';
+
+    const isSamhapYongshin = samhapElement && (yongShin.includes(samhapElement) || (BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && yongShin.includes(BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
+    const isSamhapGishin = samhapElement && (giShin.includes(samhapElement) || (BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && giShin.includes(BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
+
+    if (isSamhapYongshin) dailyLuckScore += 15;
+    if (isSamhapGishin) dailyLuckScore -= 15;
+
+    // 3. Special Energy (수화기제)
+    const isSuHwaGiJe = (todayPillar.stem === '壬' || todayPillar.stem === '癸') && (todayPillar.branch === '巳' || todayPillar.branch === '午');
+
+    // 4. Time-based Fortune
+    const currentHour = new Date().getHours();
+    const hourBranch = currentHour >= 23 || currentHour < 1 ? '子' :
+                       currentHour < 3 ? '丑' :
+                       currentHour < 5 ? '寅' :
+                       currentHour < 7 ? '卯' :
+                       currentHour < 9 ? '辰' :
+                       currentHour < 11 ? '巳' :
+                       currentHour < 13 ? '午' :
+                       currentHour < 15 ? '未' :
+                       currentHour < 17 ? '申' :
+                       currentHour < 19 ? '酉' :
+                       currentHour < 21 ? '戌' : '亥';
+    const hourElement = BAZI_MAPPING.branches[hourBranch as keyof typeof BAZI_MAPPING.branches]?.element;
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    
+    const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
+    const generatesDm = ELEMENT_CYCLE[(dmIndex + 4) % 5];
+    const sameAsDm = dmElement;
+    const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5];
+    const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5];
+    const drainsDm = ELEMENT_CYCLE[(dmIndex + 1) % 5];
+
+    const isSaengBiJae = hourElement === generatesDm || hourElement === sameAsDm || hourElement === wealth;
+    const isGeukSeol = hourElement === controlsDm || hourElement === drainsDm;
+
+    if (isSaengBiJae) dailyLuckScore += 10;
+    if (isGeukSeol) dailyLuckScore -= 10;
 
     const stemGod = (lang === 'KO' ? todayPillar.stemTenGodKo : todayPillar.stemTenGodEn) || '';
     const branchGod = (lang === 'KO' ? todayPillar.branchTenGodKo : todayPillar.branchTenGodEn) || '';
@@ -886,7 +988,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       }
     })();
 
-    const ganYeoComment = isGanYeoJiDong ? (lang === 'KO' ? ' 오, 위아래로 같은 기운이 꽉 찼네? 에너지가 아주 선명해.' : ' Oh, the same energy is packed top to bottom. Very vivid.') : '';
+    const ganYeoComment = getGanYeoJiDong(todayPillar.stem, todayPillar.branch) ? (lang === 'KO' ? ' 오, 위아래로 같은 기운이 꽉 찼네? 에너지가 아주 선명해.' : ' Oh, the same energy is packed top to bottom. Very vivid.') : '';
 
     let main = '';
     if (lang === 'KO') {
@@ -895,53 +997,132 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       
       main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. \n\n`;
 
-      if (dailyLuckScore >= 75) {
-        main += `와, 오늘 컨디션 완전 최상인데? 네가 뭘 해도 우주가 도와주는 기분일 거야. 평소에 망설였던 일이 있다면 오늘이 바로 그날이야. 네 바이브를 믿고 질러봐! `;
-      } else if (dailyLuckScore >= 55) {
-        if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) {
-          main += `평소에 ${userRef}한테 부족했던 낯선 에너지가 훅 들어오는 날이야. 어색할 수도 있지만, 오히려 그게 새로운 돌파구가 될 수 있어. `;
-        } else {
-          main += `전체적으로 기운이 매끄럽게 흐르는 날이야. 큰 무리 없이 네 페이스대로 하루를 보낼 수 있을 거야. 소소한 행운도 기대해볼 만해. `;
-        }
-      } else if (dailyLuckScore >= 35) {
-        if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) {
-          main += `에너지 과부하 주의! 이미 넘치는 기운이 또 들어와서 좀 예민해지거나 고집이 세질 수 있어. 오늘은 한 템포 쉬어가면서 주변을 살피는 게 좋아. `;
-        } else {
-          main += `기운이 좀 정체된 느낌이 들 수 있어. 억지로 속도를 내기보다, 오늘은 내실을 다지면서 에너지를 비축하는 쪽으로 방향을 잡아봐. `;
-        }
+      // 1. Base Fortune & Clash
+      if (hasDayClash) {
+        main += `오늘은 일지(내 안방/환경)와 충(沖)을 일으키는 날이라 전반적인 베이스 운이 좀 불안정해. 예기치 않은 부딪힘이나 변화가 생길 수 있으니 마음의 여유를 가져. `;
+      } else if (dailyLuckScore >= 70) {
+        main += `전체적인 베이스 운이 아주 긍정적이야! 우주가 네 편이 되어주는 느낌일 거야. `;
+      } else if (dailyLuckScore <= 30) {
+        main += `전반적인 베이스 운이 다소 무겁게 가라앉아 있어. 무리하지 말고 방어적으로 하루를 보내는 게 좋아. `;
       } else {
-        main += `오늘은 에너지가 좀 요동치는 날이네. 예상치 못한 변수가 생길 수 있으니, 중요한 결정은 내일로 미루는 게 현명할 거야. 차분하게 네 중심을 지키는 게 제일 중요해. `;
+        main += `전체적으로 무난하고 평온한 베이스 운을 띠고 있어. `;
       }
-      
-      if (stemGod.includes('재성')) main += `\n\n특히 오늘은 돈 냄새가 좀 나는데? 소소한 득템이나 경제적인 성과가 있을 수 있으니 눈 크게 뜨고 있어봐.`;
-      else if (stemGod.includes('식상')) main += `\n\n말빨이나 창의력이 폭발하는 날이야. 아이디어가 떠오르면 바로 메모해두거나 공유해봐. 네 표현력이 빛을 발할 거야.`;
-      else if (stemGod.includes('관성')) main += `\n\n사회적인 인정이나 명예가 따르는 날이야. 네가 맡은 일에서 책임감 있게 행동하면 좋은 평가를 받을 수 있을 거야.`;
-      else if (stemGod.includes('인성')) main += `\n\n배움이나 성찰에 아주 좋은 날이야. 책을 읽거나 깊은 생각을 하면서 내면의 깊이를 더해보는 건 어때?`;
+
+      // 2. Stem (Mind) vs Branch (Reality)
+      main += `\n\n[정신과 현실의 분리]\n`;
+      if (isStemYongshin) {
+        main += `오늘 천간(정신)의 기운이 네게 희신(좋은 기운)으로 작용해. 스트레스가 풀리고 심리적으로 아주 맑고 긍정적인 기분을 느낄 수 있어. `;
+      } else if (isStemGishin) {
+        main += `오늘 천간(정신)의 기운이 구신(나쁜 기운)으로 작용해. 괜한 강박이나 스트레스, 우울감이 몰려올 수 있으니 마인드 컨트롤이 필수야. `;
+      } else {
+        main += `심리적인 상태는 크게 요동치지 않고 평온할 거야. `;
+      }
+
+      if (samhapElement) {
+        if (isSamhapYongshin) {
+          main += `\n또한, 지지(현실)에서 합이 일어나 네게 유리한 용신 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들어내고 있어. 현실에서 일어나는 사건과 결과가 너에게 아주 유리하게 돌아갈 확률이 높아! `;
+        } else if (isSamhapGishin) {
+          main += `\n하지만 지지(현실)에서 합이 일어나 네게 불리한 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 형성하고 있어. 현실적인 결과나 사건이 네 의도와 다르게 꼬일 수 있으니 주의가 필요해. `;
+        } else {
+          main += `\n지지(현실)에서 합이 일어나 새로운 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들고 있어. 주변 환경이나 상황에 흥미로운 변화가 생길 수 있겠네. `;
+        }
+      }
+
+      // 3. Special Energy
+      if (isSuHwaGiJe) {
+        main += `\n\n[특수 기운: 수화기제]\n오늘은 수(水)와 화(火)가 만나는 '수화기제'의 날이야. 일이 완벽히 끝나는 건 아니지만, 막혔던 일이 일단락되고 매듭지어지며 다음 스텝을 도모할 수 있는 중요한 전환점이 될 거야.`;
+      }
+
+      // 4. 10 Gods Filtering
+      main += `\n\n[오늘의 핵심 이벤트]\n`;
+      if (stemGod.includes('비견') || stemGod.includes('겁재')) {
+        main += `비견/겁재일: 재성(돈)을 극하는 날이라 지출이 생기거나 남에게 뺏길 확률이 높아. 대신 경쟁심과 욕심이 생기고 두려움이 없어지며(겁상실), 동등한 위치의 친구나 사람을 많이 만나게 될 거야.`;
+      } else if (stemGod.includes('식신') || stemGod.includes('상관')) {
+        main += `식신/상관일: 말문이 트이고 아이디어나 표현력이 강하게 발휘되는 날이야. 단, 다른 기운에 의해 막히면 오히려 답답해지고 혀가 꼬일 수 있으니 상황을 잘 살펴.`;
+      } else if (stemGod.includes('정인')) {
+        main += `정인일: 남들에게 정직하게 인정받고 싶어 하는 날이야. 엄마의 보살핌처럼 안정적이고 편안함을 느끼며, 누군가에게 밥을 얻어먹는 등 소소한 이득이 생길 수 있어.`;
+      } else if (stemGod.includes('편인')) {
+        main += `편인일: 긍정적인 생각보다 부정적인 생각과 의심, 잦은 실수가 유발되기 쉬워. 특히 식신(즐거움)을 극하는 '도식' 작용이 일어나 몸에 힘이 빠지고 만사가 귀찮아질 수 있으니 억지로라도 텐션을 올려봐.`;
+      } else if (stemGod.includes('편관')) {
+        main += `편관일: 무언가를 기필코 해내야겠다는 강한 의지와 목표 의식이 생겨. 하지만 이로 인해 정도를 벗어나거나 초조함, 강박을 심하게 느낄 수 있으니 릴렉스하는 게 중요해.`;
+      } else if (stemGod.includes('정관')) {
+        main += `정관일: 원칙과 규칙을 지키며 안정감을 느끼는 날이야. 명예나 직장운이 상승하고 바른 생활을 추구하게 돼.`;
+      } else if (stemGod.includes('정재') || stemGod.includes('편재')) {
+        main += `재성일: 현실 감각이 뛰어나고 결과물에 집중하는 날이야. 금전적인 흐름이 활발해지거나 이성과의 만남이 있을 수 있어.`;
+      }
+
+      // 5. Time-based Fortune
+      main += `\n\n[현재 시간대 길흉 판별]\n네가 이 운세를 확인하는 지금 이 시간(${currentHour}시), `;
+      if (isSaengBiJae) {
+        main += `시간의 기운이 너를 도와주는 '생비재'에 해당해! 지금 마주한 사건의 결과나 타이밍이 아주 긍정적(길)으로 흘러갈 확률이 높아. 기회를 잡아!`;
+      } else if (isGeukSeol) {
+        main += `시간의 기운이 너의 힘을 빼는 '극설'에 해당해. 지금은 섣불리 움직이면 손해나 어려움을 겪을 수 있으니(흉), 방어적인 태도를 취하는 게 안전해.`;
+      } else {
+        main += `시간의 기운이 중립적이야. 네 의지대로 상황을 이끌어갈 수 있어.`;
+      }
+
     } else {
+      // English version
       main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. \n\n`;
 
-      if (dailyLuckScore >= 75) {
-        main += `Wow, your condition is peak today! You'll feel like the universe is backing whatever you do. If there's something you've been hesitating on, today is the day. Trust your vibe and go for it! `;
-      } else if (dailyLuckScore >= 55) {
-        if (missing.some(m => stemGod.includes(m) || branchGod.includes(m))) {
-          main += `A strange energy you usually lack is hitting you today. It might feel awkward, but it could be the breakthrough you need. `;
-        } else {
-          main += `Overall, the energy is flowing smoothly. You'll be able to spend the day at your own pace without much trouble. Expect some small luck! `;
-        }
-      } else if (dailyLuckScore >= 35) {
-        if (overflow.some(o => stemGod.includes(o) || branchGod.includes(o))) {
-          main += `Energy overload alert! Already overflowing vibes are coming in, making you sensitive or stubborn. Take a breath and look around today. `;
-        } else {
-          main += `The energy might feel a bit stagnant. Instead of forcing speed, focus on solidifying your foundation and conserving energy. `;
-        }
+      if (hasDayClash) {
+        main += `Today clashes with your Day Branch (your environment), making the base fortune unstable. Expect unexpected bumps or changes, so keep an open mind. `;
+      } else if (dailyLuckScore >= 70) {
+        main += `The overall base fortune is very positive! You'll feel like the universe is on your side. `;
+      } else if (dailyLuckScore <= 30) {
+        main += `The overall base fortune is quite heavy. It's better to spend the day defensively without overdoing it. `;
       } else {
-        main += `Energies are a bit volatile today. Unexpected variables might pop up, so it's wise to postpone big decisions. Staying calm and centered is key. `;
+        main += `The overall base fortune is smooth and peaceful. `;
       }
 
-      if (stemGod.includes('Maverick') || stemGod.includes('Architect')) main += `\n\nEspecially today, I smell some money. Keep your eyes open for small gains or financial results.`;
-      else if (stemGod.includes('Artist') || stemGod.includes('Rebel')) main += `\n\nYour creativity and wit are exploding today. If an idea hits, memo it or share it immediately. Your expression will shine.`;
-      else if (stemGod.includes('Judge') || stemGod.includes('Warrior')) main += `\n\nSocial recognition or honor is on the cards. Acting with responsibility in your tasks will lead to great evaluations.`;
-      else if (stemGod.includes('Mystic') || stemGod.includes('Sage')) main += `\n\nA great day for learning or reflection. How about deepening your inner world with a book or deep thought?`;
+      main += `\n\n[Mind vs Reality]\n`;
+      if (isStemYongshin) {
+        main += `Today's Heavenly Stem (mind) acts as a favorable energy. Stress will relieve, and you'll feel psychologically clear and positive. `;
+      } else if (isStemGishin) {
+        main += `Today's Heavenly Stem (mind) acts as an unfavorable energy. Unnecessary obsessions, stress, or gloominess might rush in, so mind control is essential. `;
+      } else {
+        main += `Your psychological state will be calm without major fluctuations. `;
+      }
+
+      if (samhapElement) {
+        if (isSamhapYongshin) {
+          main += `\nAlso, a combination in the Earthly Branches (reality) is creating a favorable energy (${samhapElement}) for you. The events and results in reality are highly likely to turn out in your favor! `;
+        } else if (isSamhapGishin) {
+          main += `\nHowever, a combination in the Earthly Branches (reality) is forming an unfavorable energy (${samhapElement}) for you. Practical results or events might get tangled differently from your intentions, so be careful. `;
+        } else {
+          main += `\nA combination in the Earthly Branches (reality) is creating a new energy (${samhapElement}). You might see some interesting changes in your surroundings or situations. `;
+        }
+      }
+
+      if (isSuHwaGiJe) {
+        main += `\n\n[Special Energy: Water-Fire Equilibrium]\nToday is a day where Water and Fire meet. Things might not finish perfectly, but blocked issues will be wrapped up, marking an important turning point for your next step.`;
+      }
+
+      main += `\n\n[Today's Core Event]\n`;
+      if (stemGod.includes('Mirror') || stemGod.includes('Rival')) {
+        main += `Mirror/Rival Day: High chance of spending money or losing it. Instead, you'll feel competitive, fearless, and meet many friends or equals.`;
+      } else if (stemGod.includes('Artist') || stemGod.includes('Rebel')) {
+        main += `Artist/Rebel Day: You'll be talkative, and your ideas and expression will shine. But if blocked by other energies, you might feel frustrated and tongue-tied.`;
+      } else if (stemGod.includes('Sage')) {
+        main += `Proper Sage Day: You want honest recognition. You'll feel stable and comfortable like a mother's care, and might get small benefits like free meals.`;
+      } else if (stemGod.includes('Mystic')) {
+        main += `Mystic Day: Prone to negative thoughts, doubts, and frequent mistakes. Energy drains and you might feel lazy, so try to force your tension up.`;
+      } else if (stemGod.includes('Strong Warrior')) {
+        main += `Strong Warrior Day: Strong will and goal-oriented. However, this might cause you to deviate from the standard or feel severe anxiety and obsession. Relax.`;
+      } else if (stemGod.includes('Proper Warrior')) {
+        main += `Proper Warrior Day: A day of feeling stable by keeping rules. Honor or career luck rises, pursuing a righteous life.`;
+      } else if (stemGod.includes('Maverick') || stemGod.includes('Architect')) {
+        main += `Wealth Day: Excellent sense of reality, focusing on results. Financial flow becomes active, or you might meet potential partners.`;
+      }
+
+      main += `\n\n[Time-based Fortune]\nAt this very moment (${currentHour}:00), `;
+      if (isSaengBiJae) {
+        main += `the time energy supports you! The outcome or timing of current events is highly likely to be positive. Grab the chance!`;
+      } else if (isGeukSeol) {
+        main += `the time energy drains you. Moving hastily now might lead to loss or difficulty, so take a defensive stance.`;
+      } else {
+        main += `the time energy is neutral. You can lead the situation with your will.`;
+      }
     }
 
     return main;
@@ -1017,7 +1198,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
                   {(vibePhase === 'question' || vibePhase === 'analysis') && (
                     <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                      {cycleVibe.intro}
+                      <ParsedText text={cycleVibe.intro} />
                     </p>
                   )}
 
@@ -1163,7 +1344,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           </p>
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
                             <p className={`text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
-                              {cycleVibe.themeAnalyses[selectedThemeId].glitch}
+                              <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />
                             </p>
                           </div>
                         </div>
@@ -1176,7 +1357,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           className="p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl"
                         >
                           <p className="text-sm font-display text-white/90 italic mb-3">
-                            {cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text}
+                            <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text || ''} />
                           </p>
                           <button
                             onClick={() => {

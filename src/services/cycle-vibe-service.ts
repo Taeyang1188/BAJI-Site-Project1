@@ -19,13 +19,14 @@ export interface CycleVibeResult {
   luckColor: string;
 }
 
-const CITY_META_TABLE: Record<string, { keywords: string; vibe: string; point: string }> = {
-  "강릉시": { keywords: "바다, 커피, 경포대, 정동진", vibe: "낭만적인, 푸른, 여유로운", point: "푸른 파도와 커피 향" },
-  "부산시": { keywords: "항구, 역동적, 마천루, 사투리", vibe: "거친, 에너제틱한, 화려한", point: "거친 파도와 도시의 소음" },
-  "춘천시": { keywords: "호수, 안개, 닭갈비, 소양강", vibe: "몽환적인, 잔잔한, 서정적인", point: "안개 낀 호수와 새벽 공기" },
-  "경주시": { keywords: "고분, 신라, 역사, 황리단길", vibe: "신비로운, 오래된, 정갈한", point: "천 년의 세월이 흐르는 땅" },
-  "제주시": { keywords: "바람, 돌, 한라산, 이국적", vibe: "자유로운, 거친, 신비로운", point: "현무암 사이를 지나는 바람" },
-  "서울": { keywords: "남산타워, 한강, 빌딩숲, 잠들지 않는 도시", vibe: "세련된, 바쁜, 화려한", point: "잠들지 않는 도시의 불빛" }
+const CITY_META_TABLE: Record<string, { impression: string, enImpression: string }> = {
+  "강릉": { impression: "푸른 파도와 커피 향이 어우러진 낭만적인 곳이지. 언제 가도 마음이 탁 트이는 기분이야.", enImpression: "A romantic place where blue waves and coffee scent blend. It always makes you feel refreshed." },
+  "부산": { impression: "거친 파도와 역동적인 에너지가 넘치는 곳이지. 돼지국밥 한 그릇 뚝딱하고 싶네.", enImpression: "A place full of rough waves and dynamic energy. Makes me crave a bowl of Dwaeji Gukbap." },
+  "춘천": { impression: "안개 낀 호수와 서정적인 분위기가 매력적인 곳이지. 닭갈비 냄새가 여기까지 나는 것 같아.", enImpression: "A charming place with foggy lakes and a lyrical atmosphere. I can almost smell the Dakgalbi from here." },
+  "경주": { impression: "천 년의 세월이 흐르는 신비로운 땅이지. 발길 닿는 곳마다 역사가 살아 숨 쉬는 기분이야.", enImpression: "A mysterious land where a thousand years of time flow. History breathes wherever you step." },
+  "제주": { impression: "현무암 사이를 지나는 바람이 자유로운 곳이지. 이국적인 풍경에 훌쩍 떠나고 싶어지네.", enImpression: "A place where the wind blows freely through basalt rocks. The exotic scenery makes me want to just take off and go." },
+  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 당기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD?" },
+  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 당기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD?" }
 };
 
 const formatGod = (god: string, stemOrBranch: string, lang: Language) => {
@@ -129,9 +130,9 @@ export function generateCycleVibe(
     const matchedCity = Object.keys(CITY_META_TABLE).find(c => city && city.includes(c));
     if (matchedCity) {
       const meta = CITY_META_TABLE[matchedCity as keyof typeof CITY_META_TABLE];
-      cityInsight = `${matchedCity}에서 태어났네? ${meta.point} 때문인지 너의 원국에서도 ${meta.vibe} 특성이 느껴지는 것 같아. `;
+      cityInsight = `${city}에서 태어났네? ${meta.impression}`;
     } else if (city) {
-      cityInsight = `${city}에서 태어났네? 그곳만의 독특한 기운이 네 사주에 스며들어 네 영혼의 색깔을 더 선명하게 만들었겠군. `;
+      cityInsight = `${city}에서 태어났네? 그곳만의 독특한 기운이 네 사주에 스며들어 네 영혼의 색깔을 더 선명하게 만들었겠군.`;
     }
   }
 
@@ -247,13 +248,27 @@ export function generateCycleVibe(
       balanceComment = `\n\n특히 ${processedName} 너는 **'${primaryWarning.title}'**의 기운이 강하게 느껴져. ${primaryWarning.description} `;
     }
 
-    intro = `${cityInsight}흠.. ${impression} \n게다가 ${strengthComment} \n\n${elementComment} ${balanceComment} \n\n이런 다양한 매력이 더해지면 ${nameRef}너만의 색깔이 뚜렷할 거야 분명히.`;
+    let introPrefix = '';
+    if (cityInsight) {
+      introPrefix = `${cityInsight} [delay:1000]\n\n아무튼.. `;
+    } else {
+      introPrefix = `흠.. `;
+    }
+
+    intro = `${introPrefix}${impression} \n게다가 ${strengthComment} \n\n${elementComment} ${balanceComment} \n\n이런 다양한 매력이 더해지면 ${nameRef}너만의 색깔이 뚜렷할 거야 분명히.`;
   } else {
     // English Intro (Simplified)
     const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title === "화토중탁";
     let enCityGreeting = '';
-    if (city) {
-      enCityGreeting = `Born in ${city}? That's quite a vibe. `;
+    
+    const matchedCityEn = Object.keys(CITY_META_TABLE).find(c => city && city.includes(c));
+    if (matchedCityEn) {
+      const meta = CITY_META_TABLE[matchedCityEn as keyof typeof CITY_META_TABLE];
+      enCityGreeting = `Born in ${city}? ${meta.enImpression} [delay:1000]\n\nAnyway.. `;
+    } else if (city) {
+      enCityGreeting = `Born in ${city}? The unique energy of that place must have seeped into your chart, making your soul's color even more vivid. [delay:1000]\n\nAnyway.. `;
+    } else {
+      enCityGreeting = `Hmm.. `;
     }
     
     let enSpecialGreeting = '';
@@ -261,7 +276,7 @@ export function generateCycleVibe(
       enSpecialGreeting = `Your chart has a unique 'Fire-Earth Heavy-Turbid' structure—dry, intense, and powerful. `;
     }
 
-    intro = `${enCityGreeting}Hmm.. ${iljuInfo.en} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
+    intro = `${enCityGreeting}${iljuInfo.en} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
   }
 
   // 4. Cycle Intro Construction
@@ -484,10 +499,12 @@ export function generateCycleVibe(
     const marital = interactionsData?.maritalStatus;
     const children = interactionsData?.hasChildren;
     
-    const hasTargetLuck = isFemale ? (luckGods.some(g => g.includes('관성'))) : isMale ? (luckGods.some(g => g.includes('재성'))) : true;
-    const hasSikSangLuck = luckGods.some(g => g.includes('식상'));
+    const hasSikSangLuck = luckGods.some(g => g.includes('식상') || g.includes('식신') || g.includes('상관'));
+    const hasJaeSeongLuck = luckGods.some(g => g.includes('재성') || g.includes('편재') || g.includes('정재'));
+    const hasGwanSeongLuck = luckGods.some(g => g.includes('관성') || g.includes('편관') || g.includes('정관'));
+    const hasInSeongLuck = luckGods.some(g => g.includes('인성') || g.includes('편인') || g.includes('정인'));
     
-    if (hasTargetLuck || hasSikSangLuck) score += 20;
+    const hasAvailability = isFemale ? hasGwanSeongLuck : isMale ? hasJaeSeongLuck : (hasGwanSeongLuck || hasJaeSeongLuck);
     
     const dayBranch = result.pillars[1].branch;
     const dayBranchInteractions = allInteractions.filter((i: any) => i.note.includes(dayBranch) && (i.note.includes(daewunBranch) || i.note.includes(seunBranch)));
@@ -496,49 +513,80 @@ export function generateCycleVibe(
     const hasChung = dayBranchInteractions.some((i: any) => i.type.includes('충'));
     const hasWonjin = dayBranchInteractions.some((i: any) => i.type.includes('원진'));
 
-    // Contextual prefix based on marital status
-    if (marital === '기혼') {
-      text += lang === 'KO' ? `이미 가정을 이룬 상태구나. ` : `You are already married. `;
-      if (hasHap) {
-        text += lang === 'KO' ? `안방에 합이 들어오니 배우자와의 관계가 더 돈독해지거나, 집안에 경사가 생길 수 있어. ` : `With a combination in your spouse palace, your relationship will deepen, or there might be good news at home. `;
-      } else if (hasChung || hasWonjin) {
-        text += lang === 'KO' ? `하지만 안방이 흔들리거나 원진이 끼어있네. 사소한 오해가 큰 싸움으로 번지지 않게 서로 배려가 필요한 시기야. ` : `However, your spouse palace is shaken or has a resentment interaction. Be careful not to let small misunderstandings turn into big fights. `;
-      } else {
-        text += lang === 'KO' ? `큰 파도 없이 안정적인 흐름이야. ` : `It's a stable flow without major waves. `;
-      }
-      
-      if (children) {
-        text += lang === 'KO' ? `아이들과 함께하는 시간에서 큰 에너지를 얻겠어. ` : `You will gain great energy from spending time with your children. `;
-      }
-    } else if (marital === '돌싱') {
-      text += lang === 'KO' ? `새로운 시작을 꿈꾸고 있네. ` : `You are dreaming of a new beginning. `;
-      if (hasHap || hasTargetLuck) {
-        text += lang === 'KO' ? `과거의 아픔을 씻어줄 새로운 인연의 기운이 강하게 들어오고 있어. 이번엔 좀 더 신중하게 마음을 열어봐. ` : `A strong energy of a new connection that will wash away past pain is coming in. Open your heart a bit more carefully this time. `;
-      } else {
-        text += lang === 'KO' ? `지금은 누군가를 만나기보다 자신을 먼저 돌보는 게 우선이야. ` : `Right now, taking care of yourself is more important than meeting someone new. `;
-      }
-    } else {
-      // Single or Private
-      if (hasHap) {
-        score += 30;
-        text += lang === 'KO' ? `내 안방(일지)의 문이 활짝 열리는 시기야. 깊은 관계가 진전되거나 결혼, 동거 같은 실질적인 결합이 일어나기 좋지. ` : `The door to your spouse palace is wide open. It's a good time for deep relationships to progress or for practical unions like marriage or cohabitation. `;
-      } else if (hasChung) {
-        score += 10;
-        text += lang === 'KO' ? `기존의 관계가 깨지거나, 갑작스럽고 불안정한 인연이 들이닥칠 수 있어. 폭풍 같은 연애가 예상되네. ` : `Existing relationships might break, or sudden, unstable connections might rush in. Expect a stormy romance. `;
-      } else if (hasWonjin) {
-        score -= 10;
-        text += lang === 'KO' ? `끌리지만 괴로운, 지독한 애증의 인연이 시작될 수 있어. 마음을 다치지 않게 조심해야 해. ` : `A toxic, love-hate relationship that you're drawn to might begin. Be careful not to get your heart broken. `;
-      }
+    const yongShin = analysis.yongShen || '';
+    const isYongShinLuck = yongShin.includes(daewunElement) || yongShin.includes(seunElement);
+
+    const isGwanSalHonJap = analysis.tenGodsRatio?.['편관 (Strong Warrior)'] > 0 && analysis.tenGodsRatio?.['정관 (Proper Warrior)'] > 0;
+    const isSinYak = analysis.shinGangShinYak?.title?.includes('약');
+    const inSeongRatio = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('인성') || k.includes('Mystic') || k.includes('Sage')).reduce((sum, [_, v]) => sum + (v as number), 0);
+    const hasNoJaeSeong = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('재성') || k.includes('Maverick') || k.includes('Architect')).reduce((sum, [_, v]) => sum + (v as number), 0) === 0;
+    const hasNoGwanSeong = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('관성') || k.includes('Warrior') || k.includes('Judge')).reduce((sum, [_, v]) => sum + (v as number), 0) === 0;
+
+    // 1. Desire and Availability
+    if (hasSikSangLuck && hasAvailability) {
+      score += 30;
+      text += lang === 'KO' ? '연애하고 싶은 마음(식상)과 실제 대상(이성운)이 동시에 들어오는 완벽한 타이밍이야. 가장 안정적인 연애가 성립될 수 있어. ' : 'A perfect timing where both your desire for romance and actual potential partners arrive simultaneously. The most stable romance can be formed. ';
+    } else if (hasSikSangLuck) {
+      score += 10;
+      text += lang === 'KO' ? '연애하고 싶은 주체적인 마음과 매력이 강해지는 시기야. ' : 'Your independent desire for romance and charm are growing stronger. ';
+    } else if (hasAvailability) {
+      score += 15;
+      text += lang === 'KO' ? '주변에 연애할 대상이 나타나는 이성운이 들어왔어. ' : 'Luck for meeting potential partners has arrived. ';
     }
 
-    if (isFrozen && (daewunElement === 'Fire' || seunElement === 'Fire')) {
-      score += 20;
-      text += lang === 'KO' ? `얼어붙은 네 마음을 녹여줄 온기 같은 사람이 나타날 거야. 이건 단순한 연애가 아니라 생존을 위한 이끌림이지. ` : `Someone with warmth who will melt your frozen heart will appear. This isn't just romance; it's an attraction for survival. `;
+    if (hasInSeongLuck) {
+      text += lang === 'KO' ? '특히 이번 운에서는 상대방으로부터 대우받고 무언가를 많이 받는 수용적인 연애(갑이 되는 연애)를 할 수 있는 흐름이야. ' : 'Especially in this cycle, you can experience a receptive romance where you are treated well and receive a lot from your partner. ';
     }
+
+    // 2. Day Branch Activation
+    if (hasHap) {
+      score += 20;
+      text += lang === 'KO' ? '내 안방(일지)의 문이 합(合)으로 활짝 열리네. 인연이 닿는 유력한 시기야. ' : 'The door to your spouse palace opens wide with a combination. It\'s a strong time for connections. ';
+      
+      const hapTypes = dayBranchInteractions.filter((i: any) => i.type.includes('합')).map((i: any) => i.note);
+      if (hapTypes.some(n => n.includes('寅') && n.includes('亥')) || hapTypes.some(n => n.includes('巳') && n.includes('申'))) {
+        text += lang === 'KO' ? '스펙과 매력에 끌려 순식간에 사랑에 빠지지만 금방 식을 수 있는 "금사빠" 성향이 발동할 수 있으니 속도 조절이 필요해. ' : 'You might fall in love quickly due to specs and charm, but it could cool down fast. Pace yourself. ';
+      } else if (hapTypes.some(n => n.includes('卯') && n.includes('戌'))) {
+        text += lang === 'KO' ? '서로 티키타카가 아주 잘 맞는 찰떡 궁합의 인연이 예상돼. ' : 'A connection with great chemistry and banter is expected. ';
+      } else if (hapTypes.some(n => n.includes('辰') && n.includes('酉'))) {
+        text += lang === 'KO' ? '연애를 넘어 동업이나 사업적 시너지를 내기 좋은 실속 있는 인연이야. ' : 'A practical connection good for business synergy beyond just romance. ';
+      }
+    } else if (hasChung) {
+      score += 10;
+      text += lang === 'KO' ? '일지에 충(沖)이 들어와. 첫눈에 반하는 강렬한 사랑이 생기거나, 임신/직장 이동 등 갑작스러운 주변 상황 변화로 인해 번갯불에 콩 볶듯 결합(결혼 등)이 발생할 수 있는 이벤트 구간이야. ' : 'A clash hits your spouse palace. Expect intense love at first sight, or a sudden union (like marriage) triggered by unexpected situations like pregnancy or job changes. ';
+    } else if (hasWonjin) {
+      score -= 10;
+      text += lang === 'KO' ? '끌리지만 괴로운, 지독한 애증의 인연(원진)이 시작될 수 있어. 마음을 다치지 않게 조심해야 해. ' : 'A toxic, love-hate relationship that you\'re drawn to might begin. Be careful not to get your heart broken. ';
+    }
+
+    // 3. Marriage Timing & Warnings
+    const isMarriageTiming = (isMale && hasJaeSeongLuck && hasHap) || 
+                             (isYongShinLuck) || 
+                             (isFemale && (hasGwanSeongLuck || hasSikSangLuck));
+    
+    if (isMarriageTiming && hasHap) {
+      text += lang === 'KO' ? '20대라면 깊은 연애로, 30대 이상 정년기라면 실제 결혼으로 이어질 확률이 매우 높은 강력한 운이야. ' : 'If in your 20s, this leads to deep romance; if 30s or older, it\'s a very strong luck likely leading to actual marriage. ';
+    }
+
+    // 4. Bad Luck Filtering & Warnings
+    if (hasAvailability && ((isFemale && isGwanSalHonJap) || isSinYak)) {
+      score -= 20;
+      text += lang === 'KO' ? '\n\n[경고] 이성운이 들어왔지만, 사주의 단점(관살혼잡 가중 또는 신약함)을 부추기는 흉운의 성격도 있어. 절대 섣부른 결정을 내리지 말고, 반드시 궁합을 확인하고 시기를 숙고해. ' : '\n\n[Warning] Romance luck has arrived, but it might worsen your chart\'s weaknesses. Do not make hasty decisions; be sure to check compatibility and consider the timing carefully. ';
+    }
+
+    if (inSeongRatio > 40) {
+      text += lang === 'KO' ? '\n\n[주의] 인성이 과다하여 주관적 잣대가 강해. 연애 시 객관성이나 눈치가 떨어질 수 있으니 타인의 조언을 귀담아들어. ' : '\n\n[Note] With excessive Wisdom, your subjective standards are strong. You might lack objectivity or tact in romance, so listen to others\' advice. ';
+    }
+
+    if ((isMale && hasNoJaeSeong) || (isFemale && hasNoGwanSeong)) {
+      text += lang === 'KO' ? '\n\n[주의] 원국에 이성을 보는 기준(재성/관성)이 부족해 나쁜 사람을 만날 확률이 높아. 주변 연애 고수들의 객관적인 조언을 반드시 받아! ' : '\n\n[Note] Your chart lacks the standard for judging partners. There is a high chance of meeting the wrong person, so definitely get objective advice from dating experts around you! ';
+    }
+
+    text += lang === 'KO' ? '\n\n마지막으로, 연애는 쌍방작용이야. 상대방의 사주에서도 연애운(식상)과 이성운이 들어왔는지, 내게 없는 오행을 보완해주는 귀인인지 꼭 함께 확인해봐.' : '\n\nLastly, romance is a two-way street. Make sure to check if your partner also has romance luck and if they complement your missing elements.';
 
     const main = lang === 'KO' ? 
-      `음, ${userRef}의 애정운을 보니... ${text || '평온한 흐름 속에 잔잔한 인연이 스며드는 시기야.'} [delay:3000]\n\n인연의 무게를 견딜 준비가 됐어?` :
-      `Looking at your romance... ${text || 'It is a period of calm and steady connections.'} [delay:3000]\n\nAre you ready to bear the weight of connection?`;
+      `음, ${userRef}의 애정운을 보니... [delay:1500]\n\n${text}` :
+      `Looking at your romance... [delay:1500]\n\n${text}`;
     
     const glitch = lang === 'KO' ? 
       (score >= 70 ? '인연의 끈이 팽팽하게 당겨지고 있어. 기회를 놓치지 마.' : '지금은 누군가를 찾기보다 네 내면의 평화를 먼저 찾는 게 이득이야.') :
@@ -556,7 +604,23 @@ export function generateCycleVibe(
     const hasJungJae = luckGods.some(g => g.includes('정재'));
     const hasBiGyeopLuck = luckGods.some(g => g.includes('비견') || g.includes('겁재'));
     
-    const isJaeDaSinYak = isSinYak && hasOriginalJae;
+    const jaeRatio = Object.entries(tenGodsRatio).filter(([k]) => k.includes('재성')).reduce((sum, [_, v]) => sum + (v as number), 0);
+    const gwanRatio = Object.entries(tenGodsRatio).filter(([k]) => k.includes('관성')).reduce((sum, [_, v]) => sum + (v as number), 0);
+    const inRatio = Object.entries(tenGodsRatio).filter(([k]) => k.includes('인성')).reduce((sum, [_, v]) => sum + (v as number), 0);
+    
+    const dmElement = BAZI_MAPPING.stems[result.pillars[1].stem as keyof typeof BAZI_MAPPING.stems]?.element || '';
+    const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const jaeElement = ELEMENT_CYCLE[(ELEMENT_CYCLE.indexOf(dmElement) + 2) % 5];
+    const hasJaeHap = analysis.dayMasterStrength?.activeCombinations?.some((c: any) => c.element === jaeElement && (c.type === 'Sam-hap' || c.type === 'Bang-hap'));
+
+    const isTrueJaeDaSinYak = (strength.title === '신약' || strength.title === '극신약') && 
+                              jaeRatio >= 35 && 
+                              gwanRatio < 15 && 
+                              inRatio < 15 && 
+                              !hasJaeHap;
+                              
+    const isSimpleJaeDaSinYak = (strength.title === '신약' || strength.title === '극신약') && hasOriginalJae && !isTrueJaeDaSinYak;
+
     const isJaengJae = hasBiGyeopLuck && hasOriginalJae;
     
     const fireRatio = analysis.elementRatios?.Fire || 0;
@@ -565,22 +629,74 @@ export function generateCycleVibe(
 
     // Layer 1: 거시적 그릇 (The Birthright)
     let layer1 = '';
-    if (isSinGang && hasOriginalJae) {
-      layer1 = `너는 황금을 넉넉히 담을 수 있는 거대한 가마솥(신강)을 타고났어. 결국 물질의 주인이 될 잠재력이 충분하지.`;
-    } else if (isJaeDaSinYak) {
-      layer1 = `재물은 주변에 널려있지만, 그걸 담아낼 그릇이 아직은 예쁘고 얇은 찻잔(신약) 같아. 돈을 쫓을수록 몸이 상할 수 있어.`;
+    const isSpecialStructure = analysis.yongshinDetail?.method === "특수격용신";
+
+    if (isTrueJaeDaSinYak) {
+      if (dmElement === 'Wood') {
+        layer1 = lang === 'KO' ? 
+          `너는 눈앞에 거대한 황금산(재성)이 있지만, 정작 네 뿌리가 약해 그 산에 짓눌려 있는 '재다신약' 사주야. 어떤 일이나 환경에 한 번 얽매이면 거기서 벗어나지 못하고 질질 끌려다니기 쉽지. 돈을 쫓기 전에 반드시 네 주체성(비겁)을 먼저 세워야 해.` : 
+          `You have a 'Jae-Da-Sin-Yak' chart, meaning there's a massive mountain of gold in front of you, but your roots are too weak, so you're crushed by it. Once you get tied to a job or environment, it's hard to escape, and you tend to be dragged around. You must establish your independence before chasing money.`;
+      } else if (dmElement === 'Fire') {
+        layer1 = lang === 'KO' ? 
+          `너는 눈앞에 거대한 황금산(재성)이 있지만, 정작 네 불꽃이 약해 그 금속에 갇혀버린 '재다신약' 사주야. 돈이나 결과에 집착할수록 본연의 빛을 잃고 비굴해지거나 자신감이 떨어질 수 있어. 사람들에게 가치를 인정받는 시스템(관성) 안으로 들어가야 해.` : 
+          `You have a 'Jae-Da-Sin-Yak' chart. There's a massive mountain of gold, but your flame is too weak, and you're trapped by the metal. The more you obsess over money or results, the more you lose your light and confidence. You need to enter a system (Official) where your value is recognized by others.`;
+      } else if (dmElement === 'Earth') {
+        layer1 = lang === 'KO' ? 
+          `너는 쏟아지는 거대한 물길(재성)을 막아내기엔 흙이 너무 무른 '재다신약' 사주야. 돈의 흐름에 휩쓸려 빚에 허덕일 위험이 크지만, 반대로 네 힘(인성/비겁)을 키워 그 물길을 독점할 수만 있다면 엄청난 벼락부자가 될 잠재력도 품고 있지.` : 
+          `You have a 'Jae-Da-Sin-Yak' chart. You are like soft earth trying to block a massive flood (wealth). There's a high risk of drowning in debt by being swept away by the flow of money, but if you build your strength to monopolize that water, you have the potential to become incredibly rich overnight.`;
+      } else if (dmElement === 'Metal') {
+        layer1 = lang === 'KO' ? 
+          `너는 베어내야 할 나무(재성)는 숲을 이루고 있는데, 네 도끼날이 너무 무딘 '재다신약' 사주야. 네가 직접 사고를 치기보다 가족이나 주변 사람들이 벌인 일을 네가 감당하고 수습하느라 고단할 수 있어. 섣부른 행동보다는 문서나 자격(인성), 혹은 강한 규율(관성)로 통제해야 해.` : 
+          `You have a 'Jae-Da-Sin-Yak' chart. The trees (wealth) you need to cut form a dense forest, but your axe is too dull. Rather than causing trouble yourself, you might find yourself exhausted from cleaning up the messes made by family or friends. You need to control things with documents/qualifications (Resource) or strong discipline (Official) rather than hasty actions.`;
+      } else if (dmElement === 'Water') {
+        layer1 = lang === 'KO' ? 
+          `너는 거대한 불길(재성) 앞에서 순식간에 증발해버릴 위기에 처한 '재다신약' 사주야. 돈을 쫓다 보면 뜬구름 잡는 소리를 하거나 망상에 빠지는 등 정신적으로 매우 불안정해질 수 있어. 흩어지는 멘탈을 꽉 잡아줄 지식이나 자격증(인성)이 절대적으로 필요해.` : 
+          `You have a 'Jae-Da-Sin-Yak' chart. You are like water in danger of evaporating instantly before a massive fire (wealth). Chasing money can make you mentally unstable, leading to delusions or chasing mirages. You absolutely need knowledge or qualifications (Resource) to hold your scattering mind together.`;
+      }
+    } else if (isSpecialStructure) {
+      layer1 = lang === 'KO' ? 
+        `너는 평범한 잣대로 잴 수 없는 특수한 그릇(특수격국)을 타고났어. 운의 흐름에 따라 극단적인 부를 거머쥐거나 모든 걸 잃을 수 있는 롤러코스터 같은 잠재력이 있지.` : 
+        `You were born with a special structure that cannot be measured by ordinary standards. Depending on the flow of luck, you have the rollercoaster-like potential to grasp extreme wealth or lose everything.`;
+    } else if (strength.title === '극신강') {
+      layer1 = lang === 'KO' ? 
+        `너는 황금을 쓸어 담을 수 있는 무쇠 가마솥(극신강)을 타고났어. 어떤 거대한 재물도 네 통제력 아래 둘 수 있는 압도적인 힘이 있지.` : 
+        `You were born with an iron cauldron (Extremely Strong) that can sweep up gold. You have the overwhelming power to put any massive wealth under your control.`;
+    } else if (strength.title === '신강') {
+      layer1 = lang === 'KO' ? 
+        `너는 황금을 넉넉히 담을 수 있는 튼튼한 금고(신강)를 가졌어. 결국 물질의 주인이 될 잠재력이 충분하지.` : 
+        `You have a sturdy safe (Strong) that can hold plenty of gold. You have enough potential to eventually become the master of material wealth.`;
+    } else if (strength.title === '중화신강' || strength.title === '중화신약') {
+      layer1 = lang === 'KO' ? 
+        `너의 재물 그릇은 아주 균형 잡혀 있어(중화). 무리한 욕심만 부리지 않는다면, 네가 노력한 만큼 정확하게 부를 축적할 수 있는 안정적인 구조야.` : 
+        `Your wealth vessel is very well-balanced (Neutral). As long as you don't get overly greedy, it's a stable structure where you can accumulate wealth exactly proportional to your efforts.`;
+    } else if (strength.title === '신약' && hasOriginalJae) {
+      layer1 = lang === 'KO' ? 
+        `재물은 주변에 널려있지만, 그걸 담아낼 그릇이 아직은 예쁘고 얇은 찻잔(신약) 같아. 돈을 쫓을수록 몸이 상할 수 있으니 내실을 다지는 게 먼저야.` : 
+        `Wealth is scattered around you, but the vessel to hold it is still like a pretty, thin teacup (Weak). The more you chase money, the more it might hurt your health, so building inner strength comes first.`;
+    } else if (strength.title === '극신약') {
+      layer1 = lang === 'KO' ? 
+        `너는 재물을 직접 쫓아가면 오히려 화를 입는 유리잔(극신약) 같은 사주야. 돈 자체보다는 사람이나 지식에 기대어 자연스럽게 부가 따라오게 만들어야 해.` : 
+        `You have a chart like a glass cup (Extremely Weak) where chasing wealth directly might actually bring harm. Rather than money itself, you should lean on people or knowledge to let wealth follow naturally.`;
     } else {
-      layer1 = `타고난 금고의 크기보다는, 네 고유의 재능이나 명예를 지렛대 삼아 부를 창출해야 하는 사주야.`;
+      layer1 = lang === 'KO' ? 
+        `타고난 금고의 크기보다는, 네 고유의 재능이나 명예를 지렛대 삼아 부를 창출해야 하는 사주야.` : 
+        `Rather than the size of your innate safe, your chart requires you to create wealth by leveraging your unique talents or honor.`;
     }
 
     // Layer 2: 중기적 궤도 (The Era)
     let layer2 = '';
     if (luckScore >= 65) {
-      layer2 = `지금 네 인생의 계절은 수확을 앞둔 가을이야. 대운의 바람이 네 등 뒤에서 불고 있으니 돛을 올려도 좋아.`;
+      layer2 = lang === 'KO' ? 
+        `지금 네 인생의 계절은 수확을 앞둔 가을이야. 대운의 바람이 네 등 뒤에서 불고 있으니 돛을 올려도 좋아.` : 
+        `The current season of your life is autumn, just before the harvest. The wind of your grand cycle is blowing at your back, so it's okay to raise your sails.`;
     } else if (luckScore < 45) {
-      layer2 = `하지만 지금은 씨를 뿌리고 견뎌야 하는 긴 겨울을 지나는 중이야. 큰 판을 벌리기엔 아직 땅이 얼어있어.`;
+      layer2 = lang === 'KO' ? 
+        `하지만 지금은 씨를 뿌리고 견뎌야 하는 긴 겨울을 지나는 중이야. 큰 판을 벌리기엔 아직 땅이 얼어있어.` : 
+        `However, you are currently passing through a long winter where you must sow seeds and endure. The ground is still too frozen to start anything big.`;
     } else {
-      layer2 = `지금은 계절이 바뀌는 환절기야. 무리한 확장보다는 상황을 관망하며 내실을 다지는 게 유리해.`;
+      layer2 = lang === 'KO' ? 
+        `지금은 계절이 바뀌는 환절기야. 무리한 확장보다는 상황을 관망하며 내실을 다지는 게 유리해.` : 
+        `It's currently a transitional season. It's more advantageous to observe the situation and build inner strength rather than expanding unreasonably.`;
     }
 
     // Layer 3: 미시적 현상 (The Current) & Glitch (The Defense)
@@ -588,26 +704,61 @@ export function generateCycleVibe(
     let glitch = '';
 
     if (isFrozen && (seunElement === 'Fire' || daewunElement === 'Fire')) {
-      layer3 = `특히 올해는 얼어붙었던 네 사주에 불(火)이 들어오는 해지. 멈췄던 심장이 다시 뛰며 황금을 쫓을 강렬한 동력이 생길 거야.`;
-      glitch = `얼음이 녹으면서 드러나는 기회들을 놓치지 마. 지금은 움직여야 할 때야.`;
+      layer3 = lang === 'KO' ? 
+        `특히 올해는 얼어붙었던 네 사주에 불(火)이 들어오는 해지. 멈췄던 심장이 다시 뛰며 황금을 쫓을 강렬한 동력이 생길 거야.` : 
+        `Especially this year, fire (Fire) enters your previously frozen chart. Your stopped heart will beat again, creating a strong driving force to chase gold.`;
+      glitch = lang === 'KO' ? 
+        `얼음이 녹으면서 드러나는 기회들을 놓치지 마. 지금은 움직여야 할 때야.` : 
+        `Don't miss the opportunities revealed as the ice melts. Now is the time to move.`;
     } else if (isFireOverload && isEarthDayMaster) {
-      layer3 = `경고 하나 할게. 불길이 너무 강해 네 땅(재물)을 다 태우고 친구들과 나눠 가져야 해. 독식하려다간 네 손이 먼저 탈 거야.`;
-      glitch = `욕심을 버리고 파이를 나눠라. 혼자 다 먹으려다간 뼈도 못 추려.`;
+      layer3 = lang === 'KO' ? 
+        `경고 하나 할게. 불길이 너무 강해 네 땅(재물)을 다 태우고 친구들과 나눠 가져야 해. 독식하려다간 네 손이 먼저 탈 거야.` : 
+        `Let me give you a warning. The flames are so strong that they will burn all your land (wealth) and you'll have to share it with friends. If you try to monopolize it, your hands will burn first.`;
+      glitch = lang === 'KO' ? 
+        `욕심을 버리고 파이를 나눠라. 혼자 다 먹으려다간 뼈도 못 추려.` : 
+        `Let go of greed and share the pie. If you try to eat it all alone, you won't even save your bones.`;
     } else if (isJaengJae) {
-      layer3 = `올해는 네 황금을 노리는 까마귀들(비겁)이 주변을 맴돌고 있어. 동업이나 금전 거래는 절대 금물이야.`;
-      glitch = `돈이 강제로 뺏길 운이야. 차라리 평소 사고 싶었던 고가의 장비를 질러버려. '쇼핑'으로 액땜을 하는 거지.`;
+      layer3 = lang === 'KO' ? 
+        `올해는 네 황금을 노리는 까마귀들(비겁)이 주변을 맴돌고 있어. 동업이나 금전 거래는 절대 금물이야.` : 
+        `This year, crows (competitors) aiming for your gold are circling around you. Partnerships or financial transactions are absolutely forbidden.`;
+      glitch = lang === 'KO' ? 
+        `돈이 강제로 뺏길 운이야. 차라리 평소 사고 싶었던 고가의 장비를 질러버려. '쇼핑'으로 액땜을 하는 거지.` : 
+        `It's a fate where money will be forcibly taken. You might as well splurge on that expensive equipment you've been wanting. Ward off bad luck with 'shopping'.`;
     } else if (hasPyunJae) {
-      layer3 = `올해는 '편재'의 기운, 즉 도박사의 운명이 널 덮쳤어. 전부를 얻거나, 전부를 잃거나. 네 영혼을 건 베팅이 시작됐지.`;
-      glitch = `하이 리스크 하이 리턴. 판돈을 걸 거면 확실하게 걸고, 아니면 아예 쳐다보지도 마.`;
+      layer3 = lang === 'KO' ? 
+        `올해는 '편재'의 기운, 즉 도박사의 운명이 널 덮쳤어. 전부를 얻거나, 전부를 잃거나. 네 영혼을 건 베팅이 시작됐지.` : 
+        `This year, the energy of 'Pyeon-Jae', the fate of a gambler, has struck you. Win it all, or lose it all. A bet with your soul on the line has begun.`;
+      glitch = lang === 'KO' ? 
+        `하이 리스크 하이 리턴. 판돈을 걸 거면 확실하게 걸고, 아니면 아예 쳐다보지도 마.` : 
+        `High risk, high return. If you're going to bet, bet for sure, or don't even look at it.`;
     } else if (hasJungJae) {
-      layer3 = `올해는 '정재'의 기운이 강해. 횡재수보다는 티끌 모아 성을 쌓는 시기야. 성실함과 계산적인 태도가 네 유일한 구원이지.`;
-      glitch = `지루하더라도 엑셀을 켜고 가계부를 써. 1원 단위의 통제가 널 지켜줄 거야.`;
-    } else if (isJaeDaSinYak) {
-      layer3 = `돈 냄새는 나는데, 무리해서 쫓아가면 네가 먼저 쓰러질 수 있어.`;
-      glitch = `돈은 보이는데 네 몸이 버겁대. 건강검진에 돈을 쓰거나 운동에 투자해. 몸집을 키워야 그 돈을 들 수 있어.`;
+      layer3 = lang === 'KO' ? 
+        `올해는 '정재'의 기운이 강해. 횡재수보다는 티끌 모아 성을 쌓는 시기야. 성실함과 계산적인 태도가 네 유일한 구원이지.` : 
+        `This year, the energy of 'Jung-Jae' is strong. It's a time to build a castle by gathering dust rather than hoping for a windfall. Diligence and a calculating attitude are your only salvation.`;
+      glitch = lang === 'KO' ? 
+        `지루하더라도 엑셀을 켜고 가계부를 써. 1원 단위의 통제가 널 지켜줄 거야.` : 
+        `Even if it's boring, open Excel and keep an account book. Controlling every single cent will protect you.`;
+    } else if (isTrueJaeDaSinYak) {
+      layer3 = lang === 'KO' ? 
+        `올해 가장 경계해야 할 것은 '어설픈 개입'이야. 네게 쥐어진 얄팍한 무기를 믿고 무리하게 투자를 하거나 판을 키우려 들면, 그 거대한 재물의 무게에 짓눌려 빚더미에 앉을 수 있어.` : 
+        `The thing you must guard against most this year is 'clumsy intervention'. If you trust your flimsy weapons and try to invest unreasonably or expand the scale, you could be crushed by the weight of that massive wealth and end up in debt.`;
+      glitch = lang === 'KO' ? 
+        `물타기, 영끌, 무리한 확장은 절대 금물. 차라리 부자들 옆에 납작 엎드려 콩고물이나 주워 먹는 게 현명해.` : 
+        `Averaging down, maxing out loans, and unreasonable expansion are absolutely forbidden. It's wiser to lay low next to the rich and pick up the crumbs.`;
+    } else if (isSimpleJaeDaSinYak) {
+      layer3 = lang === 'KO' ? 
+        `돈 냄새는 나는데, 무리해서 쫓아가면 네가 먼저 쓰러질 수 있어.` : 
+        `You can smell the money, but if you chase it too hard, you might collapse first.`;
+      glitch = lang === 'KO' ? 
+        `돈은 보이는데 네 몸이 버겁대. 건강검진에 돈을 쓰거나 운동에 투자해. 몸집을 키워야 그 돈을 들 수 있어.` : 
+        `You see the money, but your body says it's too much. Spend money on a health checkup or invest in exercise. You need to grow your capacity to lift that money.`;
     } else {
-      layer3 = `올해 당장 큰 돈이 쏟아지는 마법은 없지만, 지금 흘리는 땀이 내일의 자본이 될 거야.`;
-      glitch = `황금의 그림자가 저 멀리서 아른거리고 있어. 아직은 손을 뻗을 때가 아니야.`;
+      layer3 = lang === 'KO' ? 
+        `올해 당장 큰 돈이 쏟아지는 마법은 없지만, 지금 흘리는 땀이 내일의 자본이 될 거야.` : 
+        `There's no magic where big money pours in right away this year, but the sweat you shed now will become tomorrow's capital.`;
+      glitch = lang === 'KO' ? 
+        `황금의 그림자가 저 멀리서 아른거리고 있어. 아직은 손을 뻗을 때가 아니야.` : 
+        `The shadow of gold is flickering in the distance. It's not time to reach out yet.`;
     }
 
     const main = lang === 'KO' ? 
@@ -750,7 +901,7 @@ export function generateCycleVibe(
     if (hasYeokma && hasBranchChung) {
       text = lang === 'KO' ? `역마의 기운이 충을 맞아 궤도를 이탈하려는 에너지가 폭발하고 있어. 이사나 이직, 혹은 완전히 새로운 환경으로의 이동이 강하게 예견돼. ` : `The energy of Yeokma (traveling star) is clashing, exploding the desire to break out of orbit. Moving, changing jobs, or shifting to a completely new environment is strongly predicted. `;
     } else if (hasBranchChung) {
-      text = lang === 'KO' ? `지금 머무는 곳의 근간이 흔들리고 있네. "때려치우고 싶다"는 욕구가 머리 끝까지 찼을 거야. ` : `The foundation of where you are staying is shaking. The desire to "just quit" must be up to your neck. `;
+      text = lang === 'KO' ? `지금 머무는 곳의 근간을 흔드는 기운이 들어왔네. 주변 환경이나 심경의 변화로 인해 문득 모든 걸 뒤로하고 새로운 곳으로 떠나고 싶다는 충동이 들지도 몰라. ` : `An energy that shakes the foundation of your current place has entered. Due to changes in your environment or state of mind, you might suddenly feel the urge to leave everything behind and head to a new place. `;
     } else {
       text = lang === 'KO' ? `이동보다는 현재의 자리를 지키며 내실을 다지는 게 유리한 흐름이야. ` : `It's a more favorable flow to keep your current position and build inner strength rather than moving. `;
     }
