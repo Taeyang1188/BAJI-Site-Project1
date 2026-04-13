@@ -1,6 +1,7 @@
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { Language } from '../types';
 import { SPECIAL_STRUCTURE_DEFINITIONS } from '../constants/special-structures';
+import { JIJANGAN } from '../constants/bazi-data';
 
 const STEM_ELEMENTS: Record<string, string> = {
   '甲': 'Wood', '乙': 'Wood', '丙': 'Fire', '丁': 'Fire', '戊': 'Earth',
@@ -24,21 +25,29 @@ function getRelationship(dmElement: string, targetElement: string): string {
   return relationships[diff];
 }
 
-// 1. 격국 (Structure/Pattern) - Simplified based on Month Branch (월지) and Day Master (일간)
-export const calculateGeJu = (dayGan: string, monthZhi: string, lang: Language) => {
-  const monthZhiMainQi: Record<string, string> = {
-    '子': '癸', '丑': '己', '寅': '甲', '卯': '乙',
-    '辰': '戊', '巳': '丙', '午': '丁', '未': '己',
-    '申': '庚', '酉': '辛', '戌': '戊', '亥': '壬'
-  };
+// 1. 격국 (Structure/Pattern) - Refined based on Month Branch (월지) and Revelation (투출)
+export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string[], lang: Language) => {
+  const hiddenStems = JIJANGAN[monthZhi]?.stems || [];
   
-  const mainQi = monthZhiMainQi[monthZhi];
-  if (!mainQi) {
-    const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
-    return lang === 'KO' ? info.ko : info.en;
+  // Stems to check for revelation (Hour, Month, Year)
+  const externalStems = [allStems[0], allStems[2], allStems[3]];
+  
+  // Find which hidden stems are revealed
+  const revealedStems = hiddenStems.filter(s => externalStems.includes(s));
+  
+  // Priority: Main Qi (last) > others
+  const mainQi = hiddenStems[hiddenStems.length - 1];
+  let targetStem = mainQi;
+  
+  if (revealedStems.length > 0) {
+    if (revealedStems.includes(mainQi)) {
+      targetStem = mainQi;
+    } else {
+      // If multiple non-main are revealed, take the first one found in JIJANGAN order
+      targetStem = revealedStems[0];
+    }
   }
 
-  // Calculate Ten God of the main Qi relative to Day Master
   const stemsInfo: Record<string, { element: string, polarity: number }> = {
     '甲': { element: 'Wood', polarity: 1 }, '乙': { element: 'Wood', polarity: -1 },
     '丙': { element: 'Fire', polarity: 1 }, '丁': { element: 'Fire', polarity: -1 },
@@ -48,7 +57,7 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, lang: Language) 
   };
 
   const self = stemsInfo[dayGan];
-  const target = stemsInfo[mainQi];
+  const target = stemsInfo[targetStem];
   
   if (!self || !target) {
     const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
@@ -67,13 +76,29 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, lang: Language) 
   else if (diff === 3) tenGod = samePolarity ? '편관' : '정관';
   else if (diff === 4) tenGod = samePolarity ? '편인' : '정인';
 
-  if (tenGod === '비견' || tenGod === '겁재') {
-    const geonrok = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
-    const yangin = BAZI_MAPPING.geju['양인' as keyof typeof BAZI_MAPPING.geju];
-    return lang === 'KO' ? `${geonrok.ko} / ${yangin.ko}` : `${geonrok.en} / ${yangin.en}`;
+  // Special handling for Geon-rok and Yang-in (only if based on Month Branch relationship)
+  if (targetStem === mainQi || revealedStems.length === 0) {
+    const monthBranchElement = BRANCH_ELEMENTS[monthZhi];
+    const monthBranchPolarity = ['寅', '辰', '巳', '申', '戌', '亥'].includes(monthZhi) ? 1 : -1;
+    // Note: 子, 午, 卯, 酉 are technically Yang in polarity but Yin in essence/main qi. 
+    // However, for Geon-rok/Yang-in, we use the main qi's polarity.
+    
+    if (self.element === monthBranchElement) {
+      if (self.polarity === monthBranchPolarity) {
+        const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
+        return lang === 'KO' ? info.ko : info.en;
+      } else {
+        // Yang-in is for Yang stems when month branch matches element but opposite polarity
+        if (self.polarity === 1) {
+          const info = BAZI_MAPPING.geju['양인' as keyof typeof BAZI_MAPPING.geju];
+          return lang === 'KO' ? info.ko : info.en;
+        }
+      }
+    }
   }
 
   const info = BAZI_MAPPING.geju[tenGod as keyof typeof BAZI_MAPPING.geju];
+  if (!info) return tenGod;
   return lang === 'KO' ? info.ko : info.en;
 };
 
@@ -97,29 +122,68 @@ export const determineStructure = (
   let structureKey = "";
 
   // 1. Check for Jeon-wang-gyeok (Monarch Alignment)
-  // If one element is extremely dominant and matches DM
-  const elementRatio: Record<string, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
-  pillars.forEach(p => {
-    elementRatio[STEM_ELEMENTS[p.stem]] += 10;
-    elementRatio[BRANCH_ELEMENTS[p.branch]] += 15; // Branches carry more weight
-  });
-
-  const totalWeight = Object.values(elementRatio).reduce((a, b) => a + b, 0);
-  const dmElementRatio = (elementRatio[dmElement] / totalWeight) * 100;
+  // Use strength.elementScores for more accurate ratio detection
+  const elementScores: Record<string, number> = strength.elementScores || {};
+  const totalScore = Object.values(elementScores).reduce((a, b) => a + Math.max(0, b), 0) || 1;
+  const dmElementRatio = (elementScores[dmElement] / totalScore) * 100;
 
   // 1.5 Check for Frozen Chart (Jo-hu Priority)
-  const waterRatio = (elementRatio['Water'] / totalWeight) * 100;
-  const metalRatio = (elementRatio['Metal'] / totalWeight) * 100;
+  const waterRatio = (elementScores['Water'] / totalScore) * 100;
+  const metalRatio = (elementScores['Metal'] / totalScore) * 100;
   const isFrozen = (waterRatio + metalRatio > 50) && ['丑', '子', '亥'].includes(monthZhi);
 
-  if (dmElementRatio > 75 && strength.score > 80) {
+  if (dmElementRatio > 70 && strength.score > 75) {
     const monarchMap: Record<string, string> = {
       'Wood': '곡직격', 'Fire': '염상격', 'Earth': '가색격', 'Metal': '종혁격', 'Water': '윤하격'
     };
-    structureKey = monarchMap[dmElement];
-    logicNote = lang === 'KO' 
-      ? `일간의 오행(${dmElement})이 사주 전체의 75% 이상을 차지하여 해당 기운으로 모든 것이 집중된 전왕격으로 판정됐어.`
-      : `The Day Master's element (${dmElement}) accounts for over 75% of the chart, concentrating all energy into a Monarch Alignment.`;
+    
+    // Guardrail: Check for clashing/controlling elements in stems (Purity check)
+    const externalStems = [stems[0], stems[2], stems[3]]; // Year, Month, Hour
+    let isPure = true;
+    
+    externalStems.forEach(s => {
+      const el = STEM_ELEMENTS[s];
+      const rel = getRelationship(dmElement, el);
+      // Monarch structures hate Power (Clash) and Wealth (Drain/Conflict)
+      if (rel === 'Power' || rel === 'Wealth') {
+        isPure = false;
+      }
+    });
+
+    if (isPure) {
+      structureKey = monarchMap[dmElement];
+      logicNote = lang === 'KO' 
+        ? `일간의 오행(${dmElement})이 사주 전체에서 압도적인 세력을 형성하고, 이를 방해하는 기운(재성/관성)이 천간에 드러나지 않아 해당 기운으로 모든 것이 집중된 전왕격으로 판정됐어.`
+        : `The Day Master's element (${dmElement}) forms an overwhelming force, and with no interfering elements (Wealth/Power) revealed in the stems, it is judged as a Monarch Alignment.`;
+    }
+  }
+
+  // 1.7 Check for Jong-gang-gyeok (Resource Dominant - Follow the Strong)
+  if (!structureKey && strength.score > 75) {
+    const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
+    const resourceElement = ELEMENT_CYCLE[(dmIdx + 4) % 5];
+    const resourceRatio = (elementScores[resourceElement] / totalScore) * 100;
+    
+    if (resourceRatio > 70) {
+      // Purity check for Jong-gang-gyeok
+      const externalStems = [stems[0], stems[2], stems[3]];
+      let isPure = true;
+      externalStems.forEach(s => {
+        const el = STEM_ELEMENTS[s];
+        const rel = getRelationship(dmElement, el);
+        // Follow Resource (Jong-gang) hates Wealth (destroys Resource) and Artist (drains Resource)
+        if (rel === 'Wealth' || rel === 'Artist') {
+          isPure = false;
+        }
+      });
+
+      if (isPure) {
+        structureKey = "종강격";
+        logicNote = lang === 'KO'
+          ? `나를 생하는 인성(${resourceElement})의 기운이 사주 전체를 지배하고, 이를 파괴하는 재성이 천간에 없어 인성의 기운에 순응하는 종강격으로 판정됐어.`
+          : `Judged as Jong-gang-gyeok because Resource (${resourceElement}) energy dominates the chart and no Wealth elements are present in the stems to destroy it.`;
+      }
+    }
   }
 
   // 2. Check for Jong-gyeok (Adaptive Alignment)
@@ -188,7 +252,7 @@ export const determineStructure = (
 
   // 3. Standard Structure (Nae-gyeok)
   if (!structureKey) {
-    const standardGeJu = calculateGeJu(dayGan, monthZhi, lang);
+    const standardGeJu = calculateGeJu(dayGan, monthZhi, stems, lang);
     if (!logicNote) {
       logicNote = lang === 'KO'
         ? "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."

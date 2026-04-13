@@ -62,15 +62,15 @@ export const calculateBalanceWarnings = (
   // Wood overcomes Earth, but too much Earth breaks Wood (토다목절 土多木折)
   if (elementRatios['Earth'] >= 60 && elementRatios['Wood'] <= 15) {
     const description = dmElement === 'Metal'
-      ? `흙이 너무 많아 당신의 결과물([${woodCol}:나무])이 뿌리 내릴 곳이 없군요. 억지로 땅을 파헤치려([${metalCol}:金]) 하지 마세요. 오히려 당신의 유연한 [${waterCol}:수(水 ●)] 기운으로 땅을 적셔 나무가 스스로 자라게 해야 합니다. 실력을 쌓아([${artistCol}:식상]) 돈([${wealthCol}:재성])을 벌라는 뜻이죠.`
+      ? `[${earthCol}:흙(土)]이 너무 많아 당신의 결과물인 [${woodCol}:나무(木)]가 뿌리 내릴 곳이 없군요. 억지로 땅을 파헤치려([${metalCol}:金]) 하기보다, [${woodCol}:나무(木)]로 흙을 소통시키거나([${woodCol}:소토]), 유연한 [${waterCol}:수(水)] 기운으로 땅을 적셔([${waterCol}:윤토]) 나무가 스스로 자라게 해야 합니다. 실력을 쌓아([${artistCol}:식상]) 돈([${wealthCol}:재성])을 벌라는 뜻이죠.`
       : `[${earthCol}:흙(土)]이 너무 단단하고 많아 [${woodCol}:나무(木)] 뿌리가 뻗지 못하고 부러지는 형국이야. 주변의 완고한 환경이나 고집 때문에 본인의 성장이 정체되기 쉬우니, 유연함을 기르고 [${waterCol}:수(水)]나 [${woodCol}:목(木)]의 기운으로 흙을 다스려야 해.`;
     
     const enDescription = dmElement === 'Metal'
-      ? "Earth is so heavy that your results (Wood) have no place to take root. Don't try to force your way through with Metal; instead, use the flexible Water energy to moisten the earth and let the wood grow naturally. This means building skills (Output) to earn wealth (Wealth)."
+      ? "Earth is so heavy that your results (Wood) have no place to take root. Don't try to force your way through with Metal; instead, use Wood to loosen the soil or flexible Water energy to moisten the earth and let the wood grow naturally. This means building skills (Output) to earn wealth (Wealth)."
       : "Earth is too thick and hard for Wood roots to spread, causing them to snap. Your growth may be stagnant due to stubborn environments; cultivate flexibility and use Water or Wood to manage the Earth.";
 
     warnings.push({
-      title: '토다목절(土多木折)',
+      title: '토다목절(토多木折)',
       titleEn: 'Earth-Heavy Wood-Snap',
       description,
       enDescription,
@@ -136,7 +136,7 @@ export const calculateBalanceWarnings = (
   if (inSeongRatio > 50) {
     if (dmElement === 'Wood') {
       warnings.push({
-        title: '수다목부(水多木腐)',
+        title: '수다목부(水多목腐)',
         titleEn: 'Water-Heavy Wood-Rot',
         description: `[${woodCol}:나무(木)]에 [${waterCol}:물(水)]을 너무 많이 주어 뿌리가 썩고 둥둥 떠다니는 형국이야. 생각만 많고 실행력이 없으며 한곳에 정착하지 못할 수 있으니까, [${earthCol}:흙(土)]으로 물을 막고 현실적인 행동에 나서야 해.`,
         enDescription: 'Too much Water causes Wood roots to rot and float. You may overthink without action or stability; block water with Earth and take realistic action.',
@@ -147,7 +147,7 @@ export const calculateBalanceWarnings = (
       warnings.push({
         title: '토다매금(土多埋金)',
         titleEn: 'Earth-Heavy Metal-Burial',
-        description: `거대한 흙더미 속에 묻힌 고고한 보석의 형상입니다. 당신의 재능이 빛나지 않는 건 게으름 때문이 아니라, 너무 깊이 숨어있기 때문이죠. [${waterCol}:수(水 ●)]의 기운으로 당신을 씻어내어 세상에 드러내세요. 당신의 [${artistCol}:표현력(식상)]이 곧 당신의 가치입니다.`,
+        description: `거대한 흙더미 속에 묻힌 고고한 보석의 형상입니다. 당신의 재능이 빛나지 않는 건 게으름 때문이 아니라, 너무 깊이 숨어있기 때문이죠. [${waterCol}:수(水)]의 기운으로 당신을 씻어내어 세상에 드러내세요. 당신의 [${artistCol}:표현력(식상)]이 곧 당신의 가치입니다.`,
         enDescription: 'A noble gem buried under a massive pile of earth. Your talents aren\'t shining not because of laziness, but because they are hidden too deep. Use Water to wash yourself and reveal your value to the world; your expression is your value.',
         type: 'danger',
         element: 'Earth'
@@ -162,7 +162,6 @@ export const calculateBalanceWarnings = (
         element: 'Fire'
       });
     } else if (dmElement === 'Water') {
-      // User request: "수 일간 + 금 인성 > 50%" -> 금다수탁
       warnings.push({
         title: '금다수탁(金多水濁)',
         titleEn: 'Metal-Heavy Water-Turbid',
@@ -184,7 +183,7 @@ export const calculateBalanceWarnings = (
       description: `나를 표현하는 [${artistCol}:기운(식상)]이 너무 강해 나를 통제할 법과 규칙([${gwanCol}:관성])을 아예 없애버린 형국이야. 안하무인 격으로 행동하거나 조직 부적응으로 고립될 수 있으니까, [${inSeongCol}:인성(Wisdom)]으로 자신을 절제해야 해.`,
       enDescription: 'Output is so strong it obliterates Rules/Power. You may act recklessly or struggle to adapt to organizations; use Wisdom to discipline yourself.',
       type: 'danger',
-      element: 'Wood' // Placeholder element, logic depends on DM
+      element: 'Wood'
     });
   }
 

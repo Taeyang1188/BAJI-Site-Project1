@@ -26,8 +26,8 @@ const CITY_META_TABLE: Record<string, { impression: string, enImpression: string
   "춘천": { impression: "안개 낀 호수와 서정적인 분위기가 매력적인 곳이지. 닭갈비 냄새가 여기까지 나는 것 같아.", enImpression: "A charming place with foggy lakes and a lyrical atmosphere. I can almost smell the Dakgalbi from here." },
   "경주": { impression: "천 년의 세월이 흐르는 신비로운 땅이지. 발길 닿는 곳마다 역사가 살아 숨 쉬는 기분이야.", enImpression: "A mysterious land where a thousand years of time flow. History breathes wherever you step." },
   "제주": { impression: "현무암 사이를 지나는 바람이 자유로운 곳이지. 이국적인 풍경에 훌쩍 떠나고 싶어지네.", enImpression: "A place where the wind blows freely through basalt rocks. The exotic scenery makes me want to just take off and go." },
-  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 대한민국의 심장부다운 에너지가 느껴져.", enImpression: "A modern place where vibrant energy and tradition blend well. I can feel the energy of the heart of Korea." },
-  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 대한민국의 심장부다운 에너지가 느껴져.", enImpression: "A modern place where vibrant energy and tradition blend well. I can feel the energy of the heart of Korea." }
+  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 떙기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" },
+  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 떙기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" }
 };
 
 const formatGod = (god: string, stemOrBranch: string, lang: Language) => {

@@ -900,7 +900,6 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         if (STEM_ELEMENTS[s] !== 'Metal') return false;
         
         // Check for clash (e.g., Gyeong-Metal vs Gap-Wood is not a clash that destroys Metal)
-        // But check if it's functional
         return true;
       });
       
@@ -909,7 +908,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         if (el !== 'Metal') return false;
         
         // Metal root in Fire-heavy chart
-        if (ratios['Fire'] > 60) {
+        if (ratios['Fire'] > 50) {
           const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
                              (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
           if (hasMetalHap) return true;
@@ -919,7 +918,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
       });
       
       if (hasFunctionalMetalInStem && hasFunctionalMetalRoot) {
-        // If Metal is present and has functional root, it's not turbid
+        // If Metal is present and has functional root (like 19890618 10:00), it's not turbid
         return null;
       }
 
@@ -937,7 +936,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
           return true;
         });
 
-        if (hasFunctionalWater) return null;
+        if (hasFunctionalWater) return null; // If Water survives (like 19920611 10:40), it's not turbid
 
         // Filter 2: Yin Stem Strictness
         if ((isYinEarth || isJeongFire) && fireEarthRatio < 85) return null;

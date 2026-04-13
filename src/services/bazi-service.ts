@@ -383,7 +383,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     elementRatios[el] = totalElements > 0 ? Math.round((count / totalElements) * 100) : 20;
   });
 
-  const geJu = calculateGeJu(dayGan, monthZhi, lang);
+  const geJu = calculateGeJu(dayGan, monthZhi, allStems, lang);
   const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
   
   // New detailed calculations
@@ -474,7 +474,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     console.error("Error calculating current year pillar:", e);
   }
 
-  const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength);
+  const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength, yongshinDetail);
   const balanceWarnings = calculateBalanceWarnings(elementRatios, tenGodsRatio, dmElement, lang);
   
   return {

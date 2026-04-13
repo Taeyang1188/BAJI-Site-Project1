@@ -92,5 +92,14 @@ export const SPECIAL_STRUCTURE_DEFINITIONS: Record<string, SpecialStructureInfo>
     enDescription: "A structure that joins the powerful force of Bi-geop (Mirror/Rival), which is the same energy as oneself.",
     marketingMessage: "환경에 적응하는 천재성: 강력한 네트워크와 동료애를 바탕으로 독보적인 세력을 구축해.",
     enMarketingMessage: "Genius of adaptation: Builds a unique force based on powerful networks and camaraderie."
+  },
+  "종강격": {
+    title: "종강격 (從强格)",
+    enTitle: "THE ADAPTIVE ALIGNMENT [Mystic/Sage]",
+    category: "Adaptive",
+    description: "나를 생해주는 인성(Mystic/Sage)의 강력한 기운에 순응하는 격국이야.",
+    enDescription: "A structure that adapts to the powerful energy of In-seong (Mystic/Sage), which supports oneself.",
+    marketingMessage: "환경에 적응하는 천재성: 깊은 학문과 지혜의 흐름을 타고 정신적 지도자의 길을 걷습니다.",
+    enMarketingMessage: "Genius of adaptation: Rides the flow of deep learning and wisdom to walk the path of a spiritual leader."
   }
 };

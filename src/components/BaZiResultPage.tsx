@@ -112,7 +112,7 @@ const CITY_META_TABLE: Record<string, { keywords: string; vibe: string; point: s
   "춘천시": { keywords: "호수, 안개, 닭갈비, 소양강", vibe: "몽환적인, 잔잔한, 서정적인", point: "안개 낀 호수와 새벽 공기" },
   "경주시": { keywords: "고분, 신라, 역사, 황리단길", vibe: "신비로운, 오래된, 정갈한", point: "천 년의 세월이 흐르는 땅" },
   "제주시": { keywords: "바람, 돌, 한라산, 이국적", vibe: "자유로운, 거친, 신비로운", point: "현무암 사이를 지나는 바람" },
-  "서울": { keywords: "남산타워, 한강, 빌딩숲, 잠들지 않는 도시", vibe: "세련된, 바쁜, 화려한", point: "잠들지 않는 도시의 불빛" }
+  "서울": { keywords: "남산타워, 한강, 빌딩숲, 잠들지 않는 도시", vibe: "세련된, 바쁜, 화려한", point: "갑자기 K-FOOD가 떙기네" }
 };
 
 const getGanYeoJiDong = (stem: string, branch: string) => {
@@ -2026,9 +2026,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                     {lang === 'KO' ? warning.title : warning.titleEn}
                                   </span>
                                 </div>
-                                <p className="text-[10px] leading-relaxed text-white/80">
-                                  {lang === 'KO' ? warning.description : warning.enDescription}
-                                </p>
+                                <div className="text-[10px] leading-relaxed text-white/80">
+                                  <ParsedText text={lang === 'KO' ? warning.description : warning.enDescription} />
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -2257,10 +2257,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                     <span className="text-[10px] font-mono text-white/40">{data.ratio}%</span>
                                   )}
                                 </div>
-                                <p 
-                                  className="text-[11px] leading-relaxed text-white/60"
-                                  dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(data.description) }}
-                                />
+                                <div className="text-[11px] leading-relaxed text-white/60">
+                                  <ParsedText text={data.description} />
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -2499,26 +2498,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
               <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
                 <p className="text-sm font-medium text-neon-cyan">{lang === 'KO' ? '일간 강약이란?' : 'What is DM Strength?'}</p>
-                <p 
-                  className="text-xs leading-relaxed text-white/70"
-                  dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(result.analysis.shinGangShinYak.summary) }}
-                />
+                <div className="text-xs leading-relaxed text-white/70">
+                  <ParsedText text={result.analysis.shinGangShinYak.summary} />
+                </div>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-white">{lang === 'KO' ? '나의 상태' : 'My Status'}</p>
-                  <p 
-                    className="text-xs leading-relaxed text-white/70"
-                    dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(result.analysis.shinGangShinYak.description) }}
-                  />
+                  <div className="text-xs leading-relaxed text-white/70">
+                    <ParsedText text={result.analysis.shinGangShinYak.description} />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-white">{lang === 'KO' ? '사회적 발현' : 'Social Manifestation'}</p>
-                  <p 
-                    className="text-xs leading-relaxed text-white/70"
-                    dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(result.analysis.shinGangShinYak.socialContext) }}
-                  />
+                  <div className="text-xs leading-relaxed text-white/70">
+                    <ParsedText text={result.analysis.shinGangShinYak.socialContext} />
+                  </div>
                 </div>
               </div>
 
@@ -2561,10 +2557,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
               </div>
 
               <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
-                <p 
-                  className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(lang === 'KO' ? showMuJaDaJaInfo.description : (showMuJaDaJaInfo.enDescription || showMuJaDaJaInfo.description)) }}
-                />
+                <div className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
+                  <ParsedText text={lang === 'KO' ? showMuJaDaJaInfo.description : (showMuJaDaJaInfo.enDescription || showMuJaDaJaInfo.description)} />
+                </div>
               </div>
 
               <div className="pt-4 border-t border-white/10">
@@ -2641,7 +2636,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <ul className="space-y-2 text-[10px] text-white/60 list-disc pl-4">
                     {result.analysis.personalizedInsights && Object.entries(result.analysis.personalizedInsights).map(([key, value]: [string, any]) => (
                       <li key={key}>
-                        <span className="text-white/80 font-bold" dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(lang === 'KO' ? value.ko : value.en) }} />
+                        <span className="text-white/80 font-bold">
+                          <ParsedText text={lang === 'KO' ? value.ko : value.en} />
+                        </span>
                       </li>
                     ))}
                   </ul>
