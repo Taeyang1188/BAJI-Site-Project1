@@ -144,7 +144,7 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
   const dayIndex = date.getDate() - 1; 
 
   return (
-    <div className="relative w-full max-w-3xl h-[200px] sm:h-[240px] mx-auto flex items-center justify-center bg-[#050505] rounded-2xl border border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
+    <div className="relative w-full max-w-3xl h-[130px] sm:h-[240px] mx-auto flex items-center justify-center bg-[#050505] rounded-2xl border border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
       
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/30 via-black to-pink-950/20" />

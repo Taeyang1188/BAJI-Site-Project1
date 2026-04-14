@@ -80,22 +80,24 @@ const WeatherWidget = ({ city, lang }: { city: string; lang: Language }) => {
   }, [weatherData, lang]);
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-        <Sun className="w-4 h-4 text-yellow-400" />
-        <span className="text-[11px] font-mono text-white/80">
-          {weatherData.temp.high}° / {weatherData.temp.low}°
+    <div className="flex flex-col items-end gap-1 max-w-full">
+      <div className="flex items-center gap-1.5 sm:gap-2 bg-white/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/10 overflow-hidden">
+        <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 shrink-0" />
+        <span className="text-[10px] sm:text-[11px] font-mono text-white/80 whitespace-nowrap">
+          {weatherData.temp.high}°/{weatherData.temp.low}°
         </span>
-        <div className="w-[1px] h-3 bg-white/20" />
-        <span className="text-[11px] font-mono text-white/80">
+        <div className="w-[1px] h-3 bg-white/20 shrink-0" />
+        <span className="text-[10px] sm:text-[11px] font-mono text-white/80 whitespace-nowrap">
           {weatherData.rainProb}% ☔
         </span>
-        <div className="w-[1px] h-3 bg-white/20" />
-        <span className="text-[10px] font-display text-white/60 uppercase tracking-tighter">
+        <div className="w-[1px] h-3 bg-white/20 shrink-0" />
+        <span className="text-[9px] sm:text-[10px] font-display text-white/60 uppercase tracking-tighter truncate max-w-[60px] sm:max-w-[100px]">
           {loading ? '...' : weatherData.locationName}
         </span>
       </div>
-      <span className="text-[10px] font-display italic text-white/40">{weatherComment}</span>
+      <span className="text-[9px] sm:text-[10px] font-display italic text-white/40 text-right leading-tight">
+        {weatherComment}
+      </span>
     </div>
   );
 };
@@ -1232,12 +1234,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   )}
 
                   {vibePhase === 'analysis' && selectedThemeId && (
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {(selectedThemeId === 'romance' || selectedThemeId === 'secrets') && romanceStep !== 'final' ? (
-                        <div className="p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-2xl space-y-6">
+                        <div className="p-4 sm:p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-2xl space-y-4 sm:space-y-6">
                           {romanceStep === 'marital' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                              <p className="text-lg font-display italic text-white">
+                              <p className="text-base sm:text-lg font-display italic text-white">
                                 {result.currentYearPillar?.age < 30 ? (lang === 'KO' ? '아직 자기는 어리긴 하지만 혹시 몰라서 물어볼게. ' : 'You are still young, but just in case. ') : ''}
                                 {lang === 'KO' ? '먼저 자기, 혹시 결혼은 했어?' : 'First, are you married?'}
                               </p>
@@ -1253,7 +1255,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                       setMaritalStatus(status.ko);
                                       setRomanceStep('children');
                                     }}
-                                    className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                    className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
                                   >
                                     {lang === 'KO' ? status.ko : status.en}
                                   </button>
@@ -1263,7 +1265,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                     setMaritalStatus('비공개');
                                     setRomanceStep('children');
                                   }}
-                                  className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-white/60 transition-all"
+                                  className="px-4 sm:px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-white/60 transition-all"
                                 >
                                   {lang === 'KO' ? '말하기 싫어' : 'Prefer not to say'}
                                 </button>
@@ -1273,7 +1275,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           
                           {romanceStep === 'children' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                              <p className="text-lg font-display italic text-white">
+                              <p className="text-base sm:text-lg font-display italic text-white">
                                 {lang === 'KO' ? '그럼 자녀는 있어?' : 'Do you have children?'}
                               </p>
                               <div className="flex gap-2">
@@ -1282,7 +1284,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                     setHasChildren(true);
                                     setRomanceStep('final');
                                   }}
-                                  className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                  className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
                                 >
                                   {lang === 'KO' ? '응, 있어' : 'Yes, I do'}
                                 </button>
@@ -1291,7 +1293,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                     setHasChildren(false);
                                     setRomanceStep('final');
                                   }}
-                                  className="px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                  className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
                                 >
                                   {lang === 'KO' ? '아니, 없어' : 'No, I don\'t'}
                                 </button>
@@ -1300,11 +1302,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           )}
                         </div>
                       ) : (
-                        <div className="p-4 bg-neon-pink/10 border border-neon-pink/30 rounded-xl">
-                          <div className="text-neon-pink text-xs font-bold mb-2 uppercase tracking-widest">
+                        <div className="p-4 sm:p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-xl">
+                          <div className="text-neon-pink text-[10px] sm:text-xs font-bold mb-2 uppercase tracking-widest">
                             {cycleVibe.themes.find(t => t.id === selectedThemeId)?.title || '[운명의 대답]'}
                           </div>
-                          <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                          <p className="text-base sm:text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
                             <TypingText 
                               key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
                               text={cycleVibe.themeAnalyses[selectedThemeId].main} 
@@ -1312,7 +1314,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                             />
                           </p>
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
-                            <p className={`text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
+                            <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
                               <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />
                             </p>
                           </div>
@@ -1325,7 +1327,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           animate={{ opacity: 1, y: 0 }}
                           className="p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl"
                         >
-                          <p className="text-sm font-display text-white/90 italic mb-3">
+                          <p className="text-xs sm:text-sm font-display text-white/90 italic mb-3">
                             <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text || ''} />
                           </p>
                           <button
@@ -1333,7 +1335,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
                               if (nextId) setSelectedThemeId(nextId);
                             }}
-                            className="text-xs font-bold text-neon-cyan hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1"
+                            className="text-[10px] sm:text-xs font-bold text-neon-cyan hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1"
                           >
                             {(() => {
                               const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
@@ -1370,21 +1372,26 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   )}
                   
                   {showDailyVibe && (
-                    <div className="mt-6 p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
+                    <div className="mt-6 p-4 sm:p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-1 h-full bg-neon-pink" />
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-neon-pink font-display font-bold flex items-center space-x-2">
-                          <Sparkles className="w-5 h-5" />
-                          <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
-                        </h4>
-                        <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center justify-between sm:justify-start sm:gap-4">
+                          <h4 className="text-neon-pink font-display font-bold flex items-center space-x-2">
+                            <Sparkles className="w-5 h-5" />
+                            <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
+                          </h4>
+                          <button onClick={() => setShowDailyVibe(false)} className="sm:hidden text-white/50 hover:text-white transition-colors">
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-end gap-4">
                           <WeatherWidget city={city} lang={lang} />
-                          <button onClick={() => setShowDailyVibe(false)} className="text-white/50 hover:text-white transition-colors">
+                          <button onClick={() => setShowDailyVibe(false)} className="hidden sm:block text-white/50 hover:text-white transition-colors">
                             <X className="w-5 h-5" />
                           </button>
                         </div>
                       </div>
-                      <p className="text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
+                      <p className="text-sm sm:text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
                         <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} />
                       </p>
                     </div>

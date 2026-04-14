@@ -26,7 +26,7 @@ function getRelationship(dmElement: string, targetElement: string): string {
 }
 
 // 1. 격국 (Structure/Pattern) - Refined based on Month Branch (월지) and Revelation (투출)
-export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string[], lang: Language) => {
+export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string[], allBranches: string[], elementScores: Record<string, number>, lang: Language): { geJu: string, isOverridden: boolean, originalGeJu: string } => {
   const hiddenStems = JIJANGAN[monthZhi]?.stems || [];
   
   // Stems to check for revelation (Hour, Month, Year)
@@ -38,6 +38,12 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string
   // Priority: Main Qi (last) > others
   const mainQi = hiddenStems[hiddenStems.length - 1];
   let targetStem = mainQi;
+  let isOverridden = false;
+  let originalTargetStem = mainQi;
+  
+  const totalScore = Object.values(elementScores).reduce((a, b) => a + Math.max(0, b), 0) || 1;
+  const mainQiElement = STEM_ELEMENTS[mainQi];
+  const mainQiRatio = (elementScores[mainQiElement] / totalScore) * 100;
   
   if (revealedStems.length > 0) {
     if (revealedStems.includes(mainQi)) {
@@ -45,6 +51,30 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string
     } else {
       // If multiple non-main are revealed, take the first one found in JIJANGAN order
       targetStem = revealedStems[0];
+      originalTargetStem = targetStem;
+      
+      const targetElement = STEM_ELEMENTS[targetStem];
+      let adjustedTargetRatio = (elementScores[targetElement] / totalScore) * 100;
+      let adjustedMainQiRatio = mainQiRatio;
+
+      // [3] 조후 및 계절성 감쇄 로직 (The Season Filter)
+      // 진월(Earth)의 계수(Water)는 땅에 흡수되는 기운이므로 주도권 감쇄
+      if (mainQiElement === 'Earth' && targetElement === 'Water') {
+        adjustedTargetRatio *= 0.4;
+      }
+
+      // [2] 지지 세력 가중치 (핵심 로직: 자형 및 합)
+      // 지지에 월지와 동일한 글자가 2개 이상일 때 가중치 폭발
+      const monthBranchCount = allBranches.filter(b => b === monthZhi).length;
+      if (monthBranchCount >= 2) {
+        adjustedMainQiRatio *= 1.5;
+      }
+      
+      // Override logic: 실질적 세력(본기)이 투출된 기운보다 2배 이상 강할 경우 격국 강제 전환
+      if (adjustedMainQiRatio > adjustedTargetRatio * 2) {
+        targetStem = mainQi;
+        isOverridden = true;
+      }
     }
   }
 
@@ -58,48 +88,54 @@ export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string
 
   const self = stemsInfo[dayGan];
   const target = stemsInfo[targetStem];
+  const originalTarget = stemsInfo[originalTargetStem];
   
-  if (!self || !target) {
-    const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
-    return lang === 'KO' ? info.ko : info.en;
-  }
+  const getGeJuName = (t: { element: string, polarity: number }) => {
+    if (!self || !t) {
+      const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
+      return lang === 'KO' ? info.ko : info.en;
+    }
 
-  const sIdx = ELEMENT_CYCLE.indexOf(self.element);
-  const tIdx = ELEMENT_CYCLE.indexOf(target.element);
-  const diff = (tIdx - sIdx + 5) % 5;
-  const samePolarity = self.polarity === target.polarity;
+    const sIdx = ELEMENT_CYCLE.indexOf(self.element);
+    const tIdx = ELEMENT_CYCLE.indexOf(t.element);
+    const diff = (tIdx - sIdx + 5) % 5;
+    const samePolarity = self.polarity === t.polarity;
 
-  let tenGod = '';
-  if (diff === 0) tenGod = samePolarity ? '비견' : '겁재';
-  else if (diff === 1) tenGod = samePolarity ? '식신' : '상관';
-  else if (diff === 2) tenGod = samePolarity ? '편재' : '정재';
-  else if (diff === 3) tenGod = samePolarity ? '편관' : '정관';
-  else if (diff === 4) tenGod = samePolarity ? '편인' : '정인';
+    let tenGod = '';
+    if (diff === 0) tenGod = samePolarity ? '비견' : '겁재';
+    else if (diff === 1) tenGod = samePolarity ? '식신' : '상관';
+    else if (diff === 2) tenGod = samePolarity ? '편재' : '정재';
+    else if (diff === 3) tenGod = samePolarity ? '편관' : '정관';
+    else if (diff === 4) tenGod = samePolarity ? '편인' : '정인';
 
-  // Special handling for Geon-rok and Yang-in (only if based on Month Branch relationship)
-  if (targetStem === mainQi || revealedStems.length === 0) {
-    const monthBranchElement = BRANCH_ELEMENTS[monthZhi];
-    const monthBranchPolarity = ['寅', '辰', '巳', '申', '戌', '亥'].includes(monthZhi) ? 1 : -1;
-    // Note: 子, 午, 卯, 酉 are technically Yang in polarity but Yin in essence/main qi. 
-    // However, for Geon-rok/Yang-in, we use the main qi's polarity.
-    
-    if (self.element === monthBranchElement) {
-      if (self.polarity === monthBranchPolarity) {
-        const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
-        return lang === 'KO' ? info.ko : info.en;
-      } else {
-        // Yang-in is for Yang stems when month branch matches element but opposite polarity
-        if (self.polarity === 1) {
-          const info = BAZI_MAPPING.geju['양인' as keyof typeof BAZI_MAPPING.geju];
+    // Special handling for Geon-rok and Yang-in (only if based on Month Branch relationship)
+    if (t === stemsInfo[mainQi] || revealedStems.length === 0) {
+      const monthBranchElement = BRANCH_ELEMENTS[monthZhi];
+      const monthBranchPolarity = ['寅', '辰', '巳', '申', '戌', '亥'].includes(monthZhi) ? 1 : -1;
+      
+      if (self.element === monthBranchElement) {
+        if (self.polarity === monthBranchPolarity) {
+          const info = BAZI_MAPPING.geju['건록' as keyof typeof BAZI_MAPPING.geju];
           return lang === 'KO' ? info.ko : info.en;
+        } else {
+          if (self.polarity === 1) {
+            const info = BAZI_MAPPING.geju['양인' as keyof typeof BAZI_MAPPING.geju];
+            return lang === 'KO' ? info.ko : info.en;
+          }
         }
       }
     }
-  }
 
-  const info = BAZI_MAPPING.geju[tenGod as keyof typeof BAZI_MAPPING.geju];
-  if (!info) return tenGod;
-  return lang === 'KO' ? info.ko : info.en;
+    const info = BAZI_MAPPING.geju[tenGod as keyof typeof BAZI_MAPPING.geju];
+    if (!info) return tenGod;
+    return lang === 'KO' ? info.ko : info.en;
+  };
+
+  return {
+    geJu: getGeJuName(target),
+    isOverridden,
+    originalGeJu: getGeJuName(originalTarget)
+  };
 };
 
 /**
@@ -252,18 +288,35 @@ export const determineStructure = (
 
   // 3. Standard Structure (Nae-gyeok)
   if (!structureKey) {
-    const standardGeJu = calculateGeJu(dayGan, monthZhi, stems, lang);
+    const geJuResult = calculateGeJu(dayGan, monthZhi, stems, branches, elementScores, lang);
+    const standardGeJu = geJuResult.geJu;
+    
     if (!logicNote) {
-      logicNote = lang === 'KO'
-        ? "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."
-        : "A standard alignment structure based on the traditional principle of Month Branch hidden stems.";
+      if (geJuResult.isOverridden) {
+        const hiddenStems = JIJANGAN[monthZhi]?.stems || [];
+        const mainQi = hiddenStems[hiddenStems.length - 1];
+        const mainQiElement = STEM_ELEMENTS[mainQi];
+        const elementKoMap: Record<string, string> = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
+        const translatedMainQiElement = lang === 'KO' ? elementKoMap[mainQiElement] || mainQiElement : mainQiElement;
+
+        logicNote = lang === 'KO'
+          ? `기계적으로는 천간에 투출한 기운을 따라 '${geJuResult.originalGeJu}'으로 볼 수 있으나, 지지의 세력(${translatedMainQiElement})이 압도적으로 강해 본질적인 기운인 '${standardGeJu}'으로 재판정했어. 투출의 함정을 보정한 결과야.`
+          : `Mechanically, it could be seen as '${geJuResult.originalGeJu}' based on the revealed stem, but the earthly branch power (${translatedMainQiElement}) is overwhelmingly strong, so it was re-evaluated as '${standardGeJu}'. This corrects the 'trap of revelation'.`;
+      } else {
+        logicNote = lang === 'KO'
+          ? "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."
+          : "A standard alignment structure based on the traditional principle of Month Branch hidden stems.";
+      }
     }
     
     // For marketing tone of "Extreme Weak Nae-gyeok"
     let marketingMessage = "";
     let enMarketingMessage = "";
     
-    if (isFrozen) {
+    if (geJuResult.isOverridden && standardGeJu.includes('편인') && geJuResult.originalGeJu.includes('상관')) {
+      marketingMessage = "숨겨진 조율자: 겉으로는 파격적인 아이디어(상관)를 내뿜는 듯 보이지만, 사실은 그 이면에 수만 번의 검열과 깊은 생각(편인)이 자리 잡고 있어. 상관은 주인공이 아니라, 폭주하는 기운을 제어하는 날카로운 조절자 역할을 할 뿐이야.";
+      enMarketingMessage = "Hidden Coordinator: Outwardly, you seem to emit unconventional ideas (Artist), but in reality, tens of thousands of censorships and deep thoughts (Mystic) reside behind it. The Artist is not the protagonist, but merely a sharp regulator controlling runaway energy.";
+    } else if (isFrozen) {
       marketingMessage = "냉철한 잠재력: 차갑고 습한 기운 속에 보석 같은 재능을 품고 있어. 따뜻한 온기(火)를 통해 그 재능을 꽃피우는 것이 삶의 중요한 과제야.";
       enMarketingMessage = "Cool Potential: You hold gem-like talents within cold and damp energy. Blooming those talents through warmth (Fire) is an important life task.";
       logicNote = lang === 'KO'

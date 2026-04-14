@@ -383,12 +383,13 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     elementRatios[el] = totalElements > 0 ? Math.round((count / totalElements) * 100) : 20;
   });
 
-  const geJu = calculateGeJu(dayGan, monthZhi, allStems, lang);
   const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
   
   // New detailed calculations
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
   const strength = calcDayMasterStrength(allStems, allBranches);
+  const geJuResult = calculateGeJu(dayGan, monthZhi, allStems, allBranches, strength.elementScores, lang);
+  const geJu = geJuResult.geJu;
   let structureDetail: any = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
 
   // Analyze Special Structure (Jun-wang, Image, etc.)

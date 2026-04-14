@@ -274,47 +274,26 @@ export const calculateAdvancedAnalysis = (
           sikSangDesc = `"날카로운 비판가, 완벽주의자." 언변이 뛰어나고 분석적이지만, 때로는 타인에게 상처를 주는 독설이 될 수 있어. [${gwanCol}:목(관)]이 없으면 절제 없는 비판으로 고립될 수 있으니 유연함이 필요해.`;
           sikSangDescEn = `"A sharp critic and perfectionist." Eloquent and analytical, but can be hurtful. Without [${gwanCol}:Wood Power], unrestrained criticism may lead to isolation; flexibility is needed.`;
         } else if (dmElement === 'Metal') {
-          sikSangDesc = `"예술적 감수성과 깊은 고독." 감수성이 풍부하고 창의적이지만, 현실 세계와의 괴리감으로 고독을 느낄 수 있어. [${inSeongCol}:토(인)]이 없으면 정착하지 못하는 방랑자가 될 수 있으니 안정이 필요해.`;
-          sikSangDescEn = `"Artistic sensitivity and deep solitude." Richly sensitive and creative, but may feel lonely due to a gap with reality. Without [${inSeongCol}:Earth Resource], you might become a rootless wanderer.`;
+          sikSangDesc = `"예술적 감수성과 깊은 고독." 감수성이 풍부하고 창의적이지만, 현실 세계와의 괴리감으로 인해 우울감에 빠지기 쉬워. [${gwanCol}:화(관)]이 없으면 자기만의 세계에 갇힐 수 있으니 사회적 교류가 중요해.`;
+          sikSangDescEn = `"Artistic sensitivity and deep loneliness." Rich in sensitivity and creativity, but prone to depression due to a sense of detachment from reality. Without [${gwanCol}:Fire Power], you might get trapped in your own world; social interaction is important.`;
         } else if (dmElement === 'Water') {
-          sikSangDesc = `"끊임없는 배움과 교육의 열정." 지식을 전달하고 가르치는 데 탁월하지만, 정작 실질적인 재물 축적에는 관심이 적을 수 있어. [${wealthCol}:화(재)]가 없으면 가난한 선비에 그칠 수 있으니 현실감을 길러야 해.`;
-          sikSangDescEn = `"Endless passion for learning and education." Excellent at teaching, but may lack interest in practical wealth. Without [${wealthCol}:Fire Wealth], you might remain a "poor scholar"; develop a sense of reality.`;
+          sikSangDesc = `"자유로운 영혼, 방랑자." 호기심이 많고 틀에 얽매이는 것을 극도로 싫어해. [${gwanCol}:토(관)]이 없으면 방종으로 흐를 수 있으니 스스로 규칙을 정하고 지키는 연습이 필요해.`;
+          sikSangDescEn = `"A free spirit, a wanderer." Highly curious and hates being confined by rules. Without [${gwanCol}:Earth Power], it may lead to indulgence; practice setting and keeping your own rules.`;
         }
         descKo = sikSangDesc;
         descEn = sikSangDescEn;
-      } else if (isJaeSeong) {
-        let jaeSeongDesc = '';
-        let jaeSeongDescEn = '';
-        if (dmElement === 'Wood') {
-          jaeSeongDesc = `"흙에 파묻힌 나무 (재다신약)." 결과에 대한 욕심이 너무 커서 정작 자신의 성장이 더딜 수 있어. [${inSeongCol}:수(인)]이 부족하면 돈 때문에 건강이나 명예를 잃을 수 있으니, 실질적인 목표와 내면의 안정을 동시에 챙겨야 해.`;
-          jaeSeongDescEn = `"A tree buried in soil (Wealth-heavy, Self-weak)." Excessive greed for results may hinder your own growth. Without [${inSeongCol}:Water Resource], you may lose health or honor due to money; balance practical goals with inner stability.`;
-        } else if (dmElement === 'Fire') {
-          jaeSeongDesc = `"금을 녹이느라 지친 불." 현실적인 성과를 내기 위해 동분서주하지만 기운이 쉽게 소진될 수 있어. [${inSeongCol}:목(인)]이 없으면 번아웃이 오기 쉬우니, 충분한 휴식과 지적 충전을 통해 열정의 근원을 보강해야 해.`;
-          jaeSeongDescEn = `"Fire exhausted from melting metal." Busy striving for practical results, but energy can easily deplete. Without [${inSeongCol}:Wood Resource], burnout is likely; reinforce the source of passion through rest and intellectual recharge.`;
-        } else if (dmElement === 'Earth') {
-          jaeSeongDesc = `"물에 휩쓸리는 흙." 유동 자산이나 기회는 많지만 이를 안정적으로 담아낼 그릇이 부족할 수 있어. [${inSeongCol}:화(인)]이 없으면 실속 없이 바쁘기만 할 수 있으니, 확고한 주관과 중심을 잡는 것이 무엇보다 중요해.`;
-          jaeSeongDescEn = `"Soil swept away by water." Many liquid assets or opportunities, but may lack a stable vessel to contain them. Without [${inSeongCol}:Fire Resource], you might be busy without substance; holding firm convictions is most important.`;
-        } else if (dmElement === 'Metal') {
-          jaeSeongDesc = `"나무를 베느라 날이 무딘 칼." 관리해야 할 사람이나 일이 너무 많아 결정적인 순간에 힘을 못 쓸 수 있어. [${inSeongCol}:토(인)]이 없으면 실무에 치여 큰 그림을 놓칠 수 있으니, 체계적인 관리와 자기 수양이 필요해.`;
-          jaeSeongDescEn = `"A blade dulled from cutting wood." Too many people or tasks to manage may lead to powerlessness at critical moments. Without [${inSeongCol}:Earth Resource], you might miss the big picture; systematic management and self-discipline are needed.`;
-        } else if (dmElement === 'Water') {
-          jaeSeongDesc = `"증발하는 물." 화려한 기회와 결과물에 눈이 멀어 자신의 본질과 깊이를 잃기 쉬워. [${inSeongCol}:금(인)]이 없으면 겉만 화려하고 속은 빈 강정이 될 수 있으니, 내실을 기하고 정신적인 가치를 소중히 여겨야 해.`;
-          jaeSeongDescEn = `"Evaporating water." Blinded by flashy opportunities and results, it's easy to lose your essence and depth. Without [${inSeongCol}:Metal Resource], you might be all show and no substance; focus on inner substance and value spiritual worth.`;
-        }
-        descKo = jaeSeongDesc;
-        descEn = jaeSeongDescEn;
       } else if (isGwanSeong) {
         let gwanSeongDesc = '';
         let gwanSeongDescEn = '';
         if (dmElement === 'Wood') {
-          gwanSeongDesc = `"도끼에 찍히는 나무 (관살혼잡)." 책임감과 압박감이 너무 커서 늘 긴장 상태에 놓여 있어. [${inSeongCol}:수(인)]이 없으면 건강이 상하거나 구설수에 오르기 쉬우니, 자신을 보호하는 방어 기제와 여유를 가져야 해.`;
-          gwanSeongDescEn = `"A tree struck by an axe (Power-heavy stress)." Excessive responsibility and pressure keep you in constant tension. Without [${inSeongCol}:Water Resource], health may suffer or rumors may arise; develop self-protection and ease.`;
+          gwanSeongDesc = `"도끼에 찍히는 나무." 지나친 책임감과 타인의 시선에 대한 의식으로 스스로를 옭아매고 있어. [${inSeongCol}:수(인)]이 없으면 스트레스로 인해 건강이 상할 수 있으니, 남의 기대보다 내 마음의 소리에 귀 기울여야 해.`;
+          gwanSeongDescEn = `"A tree struck by an axe." You bind yourself with excessive responsibility and consciousness of others' opinions. Without [${inSeongCol}:Water Resource], stress may harm your health; listen to your inner voice rather than others' expectations.`;
         } else if (dmElement === 'Fire') {
-          gwanSeongDesc = `"물에 꺼지는 불." 사회적 규칙과 타인의 시선에 억눌려 자신의 뜨거운 열정을 펼치지 못할 수 있어. [${inSeongCol}:목(인)]이 없으면 자존감이 낮아지기 쉬우니, 자신만의 가치를 발견하고 자신감을 회복하는 게 중요해.`;
-          gwanSeongDescEn = `"Fire extinguished by water." Suppressed by social rules and others' opinions, you may fail to spread your passion. Without [${inSeongCol}:Wood Resource], self-esteem may drop; finding your own value and restoring confidence is key.`;
+          gwanSeongDesc = `"폭우 속에 갇힌 불꽃." 주변의 압박과 억압으로 인해 자신의 열정과 능력을 제대로 펼치지 못하고 있어. [${inSeongCol}:목(인)]이 없으면 무기력증에 빠질 수 있으니, 자신을 지지해주는 환경을 찾는 것이 시급해.`;
+          gwanSeongDescEn = `"A flame trapped in heavy rain." You cannot properly unfold your passion and abilities due to surrounding pressure and suppression. Without [${inSeongCol}:Wood Resource], you may fall into lethargy; finding a supportive environment is urgent.`;
         } else if (dmElement === 'Earth') {
-          gwanSeongDesc = `"나무 뿌리에 갈라지는 땅." 명예와 직위에 대한 과도한 집착이 오히려 자신을 갉아먹을 수 있어. [${inSeongCol}:화(인)]이 없으면 스트레스로 인한 심신 미약이 우려되니, 명상이나 취미를 통해 마음의 평화를 찾아야 해.`;
-          gwanSeongDescEn = `"Land cracked by tree roots." Excessive obsession with honor and status may eat away at you. Without [${inSeongCol}:Fire Resource], stress-related weakness is a concern; find peace through meditation or hobbies.`;
+          gwanSeongDesc = `"뿌리가 너무 깊어 갈라지는 땅." 명예와 권력에 대한 집착이 강해 주변 사람들과 마찰을 빚을 수 있어. [${inSeongCol}:화(인)]이 없으면 고집불통으로 낙인찍힐 수 있으니, 타인과 타협하고 포용하는 자세를 길러야 해.`;
+          gwanSeongDescEn = `"Earth cracking from roots too deep." Strong obsession with honor and power may cause friction with those around you. Without [${inSeongCol}:Fire Resource], you might be branded as stubborn; cultivate an attitude of compromise and embrace.`;
         } else if (dmElement === 'Metal') {
           gwanSeongDesc = `"불에 녹아내리는 칼." 과도한 업무나 엄격한 규율이 자신을 변형시키고 고통스럽게 할 수 있어. [${inSeongCol}:토(인)]이 없으면 인내심의 한계에 부딪혀 폭발할 수 있으니, 적절한 감정 분출구와 휴식이 필수야.`;
           gwanSeongDescEn = `"A blade melting in fire." Excessive work or strict discipline may deform and distress you. Without [${inSeongCol}:Earth Resource], you may hit the limit of patience and explode; an emotional outlet and rest are essential.`;
@@ -338,182 +317,216 @@ export const calculateAdvancedAnalysis = (
           inSeongDescEn = `"A stubborn conservative." Strong convictions may lead to rejecting others' opinions and resisting change. Without [${artistCol}:Metal Output], you might become inflexible and isolated; an open attitude is needed.`;
         } else if (dmElement === 'Metal') {
           inSeongDesc = `"매몰된 보석, 인정 욕구의 화신." 재능은 있으나 밖으로 드러내지 못하고 누군가 알아주기만을 기다릴 수 있어. [${artistCol}:수(식상)]이 없으면 빛을 보지 못하니 스스로를 세상에 알리는 용기가 필요해.`;
-          inSeongDescEn = `"A buried gem, an incarnation of the desire for recognition." Talented but hidden, waiting for someone to notice. Without [${artistCol}:Water Output], you won't shine; have the courage to show yourself to the world.`;
+          inSeongDescEn = `"A buried gem, an incarnation of the desire for recognition." Talented but hidden, waiting for someone to notice. Without [${artistCol}:Water Output], you won't see the light; you need the courage to make yourself known to the world.`;
         } else if (dmElement === 'Water') {
-          inSeongDesc = `"냉철한 지성, 하지만 차가운 인간관계." 지적 능력은 탁월하지만 감정 표현이 서툴러 주변 사람들에게 차갑게 느껴질 수 있어. [${artistCol}:목(식상)]이 없으면 공감 능력이 부족해질 수 있으니 따뜻한 소통이 필요해.`;
-          inSeongDescEn = `"Cool intellect, but cold relationships." Excellent intellectual ability but poor emotional expression makes you seem cold. Without [${artistCol}:Wood Output], empathy may be lacking; warm communication is needed.`;
+          inSeongDesc = `"근원 없는 샘물." 지혜는 있으나 이를 현실에 적용하고 결과로 만들어내는 추진력이 약할 수 있어. [${artistCol}:목(식상)]이 없으면 공상에 그칠 수 있으니 실질적인 활동과 소통이 필요해.`;
+          inSeongDescEn = `"A sourceless spring." Wisdom is there, but the drive to apply it to reality and create results may be weak. Without [${artistCol}:Wood Output], it may end in fantasy; practical activity and communication are needed.`;
         }
         descKo = inSeongDesc;
         descEn = inSeongDescEn;
       }
 
       return {
-        title: lang === 'KO' ? `다${godNameKo} 사주 (다자론)` : `Excessive ${godNameEn} (Abundance Theory)`,
+        title: lang === 'KO' ? `${godNameKo} 과다 사주 (다자론)` : `Excessive ${godNameEn} (Abundance Theory)`,
         description: lang === 'KO' ? descKo : descEn,
         enDescription: descEn
       };
     });
 
+  // 3. Relationship Analysis
   const getRelationshipAnalysis = () => {
     const relationships: any = {};
-    const yearPillar = pillars[3];
-    const monthPillar = pillars[2];
-    const dayPillar = pillars[1];
-    const hourPillar = pillars[0];
-    
-    const yearBranchTenGod = yearPillar?.branchKoreanName || '';
-    const monthBranchTenGod = monthPillar?.branchKoreanName || '';
-    const dayBranchTenGod = dayPillar?.branchKoreanName || '';
-    const hourBranchTenGod = hourPillar?.branchKoreanName || '';
+    const yearPillar = pillars[0];
+    const monthPillar = pillars[1];
+    const dayPillar = pillars[2];
+    const hourPillar = pillars[3];
     
     const monthStemTenGod = monthPillar?.stemKoreanName || '';
-    
-    const elementScores = strength.elementScores || {};
+    const monthBranchTenGod = monthPillar?.branchKoreanName || '';
+    const dayBranchTenGod = dayPillar?.branchKoreanName || '';
+    const hourStemTenGod = hourPillar?.stemKoreanName || '';
+    const hourBranchTenGod = hourPillar?.branchKoreanName || '';
+    const elementScores: Record<string, number> = strength.elementScores || {};
 
-    // 1. Siblings & Peers (Bi-Gyeop)
-    let siblingsDesc = '';
-    if (gods.BiGyeop === 0) {
-      siblingsDesc = lang === 'KO'
-        ? `사주에 [${getColor(dmElement)}:비겁(동료/형제)]이 드러나지 않았어. 형제나 동료의 덕을 기대하기보다 스스로의 힘으로 일어서야 하는 자수성가형이야. 외로움을 느낄 수 있지만, 그만큼 타인의 간섭 없이 독자적인 영역을 구축하는 데 유리해.`
-        : `The [${getColor(dmElement)}:Mirror/Rival] energy is not revealed. Rather than expecting help from siblings or peers, you are a self-made type who must stand on your own. You may feel lonely, but it's advantageous for building your own independent domain without interference.`;
-    } else if (gods.BiGyeop > 40) {
-      siblingsDesc = lang === 'KO'
-        ? `[${getColor(dmElement)}:비겁]의 기운이 매우 강해 주변에 사람이 끊이지 않지만, 그만큼 경쟁자도 많음을 의미해. 형제나 동료와 재산을 나누거나 다투는 [${fireCol}:군겁쟁재]의 기운이 있으니, 금전 거래나 동업은 신중해야 해.`
-        : `With very strong [${getColor(dmElement)}:Mirror/Rival] energy, you are always surrounded by people, but it also means many competitors. There's a risk of property disputes or sharing with siblings/peers, so be cautious with financial transactions or partnerships.`;
-    } else {
-      siblingsDesc = lang === 'KO'
-        ? `[${getColor(dmElement)}:비겁]이 적절히 조화되어 있어 동료나 형제와 원만한 관계를 유지해. 필요할 때 서로 도움을 주고받으며 사회생활에서 든든한 네트워크를 형성할 수 있는 구조야.`
-        : `[${getColor(dmElement)}:Mirror/Rival] energy is well-balanced, allowing for harmonious relations with siblings and peers. You can give and receive help when needed and form a strong network in social life.`;
-    }
+  // 1. Siblings & Peers (Bi-Gyeop) - Position: Month/Year
+  const siblingsDesc = (gods.BiGyeop || 0) > 0
+    ? (lang === 'KO'
+      ? `주변에 나를 돕거나 자극하는 동료들이 많아. [${woodCol}:비견]과 [${fireCol}:겁재]의 기운이 조화로우면 든든한 지원군이 되지만, 너무 강하면 경쟁으로 인한 스트레스가 생길 수 있어. 서로의 영역을 존중하며 협력할 때 시너지가 극대화돼.`
+      : `You have many peers who help or stimulate you. When [${woodCol}:Mirror] and [${fireCol}:Rival] energies are harmonious, they become strong supporters, but if too strong, competition stress may arise. Synergy is maximized when cooperating while respecting each other's domains.`)
+    : (lang === 'KO'
+      ? `형제나 동료의 덕이 부족해 보일 수 있지만, 그만큼 독립심과 주관이 뚜렷해. 타인에게 의지하기보다 스스로 길을 개척하는 힘이 강하며, 혼자만의 시간을 통해 에너지를 충전하는 스타일이야.`
+      : `You may lack support from siblings or peers, but your independence and convictions are clear. You have strong power to pave your own path rather than relying on others, and you recharge through alone time.`);
 
-    relationships.siblings = {
-      title: lang === 'KO' ? '형제 및 동료' : 'Siblings & Peers',
-      godName: lang === 'KO' ? '비겁' : 'Mirror/Rival',
-      ratio: gods.BiGyeop,
-      description: siblingsDesc
-    };
+  relationships.siblings = {
+    title: lang === 'KO' ? '형제 및 동료 (비겁)' : 'Siblings & Peers (Mirror/Rival)',
+    ratio: gods.BiGyeop,
+    description: siblingsDesc
+  };
 
-    // 2. Parents & Superiors (Year/Month Pillar) - Position: Year/Month
-    let parentsDesc = '';
-    const resourceElement = ELEMENT_CYCLE[(dmIdx + 4) % 5];
-    
-    const yearBranch = yearPillar?.branch || '';
-    const monthBranch = monthPillar?.branch || '';
-    const dayBranch = dayPillar?.branch || '';
-    const allBranches = pillars.map(p => p.branch);
-    
-    // Step 1: Wealth Root Verification (Root Check)
-    const yearStem = yearPillar?.stem || '';
-    const monthStem = monthPillar?.stem || '';
-    const wealthStemsInYearMonth = [yearStem, monthStem].filter(s => {
-      const rel = getRelationship(dmElement, BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems]?.element || '');
-      return rel === 'Wealth';
+  // 2. Parents & Superiors (Year/Month Pillar) - Position: Year/Month
+  let parentsDesc = '';
+  const resourceElement = ELEMENT_CYCLE[(dmIdx + 4) % 5];
+  
+  const yearBranch = yearPillar?.branch || '';
+  const monthBranch = monthPillar?.branch || '';
+  const dayBranch = dayPillar?.branch || '';
+  const allBranches = pillars.map(p => p.branch);
+  
+  // Step 1: Wealth Root Verification (Root Check)
+  const yearStem = yearPillar?.stem || '';
+  const monthStem = monthPillar?.stem || '';
+  const wealthStemsInYearMonth = [yearStem, monthStem].filter(s => {
+    const rel = getRelationship(dmElement, BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems]?.element || '');
+    return rel === 'Wealth';
+  });
+  const isWealthInYearMonthStem = wealthStemsInYearMonth.length > 0;
+  
+  const hasWealthRoot = wealthStemsInYearMonth.some(s => {
+    const stemEl = BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems]?.element;
+    return allBranches.some(br => {
+      const brEl = BAZI_MAPPING.branches[br as keyof typeof BAZI_MAPPING.branches]?.element;
+      return brEl === stemEl;
     });
-    const isWealthInYearMonthStem = wealthStemsInYearMonth.length > 0;
+  });
+  
+  const hasStrongOutput = gods.SikSang > 25;
+  const isRealAssetOwner = isWealthInYearMonthStem && (hasWealthRoot || hasStrongOutput);
+  const isSpiritualWealth = isWealthInYearMonthStem && !hasWealthRoot;
+
+  // Step 2: Parent Palace Interactions (Won-jin, Gwi-mun, Clash)
+  const wonjinPairs: Record<string, string> = { '子': '未', '丑': '午', '寅': '酉', '卯': '申', '辰': '亥', '巳': '戌', '未': '子', '午': '丑', '酉': '寅', '申': '卯', '亥': '辰', '戌': '巳' };
+  const gwimunPairs: Record<string, string> = { '子': '未', '丑': '午', '寅': '未', '卯': '申', '辰': '亥', '巳': '戌', '未': '子', '午': '丑', '酉': '寅', '申': '卯', '亥': '辰', '戌': '巳' };
+  const clashPairs: Record<string, string> = { '子': '午', '丑': '未', '寅': '申', '卯': '酉', '辰': '戌', '巳': '亥', '午': '子', '未': '丑', '申': '寅', '酉': '卯', '戌': '辰', '亥': '巳' };
+
+  const hasParentInteraction = (clashPairs[yearBranch] === monthBranch) || (wonjinPairs[yearBranch] === monthBranch) || (gwimunPairs[yearBranch] === monthBranch) ||
+                               (clashPairs[monthBranch] === dayBranch) || (wonjinPairs[monthBranch] === dayBranch) || (gwimunPairs[monthBranch] === dayBranch);
+
+  // Step 3: Resource Purity Check
+  const isInSeongFavorable = yongshinDetail?.primary?.god?.includes('인성') || 
+                             yongshinDetail?.heeShin?.god?.includes('인성');
+  const isJaeGeukIn = (gods.InSeong || 0) > 0 && ((gods.JaeSeong || 0) > 30 || (gods.JaeSeong || 0) > (gods.InSeong || 0) * 2);
+  const isResourcePure = isInSeongFavorable && !isJaeGeukIn;
+
+  // Edge Case: Elemental Imbalances (Mae-geum, Mok-jeol, etc.)
+  const isMaeGeum = dmElement === 'Metal' && (elementScores['Earth'] || 0) > 45;
+  const isToDaMokJeol = dmElement === 'Wood' && (elementScores['Earth'] || 0) > 45;
+  const isGeumDaMokJeol = dmElement === 'Wood' && (elementScores['Metal'] || 0) > 45;
+  const isSuDaMokBu = dmElement === 'Wood' && (elementScores['Water'] || 0) > 45;
+  const isHwaDaToCho = dmElement === 'Earth' && (elementScores['Fire'] || 0) > 45;
+  const isSuDaGeumChim = dmElement === 'Metal' && (elementScores['Water'] || 0) > 45;
+  const isMokDaHwaSik = dmElement === 'Fire' && (elementScores['Wood'] || 0) > 45;
+
+  const isNoInSeongNoJaeSeong = (gods.InSeong || 0) === 0 && (gods.JaeSeong || 0) === 0;
+
+  // Step 4: Existential Truth (Inversion Logic)
+  const monthStemGod = monthPillar?.stemKoreanName || '';
+  const monthZhiGod = monthPillar?.branchKoreanName || '';
+
+  const hapPairs: Record<string, string> = { '子': '丑', '寅': '亥', '卯': '戌', '辰': '酉', '巳': '申', '午': '未', '丑': '子', '亥': '寅', '戌': '卯', '酉': '辰', '申': '巳', '未': '午' };
+  const isMonthHapWithDay = hapPairs[monthZhi] === dayBranch;
+  const isMonthChungWithDay = clashPairs[monthZhi] === dayBranch;
+
+  const getInversionNarrative = () => {
+    let fiction = '';
+    let truth = '';
     
-    const hasWealthRoot = wealthStemsInYearMonth.some(s => {
-      const stemEl = BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems]?.element;
-      return allBranches.some(br => {
-        const brEl = BAZI_MAPPING.branches[br as keyof typeof BAZI_MAPPING.branches]?.element;
-        return brEl === stemEl;
-      });
-    });
-    
-    const hasStrongOutput = gods.SikSang > 25;
-    const isRealAssetOwner = isWealthInYearMonthStem && (hasWealthRoot || hasStrongOutput);
-    const isSpiritualWealth = isWealthInYearMonthStem && !hasWealthRoot;
-
-    // Step 2: Parent Palace Interactions (Won-jin, Gwi-mun, Clash)
-    const wonjinPairs: Record<string, string> = { '子': '未', '丑': '午', '寅': '酉', '卯': '申', '辰': '亥', '巳': '戌', '未': '子', '午': '丑', '酉': '寅', '申': '卯', '亥': '辰', '戌': '巳' };
-    const gwimunPairs: Record<string, string> = { '子': '未', '丑': '午', '寅': '未', '卯': '申', '辰': '亥', '巳': '戌', '未': '子', '午': '丑', '酉': '寅', '申': '卯', '亥': '辰', '戌': '巳' };
-    const clashPairs: Record<string, string> = { '子': '午', '丑': '未', '寅': '申', '卯': '酉', '辰': '戌', '巳': '亥', '午': '子', '未': '丑', '申': '寅', '酉': '卯', '戌': '辰', '亥': '巳' };
-
-    const hasParentInteraction = (clashPairs[yearBranch] === monthBranch) || (wonjinPairs[yearBranch] === monthBranch) || (gwimunPairs[yearBranch] === monthBranch) ||
-                                 (clashPairs[monthBranch] === dayBranch) || (wonjinPairs[monthBranch] === dayBranch) || (gwimunPairs[monthBranch] === dayBranch);
-
-    // Step 3: Resource Purity Check
-    const isInSeongFavorable = yongshinDetail?.primary?.god?.includes('인성') || 
-                               yongshinDetail?.heeShin?.god?.includes('인성');
-    const isJaeGeukIn = (gods.InSeong || 0) > 0 && ((gods.JaeSeong || 0) > 30 || (gods.JaeSeong || 0) > (gods.InSeong || 0) * 2);
-    const isResourcePure = isInSeongFavorable && !isJaeGeukIn;
-
-    // Edge Case: Elemental Imbalances (Mae-geum, Mok-jeol, etc.)
-    const isMaeGeum = dmElement === 'Metal' && (elementScores['Earth'] || 0) > 45;
-    const isToDaMokJeol = dmElement === 'Wood' && (elementScores['Earth'] || 0) > 45;
-    const isGeumDaMokJeol = dmElement === 'Wood' && (elementScores['Metal'] || 0) > 45;
-    const isSuDaMokBu = dmElement === 'Wood' && (elementScores['Water'] || 0) > 45;
-    const isHwaDaToCho = dmElement === 'Earth' && (elementScores['Fire'] || 0) > 45;
-    const isSuDaGeumChim = dmElement === 'Metal' && (elementScores['Water'] || 0) > 45;
-    const isMokDaHwaSik = dmElement === 'Fire' && (elementScores['Wood'] || 0) > 45;
-
-    const isNoInSeongNoJaeSeong = (gods.InSeong || 0) === 0 && (gods.JaeSeong || 0) === 0;
-
-    // Final Logic Assembly
-    if (isMaeGeum) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 흙(부모)이 너무 많아 보석(나)이 빛을 잃고 묻혀버리는 [${earthCol}:토다매금]의 형상이야. 부모의 과잉보호나 간섭이 당신의 재능을 가두고 있을 수 있어. 스스로 빛을 내기 위해선 부모로부터의 독립이 필수적이야.`
-        : `[Warning] A state where the soil (parent) is too abundant, burying the gem (me) and making it lose its brilliance ([${earthCol}:To-Da-Mae-Geum]). Parental overprotection or interference may be trapping your talents. Independence from parents is essential to shine on your own.`;
+    // Step 1: System Affirmation (The Bait) & Step 2: Existential Subversion (The Twist)
+    if (monthStemGod.includes('정관') || monthZhiGod.includes('정관')) {
+      fiction = "월주에 정관(正官)이 있으니 너는 가문의 명예를 업고 태어난 귀공자나 공주님이어야 해. 번듯한 배경과 도덕적 교육이 너를 지탱하는 힘이라고 교과서엔 적혀 있겠지.";
+      truth = "근데 사실 그 '번듯함'이 네 숨통을 조이는 단두대야. 부모의 체면과 사회적 시선이라는 금방석에 앉아있느라 너 본연의 야성은 거세당했네. 탈출 불가능한 우아한 감옥이지.";
+    } else if (monthStemGod.includes('편관') || monthZhiGod.includes('편관')) {
+      fiction = "월주 편관이면 부모님이 너를 지켜주는 거대한 방패나 권위 있는 존재처럼 보이기 쉬워. 든든한 울타리 안에서 보호받는 형상이라고들 하지.";
+      truth = "진실은 그 방패에 네가 깔려 죽기 직전이라는 거야. 부모의 강압적인 기운이 너를 압박하고, 그들의 짐을 네가 대신 짊어져야 하는 구조네. 부모님의 그늘을 벗어나 세상을 마주하려는 그 용기를 응원할게!";
+    } else if (monthStemGod.includes('정인') || monthZhiGod.includes('정인')) {
+      fiction = "정인(正印)이 월주에 가득하니 부모님의 무조건적인 사랑과 혜택을 듬뿍 받고 자란 행운아라고 하겠지. 부족함 없는 지원이 너의 자양분이라고 말이야.";
+      truth = "실상은 '부드러운 폭력'이야. 부모의 과잉보호가 너의 자립심을 녹여버렸어. 사랑이라는 이름의 늪에 빠져서 혼자서는 아무것도 못 하는 바보가 되길 강요받는 셈이지. 모다멸자(母多滅子)의 전형이야.";
+    } else if (monthStemGod.includes('편인') || monthZhiGod.includes('편인')) {
+      fiction = "편인(偏印)의 기운이 강하니 부모님이 너에게 특별한 재능이나 깊은 지혜를 물려주셨다고 해석할 거야. 남다른 통찰력을 가진 가문이라고 치켜세우겠지.";
+      truth = "글쎄, 그건 '조건부 사랑'의 다른 이름일 뿐이야. 부모의 기분에 따라 변하는 애정 때문에 너는 눈치 보느라 속이 다 썩었네. 혜택이 아니라 나중에 갚아야 할 빚처럼 느껴지는 무거운 유산이지.";
+    } else if (monthStemGod.includes('재성') || monthZhiGod.includes('재성')) {
+      fiction = "월주에 재성(財星)이 뚜렷하니 부모님이 닦아놓은 탄탄한 경제적 기반이 너를 받쳐준다고 하겠지. 금수저 필터 통과라며 다들 부러워할 거야.";
+      truth = "현실은 네가 부모님의 '자산 관리인'으로 고용된 격이야. 돈은 주지만 그 대가로 너의 자유를 저당 잡았네. 현실적인 이득 때문에 너의 꿈을 포기해야 하는 기만적인 거래지.";
+    } else if (monthStemGod.includes('식상') || monthZhiGod.includes('식상')) {
+      fiction = "식상(食傷)이 월주에 있으니 부모님이 너의 재능을 지지해주고 자유로운 환경을 만들어주셨다고 보겠지. 창의성을 키워주는 열린 부모님이라고 말이야.";
+      truth = "사실은 부모님이 못다 이룬 꿈을 너를 통해 대리 만족하려는 거야. '특별해야 한다'는 강박이 너의 어깨를 누르고 있어. 자유로운 척하지만 사실은 부모의 기대를 연기하는 광대 노릇 중이지.";
+    } else if (monthStemGod.includes('비겁') || monthZhiGod.includes('비겁')) {
+      fiction = "비겁(比劫)이 월주에 강하니 형제나 부모님이 친구처럼 평등하고 독립적인 관계라고 하겠지. 서로 돕고 사는 끈끈한 동료애가 느껴진다고 할 거야.";
+      truth = "진실은 끊임없는 경쟁과 비교야. 내 몫을 지키기 위해 가족 안에서도 칼을 품어야 하는 구조네. 사생활은 없고 모든 걸 공유해야 하는, 숨 막히는 집단주의의 허구지.";
+    } else if (isMaeGeum) {
+      fiction = "금(金) 일간에 토(土) 인성이 가득하니 부모님의 지원이 보석을 닦아주는 귀한 손길처럼 보일 거야.";
+      truth = "하지만 현실은 '위장된 번영'이지. 흙이 너무 많아 보석인 네가 빛을 잃고 묻혀버렸어. 사랑이라는 이름으로 너를 매장하고 있는 토다매금(土多埋金)의 현장이야. 너는 지금 숨이 막혀.";
     } else if (isToDaMokJeol) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 흙(부모)이 너무 단단하고 많아 나무(나)의 뿌리가 뻗지 못하고 부러지는 [${earthCol}:토다목절]의 형상이야. 부모의 기대치가 너무 높거나 간섭이 심해 본인의 재능이 억눌릴 수 있어. 본인만의 영역을 확실히 구축하는 것이 중요해.`
-        : `[Warning] A state where the soil (parent) is too hard and abundant, preventing the tree (me) from rooting and causing it to break ([${earthCol}:To-Da-Mok-Jeol]). Parental expectations may be too high or interference too strong, suppressing your talents. Building your own domain is crucial.`;
-    } else if (isGeumDaMokJeol) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 도끼(부모/환경)가 너무 날카로워 어린 나무(나)가 자라기도 전에 꺾이는 [${metalCol}:금다목절]의 형상이야. 엄격한 가정 환경이나 부모의 강한 통제가 당신의 창의성을 저해할 수 있어. 유연한 대처와 자기만의 공간 확보가 필요해.`
-        : `[Warning] A state where the axe (parent/environment) is too sharp, breaking the young tree (me) before it can grow ([${metalCol}:Geum-Da-Mok-Jeol]). A strict home environment or strong parental control may hinder your creativity. Flexible coping and securing your own space are needed.`;
+      fiction = "목(木) 일간에 토(土) 재성이 풍부하니 부모님이 물려줄 땅과 자산이 넘쳐나는 풍요로운 환경이라 하겠지.";
+      truth = "진실은 '텅 빈 껍데기'야. 부모의 자산이라는 흙이 너무 단단해서 나무인 너의 뿌리가 뻗지 못하고 부러지고 있어. 겉은 화려한데 네 속은 영양실조 상태지. 너만의 영역이 없어.";
     } else if (isSuDaMokBu) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 물(부모)이 너무 깊고 거세어 나무(나)가 뿌리를 내리지 못하고 떠내려가는 [${waterCol}:수다목부]의 형상이야. 부모의 지나친 감정적 의존이나 불안정한 환경이 당신의 삶의 방향성을 흔들 수 있어. 스스로 중심을 잡는 굳건한 의지가 중요해.`
-        : `[Warning] A state where the water (parent) is too deep and fierce, preventing the tree (me) from rooting and causing it to drift away ([${waterCol}:Su-Da-Mok-Bu]). Excessive emotional dependence from parents or an unstable environment may shake your life's direction. A firm will to center yourself is important.`;
-    } else if (isHwaDaToCho) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 불(부모)이 너무 뜨거워 대지(나)가 메마르고 갈라지는 [${fireCol}:화다토초]의 형상이야. 부모의 지나친 열정이나 성급함이 당신에게 정서적 메마름이나 압박감을 줄 수 있어. 차분한 내면의 안정을 찾는 노력이 필요해.`
-        : `[Warning] A state where the fire (parent) is too hot, drying and cracking the earth (me) ([${fireCol}:Hwa-Da-To-Cho]). Excessive passion or haste from parents may give you emotional dryness or pressure. Efforts to find calm inner stability are needed.`;
-    } else if (isSuDaGeumChim) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 물(부모)이 너무 깊어 보석(나)이 바닥으로 가라앉는 [${waterCol}:수다금침]의 형상이야. 부모의 영향력이 너무 강해 당신의 존재감이 드러나지 않거나, 부모의 문제에 깊이 연루되어 자신의 삶을 살지 못할 수 있어. 과감한 분리가 필요해.`
-        : `[Warning] A state where the water (parent) is too deep, causing the gem (me) to sink to the bottom ([${waterCol}:Su-Da-Geum-Chim]). Parental influence may be so strong that your presence is not revealed, or you may be deeply involved in parental issues and unable to live your own life. Bold separation is needed.`;
+      fiction = "목(木) 일간에 수(水) 인성이 넘치니 고서에 따르면 너의 사주는 마르지 않는 샘물같은 부모님의 사랑을 아낌없이 받는 형국이라고 볼거야.";
+      truth = "그치만 내가 볼때는 이건 일종의 '정서적 잠식'이야. 부모의 감정적 과잉이라는 파도때문에 너는 뿌리 내리지 못하고 떠내려가고 있어. 네 인생의 방향타를 부모가 쥐고 흔드니 너는 늘 불안하고 공허하지 않아?";
     } else if (isMokDaHwaSik) {
-      parentsDesc = lang === 'KO'
-        ? `[경고] 땔감(부모)이 너무 많아 오히려 불꽃(나)이 꺼져버리는 [${woodCol}:목다화식]의 형상이야. 부모의 과도한 지원이나 기대가 당신의 열정을 식게 하거나 부담을 줄 수 있어. 스스로 타오를 수 있는 적절한 거리 유지가 중요해.`
-        : `[Warning] A state where there is too much firewood (parent), causing the flame (me) to go out instead ([${woodCol}:Mok-Da-Hwa-Sik]). Excessive parental support or expectations may cool your passion or give you a burden. Maintaining an appropriate distance to burn on your own is important.`;
-    } else if (isRealAssetOwner && !hasParentInteraction) {
-      parentsDesc = lang === 'KO'
-        ? `[${wealthCol}:금수저 필터 통과] 부모님이 닦아놓은 탄탄한 경제적 기반([${wealthCol}:재성의 뿌리])이 당신을 든든하게 받쳐주고 있어. 억지로 독립하려 애쓰기보다, 그들이 마련한 환경 위에서 당신의 재능을 펼치는 것이 훨씬 빠르고 효율적인 성공 경로야. 윗사람의 조언이 곧 당신의 자산이 될 거야.`
-        : `[Wealthy Foundation] Your parents have built a solid economic foundation ([${wealthCol}:Wealth Root]) that supports you firmly. Rather than struggling for independence, unfolding your talents on their foundation is a faster and more efficient path to success. Their advice will be your asset.`;
-    } else if (hasParentInteraction) {
-      parentsDesc = lang === 'KO'
-        ? `부모님은 분명 재능과 열정을 가진 분들이지만, 집안 내부의 갈등이나 환경적 풍파([${fireCol}:원진/충])로 인해 그 자산을 온전히 지켜내기엔 고군분투하셨던 흔적이 보여. 부모 복이 없다고 단정하기보다, 부모님의 치열했던 삶을 이해하고 이제는 당신이 그 흩어진 기운을 모아 새로운 터전을 닦아야 할 때야.`
-        : `Your parents were talented and passionate, but signs show they struggled to preserve assets due to internal conflicts or environmental storms ([${fireCol}:Clash/Won-jin]). Rather than concluding a lack of luck, understand their fierce lives and build a new foundation yourself.`;
-    } else if (isResourcePure) {
-      parentsDesc = lang === 'KO'
-        ? `부모님이 당신에게 큰 돈을 물려주지는 못했을지라도, 수준 높은 교육이나 올바른 가치관([${inSeongCol}:인성의 순도])을 물려주셨어. 이 정신적 유산은 당신이 사회에서 귀인(貴人)을 만나고 문서를 잡는 데 결정적인 역할을 할 거야. 부모님의 지지가 당신의 가장 큰 무기야.`
-        : `Even if your parents couldn't pass down great wealth, they gave you high-level education or right values ([${inSeongCol}:Resource Purity]). This spiritual legacy will play a decisive role in meeting mentors and securing legal rights in society. Their support is your greatest weapon.`;
-    } else if (isSpiritualWealth) {
-      parentsDesc = lang === 'KO'
-        ? `부모님이 겉으로는 화려해 보이나 실속이 부족한 [${wealthCol}:재성허부(뜬구름 재물)]의 형국이야. 부모님의 경제적 도움에 의존하기보다, 당신이 직접 발로 뛰어 자수성가해야 하는 흐름이야. 부모님은 당신에게 '결핍'이라는 가장 강력한 성장 동력을 물려주신 셈이지.`
-        : `Your parents appear flashy but lack substance ([${wealthCol}:Floating Wealth]). Rather than relying on their economic help, you must pioneer your own success. They have essentially passed down "deficiency" as your strongest growth engine.`;
-    } else if (gods.InSeong > 40) {
-      parentsDesc = lang === 'KO'
-        ? `부모님의 사랑이 넘치다 못해 때로는 과잉 간섭으로 느껴질 수 있는 환경이야. 부모님의 경제적 능력이 본인의 기대에 못 미칠 경우, 그 애정이 오히려 부담이 될 수 있으니 적절한 정서적 독립과 본인만의 경제적 자립심을 키우는 것이 중요해.`
-        : "An environment where parental love overflows and may sometimes feel like over-interference. If their economic capacity falls short of your expectations, that affection can become a burden, so it's important to develop emotional independence and your own economic self-reliance.";
-    } else if (isNoInSeongNoJaeSeong) {
-      parentsDesc = lang === 'KO'
-        ? `애정이나 스킨십에 크게 집착하지 않으며, 부모에게 얽매이지 않고 일찍부터 자립하려는 독립적 성향이 강해. 부모의 혜택이 없어서가 아니라 스스로 개척하는 힘이 뛰어난 거야.`
-        : 'You don\'t obsess over affection and have a strong independent tendency to stand on your own early without being tied to parents. It\'s not a lack of parental benefits, but your outstanding ability to pioneer yourself.';
+      fiction = "화(火) 일간에 목(木) 인성이 가득하니 부모님이 땔감을 끊임없이 공급해주는 든든한 후원자라 하겠지.";
+      truth = "현실은 '역전된 부양'의 압박이야. 땔감이 너무 많아 오히려 너의 불꽃이 꺼져버리는 형국이지. 과도한 기대와 지원이 너의 야성을 죽이고, 결국 네가 그 무거운 나무더미를 치워야 하는 짐이 됐어.";
     } else {
-      parentsDesc = lang === 'KO'
-        ? `부모 및 윗사람과의 관계에서 일방적인 종속보다는 각자의 다름을 인정하는 객관적 거리가 필요해. 나이가 들수록 [${inSeongCol}:인성(부모)]은 나를 돕는 인맥과 처세술로 치환되니 유연하게 관계를 맺어봐.`
-        : 'In relations with parents and superiors, an objective distance acknowledging differences is needed rather than one-sided subordination. As you age, this energy transforms into helpful networks, so build relationships flexibly.';
+      fiction = "부모님과의 관계가 원만하고 사회적인 기반이 잘 닦여 있는 구조라고들 말하지.";
+      truth = "근데 그 원만함은 네가 입을 닫고 있기 때문에 유지되는 거야. 겉으로는 평화로워 보이지만 속으로는 각자 다른 연기를 하고 있는, 잘 짜인 연극 무대 같네.";
     }
 
-    relationships.parents = {
-      title: lang === 'KO' ? '부모 및 윗사람 (인성/재성)' : 'Parents & Superiors (Sage/Architect)',
-      ratio: gods.InSeong,
-      description: parentsDesc
-    };
+    // Step 3: The X-Factor (Hap/Chung/Hyung/Pa/Hae/Wonjin)
+    let inversion = '';
+    const isMonthWonjinWithDay = wonjinPairs[monthZhi] === dayBranch;
+    const isMonthGwimunWithDay = gwimunPairs[monthZhi] === dayBranch;
+    const isMonthHyungWithDay = (
+      (monthZhi === '寅' && dayBranch === '巳') || (monthZhi === '巳' && dayBranch === '寅') ||
+      (monthZhi === '巳' && dayBranch === '申') || (monthZhi === '申' && dayBranch === '巳') ||
+      (monthZhi === '寅' && dayBranch === '申') || (monthZhi === '申' && dayBranch === '寅') ||
+      (monthZhi === '丑' && dayBranch === '戌') || (monthZhi === '戌' && dayBranch === '丑') ||
+      (monthZhi === '戌' && dayBranch === '未') || (monthZhi === '未' && dayBranch === '戌') ||
+      (monthZhi === '丑' && dayBranch === '未') || (monthZhi === '未' && dayBranch === '丑') ||
+      (monthZhi === '子' && dayBranch === '卯') || (monthZhi === '卯' && dayBranch === '子') ||
+      (monthZhi === '辰' && dayBranch === '辰') || (monthZhi === '午' && dayBranch === '午') ||
+      (monthZhi === '酉' && dayBranch === '酉') || (monthZhi === '亥' && dayBranch === '亥')
+    );
+    const isMonthPaWithDay = (
+      (monthZhi === '子' && dayBranch === '酉') || (monthZhi === '酉' && dayBranch === '子') ||
+      (monthZhi === '丑' && dayBranch === '辰') || (monthZhi === '辰' && dayBranch === '丑') ||
+      (monthZhi === '寅' && dayBranch === '亥') || (monthZhi === '亥' && dayBranch === '寅') ||
+      (monthZhi === '卯' && dayBranch === '午') || (monthZhi === '午' && dayBranch === '卯') ||
+      (monthZhi === '巳' && dayBranch === '申') || (monthZhi === '申' && dayBranch === '巳') ||
+      (monthZhi === '未' && dayBranch === '戌') || (monthZhi === '戌' && dayBranch === '未')
+    );
+    const isMonthHaeWithDay = (
+      (monthZhi === '子' && dayBranch === '未') || (monthZhi === '未' && dayBranch === '子') ||
+      (monthZhi === '丑' && dayBranch === '午') || (monthZhi === '午' && dayBranch === '丑') ||
+      (monthZhi === '寅' && dayBranch === '巳') || (monthZhi === '巳' && dayBranch === '寅') ||
+      (monthZhi === '卯' && dayBranch === '辰') || (monthZhi === '辰' && dayBranch === '卯') ||
+      (monthZhi === '申' && dayBranch === '亥') || (monthZhi === '亥' && dayBranch === '申') ||
+      (monthZhi === '酉' && dayBranch === '戌') || (monthZhi === '戌' && dayBranch === '酉')
+    );
 
-    // 3. Spouse & Partner (Day Zhi) - Position: Day Zhi
+    if (isMonthWonjinWithDay || isMonthGwimunWithDay) {
+      inversion = "\n\n부모님과 원진이나 귀문으로 연결되어 있네. 서로 아끼면서도 막상 같이 있으면 사소한 일로 부딪히고 감정 소모가 커서 많이 지쳤겠다. 부모님의 감정을 네가 다 받아주느라 마음고생이 많았어. 이제는 적당한 거리를 두고 네 마음부터 챙겼으면 좋겠어.";
+    } else if (isMonthHyungWithDay) {
+      inversion = "\n\n부모님과 형(刑)의 관계가 보이네. 부모님이 바라는 모습과 네가 살고 싶은 삶이 달라서 자주 부딪히고 답답했을 거야. 널 위한다는 말이 때로는 무거운 족쇄처럼 느껴졌지? 네 잘못이 아니야. 부모님의 기대보다 네 행복이 먼저라는 걸 잊지 마.";
+    } else if (isMonthChungWithDay) {
+      inversion = "\n\n부모님과 충(沖)으로 부딪히는 기운이 있어. 서로 가치관이 달라서 대화가 단절되거나 크게 다투는 일이 잦았을 텐데, 그 과정에서 네가 받았을 상처가 참 컸겠다. 하지만 이 충돌은 네가 독립적인 어른으로 성장하기 위한 자연스러운 과정이기도 해. 네 삶을 찾아가는 용기를 응원할게.";
+    } else if (isMonthPaWithDay) {
+      inversion = "\n\n부모님과 파(破)의 기운이 엮여 있네. 평온하다가도 갑자기 관계가 틀어지거나 오해가 생겨서 마음 졸이는 일이 많았지? 겉으로는 괜찮은 척해도 속으로 많이 외로웠을 거야. 억지로 완벽한 가족이 되려고 애쓰지 않아도 괜찮아.";
+    } else if (isMonthHaeWithDay) {
+      inversion = "\n\n부모님과 해(害)의 작용이 있네. 부모님의 지나친 간섭이나 걱정이 오히려 네 앞길을 막는 것처럼 느껴져서 많이 답답했겠다. 널 사랑해서 그러는 거라며 참아왔던 시간들이 얼마나 버거웠을까. 이제는 네 선택을 믿고 조금씩 선을 그어보는 연습을 해보자.";
+    } else if (isMonthHapWithDay) {
+      inversion = "\n\n부모님과 합(合)으로 강하게 묶여 있네. 겉보기엔 화목해 보이지만, 사실 넌 부모님을 실망시키지 않으려고 네 진짜 마음을 많이 숨기고 참아왔을 거야. 착한 자식이 되느라 정작 널 돌보지 못한 건 아닐까? 가끔은 부모님보다 널 먼저 생각해도 괜찮아. 정말 고생 많았어.";
+    }
+
+    return `${fiction}\n\n${truth}${inversion}`;
+  };
+
+  parentsDesc = lang === 'KO' ? getInversionNarrative() : parentsDesc;
+
+  relationships.parents = {
+    title: lang === 'KO' ? '부모 및 윗사람 (인성/재성)' : 'Parents & Superiors (Sage/Architect)',
+    ratio: gods.InSeong,
+    description: parentsDesc
+  };
+
+  // 3. Spouse & Partner (Day Zhi) - Position: Day Zhi
     const spouseGodRatio = gender === 'male' ? gods.JaeSeong : gods.GwanSeong;
     let spouseDesc = '';
     
@@ -619,7 +632,6 @@ export const calculateAdvancedAnalysis = (
     const targetChildGod = gender === 'female' ? gods.SikSang : gods.GwanSeong;
     let childrenDesc = '';
     
-    const hourStemTenGod = hourPillar?.stemKoreanName || '';
     const hourBranch = hourPillar?.branch || '';
     
     // Check for Clash/Punishment on Hour Branch (Si-ju)
