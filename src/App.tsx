@@ -170,7 +170,10 @@ export default function App() {
       }
 
       // Modern way to load Google Maps (TS-friendly version)
-      const g: any = { v: "weekly" };
+      const g: any = { 
+        v: "weekly",
+        language: lang.toLowerCase()
+      };
       const b: any = window;
       let d = b.google?.maps || (b.google = b.google || {}, b.google.maps = b.google.maps || {});
       const r = new Set();
@@ -206,7 +209,7 @@ export default function App() {
     if (page !== 2) {
       autocompleteRef.current = null;
     }
-  }, [page]);
+  }, [page, lang]);
 
   const initAutocomplete = async () => {
     if (autocompleteRef.current) return; // Guard against multiple initializations

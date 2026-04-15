@@ -20,9 +20,9 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
             {lang === 'KO' ? '성별 사주 원리' : 'Gender Specific Analysis'}
           </h4>
           <div className="text-xs text-white/70 space-y-1">
-            {analysis.genderSpecificAnalysis.wifeOrMoney && <ParsedText text={analysis.genderSpecificAnalysis.wifeOrMoney} className="block" />}
-            {analysis.genderSpecificAnalysis.husbandOrCareer && <ParsedText text={analysis.genderSpecificAnalysis.husbandOrCareer} className="block" />}
-            {analysis.genderSpecificAnalysis.children && <ParsedText text={analysis.genderSpecificAnalysis.children} className="block" />}
+            {analysis.genderSpecificAnalysis.wifeOrMoney && <ParsedText lang={lang} text={analysis.genderSpecificAnalysis.wifeOrMoney} className="block" />}
+            {analysis.genderSpecificAnalysis.husbandOrCareer && <ParsedText lang={lang} text={analysis.genderSpecificAnalysis.husbandOrCareer} className="block" />}
+            {analysis.genderSpecificAnalysis.children && <ParsedText lang={lang} text={analysis.genderSpecificAnalysis.children} className="block" />}
           </div>
         </div>
       )}
@@ -36,12 +36,12 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
           <div className="space-y-2">
             {analysis.muJaRon?.map((item, i) => (
               <div key={i} className="text-xs text-white/70">
-                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText text={lang === 'KO' ? item.description : item.enDescription} />
+                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText lang={lang} text={lang === 'KO' ? item.description : item.enDescription} />
               </div>
             ))}
             {analysis.daJaRon?.map((item, i) => (
               <div key={i} className="text-xs text-white/70">
-                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText text={lang === 'KO' ? item.description : item.enDescription} />
+                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText lang={lang} text={lang === 'KO' ? item.description : item.enDescription} />
               </div>
             ))}
           </div>
@@ -58,7 +58,7 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
             {analysis.overloadAnalysis.map((item, i) => (
               <div key={i} className="text-xs text-white/70">
                 <div className="font-bold text-red-300 mb-1">{lang === 'KO' ? item.title : item.titleEn}</div>
-                <ParsedText text={lang === 'KO' ? item.description : item.enDescription} />
+                <ParsedText lang={lang} text={lang === 'KO' ? item.description : item.enDescription} />
               </div>
             ))}
           </div>
@@ -77,7 +77,7 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
                 <div className={`font-bold mb-1 ${item.type === 'warning' ? 'text-red-400' : 'text-amber-300'}`}>
                   {item.title}
                 </div>
-                <ParsedText text={item.description} />
+                <ParsedText lang={lang} text={item.description} />
               </div>
             ))}
           </div>
@@ -90,8 +90,8 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
           <h4 className="text-sm font-display font-medium text-orange-400 uppercase tracking-[0.2em] mb-2">
             {analysis.shinGangShinYak.title}
           </h4>
-          <ParsedText text={lang === 'KO' ? analysis.shinGangShinYak.description : analysis.shinGangShinYak.enDescription} className="text-xs text-white/70 mb-2 block" />
-          <ParsedText text={lang === 'KO' ? analysis.shinGangShinYak.socialContext : analysis.shinGangShinYak.enSocialContext} className="text-xs text-white/50 italic block" />
+          <ParsedText lang={lang} text={lang === 'KO' ? analysis.shinGangShinYak.description : analysis.shinGangShinYak.enDescription} className="text-xs text-white/70 mb-2 block" />
+          <ParsedText lang={lang} text={lang === 'KO' ? analysis.shinGangShinYak.socialContext : analysis.shinGangShinYak.enSocialContext} className="text-xs text-white/50 italic block" />
         </div>
       )}
     </div>

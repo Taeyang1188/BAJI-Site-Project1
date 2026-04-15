@@ -475,7 +475,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     console.error("Error calculating current year pillar:", e);
   }
 
-  const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength, yongshinDetail);
+  const advancedAnalysis = calculateAdvancedAnalysis(pillars, tenGodsRatio, input, dayGan, monthZhi, lang, strength, yongshinDetail, interactionsResult.interactions);
   const balanceWarnings = calculateBalanceWarnings(elementRatios, tenGodsRatio, dmElement, lang);
   
   return {

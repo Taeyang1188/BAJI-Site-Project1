@@ -9,7 +9,8 @@ export const calculateAdvancedAnalysis = (
   monthZhi: string,
   lang: Language,
   strength: any,
-  yongshinDetail: any
+  yongshinDetail: any,
+  interactions: any[] = []
 ) => {
   const gender = userInput.gender || 'male';
   const isStrong = Number(strength.score) > 50;
@@ -244,7 +245,7 @@ export const calculateAdvancedAnalysis = (
         let biGyeopDesc = '';
         let biGyeopDescEn = '';
         if (dmElement === 'Wood') {
-          biGyeopDesc = `"빽빽한 숲속의 치열한 생존 경쟁." 주변에 사람이 많아 든든하지만, 한정된 자원을 두고 다투는 경쟁이 매우 치열해. [${wealthCol}:토(재)]가 부족하면 재산 분탈(군비쟁재)이 일어나기 쉬우니 금전 거래에 각별히 주의해야 해.`;
+          biGyeopDesc = `"빽빽한 숲속의 치열한 생존 경쟁." 주변에 사람이 많아 든든하지만, 한정된 자원을 두고 다투는 경쟁이 매우 치열해. [${wealthCol}:토(재)]가 부족하면 재산 분탈([tooltip:군비쟁재])이 일어나기 쉬우니 금전 거래에 각별히 주의해야 해.`;
           biGyeopDescEn = `"Fierce survival competition in a dense forest." Surrounded by many people, but competition for limited resources is intense. Without [${wealthCol}:Earth Wealth], property disputes are likely; be extra cautious with financial transactions.`;
         } else if (dmElement === 'Fire') {
           biGyeopDesc = `"맹렬하게 타오르는 불바다." 열정과 에너지가 넘쳐 주변을 압도하지만, 감정 조절이 안 되면 주변을 태워버릴 수 있어. [${wealthCol}:금(재)]가 녹아내리지 않도록 냉철한 이성과 평정심을 유지하는 것이 성공의 열쇠야.`;
@@ -390,13 +391,13 @@ export const calculateAdvancedAnalysis = (
       truthEn = "The truth is, you're about to be crushed to death by that shield. The oppressive energy of your parents pressures you, and you are structured to carry their burdens instead. I cheer for your courage to step out of their shadow and face the world!";
     } else if (monthStemGod.includes('정인') || monthZhiGod.includes('정인')) {
       fictionKo = `[${inSeongCol}:정인(正印)]이 월주에 가득하니 부모님의 무조건적인 사랑과 혜택을 듬뿍 받고 자란 행운아라고 하겠지. 부족함 없는 지원이 너의 자양분이라고 말이야.`;
-      truthKo = "실상은 '부드러운 폭력'이야. 부모의 과잉보호가 너의 자립심을 녹여버렸어. 사랑이라는 이름의 늪에 빠져서 혼자서는 아무것도 못 하는 바보가 되길 강요받는 셈이지. 모다멸자(母多滅子)의 전형이야.";
-      fictionEn = `Full of [${inSeongCol}:Direct Resource] in the Month Pillar, they'd call you a lucky one raised with unconditional love and abundant benefits from your parents. Flawless support is supposedly your nourishment.`;
+      truthKo = "실상은 '부드러운 폭력'이야. 부모의 과잉보호가 너의 자립심을 녹여버렸어. 사랑이라는 이름의 늪에 빠져서 혼자서는 아무것도 못 하는 바보가 되길 강요받는 셈이지. [tooltip:모다멸자](母多滅子)의 전형이야.";
+      fictionEn = `Full of [${inSeongCol}:The Sage] in the Month Pillar, they'd call you a lucky one raised with unconditional love and abundant benefits from your parents. Flawless support is supposedly your nourishment.`;
       truthEn = "The reality is 'soft violence'. Your parents' overprotection has melted away your independence. You're forced to become a fool who can't do anything alone, drowning in a swamp called love. It's the epitome of 'Too Many Mothers Ruin the Child'.";
     } else if (monthStemGod.includes('편인') || monthZhiGod.includes('편인')) {
       fictionKo = `[${inSeongCol}:편인(偏印)]의 기운이 강하니 부모님이 너에게 특별한 재능이나 깊은 지혜를 물려주셨다고 해석할 거야. 남다른 통찰력을 가진 가문이라고 치켜세우겠지.`;
       truthKo = "글쎄, 그건 '조건부 사랑'의 다른 이름일 뿐이야. 부모의 기분에 따라 변하는 애정 때문에 너는 눈치 보느라 속이 다 썩었네. 혜택이 아니라 나중에 갚아야 할 빚처럼 느껴지는 무거운 유산이지.";
-      fictionEn = `With strong [${inSeongCol}:Indirect Resource] energy, they'll interpret that your parents passed down special talents or deep wisdom to you, praising your family's extraordinary insight.`;
+      fictionEn = `With strong [${inSeongCol}:The Mystic] energy, they'll interpret that your parents passed down special talents or deep wisdom to you, praising your family's extraordinary insight.`;
       truthEn = "Well, that's just another name for 'conditional love'. Because of affection that fluctuates with your parents' moods, you've rotted inside trying to read the room. It's a heavy legacy that feels like a debt to be repaid later, not a benefit.";
     } else if (monthStemGod.includes('재성') || monthZhiGod.includes('재성')) {
       fictionKo = `월주에 [${wealthCol}:재성(財星)]이 뚜렷하니 부모님이 닦아놓은 탄탄한 경제적 기반이 너를 받쳐준다고 하겠지. 금수저 필터 통과라며 다들 부러워할 거야.`;
@@ -415,9 +416,9 @@ export const calculateAdvancedAnalysis = (
       truthEn = "The truth is endless competition and comparison. It's a structure where you have to harbor a knife even within your family to protect your share. It's the fiction of suffocating collectivism where there's no privacy and everything must be shared.";
     } else if (isMaeGeum) {
       fictionKo = "금(金) 일간에 토(土) 인성이 가득하니 부모님의 지원이 보석을 닦아주는 귀한 손길처럼 보일 거야.";
-      truthKo = "하지만 현실은 '위장된 번영'이지. 흙이 너무 많아 보석인 네가 빛을 잃고 묻혀버렸어. 사랑이라는 이름으로 너를 매장하고 있는 토다매금(土多埋金)의 현장이야. 너는 지금 숨이 막혀.";
+      truthKo = "하지만 현실은 '위장된 번영'이지. 흙이 너무 많아 보석인 네가 빛을 잃고 묻혀버렸어. 사랑이라는 이름으로 너를 매장하고 있는 [tooltip:토다매금](土多埋金)의 현장이야. 너는 지금 숨이 막혀.";
       fictionEn = "As a Metal Day Master full of Earth Resource, your parents' support might look like precious hands polishing a gem.";
-      truthEn = "But the reality is 'disguised prosperity'. There's too much dirt, so you, the gem, have lost your light and been buried. It's a scene of being buried alive under the name of love. You are suffocating right now.";
+      truthEn = "But the reality is 'disguised prosperity'. There's too much dirt, so you, the gem, have lost your light and been buried. It's a scene of being buried alive under the name of love. You are suffocating right now. This is [tooltip:To-da-mae-geum].";
     } else if (isToDaMokJeol) {
       fictionKo = "목(木) 일간에 토(土) 재성이 풍부하니 부모님이 물려줄 땅과 자산이 넘쳐나는 풍요로운 환경이라 하겠지.";
       truthKo = "진실은 '텅 빈 껍데기'야. 부모의 자산이라는 흙이 너무 단단해서 나무인 너의 뿌리가 뻗지 못하고 부러지고 있어. 겉은 화려한데 네 속은 영양실조 상태지. 너만의 영역이 없어.";
@@ -425,14 +426,14 @@ export const calculateAdvancedAnalysis = (
       truthEn = "The truth is an 'empty shell'. The dirt, which is your parents' assets, is so hard that your roots as a tree cannot spread and are breaking. It's flashy on the outside, but you're malnourished on the inside. You have no domain of your own.";
     } else if (isSuDaMokBu) {
       fictionKo = "목(木) 일간에 수(水) 인성이 넘치니 고서에 따르면 너의 사주는 마르지 않는 샘물같은 부모님의 사랑을 아낌없이 받는 형국이라고 볼거야.";
-      truthKo = "그치만 내가 볼때는 이건 일종의 '정서적 잠식'이야. 부모의 감정적 과잉이라는 파도때문에 너는 뿌리 내리지 못하고 떠내려가고 있어. 네 인생의 방향타를 부모가 쥐고 흔드니 너는 늘 불안하고 공허하지 않아?";
+      truthKo = "그치만 내가 볼때는 이건 일종의 '정서적 잠식'이야. 부모의 감정적 과잉이라는 파도때문에 너는 뿌리 내리지 못하고 떠내려가고 있는 [tooltip:수다목부](水多木浮)의 상태야. 네 인생의 방향타를 부모가 쥐고 흔드니 너는 늘 불안하고 공허하지 않아?";
       fictionEn = "As a Wood Day Master overflowing with Water Resource, ancient texts would say your chart is receiving endless love from your parents like an undrying spring.";
-      truthEn = "But the way I see it, this is a kind of 'emotional encroachment'. You are unable to take root and are drifting away due to the waves of your parents' emotional excess. With your parents holding the rudder of your life, aren't you always anxious and empty?";
+      truthEn = "But the way I see it, this is a kind of 'emotional encroachment'. You are unable to take root and are drifting away due to the waves of your parents' emotional excess ([tooltip:Su-da-mok-bu]). With your parents holding the rudder of your life, aren't you always anxious and empty?";
     } else if (isMokDaHwaSik) {
       fictionKo = "화(火) 일간에 목(木) 인성이 가득하니 부모님이 땔감을 끊임없이 공급해주는 든든한 후원자라 하겠지.";
-      truthKo = "현실은 '역전된 부양'의 압박이야. 땔감이 너무 많아 오히려 너의 불꽃이 꺼져버리는 형국이지. 과도한 기대와 지원이 너의 야성을 죽이고, 결국 네가 그 무거운 나무더미를 치워야 하는 짐이 됐어.";
+      truthKo = "현실은 '역전된 부양'의 압박이야. 땔감이 너무 많아 오히려 너의 불꽃이 꺼져버리는 [tooltip:목다화식](木多火息)의 형국이지. 과도한 기대와 지원이 너의 야성을 죽이고, 결국 네가 그 무거운 나무더미를 치워야 하는 짐이 됐어.";
       fictionEn = "As a Fire Day Master full of Wood Resource, they'd say your parents are reliable sponsors constantly supplying firewood.";
-      truthEn = "The reality is the pressure of 'reversed support'. There's so much firewood that your flame is actually being extinguished. Excessive expectations and support have killed your wildness, and ultimately, it's become a burden where you have to clear away that heavy pile of wood.";
+      truthEn = "The reality is the pressure of 'reversed support'. There's so much firewood that your flame is actually being extinguished ([tooltip:Mok-da-hwa-sik]). Excessive expectations and support have killed your wildness, and ultimately, it's become a burden where you have to clear away that heavy pile of wood.";
     } else {
       fictionKo = "부모님과의 관계가 원만하고 사회적인 기반이 잘 닦여 있는 구조라고들 말하지.";
       truthKo = "근데 그 원만함은 네가 입을 닫고 있기 때문에 유지되는 거야. 겉으로는 평화로워 보이지만 속으로는 각자 다른 연기를 하고 있는, 잘 짜인 연극 무대 같네.";
@@ -596,18 +597,39 @@ export const calculateAdvancedAnalysis = (
     const isBiGyeopDaJa = gods.BiGyeop > 30;
 
     const riskFactors = [];
-    if (isGanYeoJiDong) riskFactors.push(lang === 'KO' ? '간여지동' : 'Gan-yeo-ji-dong');
-    if (hasDayClash || hasDayPunishment) riskFactors.push(lang === 'KO' ? '일지 형충' : 'Day Branch Clash/Punishment');
-    if (isSpouseInTomb) riskFactors.push(lang === 'KO' ? '부성/처성임묘' : 'Spouse Star in Tomb');
+    if (isGanYeoJiDong) riskFactors.push(lang === 'KO' ? '[tooltip:간여지동]' : '[tooltip:Gan-yeo-ji-dong]');
+    
+    if (hasDayClash || hasDayPunishment) {
+      // Find the specific clash/punishment involving the Day Branch (index 1)
+      const dayInteraction = interactions.find(i => 
+        (i.type.includes('충') || i.type.includes('형')) && 
+        i.pillarIndices && i.pillarIndices.includes(1)
+      );
+      
+      let tooltipText = lang === 'KO' ? '일지 형충' : 'Day Branch Clash/Punishment';
+      if (dayInteraction && dayInteraction.note) {
+        const [koNote, enNote] = dayInteraction.note.split('|');
+        // Extract just the text content from the HTML note for the tooltip
+        const stripHtml = (html: string) => html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ');
+        const cleanKo = stripHtml(koNote);
+        const cleanEn = stripHtml(enNote || koNote);
+        tooltipText = `[tooltip:${tooltipText}|${cleanKo}|${cleanEn}]`;
+      } else {
+        tooltipText = `[tooltip:${tooltipText}]`;
+      }
+      riskFactors.push(tooltipText);
+    }
+    
+    if (isSpouseInTomb) riskFactors.push(lang === 'KO' ? '[tooltip:부성/처성임묘]' : '[tooltip:Spouse Star in Tomb]');
     if (isHurtingOfficerDay) riskFactors.push(lang === 'KO' ? '일지 상관' : 'Hurting Officer on Day Branch');
-    if (isJinSulChukMi) riskFactors.push(lang === 'KO' ? '일지 진술축미' : 'Earth Branch on Day');
-    if (isBaekho || isGoegang) riskFactors.push(lang === 'KO' ? '백호/괴강살' : 'Baekho/Goegang-sal');
+    if (isJinSulChukMi) riskFactors.push(lang === 'KO' ? '[tooltip:일지 진술축미]' : '[tooltip:Earth Branch on Day]');
+    if (isBaekho || isGoegang) riskFactors.push(lang === 'KO' ? '[tooltip:백호/괴강살]' : '[tooltip:White tiger star/Overload star]');
     if (isBiGyeopDaJa) riskFactors.push(lang === 'KO' ? '비겁다자' : 'Excessive Bi-gyeop');
 
     if (riskFactors.length >= 2) {
       spouseDesc = lang === 'KO'
-        ? `배우자 운에서 주의가 필요한 신호들이 여러 개 관찰돼. 특히 [#ef4444:${riskFactors.join(', ')}] 등의 기운이 겹쳐 있어 배우자와의 관계에서 갈등이나 이별의 기운이 강할 수 있어. 이는 배우자 자리가 불안정하거나 본인의 기운이 너무 강해 배우자가 머물기 힘든 환경임을 의미해. 무조건적인 불운으로 받아들이기보다, 서로의 독립성을 존중하고 주말 부부나 각자의 전문 영역을 확실히 갖는 [#3b82f6:'업상대체']를 통해 에너지를 분산시키는 지혜가 필요해.`
-        : `Multiple signs requiring caution are observed in spouse luck. Specifically, the combination of [#ef4444:${riskFactors.join(', ')}] suggests potential for conflict or separation. This means the spouse palace is unstable or your own energy is too strong for a partner to settle easily. Rather than viewing it as pure misfortune, you need the wisdom to disperse this energy through [#3b82f6:"Up-sang-dae-che"] (career substitution) or respecting each other's independence.`;
+        ? `배우자 운에서 주의가 필요한 신호들이 여러 개 관찰돼. 특히 [#ef4444:${riskFactors.join(', ')}] 등의 기운이 겹쳐 있어 배우자와의 관계에서 갈등이나 이별의 기운이 강할 수 있어. 이는 배우자 자리가 불안정하거나 본인의 기운이 너무 강해 배우자가 머물기 힘든 환경임을 의미해. 무조건적인 불운으로 받아들이기보다, 서로의 독립성을 존중하고 주말 부부나 각자의 전문 영역을 확실히 갖는 [#3b82f6:'[tooltip:업상대체]']를 통해 에너지를 분산시키는 지혜가 필요해.`
+        : `Multiple signs requiring caution are observed in spouse luck. Specifically, the combination of [#ef4444:${riskFactors.join(', ')}] suggests potential for conflict or separation. This means the spouse palace is unstable or your own energy is too strong for a partner to settle easily. Rather than viewing it as pure misfortune, you need the wisdom to disperse this energy through [#3b82f6:"[tooltip:up-sang-dae-che]"] (career substitution) or respecting each other's independence.`;
     } else if (riskFactors.length === 1) {
       spouseDesc = lang === 'KO'
         ? `배우자 운에서 [#ef4444:${riskFactors[0]}]의 기운이 관찰돼. 배우자 자리에 변화가 잦거나 본인의 주관이 강해 충돌이 생길 수 있는 구조야. 서로의 다름을 인정하고 적절한 거리감을 유지할 때 관계가 더욱 건강해질 수 있어.`

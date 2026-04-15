@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface ParsedTextProps {
   text: string;
   className?: string;
+  lang?: 'KO' | 'EN';
 }
 
 const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
@@ -50,7 +53,15 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
     ko: '수다목부: 물이 너무 많아 나무가 뿌리를 내리지 못하고 떠내려가는 형국. 정서적 과잉이나 지나친 생각으로 실행력이 떨어질 수 있습니다.',
     en: 'Su-da-mok-bu: Too much Water causing the Wood to float. Indicates lack of execution due to emotional excess or overthinking.'
   },
+  'Su-da-mok-bu': {
+    ko: '수다목부: 물이 너무 많아 나무가 뿌리를 내리지 못하고 떠내려가는 형국. 정서적 과잉이나 지나친 생각으로 실행력이 떨어질 수 있습니다.',
+    en: 'Su-da-mok-bu: Too much Water causing the Wood to float. Indicates lack of execution due to emotional excess or overthinking.'
+  },
   '목다화식': {
+    ko: '목다화식: 나무(땔감)가 너무 많아 불이 꺼지는 형국. 지나친 지원이나 기대가 오히려 발전을 저해할 수 있습니다.',
+    en: 'Mok-da-hwa-sik: Too much Wood (firewood) extinguishing the Fire. Indicates excessive support or expectations hindering progress.'
+  },
+  'Mok-da-hwa-sik': {
     ko: '목다화식: 나무(땔감)가 너무 많아 불이 꺼지는 형국. 지나친 지원이나 기대가 오히려 발전을 저해할 수 있습니다.',
     en: 'Mok-da-hwa-sik: Too much Wood (firewood) extinguishing the Fire. Indicates excessive support or expectations hindering progress.'
   },
@@ -86,13 +97,17 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
     ko: '일지 진술축미: 배우자 자리에 흙(土)의 기운이 있는 것. 배우자가 고집이 세거나 속을 알기 어려울 수 있으며, 관계에서 인내심이 필요할 수 있습니다.',
     en: 'Earth Branch on Day: Having an Earth branch in the Spouse Palace. The partner may be stubborn or hard to read, requiring patience in the relationship.'
   },
+  '일지 진술축미': {
+    ko: '일지 진술축미: 배우자 자리에 흙(土)의 기운이 있는 것. 배우자가 고집이 세거나 속을 알기 어려울 수 있으며, 관계에서 인내심이 필요할 수 있습니다.',
+    en: 'Earth Branch on Day: Having an Earth branch in the Spouse Palace. The partner may be stubborn or hard to read, requiring patience in the relationship.'
+  },
   '백호/괴강살': {
     ko: '백호/괴강살: 호랑이에게 물려가거나 우두머리가 되는 강렬한 기운. 프로페셔널하고 카리스마가 넘치지만, 기운이 너무 강해 배우자 자리가 불안정해질 수 있습니다.',
-    en: 'Baekho/Goegang-sal: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
+    en: 'White tiger star/Overload star: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
   },
-  'Baekho/Goegang-sal': {
+  'White tiger star/Overload star': {
     ko: '백호/괴강살: 호랑이에게 물려가거나 우두머리가 되는 강렬한 기운. 프로페셔널하고 카리스마가 넘치지만, 기운이 너무 강해 배우자 자리가 불안정해질 수 있습니다.',
-    en: 'Baekho/Goegang-sal: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
+    en: 'White tiger star/Overload star: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
   },
   '부성/처성임묘': {
     ko: '부성/처성임묘: 남편(부성)이나 아내(처성)를 뜻하는 글자가 무덤(묘)에 들어가는 형국. 배우자의 건강이 약해지거나 인연이 짧아질 수 있음을 암시하며, 주말부부나 각자의 영역을 존중하는 것으로 액땜(업상대체)할 수 있습니다.',
@@ -112,31 +127,138 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
   }
 };
 
-const TooltipWrapper: React.FC<{ term: string, children: React.ReactNode }> = ({ term, children }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const info = TOOLTIP_DICTIONARY[term];
+const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, children: React.ReactNode, lang?: 'KO' | 'EN' }> = ({ term, info, children, lang = 'KO' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, placement: 'top' as 'top' | 'bottom' });
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const tooltipInfo = info || TOOLTIP_DICTIONARY[term];
   
-  if (!info) return <>{children}</>;
+  const updatePosition = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const tooltipWidth = 256; // w-64 = 16rem = 256px
+      let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+      
+      if (left < 10) left = 10;
+      if (left + tooltipWidth > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth - 10;
+      }
+
+      let top = rect.top - 8;
+      let placement: 'top' | 'bottom' = 'top';
+
+      if (top < 120) {
+        top = rect.bottom + 8;
+        placement = 'bottom';
+      }
+
+      setPosition({ top, left, placement });
+    }
+  };
+
+  const showTooltip = () => {
+    updatePosition();
+    setIsVisible(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+  };
+
+  const hideTooltip = () => {
+    setIsVisible(false);
+  };
+
+  const handleInteraction = (e: React.MouseEvent | React.TouchEvent) => {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouch) {
+      if (isVisible) {
+        hideTooltip();
+      } else {
+        showTooltip();
+        timerRef.current = setTimeout(() => {
+          setIsVisible(false);
+        }, 5000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        hideTooltip();
+      }
+    };
+
+    if (isVisible) {
+      window.addEventListener('click', handleClickOutside);
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+    }
+
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isVisible]);
+
+  if (!tooltipInfo) return <>{children}</>;
 
   return (
     <span 
+      ref={containerRef}
       className="relative inline-block border-b border-dashed border-white/50 cursor-help"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => {
+        if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+          showTooltip();
+        }
+      }}
+      onMouseLeave={() => {
+        if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+          hideTooltip();
+        }
+      }}
+      onClick={handleInteraction}
     >
       {children}
-      {isHovered && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2 bg-black/90 border border-white/10 rounded-lg text-xs text-white/80 z-50 shadow-xl pointer-events-none">
-          <span className="block font-bold text-white mb-1">{term}</span>
-          <span className="block mb-1">{info.ko}</span>
-          <span className="block text-white/50">{info.en}</span>
-        </span>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isVisible && (
+            <motion.div 
+              initial={{ opacity: 0, y: position.placement === 'top' ? 5 : -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: position.placement === 'top' ? 5 : -5 }}
+              style={{ 
+                position: 'fixed', 
+                top: position.top, 
+                left: position.left, 
+                transform: position.placement === 'top' ? 'translateY(-100%)' : 'none',
+                zIndex: 9999 
+              }}
+              className="w-64 p-3 bg-black/95 border border-white/20 rounded-lg shadow-2xl backdrop-blur-xl pointer-events-none"
+            >
+              <span className="block font-bold text-white mb-2 text-sm">{term}</span>
+              {lang === 'KO' ? (
+                <>
+                  <span className="block mb-1 whitespace-pre-wrap text-white text-xs">{tooltipInfo.ko}</span>
+                  <span className="block text-white/50 whitespace-pre-wrap text-xs">{tooltipInfo.en}</span>
+                </>
+              ) : (
+                <>
+                  <span className="block mb-1 whitespace-pre-wrap text-white text-xs">{tooltipInfo.en}</span>
+                  <span className="block text-white/50 whitespace-pre-wrap text-xs">{tooltipInfo.ko}</span>
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </span>
   );
 };
 
-export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "" }) => {
+export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", lang = 'KO' }) => {
   const elements: React.ReactNode[] = [];
   let i = 0;
   let currentText = '';
@@ -144,25 +266,8 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "" }) 
 
   if (!text) return null;
 
-  // Pre-process text to wrap known terms in [tooltip:term]
+  // We no longer auto-wrap terms. Tooltips will only be applied to terms explicitly wrapped in color codes or tooltip tags.
   let processedText = text;
-  try {
-    Object.keys(TOOLTIP_DICTIONARY).forEach(term => {
-      // Use regex to replace terms not already inside brackets
-      const regex = new RegExp(`(?<!\\[[^\\]]*)\\b${term}\\b(?!\\s*\\])`, 'gi');
-      // For Korean terms which might not have word boundaries
-      const koRegex = new RegExp(`(?<!\\[[^\\]]*)${term}(?!\\s*\\])`, 'g');
-      
-      if (/[a-zA-Z]/.test(term)) {
-        processedText = processedText.replace(regex, `[tooltip:${term}]`);
-      } else {
-        processedText = processedText.replace(koRegex, `[tooltip:${term}]`);
-      }
-    });
-  } catch (e) {
-    // Fallback for older browsers that don't support variable-length lookbehinds
-    processedText = text;
-  }
 
   while (i < processedText.length) {
     if (processedText[i] === '[') {
@@ -199,9 +304,16 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "" }) 
             elements.push(<span key={keyCount++}>{currentText}</span>);
             currentText = '';
           }
-          const term = tagContent.substring(8);
+          const content = tagContent.substring(8);
+          let term = content;
+          let info;
+          if (content.includes('|')) {
+            const parts = content.split('|');
+            term = parts[0];
+            info = { ko: parts[1], en: parts[2] || parts[1] };
+          }
           elements.push(
-            <TooltipWrapper key={keyCount++} term={term}>
+            <TooltipWrapper key={keyCount++} term={term} info={info} lang={lang}>
               {term}
             </TooltipWrapper>
           );
@@ -218,10 +330,23 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "" }) 
           const color = tagContent.substring(0, colonIndex);
           const content = tagContent.substring(colonIndex + 1);
           
+          // Auto-wrap terms with tooltips ONLY inside color tags
+          let processedContent = content;
+          Object.keys(TOOLTIP_DICTIONARY).forEach(term => {
+            const regex = new RegExp(`(?<!\\[[^\\]]*)\\b${term}\\b(?!\\s*\\])`, 'gi');
+            const koRegex = new RegExp(`(?<!\\[[^\\]]*)${term}(?!\\s*\\])`, 'g');
+            
+            if (/[a-zA-Z]/.test(term)) {
+              processedContent = processedContent.replace(regex, `[tooltip:${term}]`);
+            } else {
+              processedContent = processedContent.replace(koRegex, `[tooltip:${term}]`);
+            }
+          });
+
           // Recursively parse content in case of nested tags
           elements.push(
             <span key={keyCount++} style={{ color }}>
-              <ParsedText text={content} />
+              <ParsedText text={processedContent} lang={lang} />
             </span>
           );
           

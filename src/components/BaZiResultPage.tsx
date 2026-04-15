@@ -1169,7 +1169,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
                   {(vibePhase === 'question' || vibePhase === 'analysis') && (
                     <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                      <ParsedText text={cycleVibe.intro} />
+                      <ParsedText lang={lang} text={cycleVibe.intro} />
                     </p>
                   )}
 
@@ -1315,7 +1315,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           </p>
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
                             <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
-                              <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />
+                              <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />
                             </p>
                           </div>
                         </div>
@@ -1328,7 +1328,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           className="p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl"
                         >
                           <p className="text-xs sm:text-sm font-display text-white/90 italic mb-3">
-                            <ParsedText text={cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text || ''} />
+                            <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text || ''} />
                           </p>
                           <button
                             onClick={() => {
@@ -2034,7 +2034,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                   </span>
                                 </div>
                                 <div className="text-[10px] leading-relaxed text-white/80">
-                                  <ParsedText text={lang === 'KO' ? warning.description : warning.enDescription} />
+                                  <ParsedText lang={lang} text={lang === 'KO' ? warning.description : warning.enDescription} />
                                 </div>
                               </div>
                             ))}
@@ -2265,7 +2265,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                   )}
                                 </div>
                                 <div className="text-[11px] leading-relaxed text-white/60">
-                                  <ParsedText text={data.description} />
+                                  <ParsedText lang={lang} text={data.description} />
                                 </div>
                               </div>
                             ))}
@@ -2506,7 +2506,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
               <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
                 <p className="text-sm font-medium text-neon-cyan">{lang === 'KO' ? '일간 강약이란?' : 'What is DM Strength?'}</p>
                 <div className="text-xs leading-relaxed text-white/70">
-                  <ParsedText text={result.analysis.shinGangShinYak.summary} />
+                  <ParsedText lang={lang} text={result.analysis.shinGangShinYak.summary} />
                 </div>
               </div>
 
@@ -2514,13 +2514,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-white">{lang === 'KO' ? '나의 상태' : 'My Status'}</p>
                   <div className="text-xs leading-relaxed text-white/70">
-                    <ParsedText text={result.analysis.shinGangShinYak.description} />
+                    <ParsedText lang={lang} text={result.analysis.shinGangShinYak.description} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-white">{lang === 'KO' ? '사회적 발현' : 'Social Manifestation'}</p>
                   <div className="text-xs leading-relaxed text-white/70">
-                    <ParsedText text={result.analysis.shinGangShinYak.socialContext} />
+                    <ParsedText lang={lang} text={result.analysis.shinGangShinYak.socialContext} />
                   </div>
                 </div>
               </div>
@@ -2565,7 +2565,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
               <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
                 <div className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
-                  <ParsedText text={lang === 'KO' ? showMuJaDaJaInfo.description : (showMuJaDaJaInfo.enDescription || showMuJaDaJaInfo.description)} />
+                  <ParsedText lang={lang} text={lang === 'KO' ? showMuJaDaJaInfo.description : (showMuJaDaJaInfo.enDescription || showMuJaDaJaInfo.description)} />
                 </div>
               </div>
 
@@ -2644,7 +2644,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                     {result.analysis.personalizedInsights && Object.entries(result.analysis.personalizedInsights).map(([key, value]: [string, any]) => (
                       <li key={key}>
                         <span className="text-white/80 font-bold">
-                          <ParsedText text={lang === 'KO' ? value.ko : value.en} />
+                          <ParsedText lang={lang} text={lang === 'KO' ? value.ko : value.en} />
                         </span>
                       </li>
                     ))}
