@@ -302,7 +302,9 @@ export function generateCycleVibe(
       enSpecialGreeting = `Your chart has a unique 'Fire-Earth Heavy-Turbid' structure—dry, intense, and powerful. `;
     }
 
-    intro = `${enCityGreeting}${iljuInfo.en} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
+    const enIljuDesc = iljuInfo.en.replace(/^([A-Za-z-]+)/, "$1, which is your Day Pillar representing your core self,");
+
+    intro = `${enCityGreeting}${enIljuDesc} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
   }
 
   // 4. Cycle Intro Construction
@@ -1378,12 +1380,42 @@ export function generateCycleVibe(
 
   // 3+1 Strategy
   const allThemes: ThemeOption[] = [
-    { id: 'romance', title: '[심연의 이끌림]', question: "나를 구원할 인연일까, 아니면 나를 집어삼킬 악연일까? 내 안의 이 지독한 외로움이 향하는 곳을 알려줘.", priority: 100 },
-    { id: 'wealth', title: '[황금의 그림자]', question: "타오르는 열망이 금화가 되어 돌아올까? 아니면 한 줌의 재로 흩어질까? 내가 쥔 재물과 성취의 기회를 설명해줘.", priority: 100 },
-    { id: 'health', title: '[영혼의 균열]', question: "자꾸만 흔들리는 내 몸과 마음... 어떻게 해야 이 고통을 잠재우고 평화를 찾을 수 있을까?", priority: themeScores.health },
-    { id: 'secrets', title: '[금기된 페이지]', question: "입 밖으로 낼 수 없는 비밀, 혹은 나조차 모르는 내 안의 본능... 그 위험한 불길이 언제 타오를지 미리 경고해줘.", priority: themeScores.secrets },
-    { id: 'moving', title: '[궤도의 이탈]', question: "궤도의 이탈: 지금 머무는 이곳이 네 무덤일까, 아니면 발판일까?", priority: themeScores.moving },
-    { id: 'general', title: '[운명의 지도]', question: "올해의 전반적인 흐름과 오늘의 기운을 한눈에 보여줘.", priority: 90 }
+    { 
+      id: 'romance', 
+      title: lang === 'KO' ? '[심연의 이끌림]' : '[Attraction of the Abyss]', 
+      question: lang === 'KO' ? "나를 구원할 인연일까, 아니면 나를 집어삼킬 악연일까? 내 안의 이 지독한 외로움이 향하는 곳을 알려줘." : "Is it a connection that will save me, or an ill-fated one that will swallow me? Tell me where this terrible loneliness inside me is heading.", 
+      priority: 100 
+    },
+    { 
+      id: 'wealth', 
+      title: lang === 'KO' ? '[황금의 그림자]' : '[Shadow of Gold]', 
+      question: lang === 'KO' ? "타오르는 열망이 금화가 되어 돌아올까? 아니면 한 줌의 재로 흩어질까? 내가 쥔 재물과 성취의 기회를 설명해줘." : "Will my burning desire return as gold coins? Or will it scatter into a handful of ashes? Explain the opportunities for wealth and achievement I hold.", 
+      priority: 100 
+    },
+    { 
+      id: 'health', 
+      title: lang === 'KO' ? '[영혼의 균열]' : '[Crack in the Soul]', 
+      question: lang === 'KO' ? "자꾸만 흔들리는 내 몸과 마음... 어떻게 해야 이 고통을 잠재우고 평화를 찾을 수 있을까?" : "My body and mind keep shaking... How can I calm this pain and find peace?", 
+      priority: themeScores.health 
+    },
+    { 
+      id: 'secrets', 
+      title: lang === 'KO' ? '[금기된 페이지]' : '[Forbidden Page]', 
+      question: lang === 'KO' ? "입 밖으로 낼 수 없는 비밀, 혹은 나조차 모르는 내 안의 본능... 그 위험한 불길이 언제 타오를지 미리 경고해줘." : "Secrets I can't speak of, or instincts inside me that even I don't know... Warn me in advance when that dangerous flame will ignite.", 
+      priority: themeScores.secrets 
+    },
+    { 
+      id: 'moving', 
+      title: lang === 'KO' ? '[궤도의 이탈]' : '[Derailment of Orbit]', 
+      question: lang === 'KO' ? "궤도의 이탈: 지금 머무는 이곳이 네 무덤일까, 아니면 발판일까?" : "Derailment of Orbit: Is the place I'm staying now my grave, or a stepping stone?", 
+      priority: themeScores.moving 
+    },
+    { 
+      id: 'general', 
+      title: lang === 'KO' ? '[운명의 지도]' : '[Map of Destiny]', 
+      question: lang === 'KO' ? "올해의 전반적인 흐름과 오늘의 기운을 한눈에 보여줘." : "Show me the overall flow of this year and today's energy at a glance.", 
+      priority: 90 
+    }
   ];
 
   const topTargeted = allThemes

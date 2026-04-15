@@ -555,9 +555,9 @@ export default function App() {
                         />
                       </>
                     ) : (
-                      /* Date & Time Row (EN) */
-                      <div className="flex gap-2">
-                        <div className="relative flex-[1.2]">
+                      /* Date & Time Section (EN) */
+                      <>
+                        <div className="relative">
                           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
                           <input 
                             type="text"
@@ -593,14 +593,12 @@ export default function App() {
                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
                           />
                         </div>
-                        <div className="flex-1">
-                          <TimeInput 
-                            value={userInput.birthTime}
-                            onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
-                            lang={lang}
-                          />
-                        </div>
-                      </div>
+                        <TimeInput 
+                          value={userInput.birthTime}
+                          onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
+                          lang={lang}
+                        />
+                      </>
                     )}
 
                     {/* Gender Selection */}
