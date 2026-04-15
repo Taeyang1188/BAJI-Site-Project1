@@ -79,6 +79,84 @@ export const calculateAdvancedAnalysis = (
   };
 
   const isGwanSalHonJap = hasGod('정관') && hasGod('편관');
+
+  // --- New Special Statuses ---
+  const elementCounts: Record<string, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+  pillars.forEach(p => {
+    const sEl = BAZI_MAPPING.stems[p.stem as keyof typeof BAZI_MAPPING.stems]?.element;
+    const bEl = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
+    if (sEl) elementCounts[sEl]++;
+    if (bEl) elementCounts[bEl]++;
+  });
+  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0);
+  const elementRatios = Object.fromEntries(Object.entries(elementCounts).map(([k, v]) => [k, (v / totalElements) * 100]));
+
+  const inSeongBranchesCount = pillars.filter(p => {
+    const bEl = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
+    const rel = getRelationship(dmElement, bEl || '');
+    return rel === 'Wisdom';
+  }).length;
+
+  const isFireEarthHeavy = (elementRatios.Fire + elementRatios.Earth) >= 70 || inSeongBranchesCount >= 3;
+  const earthBranchesCount = pillars.filter(p => BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element === 'Earth').length;
+  const isGoldBuried = (dayMaster === '庚' || dayMaster === '辛') && earthBranchesCount >= 3;
+
+  const monthBranch = pillars.find(p => p.title === 'Month')?.branch || '';
+  const isWinter = ['亥', '子', '丑'].includes(monthBranch);
+  const isColdWater = (elementRatios.Metal + elementRatios.Water) >= 60 && isWinter;
+
+  const isSikSangIsolated = (gods.BiGyeop + gods.JaeSeong) >= 60 && gods.SikSang === 0;
+
+  const isDryChart = (elementRatios.Fire + elementRatios.Earth + elementRatios.Wood) >= 75 && elementRatios.Water <= 10;
+
+  const isColdWet = (monthBranch === '亥' || monthBranch === '子' || monthBranch === '丑') && (elementRatios.Water + elementRatios.Metal) >= 50;
+  const isHotDry = (monthBranch === '巳' || monthBranch === '午' || monthBranch === '未') && elementRatios.Fire >= 40;
+  const isWoodHeavy = elementRatios.Wood >= 45;
+
+  // --- Universal Energy Balancing Engine ---
+  const monthBranchElement = BAZI_MAPPING.branches[monthBranch as keyof typeof BAZI_MAPPING.branches]?.element || '';
+  const dayBranch = pillars.find(p => p.title === 'Day')?.branch || '';
+  const dayBranchElement = BAZI_MAPPING.branches[dayBranch as keyof typeof BAZI_MAPPING.branches]?.element || '';
+  
+  // Detect Overloaded/Surplus Element
+  // 1. Ratio >= 45%
+  // 2. Ratio >= 35% AND it's in the Month Branch (Strongest influence)
+  // 3. Ratio >= 35% AND it's in the Day Branch
+  const surplusElement = Object.entries(elementRatios).find(([el, ratio]) => {
+    if (ratio >= 45) return true;
+    if (ratio >= 35 && (el === monthBranchElement || el === dayBranchElement)) return true;
+    return false;
+  })?.[0] || null;
+
+  const surplusGod = Object.entries(gods).find(([_, ratio]) => ratio >= 40)?.[0] || null;
+  
+  // Palace State Detection
+  const dayBranchInteractions = interactions.filter(i => i.note.includes(dayBranch));
+  const hasHapInChart = dayBranchInteractions.some(i => i.type.includes('합'));
+  const hasChungInChart = dayBranchInteractions.some(i => i.type.includes('충'));
+  
+  // If the day branch is being controlled by many elements in the chart
+  const controllingElement = ELEMENT_CYCLE[(ELEMENT_CYCLE.indexOf(dayBranchElement) + 4) % 5];
+  const controlCount = pillars.filter(p => {
+    const sEl = BAZI_MAPPING.stems[p.stem as keyof typeof BAZI_MAPPING.stems]?.element;
+    const bEl = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
+    return sEl === controllingElement || bEl === controllingElement;
+  }).length;
+  
+  const palaceState = (controlCount >= 3 || hasChungInChart) ? 'suppressed' : (!hasHapInChart ? 'unstable' : 'stable');
+
+  // --- Special Combinations (물상론) ---
+  const hasJeongFire = pillars.some(p => p.stem === '丁' || (BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.hiddenStems || []).includes('丁'));
+  const hasJinEarth = pillars.some(p => p.branch === '辰');
+
+  const specialCombinations = {
+    isByeokGapInHwa: dayMaster === '甲' && hasJeongFire, // Will check Gyeong Metal in cycle-vibe
+    isDengLaJieJia: dayMaster === '乙', // Will check Gap Wood in cycle-vibe
+    isDoSeJuOk: dayMaster === '辛', // Will check Im Water in cycle-vibe
+    isGangHwiSangYeong: dayMaster === '壬', // Will check Byeong Fire in cycle-vibe
+    isHwaChiSeungRyong: (elementRatios.Fire >= 50) && hasJinEarth,
+    isGiToTakIm: dayMaster === '壬' // Will check Gi Earth in cycle-vibe
+  };
   
   // 1. Mu-Ja-Ron (Absence of Ten Gods)
   const muJaRon = Object.entries(tenGodsRatio)
@@ -184,7 +262,7 @@ export const calculateAdvancedAnalysis = (
           muGwanDesc = `열기를 식혀줄 [${waterCol}:수(水)]가 없는 '꺼지지 않는 불꽃'이야. 감정 조절이나 차분한 마무리가 어려울 수 있으니, 명상이나 정적인 취미를 통해 내면의 평화를 찾는 것이 중요해.`;
           muGwanDescEn = `An 'unquenchable flame' without [${waterCol}:Water] to cool the heat. Emotional regulation or calm conclusions may be difficult; finding inner peace through meditation is crucial.`;
         } else if (dmElement === 'Earth') {
-          muGwanDesc = `토를 단단하게 잡아줄 [${woodCol}:목(목)]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.`;
+          muGwanDesc = `토를 단단하게 잡아줄 [${woodCol}:목(木)]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.`;
           muGwanDescEn = `A 'pillarless land' without [${woodCol}:Wood] to hold the Earth. Life's direction can easily waver; establish strong pillars through clear goal setting and self-improvement.`;
         } else if (dmElement === 'Metal') {
           muGwanDesc = `강한 금을 제련할 [${fireCol}:화(火)]가 없는 '제련되지 않은 원석'이야. 자신의 재능을 다듬고 빛내기 위해 혹독한 자기 훈련과 인내의 시간이 필요해.`;
@@ -934,7 +1012,7 @@ export const calculateAdvancedAnalysis = (
       Output: { ko: '꽃을 피우는 표현력 (식상 - 화(火))', en: 'Expressive power to bloom (Artist/Rebel - Fire(火))' },
       Wealth: { ko: '부동산 및 현실적 안정감 (재성 - 토(土))', en: 'Real estate and realistic stability (Maverick/Architect - Earth(土))' },
       Power: { ko: '나를 다듬는 절제력 (관성 - 금(金))', en: 'Self-discipline to refine me (Warrior/Judge - Metal(金))' },
-      Wisdom: { ko: '나를 키우는 자양분 (인성 - 수(水))', en: 'Nutrients that grow me (Mystic/Sage - Water(수))' }
+      Wisdom: { ko: '나를 키우는 자양분 (인성 - 수(水))', en: 'Nutrients that grow me (Mystic/Sage - Water(水))' }
     },
     Fire: {
       Self: { ko: '나의 열정과 에너지 (비겁 - 화(火))', en: 'My passion and energy (Mirror/Rival - Fire(火))' },
@@ -1054,6 +1132,21 @@ export const calculateAdvancedAnalysis = (
     shinGangShinYak,
     personalizedInsights,
     dayMasterElement: dmElement,
+    specialStatuses: {
+      isFireEarthHeavy,
+      isGoldBuried,
+      isColdWater,
+      isSikSangIsolated,
+      isDryChart,
+      isColdWet,
+      isHotDry,
+      isWoodHeavy,
+      elementRatios,
+      surplusElement,
+      surplusGod,
+      palaceState
+    },
+    specialCombinations,
     geokGukDetail: {
       geonRok: isGeonRok,
       yangIn: isYangIn,
