@@ -300,10 +300,10 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     return relMap[getRelationship(dmElement, el)] || "";
   };
 
-  const totalScore = Object.values(strength.elementScores).reduce((a: any, b: any) => a + Math.max(0, b), 0);
+  const totalScore = Object.values(strength.elementScores).reduce((a: number, b: any) => a + Math.max(0, Number(b)), 0) as number;
   const ratios: Record<string, number> = {};
   Object.entries(strength.elementScores).forEach(([el, score]: [string, any]) => {
-    ratios[el] = (score / totalScore) * 100;
+    ratios[el] = (Number(score) / (totalScore || 1)) * 100;
   });
 
   const fireRatio = ratios['Fire'] || 0;

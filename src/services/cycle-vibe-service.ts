@@ -233,7 +233,7 @@ export function generateCycleVibe(
   const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
 
   if (isFrozen && isFireLuck) {
-    comboInsight = `이번 시기는 **'해동(解凍)'**의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`;
+    comboInsight = `이번 시기는 '해동(解凍)'의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`;
   }
 
   if (combos.length > 0 && !comboInsight) {
@@ -242,11 +242,11 @@ export function generateCycleVibe(
     const is2026 = currentAnnualPillar?.year === 2026;
 
     if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
-      comboInsight = `이번 시기는 **'화다금용(火多金鎔)'**의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
+      comboInsight = `이번 시기는 '화다금용(火多金鎔)'의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
     } else if (combos.length === 1) {
-      comboInsight = `이번 시기는 **'${combos[0].name}'**의 격을 갖췄어. ${combos[0].desc}`;
+      comboInsight = `이번 시기는 '${combos[0].name}'의 격을 갖췄어. ${combos[0].desc}`;
     } else {
-      comboInsight = `**'${combos[0].name}'**의 흐름이 주도적이지만, 동시에 **'${combos[1].name}'**의 영향도 무시할 수 없어. \n\n${combos[0].desc} ${combos[1].desc}`;
+      comboInsight = `'${combos[0].name}'의 흐름이 주도적이지만, 동시에 '${combos[1].name}'의 영향도 무시할 수 없어. \n\n${combos[0].desc} ${combos[1].desc}`;
     }
   }
 
@@ -308,7 +308,7 @@ export function generateCycleVibe(
     const balanceWarnings = analysis.balanceWarnings || [];
     if (balanceWarnings.length > 0) {
       const primaryWarning = balanceWarnings[0];
-      balanceComment = `\n\n특히 ${processedName} 너는 **'${primaryWarning.title}'**의 기운이 강하게 느껴져. ${primaryWarning.description} `;
+      balanceComment = `\n\n특히 ${processedName} 너는 '${primaryWarning.title}'의 기운이 강하게 느껴져. ${primaryWarning.description} `;
     }
 
     let introPrefix = '';
@@ -404,9 +404,9 @@ export function generateCycleVibe(
         if (isFireExtreme) {
           detailedEffect += `2026년의 병오(丙午)라는 거대한 불기둥은 너에게 '열정'이라기보다 '과열'에 가까운 압박으로 다가올 거야. `;
           if (isBokEum) {
-            detailedEffect += `특히 네 원국과 똑같은 기운이 들어오는 **'복음(伏吟)'**의 해라, 엎드려 울 일이 생길 만큼 자기 확신이 독이 될 수 있어. `;
+            detailedEffect += `특히 네 원국과 똑같은 기운이 들어오는 '복음(伏吟)'의 해라, 엎드려 울 일이 생길 만큼 자기 확신이 독이 될 수 있어. `;
           } else if (isJaHyeong) {
-            detailedEffect += `스스로를 옥죄는 **'자형(自刑)'**의 기운이 겹치니, 네 고집이 결국 너를 찌르는 칼날이 되지 않게 조심해야 해. `;
+            detailedEffect += `스스로를 옥죄는 '자형(自刑)'의 기운이 겹치니, 네 고집이 결국 너를 찌르는 칼날이 되지 않게 조심해야 해. `;
           }
         } else if (isYongShinYear) {
           detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 아이디어가 드디어 '공인된 문서'나 '자격'으로 변하는 시기니, 겁먹지 말고 그 기운을 온전히 타도 좋아. `;
@@ -421,7 +421,7 @@ export function generateCycleVibe(
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상 (Artist/Rebel)'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `사람들은 이걸 보고 **'상관패인'**이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 **'화다금용(火多金鎔)'**의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 **'디펜스'**가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
+          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
         } else if (!isFireExtreme) {
           detailedEffect += `상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
         }
@@ -527,7 +527,7 @@ export function generateCycleVibe(
       const isFireJeonWang = isJeonWang && (analysis.yongshinDetail?.primary?.element === 'Fire' || analysis.yongshinDetail?.primary?.element?.includes('Fire'));
       
       if (isFireJeonWang && isWaterYear) {
-        glitch = `**왕신충발(旺神衝發)** 주의. 거대한 변화가 예상돼. 감당할 수 없는 수준의 환경 변화와 건강 관리가 필수야. 변화를 거부하지 말고, 기존의 고집(인성)을 버리고 철저히 현실(재성)의 논리를 따를 때만 살아남아 성공할 수 있어. `;
+        glitch = `왕신충발(旺神衝發) 주의. 거대한 변화가 예상돼. 감당할 수 없는 수준의 환경 변화와 건강 관리가 필수야. 변화를 거부하지 말고, 기존의 고집(인성)을 버리고 철저히 현실(재성)의 논리를 따를 때만 살아남아 성공할 수 있어. `;
       } else if (!isFireExtreme) {
         glitch = `운의 흐름이 비교적 매끄러운 편이지만, 네 페이스를 잃지 않는 게 중요해. 주변 소음보다는 네 내면의 목소리에 더 집중해봐. `;
       } else {
@@ -779,9 +779,14 @@ export function generateCycleVibe(
         const isWonJin = wonJinPairs[dayBranch] === yZhi;
 
         // Check if the year completes a Sam-hap or Bang-hap with the rest of the chart
-        const samHapGroups = [
-          ['亥', '卯', '未'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['申', '子', '辰']
+        const samHapDetails = [
+          { group: ['亥', '卯', '未'], element: 'Wood' },
+          { group: ['寅', '午', '戌'], element: 'Fire' },
+          { group: ['巳', '酉', '丑'], element: 'Metal' },
+          { group: ['申', '子', '辰'], element: 'Water' }
         ];
+        const samHapGroups = samHapDetails.map(d => d.group);
+
         const bangHapGroups = [
           ['寅', '卯', '辰'], ['巳', '午', '未'], ['申', '酉', '戌'], ['亥', '子', '丑']
         ];
@@ -795,6 +800,26 @@ export function generateCycleVibe(
           group.includes(yZhi) && 
           group.filter(b => b !== yZhi).every(b => allBranches.includes(b))
         );
+
+        // Determine if Hap creates a bad element
+        let isBadHap = false;
+        let isGoodHap = false;
+        let hapElement = '';
+        
+        const activeSamHap = samHapDetails.find(d => d.group.includes(yZhi) && d.group.includes(dayBranch) && yZhi !== dayBranch);
+        if (activeSamHap) {
+          hapElement = activeSamHap.element;
+          const giShinEl = yongshinDetail.giShin?.element || '';
+          const guShinEl = yongshinDetail.guShin?.element || '';
+          const primaryEl = yongshinDetail.primary?.element || '';
+          const heeShinEl = yongshinDetail.heeShin?.element || '';
+          
+          if (giShinEl.includes(hapElement) || guShinEl.includes(hapElement)) {
+            isBadHap = true;
+          } else if (primaryEl.includes(hapElement) || heeShinEl.includes(hapElement)) {
+            isGoodHap = true;
+          }
+        }
 
         // --- 1. Primary Triggers (Hierarchy) ---
         
@@ -1004,7 +1029,7 @@ export function generateCycleVibe(
         // Priority 2: Useful God Clash for Weak Charts
         const isUsefulGodClash = dmScore < 50 && isChungDay && (yZhiElement === 'Metal' || yZhiElement === 'Water');
         
-        const isHapDay = (yukHapPairs[dayBranch] === yZhi) || samHapGroups.some(group => group.includes(yZhi) && group.includes(dayBranch));
+        const isHapDay = (yukHapPairs[dayBranch] === yZhi) || samHapGroups.some(group => group.includes(yZhi) && group.includes(dayBranch) && yZhi !== dayBranch);
         const palaceState = specialStatuses.palaceState;
 
         if (isUsefulGodClash) {
@@ -1034,14 +1059,37 @@ export function generateCycleVibe(
 
         // Destiny's Decalcomania
         const isDongChak = yGan === daewunStem && yZhi === daewunBranch;
+        let isDongChakYongShin = false;
+        let isDongChakGiShin = false;
+        
         if (isDongChak) {
-          yearScore += 45;
-          if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치는 '운명의 데칼코마니' 시기야." : "A period of 'Destiny's Decalcomania'.";
+          const dongChakElement = yZhiElement; // Use branch as primary energy
+          const primaryEl = yongshinDetail.primary?.element || '';
+          const heeShinEl = yongshinDetail.heeShin?.element || '';
+          const giShinEl = yongshinDetail.giShin?.element || '';
+          const guShinEl = yongshinDetail.guShin?.element || '';
+          
+          if (primaryEl.includes(dongChakElement) || heeShinEl.includes(dongChakElement)) {
+            isDongChakYongShin = true;
+            yearScore += 500; // Massive bonus
+            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치며 용신이 폭발하는 '운명의 확정' 시기야." : "A period of 'Destiny's Confirmation' where Useful God explodes.";
+          } else if (giShinEl.includes(dongChakElement) || guShinEl.includes(dongChakElement)) {
+            isDongChakGiShin = true;
+            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치며 기신이 폭발하는 맹렬한 시기야." : "A fierce period where Detrimental God explodes.";
+          } else {
+            yearScore += 45;
+            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치는 '운명의 데칼코마니' 시기야." : "A period of 'Destiny's Decalcomania'.";
+          }
         }
 
         // --- 4. Final Penalty Application (Excluding Breakthrough) ---
-        const isUsefulGodYear = yGanElement === yongShinElementFromDetail || yZhiElement === yongShinElementFromDetail || triggerElement === yongShinElementFromDetail;
-        const isGiShinYear = !isUsefulGodYear && (yGanElement === controlsDm || yZhiElement === controlsDm || yGanElement === reinforcesDm || yZhiElement === reinforcesDm);
+        const primaryEl = yongshinDetail.primary?.element || '';
+        const heeShinEl = yongshinDetail.heeShin?.element || '';
+        const giShinEl = yongshinDetail.giShin?.element || '';
+        const guShinEl = yongshinDetail.guShin?.element || '';
+
+        const isUsefulGodYear = [primaryEl, heeShinEl].some(el => el && (yGanElement === el || yZhiElement === el || triggerElement === el));
+        const isGiShinYear = [giShinEl, guShinEl].some(el => el && (yGanElement === el || yZhiElement === el));
         const isMonarchStructure = yongshinDetail.method === "전왕격용신";
 
         // Check if year branch forms a Hap that results in Gwan (Harmful for Gwan-da)
@@ -1089,7 +1137,7 @@ export function generateCycleVibe(
         // Check if year branch activates Gender Star in chart via Hap
         const activatesGenderStarInChart = chartGenderStarBranches.some(b => {
           if (yukHapPairs[b] === yZhi) return true;
-          return samHapGroups.some(group => group.includes(b) && group.includes(yZhi));
+          return samHapGroups.some(group => group.includes(b) && group.includes(yZhi) && b !== yZhi);
         });
         
         const hasGenderStarEvent = hasGenderStarInYear || isGenderStemHap || activatesGenderStarInChart;
@@ -1097,12 +1145,11 @@ export function generateCycleVibe(
         const hasMarriageEvent = hasGenderStarEvent || isPalaceActivated;
 
         // --- Step C: Gi-shin Filter (기신운 필터) ---
-        const isWealthGiShin = isPowerHeavy && (yGanElement === wealth || yZhiElement === wealth);
+        const isWealthGiShin = (yGanElement === wealth || yZhiElement === wealth) && (giShinEl.includes(wealth) || guShinEl.includes(wealth));
         
         let giShinPenalty = 0;
         if (!isMonarchStructure) {
           if (isGiShinYear) {
-            const isReinforcingGiShin = yGanElement === reinforcesDm || yZhiElement === reinforcesDm || yGanElement === selfDm || yZhiElement === selfDm;
             if (dmScore < 50 || isWealthGiShin) {
               // Weak Day Master or Power-heavy chart with Wealth (feeding power): Gi-shin luck is a critical penalty for marriage
               giShinPenalty = 300;
@@ -1118,8 +1165,13 @@ export function generateCycleVibe(
 
         // If it's the past and a strong event actually happened, reduce the penalty to highlight the actual event
         if (isPastLuck && hasGenderStarEvent && isPalaceActivated) {
-            giShinPenalty = 0; 
+            giShinPenalty = giShinPenalty * 0.5; // Don't zero it out completely, but reduce it so it can still surface as an event year
         }
+        
+        if (isDongChakGiShin) {
+          giShinPenalty *= 3.0; // Massive penalty for DongChak Gi-shin
+        }
+        
         yearScore -= giShinPenalty;
 
         let eventScore = 0;
@@ -1157,37 +1209,73 @@ export function generateCycleVibe(
         }
         yearScore -= clashPenalty;
 
+        // --- Bad Hap Penalty & Jo-hu Solution Bonus ---
+        if (isBadHap) {
+          if (!isPastLuck) {
+            yearScore -= 400; // Massive penalty for future bad haps to prevent them from ranking high
+          } else {
+            yearScore -= 100; // Still penalize past bad haps, but less so they can still show up as events
+          }
+        }
+
+        const isJoHuSolution = !isPastLuck && (
+          (isHotAndDry && (yZhiElement === 'Metal' || yZhiElement === 'Water')) ||
+          (isColdAndWet && (yZhiElement === 'Fire' || yZhiElement === 'Wood'))
+        );
+
+        if (isJoHuSolution) {
+          yearScore += 300; // Massive bonus for future Jo-hu solutions
+        }
+
         // Final Marriage Ranking Score
         let finalMarriageScore = yearScore + eventScore;
         
         // Event Filter: If no significant marriage event, it's just personal luck
-        if (!hasMarriageEvent) {
+        if (!hasMarriageEvent && !isJoHuSolution && !isDongChakYongShin) {
           finalMarriageScore -= 300; 
         }
 
         // --- Narrative Mapping ---
         let clashNarrative = '';
         if (isClashYear) {
-          clashNarrative = "\n\n이 시기에는 감정적인 혼인신고보다는 충분한 시간을 둔 검증이 필요합니다.";
+          clashNarrative = "\n\n이 시기에는 감정적인 혼인신고보다는 충분한 시간을 둔 검증이 필요해.";
         }
-        if (hasMarriageEvent && !isForcedPenalty) {
+        
+        let isFullSentence = false;
+        
+        if ((hasMarriageEvent || isJoHuSolution || isDongChakYongShin) && !isForcedPenalty) {
           let narrative = '';
-          if (isBreakthrough) {
+          if (isPastLuck && isClashYear) {
+            narrative = lang === 'KO' ? "안방이 폭발하듯 흔들린 격변의 해. 강렬한 인연이 스쳤으나 감정적 소모가 극심했을 수 있어." : "A year of upheaval where the palace shook explosively. A strong connection may have passed by, but emotional drain was likely severe.";
+          } else if (isPastLuck && isBadHap) {
+            narrative = lang === 'KO' ? "인연의 끌림은 강했으나, 현실적 압박과 스트레스가 가중되었던 맹렬한 시기야." : "The pull of connection was strong, but it was a fierce period with increased realistic pressure and stress.";
+          } else if (isJoHuSolution) {
+            narrative = lang === 'KO' ? "사주의 조후(온도)가 완벽히 해결되며, 심리적 안정과 함께 가장 이상적인 인연이 찾아오는 황금기야." : "The temperature of your chart is perfectly resolved, bringing psychological stability and the most ideal connection in this golden period.";
+          } else if (isBreakthrough) {
             narrative = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집는 강력한 결실(식신제살)" : "A powerful breakthrough where you flip the board of destiny with your own will (Sik-sin-je-sal)";
+          } else if (isGiShinYear || isWealthGiShin || isBadHap) {
+            narrative = lang === 'KO' ? "인연은 강하게 들어오나 감정적 소모나 현실적 압박이 커지는 시기 (철저한 검증 필요)" : "Strong connection but emotional drain or realistic pressure increases (Thorough verification needed)";
           } else if (isChungDay && isUsefulGodYear) {
             narrative = lang === 'KO' ? "안방의 질서를 재편하는 돌파의 해" : "A year of breakthrough reorganizing the palace order";
           } else if (isHapDay && isUsefulGodYear) {
             narrative = lang === 'KO' ? "다정한 결속과 안착의 해" : "A year of tender bond and settling down";
           } else if (isHapDay && !isUsefulGodYear) {
             narrative = lang === 'KO' ? "인연은 강하나 인내와 희생이 필요한 해" : "Strong connection but requires patience and sacrifice";
+          } else {
+            narrative = lang === 'KO' ? "새로운 인연의 기운이 감도는 해" : "A year with the energy of a new connection";
           }
 
           if (narrative) triggerReason = narrative;
 
+          isFullSentence = triggerReason.endsWith('.') || triggerReason.endsWith('야') || triggerReason.endsWith('어') || triggerReason.endsWith('지') || triggerReason.endsWith('다') || triggerReason.endsWith('요');
+
           const eventText = lang === 'KO' ? 
             (hasGenderStarEvent && isPalaceActivated ? " (배우자운+안방활성화)" : hasGenderStarEvent ? " (배우자운 등장)" : " (안방 활성화)") :
             (hasGenderStarEvent && isPalaceActivated ? " (Spouse+Palace Active)" : hasGenderStarEvent ? " (Spouse Event)" : " (Palace Active)");
-          triggerReason += eventText;
+          
+          if ((!isJoHuSolution && !isDongChakYongShin) || hasMarriageEvent) {
+            triggerReason += eventText;
+          }
         }
 
         // --- 6. Time Decay (현실적 개연성 보정) ---
@@ -1307,7 +1395,8 @@ export function generateCycleVibe(
           goldenMonths, 
           age, 
           triggerElement: yongShinElement,
-          branchAction
+          branchAction,
+          isFullSentence
         });
       }
 
@@ -1341,8 +1430,8 @@ export function generateCycleVibe(
       const isPressureYear = luck.triggerElement === 'Fire' && (dayMaster === '庚' || dayMaster === '辛');
 
       const goldenTime = luck.goldenMonths && luck.goldenMonths.length > 0 ? (lang === 'KO' ? 
-        (isPast ? ` 특히 **${luck.goldenMonths.join(', ')}**은 네 기운이 가장 핫했던 '골든 타임'이었어.` : ` 특히 **${luck.goldenMonths.join(', ')}**은 네 기운이 피크를 찍는 '골든 타임'이니까 절대 놓치지 마.`) : 
-        (isPast ? ` Especially **${luck.goldenMonths.join(', ')}** was your 'Golden Time' when your energy shone the brightest.` : ` Especially **${luck.goldenMonths.join(', ')}** is your 'Golden Time' when your energy peaks.`)) : '';
+        (isPast ? ` 특히 ${luck.goldenMonths.join(', ')}은 네 기운이 가장 핫했던 '골든 타임'이었어.` : ` 특히 ${luck.goldenMonths.join(', ')}은 네 기운이 피크를 찍는 '골든 타임'이니까 절대 놓치지 마.`) : 
+        (isPast ? ` Especially ${luck.goldenMonths.join(', ')} was your 'Golden Time' when your energy shone the brightest.` : ` Especially ${luck.goldenMonths.join(', ')} is your 'Golden Time' when your energy peaks.`)) : '';
 
       const getNarrative = (koPrime: string, koOther: string, enPrime: string, enOther: string) => {
         if (lang === 'KO') {
@@ -1393,7 +1482,7 @@ export function generateCycleVibe(
                              .replace(/있습니다/g, '있어');
           }
           
-          return finalKo;
+          return finalKo.replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '');
         }
         
         let finalEn = isEarlyPrime ? enPrime : enOther;
@@ -1418,38 +1507,38 @@ export function generateCycleVibe(
                            .replace(/takes root/g, 'took root');
         }
         
-        return finalEn;
+        return finalEn.replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '');
       };
 
       if (luck.reason?.includes('식상운') || luck.reason?.includes('Sik-sang')) {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 **식상운**의 해이야. 네 매력이 십분 발휘되면서, 네가 주도적으로 인연을 끌어당기고 관계의 결실을 보기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 **식상운**의 해이야. 네 매력이 십분 발휘되면서, 네가 주도적으로 인연을 끌어당기고 관계의 결실을 보기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Sik-sang** where your suppressed talents and energy burst out. As your charm is fully displayed, it's a great timing to actively attract a partner and see the fruits of the relationship.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Sik-sang** where your suppressed talents and energy burst out. As your charm is fully displayed, it's a great timing to actively attract a partner and see the fruits of the relationship.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 식상운의 해이야. 네 매력이 십분 발휘되면서, 네가 주도적으로 인연을 끌어당기고 관계의 결실을 보기에 아주 좋은 타이밍이지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 식상운의 해이야. 네 매력이 십분 발휘되면서, 네가 주도적으로 인연을 끌어당기고 관계의 결실을 보기에 아주 좋은 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sang where your suppressed talents and energy burst out. As your charm is fully displayed, it's a great timing to actively attract a partner and see the fruits of the relationship.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sang where your suppressed talents and energy burst out. As your charm is fully displayed, it's a great timing to actively attract a partner and see the fruits of the relationship.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason?.includes('무신년') || luck.reason?.includes('Mu-sin Year')) {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 뜨거운 열기를 식히고 보석을 캐내는 **무신(戊申)**의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 뜨거운 열기를 식히고 보석을 캐내는 **무신(戊申)**의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Mu-sin** to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Mu-sin** to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 뜨거운 열기를 식히고 보석을 캐내는 무신(戊申)의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 뜨거운 열기를 식히고 보석을 캐내는 무신(戊申)의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Mu-sin to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Mu-sin to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason?.includes('설기') || luck.reason?.includes('Seol-gi')) {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 넘치는 에너지가 드디어 결실로 이어지는 **설기(Seol-gi)**의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 넘치는 에너지가 드디어 결실로 이어지는 **설기(Seol-gi)**의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Seol-gi** where overflowing energy finally leads to fruition. A powerful timing where suppressed desires erupt into a practical union with a partner.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Seol-gi** where overflowing energy finally leads to fruition. A powerful timing where suppressed desires erupt into a practical union with a partner.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 넘치는 에너지가 드디어 결실로 이어지는 설기(Seol-gi)의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 넘치는 에너지가 드디어 결실로 이어지는 설기(Seol-gi)의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Seol-gi where overflowing energy finally leads to fruition. A powerful timing where suppressed desires erupt into a practical union with a partner.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Seol-gi where overflowing energy finally leads to fruition. A powerful timing where suppressed desires erupt into a practical union with a partner.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason?.includes('관인상생') || luck.reason?.includes('Gwan-in-sang-saeng')) {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 나를 억누르던 압박이 든든한 지원군으로 변하는 **관인상생**의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 나를 억누르던 압박이 든든한 지원군으로 변하는 **관인상생**의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Gwan-in-sang-saeng** where pressure turns into support. A great timing to find emotional stability with a partner who acts as a reliable shelter.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Gwan-in-sang-saeng** where pressure turns into support. A great timing to find emotional stability with a partner who acts as a reliable shelter.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 나를 억누르던 압박이 든든한 지원군으로 변하는 관인상생의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾기에 아주 좋은 타이밍이지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 나를 억누르던 압박이 든든한 지원군으로 변하는 관인상생의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾기에 아주 좋은 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Gwan-in-sang-saeng where pressure turns into support. A great timing to find emotional stability with a partner who acts as a reliable shelter.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Gwan-in-sang-saeng where pressure turns into support. A great timing to find emotional stability with a partner who acts as a reliable shelter.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
@@ -1462,10 +1551,10 @@ export function generateCycleVibe(
       }
 
       if (luck.branchAction === 'wonjin') {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 인연의 기운은 들어오지만 서로의 마음이 어긋나기 쉬운 **원진(Won-jin)**의 해이야. 급하게 결정하기보다는 서로를 깊이 이해하는 시간이 필요한 정체기라고 볼 수 있지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 마음의 갈등이 생기기 쉬운 **원진**의 기운이 흐르는 시기야. 감정적인 대응보다는 이성적인 대화로 관계를 풀어가는 지혜가 필요한 해지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Won-jin** where relationship energy enters but hearts can easily mismatch. It's a period of stagnation requiring time to understand each other deeply.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time when **Won-jin** energy flows, making emotional conflicts likely. A year requiring wisdom to resolve relationships through rational dialogue.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운은 들어오지만 서로의 마음이 어긋나기 쉬운 원진(Won-jin)의 해이야. 급하게 결정하기보다는 서로를 깊이 이해하는 시간이 필요한 정체기라고 볼 수 있지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 마음의 갈등이 생기기 쉬운 원진의 기운이 흐르는 시기야. 감정적인 대응보다는 이성적인 대화로 관계를 풀어가는 지혜가 필요한 해지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Won-jin where relationship energy enters but hearts can easily mismatch. It's a period of stagnation requiring time to understand each other deeply.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time when Won-jin energy flows, making emotional conflicts likely. A year requiring wisdom to resolve relationships through rational dialogue.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
@@ -1473,20 +1562,20 @@ export function generateCycleVibe(
         const evidence = luck.reason.match(/\((.*?)\)/)?.[1] || '';
         const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50; // Score was heavily penalized
         
-        let koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 네 안방 문을 발로 뻥 차고 들어오는 **강력한 합(${evidence})**의 기운이 역대급 변화를 일으키는 '결단과 시작'의 해이야. 환경의 변화가 곧 반려자와의 결합으로 이어지는 가장 핫한 타이밍이지.${goldenTime}`;
-        let koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 불안했던 안방을 단단하게 고정하는 **강력한 합(${evidence})**의 기운 속에서 삶의 안정을 찾는 '재회와 안정'의 시기야. 주변의 축복 속에서 든든한 내 편과 함께 새로운 터전을 닦기에 딱 좋은 해지.${goldenTime}`;
+        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 네 안방 문을 발로 뻥 차고 들어오는 강력한 합(${evidence})의 기운이 역대급 변화를 일으키는 '결단과 시작'의 해이야. 환경의 변화가 곧 반려자와의 결합으로 이어지는 가장 핫한 타이밍이지.${goldenTime}`;
+        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 불안했던 안방을 단단하게 고정하는 강력한 합(${evidence})의 기운 속에서 삶의 안정을 찾는 '재회와 안정'의 시기야. 주변의 축복 속에서 든든한 내 편과 함께 새로운 터전을 닦기에 딱 좋은 해지.${goldenTime}`;
 
         if (isOverwhelmed) {
-          koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 안방의 합(${evidence})이 들어오긴 하는데, 이미 넘쳐나는 기운이 널 짓누르는 해이야. 네 의지보다는 주변 등쌀에 떠밀려 결정하기 쉬우니까 정신 바짝 차려야 해.${goldenTime}`;
-          koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 안방이 묶이는 기운 속에서 책임감이 어깨를 무겁게 누르는 시기야. 설렘보다는 "이제는 해야 하나" 하는 의무감이 앞설 수 있는 해지.${goldenTime}`;
+          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 안방의 합(${evidence})이 들어오긴 하는데, 이미 넘쳐나는 기운이 널 짓누르는 해이야. 네 의지보다는 주변 등쌀에 떠밀려 결정하기 쉬우니까 정신 바짝 차려야 해.${goldenTime}`;
+          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 안방이 묶이는 기운 속에서 책임감이 어깨를 무겁게 누르는 시기야. 설렘보다는 "이제는 해야 하나" 하는 의무감이 앞설 수 있는 해지.${goldenTime}`;
         }
         
         if (isStrongPillar && isPressureYear && !isOverwhelmed) {
-          koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 자존심 센 너에게 **강렬한 에너지의 부딪힘(${evidence})**이 발생하는 해이야. 단순한 만남을 넘어, 카리스마 넘치는 인연과 기 싸움 좀 하면서 뜨겁게 엮이는 '결단과 시작'의 타이밍이지.${goldenTime}`;
+          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 자존심 센 너에게 강렬한 에너지의 부딪힘(${evidence})이 발생하는 해이야. 단순한 만남을 넘어, 카리스마 넘치는 인연과 기 싸움 좀 하면서 뜨겁게 엮이는 '결단과 시작'의 타이밍이지.${goldenTime}`;
         }
 
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of 'Decision and Start' where the **Strong Combination (${evidence})** activating your inner palace initiates a grand change. The strongest timing where environmental changes lead to a union.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Reunion and Stability' where the **Strong Combination (${evidence})** settles your inner palace. The best year to build a new foundation with a reliable partner.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' where the Strong Combination (${evidence}) activating your inner palace initiates a grand change. The strongest timing where environmental changes lead to a union.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' where the Strong Combination (${evidence}) settles your inner palace. The best year to build a new foundation with a reliable partner.${goldenTime}`;
 
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
@@ -1494,31 +1583,31 @@ export function generateCycleVibe(
       if (luck.reason === '영토 확정(복음)' || luck.reason === 'Securing Territory') {
         const isPastInBlock = luck.year <= currentYear;
         
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 너랑 똑 닮은 도플갱어 같은 기운이 들어와 자리를 잡는 **영토 확정(복음)**의 해이야. 방황하던 마음이 반려자라는 정착지를 향해 단단하게 뿌리내릴 수 있는 '결단과 시작'의 타이밍이지. ${isPastInBlock ? '이미 그 기운을 느꼈을지도 모르겠네.' : '새로운 울타리를 세울 준비를 해봐.'}${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 너랑 똑같은 기운이 들어와 자리를 잡는 **영토 확정(복음)**의 기운 속에서 삶의 안정을 찾는 시기야. 마음의 평온을 찾으며 든든한 내 편과 함께 안착하기 좋은 해지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A timing of 'Decision and Start' where the **Securing Territory (Bok-eum)** energy firmly takes root towards a partner. ${isPastInBlock ? 'You might have already felt that energy.' : 'Prepare to build a new boundary.'}${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A precious time to find stability within the **Securing Territory** energy. A good year to settle down with a reliable partner.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 너랑 똑 닮은 도플갱어 같은 기운이 들어와 자리를 잡는 영토 확정(복음)의 해이야. 방황하던 마음이 반려자라는 정착지를 향해 단단하게 뿌리내릴 수 있는 '결단과 시작'의 타이밍이지. ${isPastInBlock ? '이미 그 기운을 느꼈을지도 모르겠네.' : '새로운 울타리를 세울 준비를 해봐.'}${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 너랑 똑같은 기운이 들어와 자리를 잡는 영토 확정(복음)의 기운 속에서 삶의 안정을 찾는 시기야. 마음의 평온을 찾으며 든든한 내 편과 함께 안착하기 좋은 해지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A timing of 'Decision and Start' where the Securing Territory (Bok-eum) energy firmly takes root towards a partner. ${isPastInBlock ? 'You might have already felt that energy.' : 'Prepare to build a new boundary.'}${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A precious time to find stability within the Securing Territory energy. A good year to settle down with a reliable partner.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason === '식상 설기(에너지의 결실)' || luck.reason === 'Fruit of Energy (Sik-sang Seol-gi)') {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 고구마 백 개 먹은 듯 답답했던 에너지를 사이다처럼 뻥 뚫어주는 **식상 설기**의 흐름이 '결단과 시작'을 이끄는 시기야. 억눌려 있던 열망이 '가정'이라는 실질적인 결과물을 만들어내는 시원한 분출구가 될 거야.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 답답했던 에너지가 시원하게 터지는 **식상 설기**의 흐름 속에서 삶의 무게를 덜어내고 안정을 찾는 해이야. 그동안의 삽질이 결실을 맺어, 평온한 일상을 함께할 동반자와의 인연이 깊어지는 시기지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Decision and Start' where the flow of **Sik-sang Seol-gi** releases blocked energy. Your desires will become a powerful outlet creating a practical outcome called 'family'.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year to find stability within the flow of **Sik-sang Seol-gi**. Your efforts bear fruit, deepening the connection with a partner for a peaceful daily life.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 고구마 백 개 먹은 듯 답답했던 에너지를 사이다처럼 뻥 뚫어주는 식상 설기의 흐름이 '결단과 시작'을 이끄는 시기야. 억눌려 있던 열망이 '가정'이라는 실질적인 결과물을 만들어내는 시원한 분출구가 될 거야.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 답답했던 에너지가 시원하게 터지는 식상 설기의 흐름 속에서 삶의 무게를 덜어내고 안정을 찾는 해이야. 그동안의 삽질이 결실을 맺어, 평온한 일상을 함께할 동반자와의 인연이 깊어지는 시기지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Decision and Start' where the flow of Sik-sang Seol-gi releases blocked energy. Your desires will become a powerful outlet creating a practical outcome called 'family'.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year to find stability within the flow of Sik-sang Seol-gi. Your efforts bear fruit, deepening the connection with a partner for a peaceful daily life.${goldenTime}`;
 
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason?.includes('인연은 오나 압박 가중') || luck.reason?.includes('Connection with increased pressure')) {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 인연의 기운은 들어오지만, 널 억누르는 책임감과 압박이 더 커지는 시기야. 섣부른 결합보다는 현재의 무게를 어떻게 덜어낼지 먼저 고민해야 하는 해지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: Connection energy enters, but responsibilities and pressure weighing you down increase. Rather than a hasty union, it's a year to first consider how to lighten your current burden.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운은 들어오지만, 널 억누르는 책임감과 압박이 더 커지는 시기야. 섣부른 결합보다는 현재의 무게를 어떻게 덜어낼지 먼저 고민해야 하는 해지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): Connection energy enters, but responsibilities and pressure weighing you down increase. Rather than a hasty union, it's a year to first consider how to lighten your current burden.${goldenTime}`;
       }
 
       if (luck.reason?.includes('나를 억눌러온 외부의 기대를 뚫고 나오는 돌파의 해') || luck.reason?.includes('breakthrough where you overcome')) {
-        const koBreakthrough = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 주변에서 "결혼 안 하냐"고 볶아대던 소음을 뚫고 나오는 **돌파의 해**야. 억눌렸던 에너지가 결실로 바뀌면서, 네 주관으로 인생의 동반자를 확정 짓는 강력한 타이밍이지.${goldenTime}`;
-        const enBreakthrough = `**${luck.year} (${luck.stem}${luck.branch})**: A year of breakthrough where you overcome external expectations and confirm your partner with your own will. A time when suppressed energy turns into fruit.${goldenTime}`;
+        const koBreakthrough = `${luck.year}년(${luck.stem}${luck.branch}년): 주변에서 "결혼 안 하냐"고 볶아대던 소음을 뚫고 나오는 돌파의 해야. 억눌렸던 에너지가 결실로 바뀌면서, 네 주관으로 인생의 동반자를 확정 짓는 강력한 타이밍이지.${goldenTime}`;
+        const enBreakthrough = `${luck.year} (${luck.stem}${luck.branch}): A year of breakthrough where you overcome external expectations and confirm your partner with your own will. A time when suppressed energy turns into fruit.${goldenTime}`;
         
         return getNarrative(koBreakthrough, koBreakthrough, enBreakthrough, enBreakthrough);
       }
@@ -1527,53 +1616,53 @@ export function generateCycleVibe(
         const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
         if (isOverwhelmed) {
           return lang === 'KO' ?
-            `**${luck.year}년(${luck.stem}${luck.branch}년)**: 대운과 세운이 겹치는 시기지만, 이미 넘쳐나는 기운이 널 압박하는 해이야. 변화를 꾀하기보다는 현재 자리를 지키며 주변 눈치 보느라 바쁜 시기가 될 수 있어.${goldenTime}` :
-            `**${luck.year} (${luck.stem}${luck.branch})**: A period where the grand cycle and annual pillar match, but the overwhelming energy adds pressure. It's a time of trying to meet external expectations rather than seeking change.${goldenTime}`;
+            `${luck.year}년(${luck.stem}${luck.branch}년): 대운과 세운이 겹치는 시기지만, 이미 넘쳐나는 기운이 널 압박하는 해이야. 변화를 꾀하기보다는 현재 자리를 지키며 주변 눈치 보느라 바쁜 시기가 될 수 있어.${goldenTime}` :
+            `${luck.year} (${luck.stem}${luck.branch}): A period where the grand cycle and annual pillar match, but the overwhelming energy adds pressure. It's a time of trying to meet external expectations rather than seeking change.${goldenTime}`;
         }
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 대운과 세운이 똑같은 글자로 들어오는 '운명의 데칼코마니' 시기야. 인생의 역대급 터닝포인트이자, 네 사회적 성취가 반려자와의 정착으로 이어지는 가장 선명한 마침표를 찍는 해지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A period of 'Destiny's Decalcomania' where the grand cycle and annual pillar match. A major turning point where your social achievements lead to settling with a partner.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 대운과 세운이 똑같은 글자로 들어오는 '운명의 데칼코마니' 시기야. 인생의 역대급 터닝포인트이자, 네 사회적 성취가 반려자와의 정착으로 이어지는 가장 선명한 마침표를 찍는 해지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A period of 'Destiny's Decalcomania' where the grand cycle and annual pillar match. A major turning point where your social achievements lead to settling with a partner.${goldenTime}`;
       }
 
       if (luck.reason === '에너지 과부하 해소 및 결단' || luck.reason === 'Resolution of Energy Surplus') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 꽉 막힌 에너지가 뚫리는 시기야. 널 짓누르던 책임감이나 고민이 해결되면서, 비로소 결혼이라는 인생의 큰 결정을 내릴 수 있는 여유와 용기가 생기는 해지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A time when blocked energy is released. As the responsibilities or worries that weighed you down are resolved, you gain the leisure and courage to make the major life decision of marriage.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 꽉 막힌 에너지가 뚫리는 시기야. 널 짓누르던 책임감이나 고민이 해결되면서, 비로소 결혼이라는 인생의 큰 결정을 내릴 수 있는 여유와 용기가 생기는 해지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A time when blocked energy is released. As the responsibilities or worries that weighed you down are resolved, you gain the leisure and courage to make the major life decision of marriage.${goldenTime}`;
       }
 
       if (luck.reason === '억눌린 안방의 활성화(충)' || luck.reason === 'Activation of Suppressed Palace (Clash)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 잠들어 있던 네 안방을 깨우는 **강력한 충(Clash)**의 기운이 들어오는 해이야. 남들은 충돌이라 하겠지만, 너한테는 정체된 관계를 깨고 새로운 시작을 선포하는 강력한 돌파구가 될 거야.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year where the **Strong Clash** activating your inner palace initiates a breakthrough. It will be a powerful trigger to break stagnant relationships and declare a new start.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 잠들어 있던 네 안방을 깨우는 강력한 충(Clash)의 기운이 들어오는 해이야. 남들은 충돌이라 하겠지만, 너한테는 정체된 관계를 깨고 새로운 시작을 선포하는 강력한 돌파구가 될 거야.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year where the Strong Clash activating your inner palace initiates a breakthrough. It will be a powerful trigger to break stagnant relationships and declare a new start.${goldenTime}`;
       }
 
       if (luck.reason === '불안정한 안방의 안착(합)' || luck.reason === 'Settling of Unstable Palace (Combination)') {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 불안정했던 안방을 단단하게 묶어주는 **강력한 합(Combination)**의 기운이 들어오는 해이야. 떠돌던 마음이 비로소 안식처를 찾고, 새로운 출발을 하기에 아주 좋은 시기지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 불안정했던 안방을 단단하게 묶어주는 **강력한 합(Combination)**의 기운 속에서 삶의 파도를 지나 평온한 항구에 도착하는 시기야. 소중한 인연과 함께 단단한 약속을 맺기에 최적의 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of 'Decision and Start' where the **Strong Combination** settling your inner palace brings peace. Strong bonding energy enters to stabilize your life for a new beginning.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Stability' where the **Strong Combination** brings you to a peaceful harbor. The best timing to share life's burden by making a firm promise.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 불안정했던 안방을 단단하게 묶어주는 강력한 합(Combination)의 기운이 들어오는 해이야. 떠돌던 마음이 비로소 안식처를 찾고, 새로운 출발을 하기에 아주 좋은 시기지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 불안정했던 안방을 단단하게 묶어주는 강력한 합(Combination)의 기운 속에서 삶의 파도를 지나 평온한 항구에 도착하는 시기야. 소중한 인연과 함께 단단한 약속을 맺기에 최적의 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' where the Strong Combination settling your inner palace brings peace. Strong bonding energy enters to stabilize your life for a new beginning.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Stability' where the Strong Combination brings you to a peaceful harbor. The best timing to share life's burden by making a firm promise.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason === '벽갑인화(관념의 현실화)' || luck.reason === 'Realization of Concept (Byeok-gap)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 투박한 통나무가 날카로운 도끼를 만나서 쓸모 있는 도구로 변하는 **벽갑인화**의 해이야. 막연했던 계획이 실질적인 결과물로 바뀌면서, 결혼이라는 관념이 현실로 구체화되는 강력한 타이밍이지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Byeok-gap In-hwa** where a rough giant tree meets an axe and turns into a useful tool. Vague plans turn into practical results.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 투박한 통나무가 날카로운 도끼를 만나서 쓸모 있는 도구로 변하는 벽갑인화의 해이야. 막연했던 계획이 실질적인 결과물로 바뀌면서, 결혼이라는 관념이 현실로 구체화되는 강력한 타이밍이지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year of Byeok-gap In-hwa where a rough giant tree meets an axe and turns into a useful tool. Vague plans turn into practical results.${goldenTime}`;
       }
 
       if (luck.reason?.includes('다정한 결속(천간 합)') || luck.reason?.includes('Tender Bond (Stem Combination)')) {
         const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
         
-        let koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 일간과 운의 글자가 서로를 강하게 끌어당기는 **다정한 결속(천간 합)**의 해이야. 애매했던 관계가 확실한 약속으로 굳어지며, 서로에게 깊이 안착하는 강력한 타이밍이지.${goldenTime}`;
-        let koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 일간과 운의 글자가 서로를 강하게 끌어당기는 **다정한 결속(천간 합)**의 기운 속에서 삶의 안정을 찾는 시기야. 든든한 동반자와 함께 안락한 미래를 약속하기에 아주 좋은 해이지.${goldenTime}`;
+        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 일간과 운의 글자가 서로를 강하게 끌어당기는 다정한 결속(천간 합)의 해이야. 애매했던 관계가 확실한 약속으로 굳어지며, 서로에게 깊이 안착하는 강력한 타이밍이지.${goldenTime}`;
+        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 일간과 운의 글자가 서로를 강하게 끌어당기는 다정한 결속(천간 합)의 기운 속에서 삶의 안정을 찾는 시기야. 든든한 동반자와 함께 안락한 미래를 약속하기에 아주 좋은 해이지.${goldenTime}`;
 
         if (isOverwhelmed) {
-          koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 천간의 합이 들어와 다정해 보이지만, 실제로는 널 억누르는 책임감이 더 커지는 해이야. 겉으로 보이는 화려함보다는 내면의 답답함을 해소하는 것이 우선인 시기지.${goldenTime}`;
-          koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 주변의 기대에 부응하려 애쓰는 시기야. 다정한 결속처럼 보일 수 있으나, 너한테는 삶의 무게가 가중되는 해가 될 수 있어.${goldenTime}`;
+          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 천간의 합이 들어와 다정해 보이지만, 실제로는 널 억누르는 책임감이 더 커지는 해이야. 겉으로 보이는 화려함보다는 내면의 답답함을 해소하는 것이 우선인 시기지.${goldenTime}`;
+          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 주변의 기대에 부응하려 애쓰는 시기야. 다정한 결속처럼 보일 수 있으나, 너한테는 삶의 무게가 가중되는 해가 될 수 있어.${goldenTime}`;
         }
 
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of 'Decision and Start' where the **Tender Bond (Stem Combination)** strongly pulls your essence and the year's energy together. Ambiguous relationships solidify into firm promises.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Reunion and Stability' where the **Tender Bond (Stem Combination)** brings peace. A very good year to promise a comfortable future with a reliable partner.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' where the Tender Bond (Stem Combination) strongly pulls your essence and the year's energy together. Ambiguous relationships solidify into firm promises.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' where the Tender Bond (Stem Combination) brings peace. A very good year to promise a comfortable future with a reliable partner.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
@@ -1582,73 +1671,73 @@ export function generateCycleVibe(
         if (specialStatuses.isWoodHeavy) keyword = lang === 'KO' ? '새로운 질서' : 'new order';
         else if (specialStatuses.isFireEarthHeavy || specialStatuses.isHotDry) keyword = lang === 'KO' ? '안락한 안식처' : 'comfortable shelter';
         
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 차갑게 얼어붙어 있던 네 원국에 **따뜻한 해빙**의 기운이 스며드는 '결단과 시작'의 시기야. 정서적 갈증이 해소되면서, 비로소 누군가를 온전히 받아들일 수 있는 마음의 여유가 생기지.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 차갑게 얼어붙어 있던 네 원국에 **따뜻한 해빙**의 기운이 스며들어 마음의 평온을 찾는 해이야. ${keyword} 속에서 소중한 인연과 함께 안착하기 좋은 타이밍이지.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A period of 'Decision and Start' where the **Thawing** energy permeates your frozen chart. As emotional thirst is quenched, you gain the peace of mind to fully accept someone.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of 'Reunion and Stability' where **Thawing** energy brings peace. A good timing to settle down with a precious partner within ${keyword}.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 차갑게 얼어붙어 있던 네 원국에 따뜻한 해빙의 기운이 스며드는 '결단과 시작'의 시기야. 정서적 갈증이 해소되면서, 비로소 누군가를 온전히 받아들일 수 있는 마음의 여유가 생기지.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 차갑게 얼어붙어 있던 네 원국에 따뜻한 해빙의 기운이 스며들어 마음의 평온을 찾는 해이야. ${keyword} 속에서 소중한 인연과 함께 안착하기 좋은 타이밍이지.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A period of 'Decision and Start' where the Thawing energy permeates your frozen chart. As emotional thirst is quenched, you gain the peace of mind to fully accept someone.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Reunion and Stability' where Thawing energy brings peace. A good timing to settle down with a precious partner within ${keyword}.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason === '정체 해소 및 실행(충)' || luck.reason === 'Resolution of Stagnation (Clash)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 고요하게 멈춰있던 안방의 기운을 강하게 때려 깨우는 '실행의 해'야. 남들은 충돌이라 하겠지만, 너한테는 정체된 관계를 깨고 결혼이라는 실제적인 '골인'으로 나아가는 강력한 트리거가 될 거야.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A 'Year of Execution' that strongly awakens the stagnant energy of your inner palace. It will be a powerful trigger to break stagnant relationships and move towards marriage.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 고요하게 멈춰있던 안방의 기운을 강하게 때려 깨우는 '실행의 해'야. 남들은 충돌이라 하겠지만, 너한테는 정체된 관계를 깨고 결혼이라는 실제적인 '골인'으로 나아가는 강력한 트리거가 될 거야.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A 'Year of Execution' that strongly awakens the stagnant energy of your inner palace. It will be a powerful trigger to break stagnant relationships and move towards marriage.${goldenTime}`;
       }
 
       if (luck.reason === '등라계갑(안정적 결합)' || luck.reason === 'Stable Union (Deng La Jie Jia)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 담쟁이덩굴이 거목을 만나는 **등라계갑**의 해이야. 강력한 조력자나 배우자의 든든한 기반 위에서 네 능력을 펼치고 안착하기에 최적의 시기지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Deng La Jie Jia** where ivy meets a giant tree. It's time to unfold your abilities on the foundation of a strong supporter or spouse.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 담쟁이덩굴이 거목을 만나는 등라계갑의 해이야. 강력한 조력자나 배우자의 든든한 기반 위에서 네 능력을 펼치고 안착하기에 최적의 시기지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year of Deng La Jie Jia where ivy meets a giant tree. It's time to unfold your abilities on the foundation of a strong supporter or spouse.${goldenTime}`;
       }
 
       if (luck.reason === '도세주옥(매력의 발현)' || luck.reason === 'Manifestation of Charm (Do-se-ju-ok)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 꼬질꼬질했던 보석이 맑은 물에 씻겨 광채를 내는 **도세주옥**의 해이야. 네 매력이 피크를 찍으면서, 소중한 인연의 시선을 단번에 사로잡기에 아주 좋은 시기지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Do-se-ju-ok** where a gemstone is washed and shines. Your value begins to receive the world's attention.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 꼬질꼬질했던 보석이 맑은 물에 씻겨 광채를 내는 도세주옥의 해이야. 네 매력이 피크를 찍으면서, 소중한 인연의 시선을 단번에 사로잡기에 아주 좋은 시기지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year of Do-se-ju-ok where a gemstone is washed and shines. Your value begins to receive the world's attention.${goldenTime}`;
       }
 
       if (luck.reason === '강휘상영(명예의 상승)' || luck.reason === 'Rise of Honor (Gang-hwi-sang-yeong)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 탁 트인 한강 뷰에 햇살이 내리쬐듯 찬란한 빛을 만드는 **강휘상영**의 해이야. 네 명예가 올라가고, 귀한 인연을 만나 사회적/가정적 안정을 이루기에 딱 좋은 시기지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Gang-hwi-sang-yeong** where the sun shines over a wide river. You will meet a benefactor or your social status will rise sharply.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 탁 트인 한강 뷰에 햇살이 내리쬐듯 찬란한 빛을 만드는 강휘상영의 해이야. 네 명예가 올라가고, 귀한 인연을 만나 사회적/가정적 안정을 이루기에 딱 좋은 시기지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year of Gang-hwi-sang-yeong where the sun shines over a wide river. You will meet a benefactor or your social status will rise sharply.${goldenTime}`;
       }
       
       if (luck.reason === '관념의 현실화(벽갑)' || luck.reason === 'Realization of Concept') {
         return lang === 'KO' ?
           (isPast ? 
-            `**${luck.year}년(${luck.stem}${luck.branch}년)**: 머릿속 계획들이 현실과 강렬하게 맞물리면서 결혼을 결심하기에 유력한 시기였네. 이때 충돌과 압박이 좀 있었을 것 같은데? 네 노력에 대한 결실을 맺고 정착하기 위한 고통이었을 거야.` :
-            `**${luck.year}년(${luck.stem}${luck.branch}년)**: 머릿속 계획들이 현실과 강렬하게 맞물리는 시기야. 이때의 충돌과 압박은 고통이 아니라 원석을 보석으로 깎는 과정이지. 실제적인 결실과 정착을 향해 강력하게 나아가고 있다는 증거야.`) :
-          `**${luck.year} (${luck.stem}${luck.branch})**: Plans in your head fiercely interlock with reality. The clashes and pressure are not pain, but the process of carving a gem. It proves you are strongly moving towards actual fruition and settlement.`;
+            `${luck.year}년(${luck.stem}${luck.branch}년): 머릿속 계획들이 현실과 강렬하게 맞물리면서 결혼을 결심하기에 유력한 시기였네. 이때 충돌과 압박이 좀 있었을 것 같은데? 네 노력에 대한 결실을 맺고 정착하기 위한 고통이었을 거야.` :
+            `${luck.year}년(${luck.stem}${luck.branch}년): 머릿속 계획들이 현실과 강렬하게 맞물리는 시기야. 이때의 충돌과 압박은 고통이 아니라 원석을 보석으로 깎는 과정이지. 실제적인 결실과 정착을 향해 강력하게 나아가고 있다는 증거야.`) :
+          `${luck.year} (${luck.stem}${luck.branch}): Plans in your head fiercely interlock with reality. The clashes and pressure are not pain, but the process of carving a gem. It proves you are strongly moving towards actual fruition and settlement.`;
       }
       
       if (luck.reason === '환경 극복 및 독립' || luck.reason === 'Independence from Environment') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 부모님이나 과거의 관습 같은 구속력을 스스로 끊어내는 해. 수동적인 태도에서 벗어나, 오직 네 주관으로 새로운 울타리를 세우려는 독립의 의지가 현실로 ${isPast ? '드러났을 거야.' : '드러날 거야.'} 생각의 늪에서 빠져나와 스스로 삶을 책임질 타이밍이지.` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A year to break free from the binding forces of parents or past customs. Your will to build a new fence solely on your own terms will manifest. It's time to escape the swamp of thoughts and take charge of your life.`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 부모님이나 과거의 관습 같은 구속력을 스스로 끊어내는 해. 수동적인 태도에서 벗어나, 오직 네 주관으로 새로운 울타리를 세우려는 독립의 의지가 현실로 ${isPast ? '드러났을 거야.' : '드러날 거야.'} 생각의 늪에서 빠져나와 스스로 삶을 책임질 타이밍이지.` :
+          `${luck.year} (${luck.stem}${luck.branch}): A year to break free from the binding forces of parents or past customs. Your will to build a new fence solely on your own terms will manifest. It's time to escape the swamp of thoughts and take charge of your life.`;
       }
 
       if (luck.reason === '사회적 책임(가장)' || luck.reason === 'Social Responsibility') {
         return lang === 'KO' ? 
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 시스템은 이 시기를 압박(관성)이라 말하겠지만, 넌 그 불꽃 속에서 스스로를 제련해 가정을 일궈낼 거야. 책임감이 곧 너의 결단이 되는 시기지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: The system might call this pressure, but you will forge yourself in that fire to build a family. Responsibility becomes your decision.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 시스템은 이 시기를 압박(관성)이라 말하겠지만, 넌 그 불꽃 속에서 스스로를 제련해 가정을 일궈낼 거야. 책임감이 곧 너의 결단이 되는 시기지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): The system might call this pressure, but you will forge yourself in that fire to build a family. Responsibility becomes your decision.${goldenTime}`;
       }
       
       if (luck.reason === '자발적 독립(식상)' || luck.reason === 'Independent Escape') {
         return lang === 'KO' ? 
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 억눌렸던 기운을 깨고 자발적으로 독립을 선택하는 시기야. 누군가에게 기대는 게 아니라, 네가 주도해서 새로운 울타리를 만드는 강렬한 타이밍이지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: A time to break suppressed energy and choose independence. You lead the creation of a new boundary.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 억눌렸던 기운을 깨고 자발적으로 독립을 선택하는 시기야. 누군가에게 기대는 게 아니라, 네가 주도해서 새로운 울타리를 만드는 강렬한 타이밍이지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): A time to break suppressed energy and choose independence. You lead the creation of a new boundary.${goldenTime}`;
       }
 
       if (luck.reason === '등라계갑(안정적 결합)' || luck.reason === 'Stable Union (Deng La Jie Jia)') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 혼자 버티기 힘들었던 시간들을 지나, 드디어 내가 온전히 의지할 수 있는 든든한 버팀목(등라계갑)이 들어${isPast ? '왔던 해였어.' : '오는 해가 될 거야.'} 심리적인 안정감이 자연스럽게 결합으로 이어지는 흐름이지.` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: After times of struggling alone, a strong support system you can fully rely on finally enter${isPast ? 'ed' : 's'} your life. This psychological stability naturally leads to a union.`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 혼자 버티기 힘들었던 시간들을 지나, 드디어 내가 온전히 의지할 수 있는 든든한 버팀목(등라계갑)이 들어${isPast ? '왔던 해였어.' : '오는 해가 될 거야.'} 심리적인 안정감이 자연스럽게 결합으로 이어지는 흐름이지.` :
+          `${luck.year} (${luck.stem}${luck.branch}): After times of struggling alone, a strong support system you can fully rely on finally enter${isPast ? 'ed' : 's'} your life. This psychological stability naturally leads to a union.`;
       }
 
       if (luck.reason === '잠재된 인연의 발현(지합)' || luck.reason === 'Manifestation of Latent Connection') {
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 겉으로는 인연의 기운이 잘 보이지 않지만, 보이지 않는 곳에서 강한 끌림(지합)이 발생해 내 안방으로 들어${isPast ? '왔던 시기야.' : '오는 시기야.'} 예상치 못한 타이밍에 운명처럼 엮이는 결합이지.` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: While connection energy might not be obvious on the surface, a strong unseen attraction (Branch Combination) pull${isPast ? 'ed' : 's'} someone into your inner circle. A union that feels like fate at an unexpected timing.`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 겉으로는 인연의 기운이 잘 보이지 않지만, 보이지 않는 곳에서 강한 끌림(지합)이 발생해 내 안방으로 들어${isPast ? '왔던 시기야.' : '오는 시기야.'} 예상치 못한 타이밍에 운명처럼 엮이는 결합이지.` :
+          `${luck.year} (${luck.stem}${luck.branch}): While connection energy might not be obvious on the surface, a strong unseen attraction (Branch Combination) pull${isPast ? 'ed' : 's'} someone into your inner circle. A union that feels like fate at an unexpected timing.`;
       }
 
       if (luck.reason === '조후 해결(정서적 안정)' || luck.reason === 'Emotional Grounding (Climate Resolution)' || luck.reason === '조후 해결(그늘과 안식처)' || luck.reason === 'Shade and Resting Place (Climate Resolution)') {
@@ -1660,69 +1749,75 @@ export function generateCycleVibe(
 
         if (isHotDryCase) {
           return lang === 'KO' ?
-            `**${luck.year}년(${luck.stem}${luck.branch}년)**: 너무 뜨겁고 메말랐던 네 삶에 드디어 안착할 수 있는 '${keyword}'가 들어오는 해이야. 정서적인 갈증이 해소되면서, 비로소 누군가를 온전히 받아들일 수 있는 마음의 여유가 생겨.${goldenTime}` :
-            `**${luck.year} (${luck.stem}${luck.branch})**: A year where '${keyword}' finally enters your overly hot and dry life. As emotional thirst is quenched, you gain the peace of mind to fully accept someone.${goldenTime}`;
+            `${luck.year}년(${luck.stem}${luck.branch}년): 너무 뜨겁고 메말랐던 네 삶에 드디어 안착할 수 있는 '${keyword}'가 들어오는 해이야. 정서적인 갈증이 해소되면서, 비로소 누군가를 온전히 받아들일 수 있는 마음의 여유가 생겨.${goldenTime}` :
+            `${luck.year} (${luck.stem}${luck.branch}): A year where '${keyword}' finally enters your overly hot and dry life. As emotional thirst is quenched, you gain the peace of mind to fully accept someone.${goldenTime}`;
         }
 
         return lang === 'KO' ?
-          `**${luck.year}년(${luck.stem}${luck.branch}년)**: 너무 뜨겁고 건조했던 네 삶에 드디어 ${keyword}가 내리며 정서적인 갈증이 해소${isPast ? '됐던 시기야.' : '되는 시기야.'} 마음의 안정을 찾으면서 자연스럽게 가정을 꾸리고 정착하고 싶은 욕구가 강해지는 타이밍이지.${goldenTime}` :
-          `**${luck.year} (${luck.stem}${luck.branch})**: ${keyword} finally fall${isPast ? 's' : 's'} on your overly hot and dry life, quenching your emotional thirst. As you find peace of mind, the desire to build a family and settle down naturally grows stronger.${goldenTime}`;
+          `${luck.year}년(${luck.stem}${luck.branch}년): 너무 뜨겁고 건조했던 네 삶에 드디어 ${keyword}가 내리며 정서적인 갈증이 해소${isPast ? '됐던 시기야.' : '되는 시기야.'} 마음의 안정을 찾으면서 자연스럽게 가정을 꾸리고 정착하고 싶은 욕구가 강해지는 타이밍이지.${goldenTime}` :
+          `${luck.year} (${luck.stem}${luck.branch}): ${keyword} finally fall${isPast ? 's' : 's'} on your overly hot and dry life, quenching your emotional thirst. As you find peace of mind, the desire to build a family and settle down naturally grows stronger.${goldenTime}`;
       }
 
       if (luck.reason === '재성(이성운)' || luck.reason === 'Wealth (romance)') {
         const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-        let koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 재성(이성운)이 강하게 들어오며 '결단과 시작'을 하기에 아주 좋은 시기야. 네 매력이 빛을 발하고, 실질적인 결실을 맺을 확률이 매우 높은 해지.${goldenTime}`;
-        let koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 삶의 안정을 찾으며 소중한 인연과의 관계를 돈독히 하는 '재회와 안정'의 시기야. 마음의 평온 속에서 든든한 내 편과 함께하기 좋은 해지.${goldenTime}`;
+        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 재성(이성운)이 강하게 들어오며 '결단과 시작'을 하기에 아주 좋은 시기야. 네 매력이 빛을 발하고, 실질적인 결실을 맺을 확률이 매우 높은 해지.${goldenTime}`;
+        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 삶의 안정을 찾으며 소중한 인연과의 관계를 돈독히 하는 '재회와 안정'의 시기야. 마음의 평온 속에서 든든한 내 편과 함께하기 좋은 해지.${goldenTime}`;
 
         if (isOverwhelmed) {
-          koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 이성운이 들어오긴 하는데, 주변 눈치 보느라 네가 짓눌리는 해이야. 주체적인 선택보다는 상황에 떠밀려 결정하기 쉬우니까 주의해야 해.${goldenTime}`;
-          koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 인연의 기운 속에서도 책임감이 무겁게 느껴지는 시기야. 주변 기대에 부응하려 애쓰느라 정작 네 행복을 놓칠 수 있으니 내면의 소리에 집중해봐.${goldenTime}`;
+          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 이성운이 들어오긴 하는데, 주변 눈치 보느라 네가 짓눌리는 해이야. 주체적인 선택보다는 상황에 떠밀려 결정하기 쉬우니까 주의해야 해.${goldenTime}`;
+          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운 속에서도 책임감이 무겁게 느껴지는 시기야. 주변 기대에 부응하려 애쓰느라 정작 네 행복을 놓칠 수 있으니 내면의 소리에 집중해봐.${goldenTime}`;
         }
 
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A great time for 'Decision and Start' as Wealth (romance) energy is strong. Your charm shines, and there's a high probability of practical results.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Reunion and Stability' finding peace in life and strengthening relationships. A good year to be with a reliable partner.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A great time for 'Decision and Start' as Wealth (romance) energy is strong. Your charm shines, and there's a high probability of practical results.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' finding peace in life and strengthening relationships. A good year to be with a reliable partner.${goldenTime}`;
 
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
       if (luck.reason === '관성(이성운)' || luck.reason === 'Power (romance)') {
         const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-        let koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 관성(이성운)이 강하게 들어오며 사회적 성취와 함께 '결단과 시작'을 하는 해이야. 믿음직한 인연이 네 삶으로 훅 들어와서 새로운 울타리를 만들게 될 거야.${goldenTime}`;
-        let koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 삶의 책임감을 나누며 안정을 찾는 '재회와 안정'의 시기야. 듬직한 내 편과 함께 미래를 약속하며 삶의 무게를 덜어내기에 딱 좋은 타이밍이지.${goldenTime}`;
+        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 관성(이성운)이 강하게 들어오며 사회적 성취와 함께 '결단과 시작'을 하는 해이야. 믿음직한 인연이 네 삶으로 훅 들어와서 새로운 울타리를 만들게 될 거야.${goldenTime}`;
+        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 삶의 책임감을 나누며 안정을 찾는 '재회와 안정'의 시기야. 듬직한 내 편과 함께 미래를 약속하며 삶의 무게를 덜어내기에 딱 좋은 타이밍이지.${goldenTime}`;
 
         if (isOverwhelmed) {
-          koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 관성의 기운이 강해지며 널 향한 사회적 압박과 기대가 피크를 찍는 해이야. 결혼이 축복이 아니라 '해결해야 할 숙제'처럼 느껴질 수 있으니 주도권을 잃지 마.${goldenTime}`;
-          koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 책임감이 무겁게 다가오는 시기야. 주변 기대에 맞추려다 본인의 행복을 놓치지 않도록 경계해야 해.${goldenTime}`;
+          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 관성의 기운이 강해지며 널 향한 사회적 압박과 기대가 피크를 찍는 해이야. 결혼이 축복이 아니라 '해결해야 할 숙제'처럼 느껴질 수 있으니 주도권을 잃지 마.${goldenTime}`;
+          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 책임감이 무겁게 다가오는 시기야. 주변 기대에 맞추려다 본인의 행복을 놓치지 않도록 경계해야 해.${goldenTime}`;
         }
 
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of 'Decision and Start' with social achievement as Power (romance) energy is strong. A trustworthy partner enters your life to build a new boundary.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A time of 'Reunion and Stability' sharing life's responsibilities. The best timing to promise a future and lighten life's burden with a reliable partner.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' with social achievement as Power (romance) energy is strong. A trustworthy partner enters your life to build a new boundary.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' sharing life's responsibilities. The best timing to promise a future and lighten life's burden with a reliable partner.${goldenTime}`;
 
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
-      const koPrimeFallback = `**${luck.year}년(${luck.stem}${luck.branch}년)**: ${luck.reason}이 강하게 들어오며 '결단과 시작'을 하기에 유력한 시기야. ${luck.year < currentYear ? '이미 지나갔거나 현재 진행 중인 강력한 인연의 타이밍이지.' : '앞으로 다가올 가장 강력한 결합의 기회야.'}${goldenTime}`;
-      const koOtherFallback = `**${luck.year}년(${luck.stem}${luck.branch}년)**: ${luck.reason}의 기운 속에서 '재회와 안정'을 찾는 소중한 시기야. 마음의 평온을 찾으며 든든한 동반자와 함께 안착하기 좋은 해지.${goldenTime}`;
+      if (luck.isFullSentence) {
+        return lang === 'KO' ? 
+          `${luck.reason.replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}${goldenTime}` :
+          `${luck.reason.replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}${goldenTime}`;
+      }
+
+      const koPrimeFallback = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운이 강하게 들어오며 '결단과 시작'을 하기에 유력한 시기야. ${luck.year < currentYear ? '이미 지나갔거나 현재 진행 중인 강력한 인연의 타이밍이지.' : '앞으로 다가올 가장 강력한 결합의 기회야.'}${goldenTime}`;
+      const koOtherFallback = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운 속에서 '재회와 안정'을 찾는 소중한 시기야. 마음의 평온을 찾으며 든든한 동반자와 함께 안착하기 좋은 해지.${goldenTime}`;
 
       const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
       if (isOverwhelmed) {
-        const koOverwhelmed = `**${luck.year}년(${luck.stem}${luck.branch}년)**: ${luck.reason}의 기운이 들어오지만, 이미 넘쳐나는 에너지가 널 압박하는 해이야. 주체적인 선택보다는 주변의 기대에 부응하려 애쓰는 시기가 될 수 있으니 내면의 목소리에 귀를 기울여봐.${goldenTime}`;
+        const koOverwhelmed = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운이 들어오지만, 이미 넘쳐나는 에너지가 널 압박하는 해이야. 주체적인 선택보다는 주변의 기대에 부응하려 애쓰는 시기가 될 수 있으니 내면의 목소리에 귀를 기울여봐.${goldenTime}`;
         return koOverwhelmed;
       }
-      const enPrimeFallback = `**${luck.year} (${luck.stem}${luck.branch})**: A likely time for 'Decision and Start' with strong ${luck.reason} energy. ${luck.year < currentYear ? 'A timing of strong connection that has passed or is ongoing.' : 'The strongest upcoming opportunity for a deep union.'}${goldenTime}`;
-      const enOtherFallback = `**${luck.year} (${luck.stem}${luck.branch})**: A precious time to find 'Reunion and Stability' within ${luck.reason} energy. A good year to settle down with a reliable partner.${goldenTime}`;
+      const enPrimeFallback = `${luck.year} (${luck.stem}${luck.branch}): A likely time for 'Decision and Start' with strong ${luck.reason} energy. ${luck.year < currentYear ? 'A timing of strong connection that has passed or is ongoing.' : 'The strongest upcoming opportunity for a deep union.'}${goldenTime}`;
+      const enOtherFallback = `${luck.year} (${luck.stem}${luck.branch}): A precious time to find 'Reunion and Stability' within ${luck.reason} energy. A good year to settle down with a reliable partner.${goldenTime}`;
 
       return getNarrative(koPrimeFallback, koOtherFallback, enPrimeFallback, enOtherFallback);
     };
 
     const main = lang === 'KO' ? 
       `네 인연의 타임라인을 스캔해봤어. [delay:1500]\n\n` +
-      `[가장 가까웠던/현재의 결혼운]\n${formatLuck(pastLuck)}\n\n` +
-      `[향후 가장 강력한 결혼운]\n${formatLuck(finalFutureLuck)}\n\n` +
+      `[가장 가까웠던/현재의 결혼운]\n${pastLuck.year}년(${pastLuck.stem}${pastLuck.branch}년): ${formatLuck(pastLuck).replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}\n\n` +
+      `[향후 가장 강력한 결혼운]\n${finalFutureLuck.year}년(${finalFutureLuck.stem}${finalFutureLuck.branch}년): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}\n\n` +
       `결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해. 이 시기들을 잘 활용해봐.` :
       `I've scanned your relationship timeline. [delay:1500]\n\n` +
-      `🕒 **[Most Recent/Current Marriage Luck]**\n${formatLuck(pastLuck)}\n\n` +
-      `🚀 **[Strongest Future Marriage Luck]**\n${formatLuck(finalFutureLuck)}\n\n` +
+      `🕒 [Most Recent/Current Marriage Luck]\n${pastLuck.year} (${pastLuck.stem}${pastLuck.branch}): ${formatLuck(pastLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}\n\n` +
+      `🚀 [Strongest Future Marriage Luck]\n${finalFutureLuck.year} (${finalFutureLuck.stem}${finalFutureLuck.branch}): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}\n\n` +
       `Marriage isn't just about following the flow of luck, but about the choices you make within that flow. Use these timings wisely.`;
 
     const glitch = lang === 'KO' ? '운명은 준비된 자에게 찾아오는 법이야.' : 'Fate comes to those who are prepared.';
