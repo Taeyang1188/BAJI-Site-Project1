@@ -1,4 +1,4 @@
-const { Solar } = require('lunar-typescript');
+import { Solar } from 'lunar-typescript';
 const solar = Solar.fromYmdHms(1993, 2, 26, 10, 40, 0);
 const lunar = solar.getLunar();
 const baZi = lunar.getEightChar();

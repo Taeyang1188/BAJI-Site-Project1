@@ -266,130 +266,102 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   };
 }
 
-export function determineYongshin(stems: string[], branches: string[], geju: string, strength: any, structureDetail?: any) {
+export function determineYongshin(stems: string[], branches: string[], geju: string, strength: any, structureDetail?: any, tenGodsRatio: any = {}) {
   const dayMaster = stems[1];
   const dmElement = STEM_ELEMENTS[dayMaster];
   const isStrong = strength.score > 50;
 
+  // 観多判定 (Absolute Priority)
+  const gwanRatio = (tenGodsRatio['관성(Warrior/Judge)'] as number) || 0;
+  const isGwanDa = gwanRatio >= 40; // Threshold lowered from 60 to 40
+  
+  console.log("DEBUG: gwanRatio:", gwanRatio);
+  console.log("DEBUG: isGwanDa:", isGwanDa);
+
+  const getElementByRel = (rel: string) => {
+    const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
+    const rels = ['Self', 'Output', 'Wealth', 'Power', 'Wisdom'];
+    const aliasMap: Record<string, string> = { 'Artist': 'Output', 'Rebel': 'Output' };
+    const normalizedRel = aliasMap[rel] || rel;
+    const targetIdx = (dmIdx + rels.indexOf(normalizedRel)) % 5;
+    return ELEMENT_CYCLE[targetIdx];
+  };
+
+  if (isGwanDa) {
+    const primary = { god: "식상", element: getElementByRel('Output'), reason: "관다신약 → 식상용신 (식신제살)", reasonEn: "GwanDa -> Artist/Rebel Useful God" };
+    const heeShin = { god: "비겁", element: getElementByRel('Self') };
+    const giShin = { god: "재성", element: getElementByRel('Wealth') };
+    const guShin = { god: "인성", element: getElementByRel('Wisdom') };
+    return { primary, heeShin, giShin, guShin, method: "관다용신", byeongYak: null, tongGwan: null, eokbu: null };
+  }
+
+  const getGod = (el: string) => {
+    const relMap: Record<string, string> = { 'Self': '비겁', 'Output': '식상', 'Wealth': '재성', 'Power': '관성', 'Wisdom': '인성' };
+    return relMap[getRelationship(dmElement, el)] || "";
+  };
+
+  const totalScore = Object.values(strength.elementScores).reduce((a: any, b: any) => a + Math.max(0, b), 0);
+  const ratios: Record<string, number> = {};
+  Object.entries(strength.elementScores).forEach(([el, score]: [string, any]) => {
+    ratios[el] = (score / totalScore) * 100;
+  });
+
+  const fireRatio = ratios['Fire'] || 0;
+  const earthRatio = ratios['Earth'] || 0;
+
+  const isHwaDaToCho = (dmElement === 'Earth' && fireRatio >= 40) || (structureDetail?.title === '화토중탁') || (structureDetail?.title === '화다토초');
+  const isToDaMaeGeum = (dmElement === 'Metal' && earthRatio >= 40) || (structureDetail?.title === '토다매금');
+
+  if (isHwaDaToCho) {
+    const primary = { god: getGod('Metal'), element: "Metal", reason: "화다토초/화토중탁 → 금(金) 통관용신", reasonEn: "Fire Dominance → Metal Useful God" };
+    const heeShin = { god: getGod('Water'), element: "Water" };
+    const hanShin = { god: getGod('Earth'), element: "Earth" };
+    const giShin = { god: getGod('Fire'), element: "Fire" };
+    const guShin = { god: getGod('Wood'), element: "Wood" };
+    return { primary, heeShin, giShin, guShin, hanShin, method: "특수격용신", dominantElement: "Fire", byeongYak: null, tongGwan: null, eokbu: null };
+  }
+
+  if (isToDaMaeGeum) {
+    const primary = { god: getGod('Wood'), element: "Wood", reason: "토다매금 → 목(木) 소토용신", reasonEn: "Earth Dominance → Wood Useful God" };
+    const heeShin = { god: getGod('Water'), element: "Water" };
+    const hanShin = { god: getGod('Metal'), element: "Metal" };
+    const giShin = { god: getGod('Earth'), element: "Earth" };
+    const guShin = { god: getGod('Fire'), element: "Fire" };
+    return { primary, heeShin, giShin, guShin, hanShin, method: "특수격용신", dominantElement: "Earth", byeongYak: null, tongGwan: null, eokbu: null };
+  }
+
+  // 0. Special Structure Handling (Jong-gyeok / Jeon-wang-gyeok) - High Priority
+  let method = "격국용신";
   let primary = { god: "", element: "", reason: "", reasonEn: "" };
   let heeShin = { god: "", element: "" };
   let giShin = { god: "", element: "" };
   let guShin = { god: "", element: "" };
-  let method = "격국용신";
   let eokbu: any = null;
 
-  const getElementByRel = (rel: string) => {
-    const dmIdx = ELEMENT_CYCLE.indexOf(dmElement);
-    const rels = ['Self', 'Artist', 'Wealth', 'Power', 'Wisdom'];
-    const targetIdx = (dmIdx + rels.indexOf(rel)) % 5;
-    return ELEMENT_CYCLE[targetIdx];
-  };
-
-  // 0. Threshold Logic for Extreme Elemental Dominance (>= 60%)
-  // If one element is overwhelming, normal balance (Eok-bu) logic fails and can be dangerous.
-  const elementRatios = strength.elementScores || {};
-  const totalScore = Object.values(elementRatios).reduce((a: any, b: any) => a + b, 0) as number;
-  
-  let extremeElement = "";
-  let extremeRatio = 0;
-  
-  for (const [el, score] of Object.entries(elementRatios)) {
-    const ratio = ((score as number) / totalScore) * 100;
-    if (ratio >= 60) {
-      extremeElement = el;
-      extremeRatio = ratio;
-      break;
-    }
-  }
-
-  if (extremeElement) {
-    method = "전왕격용신"; // Treat as Monarch/Extreme logic
-    const mIdx = ELEMENT_CYCLE.indexOf(extremeElement);
-    
-    // For extreme dominance, we follow the flow (Sun-eung)
-    // Useful = Output (Draining), Supporting = Dominant (Mirror), Danger = Clashing (Wang-shin-chung-bal)
-    primary = { 
-      god: extremeElement === dmElement ? "비겁" : "인성", // Simplified mapping
-      element: ELEMENT_CYCLE[(mIdx + 1) % 5], // Earth if Fire is extreme
-      reason: `${extremeElement} 기운이 ${Math.round(extremeRatio)}%로 압도적임. 강한 기운을 설기(泄氣)해야 함.`,
-      reasonEn: `${extremeElement} energy is overwhelming at ${Math.round(extremeRatio)}%. Must drain (leak) the strong energy.`
-    };
-
-    // User requested mapping for extreme Fire: [Fire=Hee, Earth=Yong, Metal=Hee/Han, Water=Gi(Danger), Wood=Gu]
-    heeShin = { 
-      god: "비겁, 재성", 
-      element: `${extremeElement}, ${ELEMENT_CYCLE[(mIdx + 2) % 5]}` 
-    };
-    giShin = { 
-      god: "관성", 
-      element: ELEMENT_CYCLE[(mIdx + 3) % 5] // Water if Fire is extreme
-    };
-    guShin = { 
-      god: "인성", 
-      element: ELEMENT_CYCLE[(mIdx + 4) % 5] // Wood if Fire is extreme
-    };
-    const hanShin = {
-      god: "식상",
-      element: ELEMENT_CYCLE[(mIdx + 1) % 5] // Earth (Primary is already Earth)
-    };
-
-    return { primary, heeShin, giShin, guShin, hanShin, method, byeongYak: null, tongGwan: null, eokbu: null };
-  }
-
-  // 0. Special Structure Handling (Jong-gyeok / Jeon-wang-gyeok)
   if (structureDetail && structureDetail.category === 'Adaptive') {
     method = "종격용신";
     const title = structureDetail.title;
     
     if (title.includes("종아격")) {
-      primary = { god: "식상", element: getElementByRel('Artist'), reason: "종아격 → 식상용신", reasonEn: "Adaptive Alignment [Artist/Rebel] → Artist/Rebel Useful God" };
-      heeShin = { god: "재성", element: getElementByRel('Wealth') };
-      giShin = { god: "인성", element: getElementByRel('Wisdom') };
-      guShin = { god: "비겁", element: getElementByRel('Self') };
+      return { primary: { god: "식상", element: getElementByRel('Output'), reason: "종아격 → 식상용신", reasonEn: "Adaptive Alignment [Artist/Rebel] → Artist/Rebel Useful God" }, heeShin: { god: "재성", element: getElementByRel('Wealth') }, giShin: { god: "인성", element: getElementByRel('Wisdom') }, guShin: { god: "비겁", element: getElementByRel('Self') }, method, byeongYak: null, tongGwan: null, eokbu: null };
     } else if (title.includes("종재격")) {
-      primary = { god: "재성", element: getElementByRel('Wealth'), reason: "종재격 → 재성용신", reasonEn: "Adaptive Alignment [Maverick/Architect] → Maverick/Architect Useful God" };
-      heeShin = { god: "식상", element: getElementByRel('Artist') };
-      giShin = { god: "비겁", element: getElementByRel('Self') };
-      guShin = { god: "인성", element: getElementByRel('Wisdom') };
+      return { primary: { god: "재성", element: getElementByRel('Wealth'), reason: "종재격 → 재성용신", reasonEn: "Adaptive Alignment [Maverick/Architect] → Maverick/Architect Useful God" }, heeShin: { god: "식상", element: getElementByRel('Output') }, giShin: { god: "비겁", element: getElementByRel('Self') }, guShin: { god: "인성", element: getElementByRel('Wisdom') }, method, byeongYak: null, tongGwan: null, eokbu: null };
     } else if (title.includes("종살격")) {
-      primary = { god: "관성", element: getElementByRel('Power'), reason: "종살격 → 관성용신", reasonEn: "Adaptive Alignment [Warrior/Judge] → Warrior/Judge Useful God" };
-      heeShin = { god: "재성", element: getElementByRel('Wealth') };
-      giShin = { god: "식상", element: getElementByRel('Artist') };
-      guShin = { god: "비겁", element: getElementByRel('Self') };
+      return { primary: { god: "관성", element: getElementByRel('Power'), reason: "종살격 → 관성용신", reasonEn: "Adaptive Alignment [Warrior/Judge] → Warrior/Judge Useful God" }, heeShin: { god: "재성", element: getElementByRel('Wealth') }, giShin: { god: "식상", element: getElementByRel('Output') }, guShin: { god: "비겁", element: getElementByRel('Self') }, method, byeongYak: null, tongGwan: null, eokbu: null };
     } else if (title.includes("종왕격")) {
-      primary = { god: "비겁", element: getElementByRel('Self'), reason: "종왕격 → 비겁용신", reasonEn: "Adaptive Alignment [Mirror/Rival] → Mirror/Rival Useful God" };
-      heeShin = { god: "인성", element: getElementByRel('Wisdom') };
-      giShin = { god: "식상", element: getElementByRel('Artist') };
-      guShin = { god: "재성", element: getElementByRel('Wealth') };
+      return { primary: { god: "비겁", element: getElementByRel('Self'), reason: "종왕격 → 비겁용신", reasonEn: "Adaptive Alignment [Mirror/Rival] → Mirror/Rival Useful God" }, heeShin: { god: "인성", element: getElementByRel('Wisdom') }, giShin: { god: "식상", element: getElementByRel('Output') }, guShin: { god: "재성", element: getElementByRel('Wealth') }, method, byeongYak: null, tongGwan: null, eokbu: null };
     }
   } else if (structureDetail && structureDetail.category === 'Monarch') {
     method = "전왕격용신";
     const monarchEl = structureDetail.mainElement || dmElement;
-    const mIdx = ELEMENT_CYCLE.indexOf(monarchEl);
     
     primary = { god: "비겁", element: monarchEl, reason: "전왕격 → 비겁용신", reasonEn: "Monarch Alignment → Mirror/Rival Useful God" };
-    
-    // User requested mapping for Monarch structures:
-    // [Monarch=Hee, Output=Hee, Wealth=Han, Power=Gi, Resource=Gu]
-    // Example Fire Monarch: Fire=Hee, Earth=Hee, Metal=Han, Water=Gi, Wood=Gu
-    
-    heeShin = { 
-      god: "비겁, 식상", 
-      element: `${monarchEl}, ${ELEMENT_CYCLE[(mIdx + 1) % 5]}` 
-    };
-    giShin = { 
-      god: "관성", 
-      element: ELEMENT_CYCLE[(mIdx + 3) % 5] 
-    };
-    guShin = { 
-      god: "인성", 
-      element: ELEMENT_CYCLE[(mIdx + 4) % 5] 
-    };
-    const hanShin = {
-      god: "재성",
-      element: ELEMENT_CYCLE[(mIdx + 2) % 5]
-    };
-    return { primary, heeShin, giShin, guShin, hanShin, method, byeongYak: null, tongGwan: null, eokbu: null };
+    const mIdx = ELEMENT_CYCLE.indexOf(monarchEl);
+    heeShin = { god: "비겁, 식상", element: `${monarchEl}, ${ELEMENT_CYCLE[(mIdx + 1) % 5]}` };
+    giShin = { god: "관성", element: ELEMENT_CYCLE[(mIdx + 3) % 5] };
+    guShin = { god: "인성", element: ELEMENT_CYCLE[(mIdx + 4) % 5] };
+    const hanShin = { god: "재성", element: ELEMENT_CYCLE[(mIdx + 2) % 5] };
+    return { primary, heeShin, giShin, guShin, hanShin, method, dominantElement: monarchEl, byeongYak: null, tongGwan: null, eokbu: null };
   } else if (structureDetail && structureDetail.category === 'Image') {
     method = "특수격용신";
     const title = structureDetail.title;
@@ -400,6 +372,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     const godMap: Record<string, string> = {
       'Self': '비겁',
       'Artist': '식상',
+      'Output': '식상',
       'Wealth': '재성',
       'Power': '관성',
       'Wisdom': '인성'
@@ -415,19 +388,27 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     heeShin = { god: "희신", element: ELEMENT_CYCLE[(targetIdx + 1) % 5] };
     giShin = { god: "기신", element: ELEMENT_CYCLE[(targetIdx + 3) % 5] };
     guShin = { god: "구신", element: ELEMENT_CYCLE[(targetIdx + 2) % 5] };
+    
+    let dominantElement = dmElement;
+    if (title.includes("화토중탁")) dominantElement = "Earth";
+    else if (title.includes("금백수청")) dominantElement = "Metal";
+    else if (title.includes("목화통명")) dominantElement = "Wood";
+    else if (title.includes("수목청화")) dominantElement = "Water";
+
+    return { primary, heeShin, giShin, guShin, method, dominantElement, byeongYak: null, tongGwan: null, eokbu: null };
   }
-  // 1. Standard Structure Logic
-  else if (geju.includes("정관") || geju.includes("JUDGE")) {
-    if (!isStrong) {
-      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "정관격 일간약 → 인성용신", reasonEn: "Warrior/Judge Structure & Weak DM → Mystic/Sage Useful God" };
-      heeShin = { god: "비겁", element: getElementByRel('Self') };
-      giShin = { god: "상관", element: getElementByRel('Artist') };
-      guShin = { god: "재성", element: getElementByRel('Wealth') };
-    } else {
+
+  if (geju.includes("정관") || geju.includes("JUDGE")) {
+    if (isStrong) {
       primary = { god: "재성", element: getElementByRel('Wealth'), reason: "정관격 일간강 → 재성용신", reasonEn: "Warrior/Judge Structure & Strong DM → Maverick/Architect Useful God" };
       heeShin = { god: "관성", element: getElementByRel('Power') };
       giShin = { god: "비겁", element: getElementByRel('Self') };
       guShin = { god: "인성", element: getElementByRel('Wisdom') };
+    } else {
+      primary = { god: "인성", element: getElementByRel('Wisdom'), reason: "정관격 일간약 → 인성용신", reasonEn: "Warrior/Judge Structure & Weak DM → Mystic/Sage Useful God" };
+      heeShin = { god: "비겁", element: getElementByRel('Self') };
+      giShin = { god: "상관", element: getElementByRel('Artist') };
+      guShin = { god: "재성", element: getElementByRel('Wealth') };
     }
   } else if (geju.includes("편관") || geju.includes("칠살") || geju.includes("WARRIOR")) {
     if (!isStrong) {
@@ -436,10 +417,12 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
       giShin = { god: "재성", element: getElementByRel('Wealth') };
       guShin = { god: "식상", element: getElementByRel('Artist') };
     } else {
+      // 1993-02-26 Male: 편관격, 중화신강, 용신 금(식상)
+      // 토생금(희신), 화극금(기신)
       primary = { god: "식상", element: getElementByRel('Artist'), reason: "편관격 일간강 → 식상용신 (식신제살)", reasonEn: "Warrior/Judge Structure & Strong DM → Artist/Rebel Useful God" };
-      heeShin = { god: "인성", element: getElementByRel('Wisdom') };
-      giShin = { god: "비겁", element: getElementByRel('Self') };
-      guShin = { god: "재성", element: getElementByRel('Wealth') };
+      heeShin = { god: "재성", element: getElementByRel('Wealth') }; // 토(재성)
+      giShin = { god: "인성", element: getElementByRel('Wisdom') }; // 화(인성)
+      guShin = { god: "비겁", element: getElementByRel('Self') };
     }
   } else if (geju.includes("식신") || geju.includes("상관") || geju.includes("ARTIST") || geju.includes("REBEL")) {
     if (isStrong) {
@@ -548,24 +531,33 @@ export function checkByeongYak(stems: string[], branches: string[], yongshin: an
     // For Monarch structures, we don't treat the dominant element as a "disease" to be cured by clashing.
     const isMonarch = yongshin?.method === "전왕격용신" || yongshin?.method === "특수격용신";
     if (isMonarch) {
-      const monarchEl = yongshin.primary.element;
+      const monarchEl = yongshin.dominantElement || yongshin.primary.element;
       const mIdx = ELEMENT_CYCLE.indexOf(monarchEl);
       const drainEl = ELEMENT_CYCLE[(mIdx + 1) % 5]; // Output element
       
+      const getRelKo = (el: string) => {
+        const rel = getRelationship(dmElement, el);
+        const map: Record<string, string> = {
+          'Self': '비겁', 'Output': '식상', 'Wealth': '재성', 'Power': '관성', 'Wisdom': '인성'
+        };
+        return map[rel] || rel;
+      };
+
       const elementKoMap: Record<string, string> = { 
-        Wood: '목(식상)', 
-        Fire: '화(식상)', 
-        Earth: '토(식상)', 
-        Metal: '금(식상)', 
-        Water: '수(식상)' 
+        Wood: `목(${getRelKo('Wood')})`, 
+        Fire: `화(${getRelKo('Fire')})`, 
+        Earth: `토(${getRelKo('Earth')})`, 
+        Metal: `금(${getRelKo('Metal')})`, 
+        Water: `수(${getRelKo('Water')})` 
       };
       const koDrain = elementKoMap[drainEl] || drainEl;
+      const koMonarch = elementKoMap[monarchEl] || monarchEl;
 
       return {
         byeong: monarchEl,
         yak: drainEl,
-        note: `전왕격은 강한 기운을 거스르면 안 돼. ${koDrain}으로 기운을 부드럽게 설기하는 것이 좋아.`,
-        noteEn: `Monarch structures should not be clashed. It is best to gently drain the energy with ${drainEl} (Artist/Rebel).`
+        note: `${koMonarch} 기운이 강한 격국은 그 기운을 거스르면 안 돼. ${koDrain}으로 기운을 부드럽게 설기하는 것이 좋아.`,
+        noteEn: `Structures with strong ${monarchEl} energy should not be clashed. It is best to gently drain the energy with ${drainEl} (Artist/Rebel).`
       };
     }
 
@@ -922,36 +914,36 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         return null;
       }
 
-      if (fireEarthRatio >= 75 && ratios['Water'] < 10) {
-        // Check for Water survival
-        const hasFunctionalWater = stems.some((s, idx) => {
-          if (idx === 1) return false;
-          if (STEM_ELEMENTS[s] !== 'Water') return false;
-          
-          // Check for clash (e.g., 1992's Im-Water vs Byeong-Fire)
-          const prev = idx > 0 ? stems[idx - 1] : null;
-          const next = idx < stems.length - 1 ? stems[idx + 1] : null;
-          const isClashed = (prev && STEM_CLASHES[prev] === s) || (next && STEM_CLASHES[next] === s);
-          if (isClashed) return false; // Evaporated
-          return true;
-        });
-
-        if (hasFunctionalWater) return null; // If Water survives (like 19920611 10:40), it's not turbid
-
-        // Filter 2: Yin Stem Strictness
-        if ((isYinEarth || isJeongFire) && fireEarthRatio < 85) return null;
+    if (fireEarthRatio >= 75 && ratios['Water'] < 10) {
+      // Check for Water survival
+      const hasFunctionalWater = stems.some((s, idx) => {
+        if (idx === 1) return false;
+        if (STEM_ELEMENTS[s] !== 'Water') return false;
         
-        return {
-          name: '화토중탁',
-          nameEn: 'Fire-Earth Heavy-Turbid',
-          category: 'Image',
-          mainElement: 'Earth',
-          confidence: 90,
-          isDirty: true,
-          description: "불과 흙이 뒤섞여 메마르고 탁해진 격국. 조후가 시급함.",
-          enDescription: "A dry and turbid structure where Fire and Earth are mixed. Urgent need for temperature balance."
-        };
-      }
+        // Check for clash (e.g., 1992's Im-Water vs Byeong-Fire)
+        const prev = idx > 0 ? stems[idx - 1] : null;
+        const next = idx < stems.length - 1 ? stems[idx + 1] : null;
+        const isClashed = (prev && STEM_CLASHES[prev] === s) || (next && STEM_CLASHES[next] === s);
+        if (isClashed) return false; // Evaporated
+        return true;
+      });
+
+      if (hasFunctionalWater) return null; // If Water survives (like 19920611 10:40), it's not turbid
+
+      // Filter 2: Yin Stem Strictness
+      if ((isYinEarth || isJeongFire) && fireEarthRatio < 85) return null;
+      
+      return {
+        name: '화토중탁',
+        nameEn: 'Fire-Earth Heavy-Turbid',
+        category: 'Image',
+        mainElement: 'Metal', // Remedy is Metal (draining) or Water (cooling)
+        confidence: 90,
+        isDirty: true,
+        description: "불과 흙이 뒤섞여 메마르고 탁해진 격국. 금(Metal)으로 설기하거나 수(Water)로 식혀야 함.",
+        enDescription: "A dry and turbid structure where Fire and Earth are mixed. Needs Metal to drain or Water to cool."
+      };
+    }
     }
     return null;
   };

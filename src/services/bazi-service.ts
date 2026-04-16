@@ -409,7 +409,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     };
   }
 
-  const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength, structureDetail);
+  const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength, structureDetail, tenGodsRatio);
   const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);
   
   // Check for ByeongYak and TongGwan

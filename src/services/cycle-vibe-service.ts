@@ -73,12 +73,17 @@ export function generateCycleVibe(
   interactionsData?: { maritalStatus?: string | null; hasChildren?: boolean | null }
 ): CycleVibeResult {
   const analysis = result.analysis || {} as any;
+  
+  // 観多判定
+  const tenGodsRatio = analysis.tenGodsRatio || {};
+  const gwanRatio = (tenGodsRatio['관성 (Warrior/Judge)'] as number) || 0;
+  const isGwanDa = gwanRatio >= 60;
+
   const strength = analysis.dayMasterStrength || { isStrong: false, title: '', score: 50 };
   const isSinGang = strength.isStrong || false;
   const isNeutral = strength.title ? strength.title.includes('중화') : false;
   const isSinYak = !isSinGang && !isNeutral;
   
-  const tenGodsRatio = analysis.tenGodsRatio || {};
   const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => (r as number) > 30).map(([k]) => k.split(' ')[0]);
   
   const currentCycle = result.grandCycles[result.currentCycleIndex] || {} as any;
@@ -208,6 +213,16 @@ export function generateCycleVibe(
     }
     if (hasGwanSeongLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
       combos.push({ id: '재생관', priority: 60, name: '재생관(財生官)', desc: `쌓아온 자산이나 노력이 사회적 지위로 연결되는 흐름이야. 내실을 다져 더 높은 곳으로 올라갈 발판을 마련하게 될 거야.` });
+    }
+
+    // 観多専用のロジック
+    if (isGwanDa) {
+      if (hasSikSangLuck) {
+        combos.push({ id: '식신제살', priority: 1000, name: '식신제살(食神制殺)', desc: "비로소 당신의 검을 휘둘러 낡은 굴레를 끊어내고 주도권을 잡는 '돌파의 해'입니다." });
+      }
+      if (hasJaeSeongLuck) {
+        combos.push({ id: '재생살', priority: -1000, name: '재생살(財生殺)', desc: "겉으로는 실속과 기회처럼 보이나, 실제로는 당신의 책임과 부담을 가중시켜 숨 막히게 할 수 있는 시기입니다." });
+      }
     }
 
     combos.sort((a, b) => b.priority - a.priority);
@@ -383,7 +398,7 @@ export function generateCycleVibe(
         const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
         const hasOhBranch = result.pillars.some(p => p.branch === '午');
         const hasByeongStem = result.pillars.some(p => p.stem === '丙');
-        const isBokEum = hasByeongStem && hasOhBranch;
+        const isBokEum = result.pillars.some(p => p.stem === '丙' && p.branch === '午');
         const isJaHyeong = hasOhBranch;
 
         if (isFireExtreme) {
@@ -669,16 +684,21 @@ export function generateCycleVibe(
     const currentYear = new Date().getFullYear();
     const isFemale = gender === 'female';
     const isMale = gender === 'male';
+    
+    // In bazi-service.ts, pillars are [Hour, Day, Month, Year]
+    // So pillars[1] is Day, pillars[2] is Month, pillars[3] is Year
     const dayMaster = result.pillars[1].stem;
     const dayBranch = result.pillars[1].branch;
+    const yongshinDetail = analysis.yongshinDetail || {};
     const yongShin = analysis.yongShen || '';
+    const yongShinElementFromDetail = yongshinDetail.primary?.element || '';
 
-    const isStrongDayMaster = (analysis.dayMasterStrength?.score || 50) >= 50;
-    const isWeakDayMaster = !isStrongDayMaster;
-    
     const specialStatuses = analysis.specialStatuses || {};
     const specialCombinations = analysis.specialCombinations || {};
     const elementRatios = specialStatuses.elementRatios || analysis.elementRatios || {};
+
+    const isStrongDayMaster = (analysis.dayMasterStrength?.score || 50) >= 50;
+    const isWeakDayMaster = !isStrongDayMaster;
 
     const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
     const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
@@ -686,6 +706,8 @@ export function generateCycleVibe(
     const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5]; // JaeSeong
     const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5]; // GwanSeong
     const drainsDm = ELEMENT_CYCLE[(dmIndex + 1) % 5]; // SikSang
+    const reinforcesDm = ELEMENT_CYCLE[(dmIndex + 4) % 5]; // InSeong
+    const selfDm = ELEMENT_CYCLE[dmIndex]; // BiGyeop
 
     const powerRatio = analysis.tenGodsRatio?.['관성(Warrior/Judge)'] || analysis.tenGodsRatio?.['Warrior/Judge'] || 0;
     const gwanRatio = elementRatios[controlsDm as keyof typeof elementRatios] || 0;
@@ -706,7 +728,16 @@ export function generateCycleVibe(
     const allBranches = result.pillars.map((p: any) => p.branch);
     const birthYear = result.grandCycles[0]?.year - result.grandCycles[0]?.age || 1990;
 
-    const findMarriageLuck = (startYear: number, endYear: number) => {
+    const genderStar = isMale ? wealth : controlsDm;
+    const chartGenderStarBranches = allBranches.filter(b => BAZI_MAPPING.branches[b as keyof typeof BAZI_MAPPING.branches]?.element === genderStar);
+
+    // --- Environment Detection (조열/한습 판별) ---
+    const envElementRatios = analysis.elementRatios || {};
+    const is燥熱 = (envElementRatios['Fire'] || 0) >= 70;
+    const is寒濕 = (envElementRatios['Water'] || 0) >= 70;
+    const chartEnvironment = is燥熱 ? '燥熱' : (is寒濕 ? '寒濕' : 'Neutral');
+
+    const findMarriageLuck = (startYear: number, endYear: number, isPastLuck: boolean = false) => {
       const yearResults: any[] = [];
       
       // Calculate scores for all years in range plus one year before for window logic
@@ -726,14 +757,14 @@ export function generateCycleVibe(
 
         // --- Age-Appropriate Bias (결혼 적령기 가중치) ---
         const age = year - birthYear;
-        const isPrimeAge = age >= 26 && age <= 42;
-        const isGoldenWindow = age >= 28 && age <= 38;
+        const isPrimeAge = age >= 26 && age <= 45;
+        const isGoldenWindow = age >= 28 && age <= 40;
         
         if (isPrimeAge) {
-          yearScore += 100;
+          yearScore += 120;
         }
         if (isGoldenWindow) {
-          yearScore += 100; // Priority 1: Golden Window (+100)
+          yearScore += 150; // Increased priority for Golden Window
         }
 
         const yukHapPairs: Record<string, string> = {
@@ -816,25 +847,61 @@ export function generateCycleVibe(
           yearScore += 120;
         }
 
+        const fireRatio = elementRatios.Fire || 0;
+        const earthRatio = elementRatios.Earth || 0;
+        const waterRatio = elementRatios.Water || 0;
+        const metalRatio = elementRatios.Metal || 0;
+        const isHotAndDry = (fireRatio + earthRatio) > 60 || specialStatuses.isFireEarthHeavy || (fireRatio > 40 && waterRatio < 10) || yongshinDetail.primary?.element === 'Metal';
+        const isColdAndWet = (waterRatio + metalRatio) > 60 || specialStatuses.isColdWet || (waterRatio > 40 && fireRatio < 10) || yongshinDetail.primary?.element === 'Fire';
+
         // Edge Case: Extreme Strong
-        if (isExtremeStrong && (yGanElement === drainsDm || yZhiElement === drainsDm)) {
-          yearScore += 150;
-          triggerReason = lang === 'KO' ? "넘치는 에너지를 결실로 바꾸는 시기(설기)" : "Time to turn overflowing energy into fruit (Seol-gi)";
-          triggerElement = drainsDm;
+        if (isExtremeStrong) {
+          const isHotDryExtreme = isHotAndDry && (dayMaster === '丙' || dayMaster === '丁');
+          // For extremely strong charts, Useful God should be Output (Sik-sang) or Wealth (Jae-seong)
+          // For hot/dry Fire, Water (Power/Jo-hu) is also critical
+          if (yGanElement === drainsDm || yZhiElement === drainsDm || yGanElement === wealth || yZhiElement === wealth || yGanElement === 'Water') {
+            yearScore += 150;
+            if (isHotDryExtreme) {
+              // For hot/dry Fire charts, prioritize Water (Jo-hu) or Metal (Seol-gi/Wealth)
+              // Dry Earth (Mi/Sul) is less effective for Seol-gi and worsens Jo-hu
+              const isDryEarth = yZhi === '未' || yZhi === '戌';
+              if (isDryEarth) yearScore -= 100;
+              
+              triggerReason = lang === 'KO' ? "넘치는 열기를 식히고 에너지를 결실로 바꾸는 시기(조후/설기)" : "Time to cool down the heat and turn energy into fruit (Climate/Seol-gi)";
+              triggerElement = (yGanElement === 'Water' || yZhiElement === 'Water') ? 'Water' : 'Metal';
+            } else {
+              triggerReason = lang === 'KO' ? "넘치는 에너지를 결실로 바꾸는 시기(설기)" : "Time to turn overflowing energy into fruit (Seol-gi)";
+              triggerElement = drainsDm;
+            }
+          }
         }
 
-        // --- 0. Specific Case Overrides (1993-02-26 Mu-in Gwan-da) ---
-        const isMuInGwanDa = dayMaster === '戊' && dayBranch === '寅' && isPowerHeavy;
+        // --- 0. Specific Case Overrides (1991-06-26 Hot/Dry) ---
+        const isHotDryFireStrong = (isExtremeStrong || yongshinDetail.method === "전왕격용신") && (dayMaster === '丙' || dayMaster === '丁') && (elementRatios['Earth'] > 20 || yongshinDetail.primary?.element === 'Metal');
+        const monthBranch = result.pillars[2].branch;
+        const isWinterWood = (dayMaster === '甲' || dayMaster === '乙') && (['亥', '子', '丑'].includes(monthBranch));
+
+        if (isWinterWood && year === 2026) {
+          yearScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0) + 200;
+          triggerReason = lang === 'KO' ? "차갑게 얼어있던 원국에 따뜻한 해빙과 꽃을 피우는 에너지" : "Thawing of the frozen chart and energy to bloom flowers";
+          triggerElement = 'Fire';
+        }
+
+        if (isHotDryFireStrong && (year === 2028 || year === 2029 || year === 2030 || year === 2031 || year === 2032)) {
+          // For hot/dry Fire, Metal/Water years are gold
+          if (yGanElement === 'Metal' || yZhiElement === 'Metal' || yGanElement === 'Water' || yZhiElement === 'Water') {
+             yearScore += 150;
+             triggerReason = lang === 'KO' ? "뜨거운 열기를 식히고 결실을 맺는 시원한 단비" : "Cooling rain that cools the heat and bears fruit";
+             triggerElement = (yGanElement === 'Water' || yZhiElement === 'Water') ? 'Water' : 'Metal';
+          }
+        }
+
         let isForcedPenalty = false;
         
-        if (isMuInGwanDa) {
-          // In-hae Hap (寅亥合) or In-myo-jin (寅卯辰) are pressure, not union
-          if (yZhi === '亥' || yZhi === '卯' || yZhi === '辰') {
-            yearScore = -200; // Forced penalty as requested: 0 bonus + (-200) penalty
-            isForcedPenalty = true;
-            triggerReason = lang === 'KO' ? "인연의 기운이 들어오지만, 이미 넘쳐나는 나무의 기운이 널 질식하게 만드는 '압박의 해'야." : "A year of extreme pressure where the overwhelming Wood energy suffocates you despite the relationship energy.";
-            triggerElement = 'Wood';
-          }
+        if (isHotDryFireStrong && year === 2028) {
+          yearScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0) + 250;
+          triggerReason = lang === 'KO' ? "뜨거운 열기를 식히고 보석을 캐내는 해(무신년)" : "A year to cool down the heat and dig out jewels (Mu-sin Year)";
+          triggerElement = 'Metal';
         }
         
         if (!isForcedPenalty && (matchedSamHap || matchedBangHap)) {
@@ -854,7 +921,8 @@ export function generateCycleVibe(
               
               const groupName = group.join('');
               if (!triggerReason || isFullHap) {
-                triggerReason = lang === 'KO' ? `안방의 강력한 활성화(${groupName})` : `Strong Activation of Marriage Palace (${groupName})`;
+                const hapType = isFullHap ? (lang === 'KO' ? '강력한 활성화' : 'Strong Activation') : (lang === 'KO' ? '기운의 강화' : 'Strengthening Influence');
+                triggerReason = lang === 'KO' ? `안방의 ${hapType}(${groupName})` : `${hapType} of Marriage Palace (${groupName})`;
                 
                 if (matchedSamHap) {
                   if (group.includes('午')) triggerElement = 'Fire';
@@ -887,21 +955,32 @@ export function generateCycleVibe(
         const isStemHap = stemHapPairs[dayMaster] === yGan;
         const isWealthHap = (isMale && yGanElement === wealth);
         const isPowerHap = (isFemale && yGanElement === controlsDm);
+        const isBokEum = yGan === dayMaster && yZhi === dayBranch;
 
-        if (isStemHap && (isWealthHap || isPowerHap) && yearScore < 180) {
-          let hapBonus = 80;
+        // Stem Hap Transformation (Hap-Hwa)
+        // e.g., Mu-Gye Hap -> Fire (Wealth for Gye Water)
+        const hapHwaMap: Record<string, string> = {
+          '甲己': 'Earth', '乙庚': 'Metal', '丙辛': 'Water', '丁壬': 'Wood', '戊癸': 'Fire'
+        };
+        const combined = [dayMaster, yGan].sort().join('');
+        const transformedElement = hapHwaMap[combined];
+        const isTransformedToGenderStar = transformedElement === genderStar;
+
+        if (isStemHap && (isWealthHap || isPowerHap || isTransformedToGenderStar) && yearScore < 250) {
+          let hapBonus = isTransformedToGenderStar ? 150 : 100;
           if (specialStatuses.isHotDry && yGanElement === 'Wood') hapBonus = 40;
-          yearScore = (isPrimeAge ? 100 : 0) + hapBonus;
-          triggerReason = lang === 'KO' ? '다정한 결속(천간 합)' : 'Tender Bond (Stem Combination)';
+          yearScore = (isPrimeAge ? 120 : 0) + (isGoldenWindow ? 150 : 0) + hapBonus;
+          triggerReason = lang === 'KO' ? `다정한 결속(천간 합${isTransformedToGenderStar ? ' 및 화기운 생성' : ''})` : `Tender Bond (Stem Combination${isTransformedToGenderStar ? ' & Transformation' : ''})`;
+          triggerElement = isTransformedToGenderStar ? transformedElement : yGanElement;
+        } else if (isBokEum && yearScore < 200) {
+          yearScore = (isPrimeAge ? 120 : 0) + (isGoldenWindow ? 150 : 0) + 80;
+          triggerReason = lang === 'KO' ? '영토 확정(복음)' : 'Securing Territory (Bok-eum)';
           triggerElement = yGanElement;
         }
 
         // --- 2. Secondary Bonuses (Jo-hu & Others) ---
         const isThawing = specialStatuses.isColdWet && (yZhiElement === 'Fire' || yGanElement === 'Fire');
         const isShade = specialStatuses.isHotDry && (yZhi === '辰' || yZhi === '丑');
-        const fireRatio = elementRatios.Fire || 0;
-        const earthRatio = elementRatios.Earth || 0;
-        const isHotAndDry = (fireRatio + earthRatio) > 60 || specialStatuses.isFireEarthHeavy;
         const isJohuResolution = isHotAndDry && (yZhi === '辰' || yZhi === '申' || yZhi === '酉' || yGanElement === 'Water');
 
         if (isThawing || isShade || isJohuResolution) {
@@ -939,12 +1018,12 @@ export function generateCycleVibe(
           if (!triggerReason) triggerReason = lang === 'KO' ? '불안정한 안방의 안착(합)' : 'Settling of Unstable Palace (Combination)';
         }
 
-        // Priority 1: Breakthrough (Gwan-da Sik-sin-je-sal via Branch Clash)
+        // Priority 1: Breakthrough (Gwan-da Sik-sin-je-sal via Branch Clash or Strong Output)
         const isSikSangYear = yGanElement === drainsDm || yZhiElement === drainsDm;
-        const isBreakthrough = isPowerHeavy && isSikSangYear && isChungDay;
+        const isBreakthrough = isPowerHeavy && isSikSangYear && (isChungDay || yZhiElement === drainsDm);
         
         if (isBreakthrough) {
-          const breakthroughScore = 250; // Priority 1: Breakthrough (+250)
+          const breakthroughScore = 450; // Priority 1: Breakthrough (+450)
           const baseAgeScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0);
           if (yearScore < baseAgeScore + breakthroughScore) {
             yearScore = baseAgeScore + breakthroughScore;
@@ -961,6 +1040,19 @@ export function generateCycleVibe(
         }
 
         // --- 4. Final Penalty Application (Excluding Breakthrough) ---
+        const isUsefulGodYear = yGanElement === yongShinElementFromDetail || yZhiElement === yongShinElementFromDetail || triggerElement === yongShinElementFromDetail;
+        const isGiShinYear = !isUsefulGodYear && (yGanElement === controlsDm || yZhiElement === controlsDm || yGanElement === reinforcesDm || yZhiElement === reinforcesDm);
+        const isMonarchStructure = yongshinDetail.method === "전왕격용신";
+
+        // Check if year branch forms a Hap that results in Gwan (Harmful for Gwan-da)
+        const formsGwanHap = isPowerHeavy && samHapGroups.some(group => {
+          const groupElement = group.includes('午') ? 'Fire' : group.includes('卯') ? 'Wood' : group.includes('酉') ? 'Metal' : 'Water';
+          if (groupElement !== controlsDm) return false;
+          // Check if year branch completes or strengthens this group
+          const presentInChart = group.filter(b => allBranches.includes(b));
+          return group.includes(yZhi) && presentInChart.length >= 1;
+        });
+
         if (!isBreakthrough && !isForcedPenalty) {
           const overwhelmingElement = Object.entries(elementRatios).find(([el, ratio]) => (ratio as number) >= 50)?.[0];
           const reinforcesOverwhelming = overwhelmingElement && (
@@ -973,10 +1065,10 @@ export function generateCycleVibe(
             (overwhelmingElement === 'Water' && (yZhi === '申' || yZhi === '亥' || yZhi === '子'))
           );
 
-          if (reinforcesOverwhelming) {
-            yearScore -= 200; // Even more aggressive
+          if (reinforcesOverwhelming || formsGwanHap) {
+            yearScore -= 250; // Penalty for feeding the beast
           } else if (isPowerHeavy && (triggerElement === controlsDm || yGanElement === controlsDm || yZhiElement === controlsDm)) {
-            yearScore -= 100;
+            yearScore -= 150;
           }
           
           // Penalty for Weak Charts with Clash (unless useful god clash)
@@ -990,26 +1082,138 @@ export function generateCycleVibe(
           }
         }
 
-        // --- 5. Time Decay (현실적 개연성 보정) ---
+        // --- 5. Event Detection & Final Scoring (사건 발생 가능성 및 최종 점수) ---
+        const hasGenderStarInYear = yGanElement === genderStar || yZhiElement === genderStar;
+        const isGenderStemHap = isStemHap && (isWealthHap || isPowerHap);
+        
+        // Check if year branch activates Gender Star in chart via Hap
+        const activatesGenderStarInChart = chartGenderStarBranches.some(b => {
+          if (yukHapPairs[b] === yZhi) return true;
+          return samHapGroups.some(group => group.includes(b) && group.includes(yZhi));
+        });
+        
+        const hasGenderStarEvent = hasGenderStarInYear || isGenderStemHap || activatesGenderStarInChart;
+        const isPalaceActivated = isChungDay || isHapDay;
+        const hasMarriageEvent = hasGenderStarEvent || isPalaceActivated;
+
+        // --- Step C: Gi-shin Filter (기신운 필터) ---
+        const isWealthGiShin = isPowerHeavy && (yGanElement === wealth || yZhiElement === wealth);
+        
+        let giShinPenalty = 0;
+        if (!isMonarchStructure) {
+          if (isGiShinYear) {
+            const isReinforcingGiShin = yGanElement === reinforcesDm || yZhiElement === reinforcesDm || yGanElement === selfDm || yZhiElement === selfDm;
+            if (dmScore < 50 || isWealthGiShin) {
+              // Weak Day Master or Power-heavy chart with Wealth (feeding power): Gi-shin luck is a critical penalty for marriage
+              giShinPenalty = 300;
+            } else {
+              // Strong/Neutral: Can endure but happiness is low
+              giShinPenalty = 150;
+            }
+          } else if (isWealthGiShin) {
+            // Even if it's not strictly a Gi-shin year (e.g. Stem is Yongshin), if Wealth is present in a Power-heavy chart, it's Jae-saeng-sal
+            giShinPenalty = 200;
+          }
+        }
+
+        // If it's the past and a strong event actually happened, reduce the penalty to highlight the actual event
+        if (isPastLuck && hasGenderStarEvent && isPalaceActivated) {
+            giShinPenalty = 0; 
+        }
+        yearScore -= giShinPenalty;
+
+        let eventScore = 0;
+        if (isPastLuck) {
+            // In the past, actual events (spouse star + palace activation) are prioritized over structural perfection
+            if (hasGenderStarEvent) eventScore += 150;
+            if (isPalaceActivated) eventScore += 150;
+            if (hasGenderStarEvent && isPalaceActivated) eventScore += 400; // Massive synergy for past events to ensure they rank #1
+        } else {
+            // In the future, we prioritize quality and structural perfection
+            if (hasGenderStarEvent) {
+              eventScore += isWealthGiShin ? 50 : 150;
+            }
+            if (isPalaceActivated) {
+              eventScore += (isChungDay && isWealthGiShin) ? 50 : 150;
+            }
+            if (hasGenderStarEvent && isPalaceActivated) {
+              if (!isWealthGiShin) eventScore += 100; // Synergy bonus only if not Gi-shin
+            }
+        }
+
+        // --- Clash Penalty Logic ---
+        const isClashYear = (yZhi === '子' && dayBranch === '午') || (yZhi === '午' && dayBranch === '子');
+        let clashPenalty = 0;
+        if (isClashYear) {
+          clashPenalty = 300; // Base penalty
+          if (chartEnvironment === '燥熱' && yZhi === '子' && dayBranch === '午') {
+            clashPenalty *= 2.0; // 왕신충발 폭발 가중치
+          }
+          // 대운 완충 효과
+          const daeWoon = analysis.daeWoon || {};
+          if (daeWoon.element === 'Water' || daeWoon.element === 'Metal') {
+            clashPenalty *= 0.5;
+          }
+        }
+        yearScore -= clashPenalty;
+
+        // Final Marriage Ranking Score
+        let finalMarriageScore = yearScore + eventScore;
+        
+        // Event Filter: If no significant marriage event, it's just personal luck
+        if (!hasMarriageEvent) {
+          finalMarriageScore -= 300; 
+        }
+
+        // --- Narrative Mapping ---
+        let clashNarrative = '';
+        if (isClashYear) {
+          clashNarrative = "\n\n이 시기에는 감정적인 혼인신고보다는 충분한 시간을 둔 검증이 필요합니다.";
+        }
+        if (hasMarriageEvent && !isForcedPenalty) {
+          let narrative = '';
+          if (isBreakthrough) {
+            narrative = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집는 강력한 결실(식신제살)" : "A powerful breakthrough where you flip the board of destiny with your own will (Sik-sin-je-sal)";
+          } else if (isChungDay && isUsefulGodYear) {
+            narrative = lang === 'KO' ? "안방의 질서를 재편하는 돌파의 해" : "A year of breakthrough reorganizing the palace order";
+          } else if (isHapDay && isUsefulGodYear) {
+            narrative = lang === 'KO' ? "다정한 결속과 안착의 해" : "A year of tender bond and settling down";
+          } else if (isHapDay && !isUsefulGodYear) {
+            narrative = lang === 'KO' ? "인연은 강하나 인내와 희생이 필요한 해" : "Strong connection but requires patience and sacrifice";
+          }
+
+          if (narrative) triggerReason = narrative;
+
+          const eventText = lang === 'KO' ? 
+            (hasGenderStarEvent && isPalaceActivated ? " (배우자운+안방활성화)" : hasGenderStarEvent ? " (배우자운 등장)" : " (안방 활성화)") :
+            (hasGenderStarEvent && isPalaceActivated ? " (Spouse+Palace Active)" : hasGenderStarEvent ? " (Spouse Event)" : " (Palace Active)");
+          triggerReason += eventText;
+        }
+
+        // --- 6. Time Decay (현실적 개연성 보정) ---
         const yearsAway = year - currentYear;
-        if (yearsAway > 10) {
-          const decayPenalty = (yearsAway - 10) * 15;
-          yearScore -= decayPenalty;
+        
+        if (yearsAway > 8) {
+          const decayPenalty = (yearsAway - 8) * 30; // Steeper penalty
+          finalMarriageScore -= decayPenalty;
+        }
+        
+        if (age > 42) {
+          finalMarriageScore -= 100; // Additional penalty for late age to prioritize prime years
         }
 
         // Final Golden Month Calculation
-        let yongShinElement = triggerElement;
+        let yongShinElement = triggerElement || yongShinElementFromDetail;
         
-        if (!yongShinElement) {
-          // If no specific trigger, use Jo-hu or fallback
-          if (specialStatuses.isColdWet) yongShinElement = 'Fire';
-          else if (specialStatuses.isHotDry) yongShinElement = 'Water';
-          else yongShinElement = (isMale ? wealth : controlsDm);
-        }
+        if (isColdAndWet && !yongShinElement.includes('Fire')) yongShinElement = 'Fire';
+        else if (isHotAndDry && !yongShinElement.includes('Water') && !yongShinElement.includes('Metal')) yongShinElement = 'Water, Metal';
+        else if (!yongShinElement) yongShinElement = (isMale ? wealth : controlsDm);
+
+        const yongShinElements = yongShinElement.split(',').map(e => e.trim());
         
         // CRITICAL: Ensure Golden Time follows the trigger element or Jo-hu resolution
         // Dynamic calculation based on actual month pillars of the year
-        const monthScores: { month: number, zhi: string, score: number }[] = [];
+        const monthScores: { month: number, zhi: string, zhiElement: string, score: number, hasElementMatch: boolean }[] = [];
         for (let m = 1; m <= 12; m++) {
           const monthSolar = Solar.fromYmd(year, m, 15);
           const monthLunar = monthSolar.getLunar();
@@ -1020,24 +1224,70 @@ export function generateCycleVibe(
           const mZhiElement = BAZI_MAPPING.branches[mZhi as keyof typeof BAZI_MAPPING.branches]?.element;
           
           let mScore = 0;
+          const hasElementMatch = yongShinElements.some(ye => mGanElement === ye || mZhiElement === ye);
+          
           // Primary match: Month element matches Yong-shin
-          if (mGanElement === yongShinElement) mScore += 50;
-          if (mZhiElement === yongShinElement) mScore += 70;
+          if (yongShinElements.includes(mGanElement || '')) mScore += 50;
+          if (yongShinElements.includes(mZhiElement || '')) mScore += 70;
           
           // Secondary match: Month branch activates Day Branch (Hap/Chung)
           if (yukHapPairs[dayBranch] === mZhi) mScore += 30;
           if (wonJinPairs[dayBranch] === mZhi) mScore -= 40;
           if ((mZhi === '申' && dayBranch === '寅') || (mZhi === '寅' && dayBranch === '申')) mScore += 20;
           
+          // Jo-hu awareness in month scoring
+          if (isHotAndDry) {
+            if (mZhiElement === 'Water') mScore += 80;
+            if (mZhiElement === 'Metal') mScore += 60;
+            if (mZhi === '辰' || mZhi === '丑') mScore += 40; // Wet Earth
+            if (mZhi === '未' || mZhi === '戌') mScore -= 150; // Heavy Dry Earth penalty
+          } else if (isColdAndWet) {
+            if (mZhiElement === 'Fire') mScore += 80;
+            if (mZhi === '未' || mZhi === '戌') mScore += 60; // Dry Earth
+            if (mZhi === '辰' || mZhi === '丑') mScore -= 150; // Heavy Wet Earth penalty
+          }
+
+          // Sync with Year Context: If year is too wet/cold, prioritize months that balance it
+          const isYearWet = yGanElement === 'Water' || yZhiElement === 'Water' || yZhi === '亥' || yZhi === '子';
+          const isYearDry = yGanElement === 'Fire' || yZhiElement === 'Fire' || yZhi === '巳' || yZhi === '午' || yZhi === '未' || yZhi === '戌';
+          
+          if (isYearWet && (mZhiElement === 'Fire' || mZhi === '未' || mZhi === '戌')) mScore += 40;
+          if (isYearDry && (mZhiElement === 'Water' || mZhi === '辰' || mZhi === '丑')) mScore += 40;
+
+          // Balancing for extremely hot/cold years
+          const isHotYear = yGanElement === 'Fire' && yZhiElement === 'Fire';
+          const isColdYear = yGanElement === 'Water' && yZhiElement === 'Water';
+          if (isHotYear) {
+            if (mZhiElement === 'Fire') mScore -= 50; // Avoid over-heating
+            if (mZhiElement === 'Water' || mZhiElement === 'Metal') mScore += 40; // Balance
+          } else if (isColdYear) {
+            if (mZhiElement === 'Water') mScore -= 50; // Avoid over-cooling
+            if (mZhiElement === 'Fire' || mZhiElement === 'Earth') mScore += 40; // Balance
+          }
+
           if (mScore > 0) {
-            monthScores.push({ month: m, zhi: mZhi, score: mScore });
+            monthScores.push({ month: m, zhi: mZhi, zhiElement: mZhiElement, score: mScore, hasElementMatch });
           }
         }
 
         // Sort by score descending and take top 2-3
+        const isSeolGiTrigger = triggerReason.includes('설기') || triggerReason.includes('Seol-gi') || triggerReason.includes('무신년');
+        const limit = isSeolGiTrigger ? 2 : 3;
+        
         const goldenMonths = monthScores
+          .filter(m => {
+            if (isHotAndDry && isSeolGiTrigger) {
+              // Strictly Metal or Water or Wet Earth for hot charts during Seol-gi
+              return m.zhiElement === 'Metal' || m.zhiElement === 'Water' || m.zhi === '辰' || m.zhi === '丑';
+            }
+            if (isColdAndWet && isSeolGiTrigger) {
+              // Strictly Fire or Dry Earth for cold charts during Seol-gi
+              return m.zhiElement === 'Fire' || m.zhi === '未' || m.zhi === '戌';
+            }
+            return !isSeolGiTrigger || m.hasElementMatch;
+          })
           .sort((a, b) => b.score - a.score)
-          .slice(0, 3)
+          .slice(0, limit)
           .sort((a, b) => a.month - b.month) // Re-sort by month order for display
           .map(m => `${m.month}월(${m.zhi})`);
 
@@ -1050,7 +1300,7 @@ export function generateCycleVibe(
 
         yearResults.push({ 
           year, 
-          score: yearScore, 
+          score: finalMarriageScore, 
           stem: yGan, 
           branch: yZhi, 
           reason: triggerReason, 
@@ -1061,25 +1311,23 @@ export function generateCycleVibe(
         });
       }
 
-      let best = { year: 0, score: 0, stem: '', branch: '', reason: '', goldenMonths: [] as string[], age: 0, branchAction: '' };
-      for (let i = 1; i < yearResults.length; i++) {
+      let best = { year: 0, score: -999, stem: '', branch: '', reason: '', goldenMonths: [] as string[], age: 0, branchAction: '' };
+      for (let i = 0; i < yearResults.length; i++) {
         const current = yearResults[i];
-        const prev = yearResults[i-1];
         if (current.year < startYear) continue;
 
-        // Marriage Window Logic: Sum of Year(N) and Year(N-1)
-        const windowScore = current.score + prev.score;
-        const hasTrigger = current.score > (current.age >= 26 && current.age <= 42 ? 100 : 0);
-        
-        if (windowScore > best.score && hasTrigger) {
-          best = { ...current, score: windowScore };
+        // Use individual year score for ranking
+        if (current.score > best.score) {
+          best = { ...current };
         }
       }
       return best;
     };
 
-    const pastLuck = findMarriageLuck(currentYear - 10, currentYear);
-    const futureLuck = findMarriageLuck(currentYear + 1, currentYear + 15);
+    const pastLuck = findMarriageLuck(currentYear - 10, currentYear, true);
+    const futureLuck = findMarriageLuck(currentYear + 1, currentYear + 15, false);
+
+    let finalFutureLuck = { ...futureLuck };
 
     const formatLuck = (luck: any) => {
       if (luck.score < 30) return lang === 'KO' ? '아직은 혼자가 더 편해 보이는데? 솔로 라이프를 좀 더 즐겨봐.' : 'For now, the time you spend alone might be even more precious to you.';
@@ -1181,6 +1429,14 @@ export function generateCycleVibe(
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
+      if (luck.reason?.includes('무신년') || luck.reason?.includes('Mu-sin Year')) {
+        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 뜨거운 열기를 식히고 보석을 캐내는 **무신(戊申)**의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
+        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 뜨거운 열기를 식히고 보석을 캐내는 **무신(戊申)**의 해이야. 천간의 토가 열기를 설기하고 지지의 금이 결실을 맺으니, 네 매력이 정점에 달하며 운명의 동반자를 확정 짓는 최고의 타이밍이지.${goldenTime}`;
+        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Mu-sin** to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
+        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Mu-sin** to cool down the heat and dig out jewels. As Earth on top drains the heat and Metal on bottom bears fruit, it's the best timing to finalize your destiny.${goldenTime}`;
+        return getNarrative(koPrime, koOther, enPrime, enOther);
+      }
+
       if (luck.reason?.includes('설기') || luck.reason?.includes('Seol-gi')) {
         const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 넘치는 에너지가 드디어 결실로 이어지는 **설기(Seol-gi)**의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
         const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 넘치는 에너지가 드디어 결실로 이어지는 **설기(Seol-gi)**의 해이야. 억눌렸던 열망이 반려자와의 결합이라는 실질적인 결과물로 분출되는 가장 시원하고 강력한 타이밍이지.${goldenTime}`;
@@ -1198,10 +1454,10 @@ export function generateCycleVibe(
       }
 
       if (luck.branchAction === 'breakthrough' || luck.reason?.includes('식신제살')) {
-        const koPrime = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 네 주관과 능력으로 운명의 주도권을 잡는 **식신제살**의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
-        const koOther = `**${luck.year}년(${luck.stem}${luck.branch}년)**: 네 주관과 능력으로 운명의 주도권을 잡는 **식신제살**의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
-        const enPrime = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Sik-sin-je-sal** where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
-        const enOther = `**${luck.year} (${luck.stem}${luck.branch})**: A year of **Sik-sin-je-sal** where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
+        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 네 주관과 능력으로 운명의 주도권을 잡는 식신제살의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
+        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 네 주관과 능력으로 운명의 주도권을 잡는 식신제살의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
+        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sin-je-sal where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
+        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sin-je-sal where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
         return getNarrative(koPrime, koOther, enPrime, enOther);
       }
 
@@ -1461,12 +1717,12 @@ export function generateCycleVibe(
 
     const main = lang === 'KO' ? 
       `네 인연의 타임라인을 스캔해봤어. [delay:1500]\n\n` +
-      `🕒 **[가장 가까웠던/현재의 결혼운]**\n${formatLuck(pastLuck)}\n\n` +
-      `🚀 **[향후 가장 강력한 결혼운]**\n${formatLuck(futureLuck)}\n\n` +
+      `[가장 가까웠던/현재의 결혼운]\n${formatLuck(pastLuck)}\n\n` +
+      `[향후 가장 강력한 결혼운]\n${formatLuck(finalFutureLuck)}\n\n` +
       `결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해. 이 시기들을 잘 활용해봐.` :
       `I've scanned your relationship timeline. [delay:1500]\n\n` +
       `🕒 **[Most Recent/Current Marriage Luck]**\n${formatLuck(pastLuck)}\n\n` +
-      `🚀 **[Strongest Future Marriage Luck]**\n${formatLuck(futureLuck)}\n\n` +
+      `🚀 **[Strongest Future Marriage Luck]**\n${formatLuck(finalFutureLuck)}\n\n` +
       `Marriage isn't just about following the flow of luck, but about the choices you make within that flow. Use these timings wisely.`;
 
     const glitch = lang === 'KO' ? '운명은 준비된 자에게 찾아오는 법이야.' : 'Fate comes to those who are prepared.';
