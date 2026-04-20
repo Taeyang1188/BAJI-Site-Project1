@@ -60,7 +60,7 @@ export const calculateBalanceWarnings = (
 
   // 1. Inverse Overcoming (부역/反侮)
   // Wood overcomes Earth, but too much Earth breaks Wood (토다목절 土多木折)
-  if (elementRatios['Earth'] >= 60 && elementRatios['Wood'] <= 15) {
+  if ((elementRatios?.['Earth'] || 0) >= 60 && (elementRatios?.['Wood'] || 0) <= 15) {
     const description = dmElement === 'Metal'
       ? `[${earthCol}:흙(土)]이 너무 많아 당신의 결과물인 [${woodCol}:나무(木)]가 뿌리 내릴 곳이 없군요. 억지로 땅을 파헤치려([${metalCol}:金]) 하기보다, [${woodCol}:나무(木)]로 흙을 소통시키거나([${woodCol}:소토]), 유연한 [${waterCol}:수(水)] 기운으로 땅을 적셔([${waterCol}:윤토]) 나무가 스스로 자라게 해야 합니다. 실력을 쌓아([${artistCol}:식상]) 돈([${wealthCol}:재성])을 벌라는 뜻이죠.`
       : `[${earthCol}:흙(土)]이 너무 단단하고 많아 [${woodCol}:나무(木)] 뿌리가 뻗지 못하고 부러지는 형국이야. 주변의 완고한 환경이나 고집 때문에 본인의 성장이 정체되기 쉬우니, 유연함을 기르고 [${waterCol}:수(水)]나 [${woodCol}:목(木)]의 기운으로 흙을 다스려야 해.`;
@@ -79,7 +79,7 @@ export const calculateBalanceWarnings = (
     });
   }
   // Earth overcomes Water, but too much Water washes away Earth (수다토붕 水多土崩)
-  if (elementRatios['Water'] >= 60 && elementRatios['Earth'] <= 15) {
+  if ((elementRatios?.['Water'] || 0) >= 60 && (elementRatios?.['Earth'] || 0) <= 15) {
     warnings.push({
       title: '수다토붕(수多土崩)',
       titleEn: 'Water-Heavy Earth-Collapse',
@@ -90,7 +90,7 @@ export const calculateBalanceWarnings = (
     });
   }
   // Water overcomes Fire, but too much Fire dries up Water (화다수증 火多수蒸)
-  if (elementRatios['Fire'] >= 60 && elementRatios['Water'] <= 15) {
+  if ((elementRatios?.['Fire'] || 0) >= 60 && (elementRatios?.['Water'] || 0) <= 15) {
     const description = dmElement === 'Water'
       ? `당신([${waterCol}:水])의 기운이 너무 강한 [${fireCol}:열기(火)]에 증발하고 있습니다. 억지로 맞서려 하기보다, [${metalCol}:금(金)]의 기운으로 자신을 보호하고 열기를 식히는 지혜가 필요합니다. 감정에 휩쓸리지 않도록 냉정함을 유지하세요.`
       : `[${fireCol}:불(火)]이 너무 강해 [${waterCol}:물(水)]이 순식간에 증발하여 사라지는 형국이야. 감정이 격해지기 쉽고 자신을 통제할 이성이 무력화될 수 있으니, 억지로 물을 끌어오면 폭발(왕신충발)하니, [${metalCol}:금(金)]을 통해 열기를 밖으로 빼내는 '설기'에만 집중해.`;
@@ -109,7 +109,7 @@ export const calculateBalanceWarnings = (
     });
   }
   // Fire overcomes Metal, but too much Metal dulls Fire (금다화식 金多火熄)
-  if (elementRatios['Metal'] >= 60 && elementRatios['Fire'] <= 15) {
+  if ((elementRatios?.['Metal'] || 0) >= 60 && (elementRatios?.['Fire'] || 0) <= 15) {
     warnings.push({
       title: '금다화식(金多火熄)',
       titleEn: 'Metal-Heavy Fire-Extinguish',
@@ -120,7 +120,7 @@ export const calculateBalanceWarnings = (
     });
   }
   // Metal overcomes Wood, but too much Wood breaks Metal (목다금결 木多金缺)
-  if (elementRatios['Wood'] >= 60 && elementRatios['Metal'] <= 15) {
+  if ((elementRatios?.['Wood'] || 0) >= 60 && (elementRatios?.['Metal'] || 0) <= 15) {
     warnings.push({
       title: '목다금결(목多金缺)',
       titleEn: 'Wood-Heavy Metal-Dull',
@@ -188,7 +188,7 @@ export const calculateBalanceWarnings = (
   }
 
   // 4. Hwa-Da-Geum-Yong (火多金鎔) - Special case for Metal
-  if (elementRatios['Fire'] > 50 && (dmElement === 'Metal' || elementRatios['Metal'] > 15)) {
+  if ((elementRatios?.['Fire'] || 0) > 50 && (dmElement === 'Metal' || (elementRatios?.['Metal'] || 0) > 15)) {
     warnings.push({
       title: '화다금용(火多金鎔)',
       titleEn: 'Fire-Heavy Metal-Melting',

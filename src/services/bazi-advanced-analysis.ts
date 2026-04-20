@@ -845,6 +845,21 @@ export const calculateAdvancedAnalysis = (
     const elementScores: Record<string, number> = strength.elementScores || {};
     const totalScore = Object.values(elementScores).reduce((a: number, b: number) => a + Math.max(0, b), 0) || 1;
     
+    // 0. Gwan-Sal Hon-Jap check (Power Mixture)
+    const pyeonGwanCount = (pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('편관') ? 1 : 0) + (p.branchKoreanName?.includes('편관') ? 1 : 0), 0) || 0);
+    const jeongGwanCount = (pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('정관') ? 1 : 0) + (p.branchKoreanName?.includes('정관') ? 1 : 0), 0) || 0);
+    const hasGwanSalHonJap = pyeonGwanCount > 0 && jeongGwanCount > 0 && (pyeonGwanCount + jeongGwanCount >= 2);
+    
+    if (hasGwanSalHonJap) {
+      cases.push({
+        title: lang === 'KO' ? '관살혼잡(官殺混雜) - 명예와 책임의 과부하' : 'Power Mixture (Gwan-Sal Hon-Jap)',
+        description: lang === 'KO' 
+          ? `정관(명예)과 편관(권위)이 섞여 있어 삶의 목표가 충돌하고 에너지가 분산되는 형상이야. 책임감이 너무 강해 스스로를 볶아치거나, 이성 관계 및 직장 생활에서 선택의 기로에 놓이기 쉬워. 하나를 확실히 택하거나, [${inSeongCol}:인성(Mystic/Sage)]을 통해 이 기운을 부드럽게 소화하는 게 유일한 살길이야.`
+          : `Jeong-Gwan (Honor) and Pyeon-Gwan (Authority) are mixed, causing conflicting life goals and scattered energy. You may push yourself too hard due to excessive responsibility or face frequent dilemmas in relationships and career. The key is to choose one path firmly or utilize [${inSeongCol}:Wisdom (Mystic/Sage)] to handle this intensity.`,
+        type: 'warning'
+      });
+    }
+
     // 1. Wang-shin-chung-bal (Explosive Clash)
     const clashes = [
       ['子', '午'], ['丑', '未'], ['寅', '申'], ['卯', '酉'], ['辰', '戌'], ['巳', '亥']
@@ -1150,7 +1165,15 @@ export const calculateAdvancedAnalysis = (
     geokGukDetail: {
       geonRok: isGeonRok,
       yangIn: isYangIn,
-      description: isGeonRok ? '건록격이야.' : isYangIn ? '양인격이야.' : '일반격이야.'
+      isSpecial: yongshinDetail?.method === '종격용신' || yongshinDetail?.method === '전왕격용신' || yongshinDetail?.method === '특수격용신',
+      specialTitle: yongshinDetail?.primary?.reason?.split(' → ')[0] || '',
+      description: (() => {
+        if (yongshinDetail?.method === '종격용신') return lang === 'KO' ? `귀한 [${yongshinDetail.primary.reason.split(' → ')[0]}]이야. 자신의 고집을 버리고 대세의 흐름에 몸을 맡길 때 거대한 성공이 보장되는 특별한 명식이지.` : `Special Adaptive Structure [${yongshinDetail.primary.reasonEn.split(' → ')[0]}]. Great success is guaranteed when you flow with the dominant energy rather than resisting it.`;
+        if (yongshinDetail?.method === '전왕격용신') return lang === 'KO' ? `강력한 [${yongshinDetail.primary.reason.split(' → ')[0]}]이야. 한 오행의 기운이 온 세상을 뒤덮은 격으로, 그 기운을 막힘없이 써야만 대업을 이룰 수 있는 영웅의 사주야.` : `Powerful Monarch Structure [${yongshinDetail.primary.reasonEn.split(' → ')[0]}]. A heroic chart where one element dominates, and success comes from following that unstoppable force.`;
+        if (isGeonRok) return lang === 'KO' ? '정석적이고 바른 [건록격]이야. 스스로의 힘으로 가문을 일으키고 자수성가할 수 있는 튼튼한 기반을 가졌어.' : 'Ideal [Geon-rok] structure. You have a solid foundation to build your own legacy and succeed through self-made effort.';
+        if (isYangIn) return lang === 'KO' ? '카리스마 넘치는 [양인격]이야. 남다른 경쟁심과 추진력을 가졌으나, 칼을 휘두를 땐 늘 절제가 필요함을 잊지 마.' : 'Charismatic [Yang-in] structure. You possess extraordinary competitive spirit and drive; remember that wielding such power requires constant self-control.';
+        return lang === 'KO' ? '안정적인 [일반격]이야. 오행의 조력이 필요한 만큼 주변과 협조하며 차근차근 성공을 일궈가는 스타일이야.' : 'Stable [Standard] structure. You succeed by cooperating with others and building progress step-by-step as needed by your elemental balance.';
+      })()
     }
   };
 };

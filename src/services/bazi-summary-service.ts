@@ -260,11 +260,20 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   const pickRandom = (tags: string[], count: number = 2) => [...tags].sort(() => 0.5 - Math.random()).slice(0, count);
 
   // 1. Ten Gods Scores (Da-ja / Mu-ja)
-  const bigyeopScore = (tenGods['Friend'] || 0) + (tenGods['Rob Money'] || 0);
-  const sikSangScore = (tenGods['Eating God'] || 0) + (tenGods['Hurting Officer'] || 0);
-  const jaeSeongScore = (tenGods['Indirect Wealth'] || 0) + (tenGods['Direct Wealth'] || 0);
-  const gwanSeongScore = (tenGods['Indirect Officer'] || 0) + (tenGods['Direct Officer'] || 0);
-  const inSeongScore = (tenGods['Indirect Resource'] || 0) + (tenGods['Direct Resource'] || 0);
+  const getTenGodScore = (keywords: string[]) => {
+    return Object.entries(tenGods).reduce((sum, [key, val]) => {
+      if (keywords.some(kw => key.includes(kw))) {
+        return sum + (val as number);
+      }
+      return sum;
+    }, 0);
+  };
+
+  const bigyeopScore = getTenGodScore(['비겁', 'Mirror', 'Rival']);
+  const sikSangScore = getTenGodScore(['식상', 'Artist', 'Rebel']);
+  const jaeSeongScore = getTenGodScore(['재성', 'Maverick', 'Architect']);
+  const gwanSeongScore = getTenGodScore(['관성', 'Warrior', 'Judge']);
+  const inSeongScore = getTenGodScore(['인성', 'Mystic', 'Sage']);
 
   if (lang === 'KO') {
     // Bi-Gyeop (Self)
@@ -282,7 +291,20 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     else if (jaeSeongScore === 0) hashtags.push(...pickRandom(["#무소유의미학", "#과정중심", "#낭만주의자", "#돈보다꿈", "#물욕제로"]));
 
     // Gwan-Seong (Power/Officer)
-    if (gwanSeongScore > 35) hashtags.push(...pickRandom(["#K-직장인", "#책임감지옥", "#원칙주의자", "#완벽주의", "#바른생활"]));
+    if (gwanSeongScore > 35) {
+      const pyeonGwanCount = result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('편관') ? 1 : 0) + (p.branchKoreanName?.includes('편관') ? 1 : 0), 0) || 0;
+      const jeongGwanCount = result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('정관') ? 1 : 0) + (p.branchKoreanName?.includes('정관') ? 1 : 0), 0) || 0;
+      
+      const isGwanSalHonJap = pyeonGwanCount > 0 && jeongGwanCount > 0 && (pyeonGwanCount + jeongGwanCount >= 2);
+
+      if (isGwanSalHonJap) {
+        hashtags.push(...pickRandom(["#천의얼굴", "#다기능멀티탭", "#카멜레온", "#알외단내", "#어떨땐FM어떨땐야생마"]));
+      } else if (pyeonGwanCount > jeongGwanCount) {
+        hashtags.push(...pickRandom(["#책임감지옥", "#원칙주의자", "#완벽주의", "#보스기질", "#카리스마"]));
+      } else {
+        hashtags.push(...pickRandom(["#K-직장인", "#바른생활", "#모범생", "#FM", "#신뢰의아이콘"]));
+      }
+    }
     else if (gwanSeongScore === 0) hashtags.push(...pickRandom(["#규칙브레이커", "#자유로운영혼", "#통제불가", "#내맘대로살거야", "#보헤미안"]));
 
     // In-Seong (Resource)
@@ -334,7 +356,16 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     else if (jaeSeongScore === 0) hashtags.push(...pickRandom(["#Minimalist", "#ProcessOverResult", "#Romantic", "#DreamsOverMoney", "#ZeroMaterialism"]));
 
     // Gwan-Seong (Power/Officer)
-    if (gwanSeongScore > 35) hashtags.push(...pickRandom(["#CorporateSlave", "#ResponsibilityHell", "#RuleFollower", "#Perfectionist", "#GoodTwoShoes"]));
+    if (gwanSeongScore > 35) {
+      const pyeonGwanCount = result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('편관') ? 1 : 0) + (p.branchKoreanName?.includes('편관') ? 1 : 0), 0) || 0;
+      const jeongGwanCount = result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('정관') ? 1 : 0) + (p.branchKoreanName?.includes('정관') ? 1 : 0), 0) || 0;
+      
+      if (pyeonGwanCount > jeongGwanCount) {
+        hashtags.push(...pickRandom(["#ResponsibilityHell", "#RuleFollower", "#Perfectionist", "#BossVibe", "#CharismaFocus"]));
+      } else {
+        hashtags.push(...pickRandom(["#CorporateHero", "#GoodTwoShoes", "#ModelCitizen", "#ByTheBook", "#TrustIcon"]));
+      }
+    }
     else if (gwanSeongScore === 0) hashtags.push(...pickRandom(["#RuleBreaker", "#FreeSpirit", "#Uncontrollable", "#MyLifeMyRules", "#Bohemian"]));
 
     // In-Seong (Resource)

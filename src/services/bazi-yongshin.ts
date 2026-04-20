@@ -306,8 +306,8 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
     ratios[el] = (Number(score) / (totalScore || 1)) * 100;
   });
 
-  const fireRatio = ratios['Fire'] || 0;
-  const earthRatio = ratios['Earth'] || 0;
+  const fireRatio = (ratios?.['Fire'] || 0) || 0;
+  const earthRatio = (ratios?.['Earth'] || 0) || 0;
 
   const isHwaDaToCho = (dmElement === 'Earth' && fireRatio >= 40) || (structureDetail?.title === '화토중탁') || (structureDetail?.title === '화다토초');
   const isToDaMaeGeum = (dmElement === 'Metal' && earthRatio >= 40) || (structureDetail?.title === '토다매금');
@@ -629,7 +629,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     if (el !== powerEl && el !== wealthEl && el !== artistEl) return false;
     
     // Check if the root is "functional" or "attacked"
-    if (el === 'Metal' && ratios['Fire'] > 60) {
+    if (el === 'Metal' && (ratios?.['Fire'] || 0) > 60) {
       // Metal root in Fire-heavy chart
       const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
                          (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
@@ -637,7 +637,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
       return false; // Isolated Metal root is "melted" (e.g., 1992's Shin)
     }
     
-    if (el === 'Water' && ratios['Earth'] > 60) {
+    if (el === 'Water' && (ratios?.['Earth'] || 0) > 60) {
       // Water root in Earth-heavy chart
       const hasWaterHap = (branches.includes('子') && (branches.includes('申') || branches.includes('辰'))) ||
                          (branches.includes('亥') && (branches.includes('寅') || branches.includes('卯')));
@@ -723,9 +723,9 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
           if (score < 80 * yinStrictnessRatio) return null;
 
           // 3. Earth DM Metal Filter: If Earth DM and Metal is strong (Sa-Yu-Chuk etc), it's not Jeon-Wang
-          if (dmElement === 'Earth' && (ratios['Metal'] > 25 || branches.some(b => b === '酉'))) {
+          if (dmElement === 'Earth' && ((ratios?.['Metal'] || 0) > 25 || branches.some(b => b === '酉'))) {
              const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑')));
-             if (hasMetalHap || ratios['Metal'] > 30) return null;
+             if (hasMetalHap || (ratios?.['Metal'] || 0) > 30) return null;
           }
 
           // 4. Heavenly Stem Opponent (천간의 방해자)
@@ -817,8 +817,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
   const checkImage = () => {
     // 금수쌍청
     if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '亥', '子'].includes(monthZhi)) {
-      if (ratios['Metal'] + ratios['Water'] >= 70) {
-        const isDirty = ratios['Earth'] > 10 || ratios['Fire'] > 15;
+      if ((ratios?.['Metal'] || 0) + (ratios?.['Water'] || 0) >= 70) {
+        const isDirty = (ratios?.['Earth'] || 0) > 10 || (ratios?.['Fire'] || 0) > 15;
         return {
           name: '금수쌍청',
           nameEn: 'Metal-Water Purity',
@@ -833,8 +833,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     }
     // 목화통명
     if (['甲', '乙'].includes(dayMaster) && ['寅', '卯', '辰', '巳', '午'].includes(monthZhi)) {
-      if (ratios['Wood'] + ratios['Fire'] >= 60) {
-        const isDirty = ratios['Water'] > 25 || ratios['Metal'] > 20;
+      if ((ratios?.['Wood'] || 0) + (ratios?.['Fire'] || 0) >= 60) {
+        const isDirty = (ratios?.['Water'] || 0) > 25 || (ratios?.['Metal'] || 0) > 20;
         return {
           name: '목화통명',
           nameEn: 'Wood-Fire Brilliance',
@@ -849,8 +849,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     }
     // 수목청화
     if (['壬', '癸'].includes(dayMaster) && ['亥', '子', '丑', '寅', '卯'].includes(monthZhi)) {
-      if (ratios['Water'] + ratios['Wood'] >= 60) {
-        const isDirty = ratios['Earth'] > 20 || ratios['Metal'] > 30;
+      if ((ratios?.['Water'] || 0) + (ratios?.['Wood'] || 0) >= 60) {
+        const isDirty = (ratios?.['Earth'] || 0) > 20 || (ratios?.['Metal'] || 0) > 30;
         return {
           name: '수목청화',
           nameEn: 'Water-Wood Purity',
@@ -865,8 +865,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     }
     // 금백수청
     if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '戌', '亥', '子'].includes(monthZhi)) {
-      if (ratios['Metal'] >= 40 && ratios['Water'] >= 30) {
-        const isDirty = ratios['Earth'] > 10 || ratios['Fire'] > 15;
+      if ((ratios?.['Metal'] || 0) >= 40 && (ratios?.['Water'] || 0) >= 30) {
+        const isDirty = (ratios?.['Earth'] || 0) > 10 || (ratios?.['Fire'] || 0) > 15;
         return {
           name: '금백수청',
           nameEn: 'Metal-White Water-Clear',
@@ -884,7 +884,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
       // Strict filter for Fire-Earth Turbid
       const isYinEarth = dayMaster === '己';
       const isJeongFire = dayMaster === '丁';
-      const fireEarthRatio = ratios['Fire'] + ratios['Earth'];
+      const fireEarthRatio = (ratios?.['Fire'] || 0) + (ratios?.['Earth'] || 0);
       
       // Filter 3: Leakage Check (Sik-sang Metal in stems with root)
       const hasFunctionalMetalInStem = stems.some((s, idx) => {
@@ -900,7 +900,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         if (el !== 'Metal') return false;
         
         // Metal root in Fire-heavy chart
-        if (ratios['Fire'] > 50) {
+        if ((ratios?.['Fire'] || 0) > 50) {
           const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
                              (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
           if (hasMetalHap) return true;
@@ -914,7 +914,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         return null;
       }
 
-    if (fireEarthRatio >= 75 && ratios['Water'] < 10) {
+    if (fireEarthRatio >= 75 && (ratios?.['Water'] || 0) < 10) {
       // Check for Water survival
       const hasFunctionalWater = stems.some((s, idx) => {
         if (idx === 1) return false;

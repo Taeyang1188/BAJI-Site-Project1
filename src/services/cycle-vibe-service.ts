@@ -731,6 +731,17 @@ export function generateCycleVibe(
     const genderStar = isMale ? wealth : controlsDm;
     const chartGenderStarBranches = allBranches.filter(b => BAZI_MAPPING.branches[b as keyof typeof BAZI_MAPPING.branches]?.element === genderStar);
 
+    // Gwan-Sal Hon-Jap checking (관살혼잡 / 관다 / 상관견관 필터용)
+    const pyeonGwanCount = (result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('편관') ? 1 : 0) + (p.branchKoreanName?.includes('편관') ? 1 : 0), 0) || 0);
+    const jeongGwanCount = (result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('정관') ? 1 : 0) + (p.branchKoreanName?.includes('정관') ? 1 : 0), 0) || 0);
+    const gwanSeongRatio = analysis?.tenGodsRatio?.['관성'] || 0;
+    const biGeopRatio = analysis?.tenGodsRatio?.['비겁'] || 0;
+    const isGwanTaegwang = isFemale && gwanSeongRatio > 35; // 관살태강
+    const isGwanSalHonJap = isFemale && pyeonGwanCount > 0 && jeongGwanCount > 0 && (pyeonGwanCount + jeongGwanCount >= 2);
+    // DaeWoon check mock (DaeWoon info isn't directly fully available in cycle-vibe yet, but we will protect against SangGwanGyeonGwan)
+    const hasJeongGwan = jeongGwanCount > 0;
+    const hasPyeonGwan = pyeonGwanCount > 0;
+
     // --- Environment Detection (조열/한습 판별) ---
     const envElementRatios = analysis.elementRatios || {};
     const is燥熱 = (envElementRatios['Fire'] || 0) >= 70;
@@ -754,6 +765,40 @@ export function generateCycleVibe(
         let yearScore = 0;
         let triggerReason = '';
         let triggerElement = '';
+        let branchAction = '';
+        let penaltyReason = '';
+
+        // 상관견관 명확한 판별 로직
+        // 연운 천간이 '상관'인데 원국 내 정관이 있거나, 연운 자체가 상관견관 간여지동일 때
+        
+        // 상관 (Hurting Officer): Drains DM, different polarity.
+        const dmInfo = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems];
+        const yGanInfo = BAZI_MAPPING.stems[yGan as keyof typeof BAZI_MAPPING.stems];
+        const dmPolarity = dmInfo?.element ? (['甲', '丙', '戊', '庚', '壬'].includes(dayMaster) ? '+' : '-') : null;
+        const yGanPolarity = yGanInfo?.element ? (['甲', '丙', '戊', '庚', '壬'].includes(yGan) ? '+' : '-') : null;
+        
+        const isSangGwan = (yGanElement === drainsDm && dmPolarity !== yGanPolarity);
+        const isSikSin = (yGanElement === drainsDm && dmPolarity === yGanPolarity);
+        const isJeongGwanYear = (yGanElement === controlsDm && dmPolarity !== yGanPolarity);
+        const isPyeonGwanYear = (yGanElement === controlsDm && dmPolarity === yGanPolarity);
+        const isBiGeop = (yGanElement === dmElement);
+
+        let isSangGwanGyeonGwan = false;
+        let isSikSinJeSal = false;
+
+        if (isFemale && (isGwanTaegwang || isGwanSalHonJap)) {
+          if (isSangGwan && hasJeongGwan) {
+             isSangGwanGyeonGwan = true;
+             penaltyReason = "상관견관: 관살혼잡 중에 상관이 들어와 이성운이 파탄나거나 갈등이 극대화되는 흉운 (결혼 불가)";
+          }
+          if (isSikSin && pyeonGwanCount > 0) {
+             isSikSinJeSal = true;
+          }
+          // 무리한 간여지동 (비견/겁재) 연운
+          if (isBiGeop && yGanElement === yZhiElement && biGeopRatio > 25) {
+             penaltyReason = "강력한 간여지동 비겁운: 고집이 거세지고 경쟁이 심화되어 타협과 결합을 상징하는 결혼에는 매우 부적절함";
+          }
+        }
 
         // --- Age-Appropriate Bias (결혼 적령기 가중치) ---
         const age = year - birthYear;
@@ -872,10 +917,10 @@ export function generateCycleVibe(
           yearScore += 120;
         }
 
-        const fireRatio = elementRatios.Fire || 0;
-        const earthRatio = elementRatios.Earth || 0;
-        const waterRatio = elementRatios.Water || 0;
-        const metalRatio = elementRatios.Metal || 0;
+        const fireRatio = (elementRatios?.Fire || 0) || 0;
+        const earthRatio = (elementRatios?.Earth || 0) || 0;
+        const waterRatio = (elementRatios?.Water || 0) || 0;
+        const metalRatio = (elementRatios?.Metal || 0) || 0;
         const isHotAndDry = (fireRatio + earthRatio) > 60 || specialStatuses.isFireEarthHeavy || (fireRatio > 40 && waterRatio < 10) || yongshinDetail.primary?.element === 'Metal';
         const isColdAndWet = (waterRatio + metalRatio) > 60 || specialStatuses.isColdWet || (waterRatio > 40 && fireRatio < 10) || yongshinDetail.primary?.element === 'Fire';
 
@@ -902,7 +947,7 @@ export function generateCycleVibe(
         }
 
         // --- 0. Specific Case Overrides (1991-06-26 Hot/Dry) ---
-        const isHotDryFireStrong = (isExtremeStrong || yongshinDetail.method === "전왕격용신") && (dayMaster === '丙' || dayMaster === '丁') && (elementRatios['Earth'] > 20 || yongshinDetail.primary?.element === 'Metal');
+        const isHotDryFireStrong = (isExtremeStrong || yongshinDetail.method === "전왕격용신") && (dayMaster === '丙' || dayMaster === '丁') && ((elementRatios?.['Earth'] || 0) > 20 || yongshinDetail.primary?.element === 'Metal');
         const monthBranch = result.pillars[2].branch;
         const isWinterWood = (dayMaster === '甲' || dayMaster === '乙') && (['亥', '子', '丑'].includes(monthBranch));
 
@@ -968,7 +1013,15 @@ export function generateCycleVibe(
         const hasSikSang = yGanElement === drainsDm || yZhiElement === drainsDm || completesSamHap || completesBangHap;
         const isSikSangSeolGi = (specialStatuses.isFireEarthHeavy || specialStatuses.isGoldBuried) && hasSikSang;
         
-        if (isSikSangSeolGi && yearScore < 185) {
+        if (isSangGwanGyeonGwan) {
+          yearScore -= 500; // Massive penalty for 상관견관 (breaking relationships)
+          branchAction = '상관견관';
+        } else if (penaltyReason) {
+          yearScore -= 300; // General penalty for BiGeop 간여지동
+          branchAction = '흉운주의';
+        }
+
+        if (isSikSangSeolGi && !isSangGwanGyeonGwan && yearScore < 185) {
           const isMetalSeolGi = yZhiElement === 'Metal' || (yZhi === '酉' || yZhi === '申') || (yZhi === '巳' && allBranches.includes('酉')) || (yZhi === '酉' && allBranches.includes('巳'));
           const seolGiScore = isMetalSeolGi ? 85 : 70;
           yearScore = (isPrimeAge ? 100 : 0) + seolGiScore;
@@ -1243,6 +1296,25 @@ export function generateCycleVibe(
         
         let isFullSentence = false;
         
+        if (isSangGwanGyeonGwan || penaltyReason) {
+            triggerReason = branchAction || "흉운주의";
+            isFullSentence = true; // Use entirely custom sentence
+            let explain = isSangGwanGyeonGwan ? "상관견관(傷官見官): 내 주관과 불만이 커지며 기존의 연애나 직장(관성)과 강하게 충돌하는 시기야." : penaltyReason;
+            finalMarriageScore = -999; // absolutely destroy score
+            
+            yearResults.push({
+              year,
+              score: finalMarriageScore,
+              stem: yGan,
+              branch: yZhi,
+              reason: lang === 'KO' ? `${explain} 억지로 인연을 맺으려 하기보다는 본인의 커리어 성취나 내면의 성장에 집중하는 것이 정답인 해였어.` : "A period of conflict. Focus on career and personal growth rather than forcing relationships.",
+              goldenMonths: [],
+              age,
+              branchAction: branchAction || '관살혼잡 충돌'
+            });
+            continue; // Skip the rest of the standard formatting
+        }
+
         if ((hasMarriageEvent || isJoHuSolution || isDongChakYongShin) && !isForcedPenalty) {
           let narrative = '';
           if (isPastLuck && isClashYear) {
@@ -1251,8 +1323,9 @@ export function generateCycleVibe(
             narrative = lang === 'KO' ? "인연의 끌림은 강했으나, 현실적 압박과 스트레스가 가중되었던 맹렬한 시기야." : "The pull of connection was strong, but it was a fierce period with increased realistic pressure and stress.";
           } else if (isJoHuSolution) {
             narrative = lang === 'KO' ? "사주의 조후(온도)가 완벽히 해결되며, 심리적 안정과 함께 가장 이상적인 인연이 찾아오는 황금기야." : "The temperature of your chart is perfectly resolved, bringing psychological stability and the most ideal connection in this golden period.";
-          } else if (isBreakthrough) {
-            narrative = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집는 강력한 결실(식신제살)" : "A powerful breakthrough where you flip the board of destiny with your own will (Sik-sin-je-sal)";
+          } else if (isSikSinJeSal || isBreakthrough) {
+            narrative = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집어 억눌렸던 에너지를 결실로 바꾸는 식신제살(상관합살)의 황금기야. 네가 원하는 상대, 혹은 조건 좋은 인연을 스스로 확정 짓는 강력한 돌파구가 될 거야." : "A powerful breakthrough where you flip the board of destiny with your own will, turning suppressed energy into fruition (Sik-sin-je-sal).";
+            isFullSentence = true;
           } else if (isGiShinYear || isWealthGiShin || isBadHap) {
             narrative = lang === 'KO' ? "인연은 강하게 들어오나 감정적 소모나 현실적 압박이 커지는 시기 (철저한 검증 필요)" : "Strong connection but emotional drain or realistic pressure increases (Thorough verification needed)";
           } else if (isChungDay && isUsefulGodYear) {
@@ -1276,18 +1349,6 @@ export function generateCycleVibe(
           if ((!isJoHuSolution && !isDongChakYongShin) || hasMarriageEvent) {
             triggerReason += eventText;
           }
-        }
-
-        // --- 6. Time Decay (현실적 개연성 보정) ---
-        const yearsAway = year - currentYear;
-        
-        if (yearsAway > 8) {
-          const decayPenalty = (yearsAway - 8) * 30; // Steeper penalty
-          finalMarriageScore -= decayPenalty;
-        }
-        
-        if (age > 42) {
-          finalMarriageScore -= 100; // Additional penalty for late age to prioritize prime years
         }
 
         // Final Golden Month Calculation
@@ -1379,12 +1440,13 @@ export function generateCycleVibe(
           .sort((a, b) => a.month - b.month) // Re-sort by month order for display
           .map(m => `${m.month}월(${m.zhi})`);
 
-        let branchAction = '';
-        if (isBreakthrough) branchAction = 'breakthrough';
-        else if (isWonJin) branchAction = 'wonjin';
-        else if (isChungDay) branchAction = 'clash';
-        else if (matchedSamHap || matchedBangHap) branchAction = 'hap';
-        else if (isStemHap) branchAction = 'stemhap';
+        if (!branchAction) {
+          if (isBreakthrough) branchAction = 'breakthrough';
+          else if (isWonJin) branchAction = 'wonjin';
+          else if (isChungDay) branchAction = 'clash';
+          else if (matchedSamHap || matchedBangHap) branchAction = 'hap';
+          else if (isStemHap) branchAction = 'stemhap';
+        }
 
         yearResults.push({ 
           year, 
@@ -1400,14 +1462,44 @@ export function generateCycleVibe(
         });
       }
 
-      let best = { year: 0, score: -999, stem: '', branch: '', reason: '', goldenMonths: [] as string[], age: 0, branchAction: '' };
-      for (let i = 0; i < yearResults.length; i++) {
-        const current = yearResults[i];
-        if (current.year < startYear) continue;
+      let candidates = yearResults.filter(r => r.year >= startYear);
 
-        // Use individual year score for ranking
+      if (!isPastLuck) {
+        const userCurrentAge = candidates.length > 0 ? candidates[0].age - (candidates[0].year - currentYear) : 0;
+
+        // 사용자 제안 로직: 현재 나이가 38세 이하인 경우, 38세 초과 연도를 일단 필터링 (적령기 필터)
+        if (userCurrentAge <= 38) {
+          const primeAgeCandidates = candidates.filter(r => r.age <= 38);
+          // 해당 조건 내에 '최소한 괜찮은 수준(score >= 50)'의 운이 한 해라도 있다면 38세 이하로만 고정
+          if (primeAgeCandidates.some(r => r.score >= 50)) {
+            candidates = primeAgeCandidates;
+          } else {
+            // 38세 이하 연도들이 전부 최악의 흉운(score < 50)이라면, 무리해서 그중 하나를 고르기보다 향후 8년까지 풀을 약간 넓혀 탐색
+            candidates = candidates.filter(r => r.year <= currentYear + 8);
+          }
+        } else {
+          // 이미 38세를 초과한 경우, 먼 미래(10년 이상)로 튀는 것을 막기 위해 향후 5년 이내의 후보군으로 한정
+          candidates = candidates.filter(r => r.year <= currentYear + 5);
+        }
+      }
+
+      let best = { year: 0, score: -999, stem: '', branch: '', reason: '', goldenMonths: [] as string[], age: 0, branchAction: '' };
+
+      for (let i = 0; i < candidates.length; i++) {
+        const current = candidates[i];
+        
+        // 필터링된 집합 내에서는 '순수 점수'만으로 최고운을 선정
         if (current.score > best.score) {
           best = { ...current };
+        } else if (current.score === best.score) {
+          // 점수가 동점일 경우, 미래운은 더 짧은 시간을 대기할 수 있도록 가까운 연도 선택
+          if (!isPastLuck && (best.year === 0 || current.year < best.year)) {
+            best = { ...current };
+          }
+          // 과거운은 더 최근 연도 선택
+          if (isPastLuck && (best.year === 0 || current.year > best.year)) {
+            best = { ...current };
+          }
         }
       }
       return best;
@@ -1419,7 +1511,11 @@ export function generateCycleVibe(
     let finalFutureLuck = { ...futureLuck };
 
     const formatLuck = (luck: any) => {
-      if (luck.score < 30) return lang === 'KO' ? '아직은 혼자가 더 편해 보이는데? 솔로 라이프를 좀 더 즐겨봐.' : 'For now, the time you spend alone might be even more precious to you.';
+      if (luck.score < 0) {
+        return lang === 'KO' ? 
+        `운의 흐름상 당분간은 억지로 인연을 만들려 하기보다 본인의 커리어 성취나 내면의 확장에 집중하는 것이 훨씬 이로운 시기야. (사주상 관살혼잡이나 흉운의 부작용이 우려됨)` : 
+        `For the time being, it is much more beneficial to focus on your career achievements and inner expansion rather than forcing relationships.`;
+      }
       
       const isPast = luck.year < currentYear;
       const isPrimeAge = luck.age >= 26 && luck.age <= 42;

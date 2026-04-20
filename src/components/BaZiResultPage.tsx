@@ -531,22 +531,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
   const [showAllThemes, setShowAllThemes] = useState(false);
 
   const elementData = useMemo(() => {
-    const counts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
-    result.pillars.forEach(p => {
-      const stemElement = BAZI_MAPPING.stems[p.stem as keyof typeof BAZI_MAPPING.stems]?.element;
-      const branchElement = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
-      if (stemElement && counts[stemElement as keyof typeof counts] !== undefined) counts[stemElement as keyof typeof counts]++;
-      if (branchElement && counts[branchElement as keyof typeof counts] !== undefined) counts[branchElement as keyof typeof counts]++;
-    });
+    const defaultCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+    const counts = result.analysis?.elementRatios || defaultCounts;
     
     return [
-      { name: lang === 'KO' ? '목(Wood)' : 'Wood', value: counts.Wood, color: '#22c55e' },
-      { name: lang === 'KO' ? '화(Fire)' : 'Fire', value: counts.Fire, color: '#ef4444' },
-      { name: lang === 'KO' ? '토(Earth)' : 'Earth', value: counts.Earth, color: '#eab308' },
-      { name: lang === 'KO' ? '금(Metal)' : 'Metal', value: counts.Metal, color: '#f8fafc' },
-      { name: lang === 'KO' ? '수(Water)' : 'Water', value: counts.Water, color: '#3b82f6' },
+      { name: lang === 'KO' ? '목(Wood)' : 'Wood', value: counts?.Wood || 0, color: '#22c55e' },
+      { name: lang === 'KO' ? '화(Fire)' : 'Fire', value: counts?.Fire || 0, color: '#ef4444' },
+      { name: lang === 'KO' ? '토(Earth)' : 'Earth', value: counts?.Earth || 0, color: '#eab308' },
+      { name: lang === 'KO' ? '금(Metal)' : 'Metal', value: counts?.Metal || 0, color: '#f8fafc' },
+      { name: lang === 'KO' ? '수(Water)' : 'Water', value: counts?.Water || 0, color: '#3b82f6' },
     ].filter(d => d.value > 0);
-  }, [result.pillars, lang]);
+  }, [result.analysis?.elementRatios, lang]);
 
   const getAnalysisText = () => {
     if (!result.analysis) {
@@ -591,7 +586,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     if (!dayPillar) return null;
     
     const dayMaster = dayPillar.stem;
-    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const dmElement = BAZI_MAPPING.stems?.[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
     if (!dmElement) return null;
 
     const elementsOrder = ["Wood", "Fire", "Earth", "Metal", "Water"];
@@ -620,7 +615,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       };
       const stems = stemsMap[targetElement];
 
-      const elementKo = BAZI_MAPPING.elements[targetElement as keyof typeof BAZI_MAPPING.elements]?.ko.split(' ')[0];
+      const elementKo = BAZI_MAPPING.elements?.[targetElement as keyof typeof BAZI_MAPPING.elements]?.ko.split(' ')[0];
       const elementEn = targetElement;
 
       return {
@@ -646,8 +641,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     if (!info) return <span>{godName}</span>;
 
     const stemText = info.stems.map(s => {
-      const stemInfo = BAZI_MAPPING.stems[s as keyof typeof BAZI_MAPPING.stems];
-      return `${lang === 'KO' ? stemInfo.ko : stemInfo.en} (${s})`;
+      const stemInfo = BAZI_MAPPING.stems?.[s as keyof typeof BAZI_MAPPING.stems];
+      return `${lang === 'KO' ? (stemInfo?.ko || s) : (stemInfo?.en || s)} (${s})`;
     }).join(' / ');
 
     const elementColor = ELEMENT_COLORS[info.elementEn as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
@@ -805,10 +800,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
       const hanja = TEN_GODS_HANJA[base] || '';
       
       let element = '';
-      if (BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems]) {
-        element = BAZI_MAPPING.stems[stemOrBranch as keyof typeof BAZI_MAPPING.stems].element;
-      } else if (BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches]) {
-        element = BAZI_MAPPING.branches[stemOrBranch as keyof typeof BAZI_MAPPING.branches].element;
+      if (BAZI_MAPPING.stems?.[stemOrBranch as keyof typeof BAZI_MAPPING.stems]) {
+        element = BAZI_MAPPING.stems?.[stemOrBranch as keyof typeof BAZI_MAPPING.stems].element;
+      } else if (BAZI_MAPPING.branches?.[stemOrBranch as keyof typeof BAZI_MAPPING.branches]) {
+        element = BAZI_MAPPING.branches?.[stemOrBranch as keyof typeof BAZI_MAPPING.branches].element;
       }
       
       const color = ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
@@ -829,10 +824,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     const yongShin = result.analysis?.yongShen || '';
     const giShin = result.analysis?.yongshinDetail?.giShin?.element || '';
     
-    const todayStemElement = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || '';
-    const todayBranchElement = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.element || '';
-    const todayStemElementKo = BAZI_MAPPING.elements[todayStemElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
-    const todayBranchElementKo = BAZI_MAPPING.elements[todayBranchElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
+    const todayStemElement = BAZI_MAPPING.stems?.[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || '';
+    const todayBranchElement = BAZI_MAPPING.branches?.[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.element || '';
+    const todayStemElementKo = BAZI_MAPPING.elements?.[todayStemElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
+    const todayBranchElementKo = BAZI_MAPPING.elements?.[todayBranchElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
 
     const dayBranch = result.pillars[1].branch;
     
@@ -864,8 +859,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     if ((dayBranch === '巳' || dayBranch === '酉' || dayBranch === '丑') && (todayPillar.branch === '巳' || todayPillar.branch === '酉' || todayPillar.branch === '丑') && dayBranch !== todayPillar.branch) samhapElement = 'Metal';
     if ((dayBranch === '亥' || dayBranch === '卯' || dayBranch === '未') && (todayPillar.branch === '亥' || todayPillar.branch === '卯' || todayPillar.branch === '未') && dayBranch !== todayPillar.branch) samhapElement = 'Wood';
 
-    const isSamhapYongshin = samhapElement && (yongShin.includes(samhapElement) || (BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && yongShin.includes(BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
-    const isSamhapGishin = samhapElement && (giShin.includes(samhapElement) || (BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && giShin.includes(BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
+    const isSamhapYongshin = samhapElement && (yongShin.includes(samhapElement) || (BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && yongShin.includes(BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
+    const isSamhapGishin = samhapElement && (giShin.includes(samhapElement) || (BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko && giShin.includes(BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements].ko)));
 
     if (isSamhapYongshin) dailyLuckScore += 15;
     if (isSamhapGishin) dailyLuckScore -= 15;
@@ -886,8 +881,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                        currentHour < 17 ? '申' :
                        currentHour < 19 ? '酉' :
                        currentHour < 21 ? '戌' : '亥';
-    const hourElement = BAZI_MAPPING.branches[hourBranch as keyof typeof BAZI_MAPPING.branches]?.element;
-    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const hourElement = BAZI_MAPPING.branches?.[hourBranch as keyof typeof BAZI_MAPPING.branches]?.element;
+    const dmElement = BAZI_MAPPING.stems?.[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
     
     const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
     const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
@@ -950,8 +945,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
     let main = '';
     if (lang === 'KO') {
-      const stemKo = BAZI_MAPPING.stems[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko;
-      const branchKo = BAZI_MAPPING.branches[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko;
+      const stemKo = BAZI_MAPPING.stems?.[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko;
+      const branchKo = BAZI_MAPPING.branches?.[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko;
       
       main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. \n\n`;
 
@@ -978,11 +973,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
       if (samhapElement) {
         if (isSamhapYongshin) {
-          main += `\n또한, 지지(현실)에서 합이 일어나 네게 유리한 용신 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들어내고 있어. 현실에서 일어나는 사건과 결과가 너에게 아주 유리하게 돌아갈 확률이 높아! `;
+          main += `\n또한, 지지(현실)에서 합이 일어나 네게 유리한 용신 기운(${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들어내고 있어. 현실에서 일어나는 사건과 결과가 너에게 아주 유리하게 돌아갈 확률이 높아! `;
         } else if (isSamhapGishin) {
-          main += `\n하지만 지지(현실)에서 합이 일어나 네게 불리한 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 형성하고 있어. 현실적인 결과나 사건이 네 의도와 다르게 꼬일 수 있으니 주의가 필요해. `;
+          main += `\n하지만 지지(현실)에서 합이 일어나 네게 불리한 기운(${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 형성하고 있어. 현실적인 결과나 사건이 네 의도와 다르게 꼬일 수 있으니 주의가 필요해. `;
         } else {
-          main += `\n지지(현실)에서 합이 일어나 새로운 기운(${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들고 있어. 주변 환경이나 상황에 흥미로운 변화가 생길 수 있겠네. `;
+          main += `\n지지(현실)에서 합이 일어나 새로운 기운(${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.ko})을 만들고 있어. 주변 환경이나 상황에 흥미로운 변화가 생길 수 있겠네. `;
         }
       }
 
@@ -1015,11 +1010,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
 
       if (samhapElement) {
         if (isSamhapYongshin) {
-          main += `\nAlso, a combination in the Earthly Branches (reality) is creating a favorable energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. The events and results in reality are highly likely to turn out in your favor! `;
+          main += `\nAlso, a combination in the Earthly Branches (reality) is creating a favorable energy (${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. The events and results in reality are highly likely to turn out in your favor! `;
         } else if (isSamhapGishin) {
-          main += `\nHowever, a combination in the Earthly Branches (reality) is forming an unfavorable energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. Practical results or events might get tangled differently from your intentions, so be careful. `;
+          main += `\nHowever, a combination in the Earthly Branches (reality) is forming an unfavorable energy (${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}) for you. Practical results or events might get tangled differently from your intentions, so be careful. `;
         } else {
-          main += `\nA combination in the Earthly Branches (reality) is creating a new energy (${BAZI_MAPPING.elements[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}). You might see some interesting changes in your surroundings or situations. `;
+          main += `\nA combination in the Earthly Branches (reality) is creating a new energy (${BAZI_MAPPING.elements?.[samhapElement as keyof typeof BAZI_MAPPING.elements]?.en}). You might see some interesting changes in your surroundings or situations. `;
         }
       }
 
@@ -1438,7 +1433,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
         <div className="grid grid-cols-4 gap-0.5 sm:gap-2 md:gap-4 items-stretch">
           {result.pillars.map((pillar, i) => {
             const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
-            const branchData = BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches];
+            const branchData = BAZI_MAPPING.branches?.[pillar.branch as keyof typeof BAZI_MAPPING.branches];
             const hiddenStems = branchData?.hiddenStems || [];
             const isDayPillar = pillar.title === 'Day';
             const pillarName = lang === 'KO' ? 
@@ -1476,14 +1471,14 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                     </div>
                     <div className="w-full text-base sm:text-xl md:text-3xl font-gothic text-white leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2">
                       {lang === 'KO' ? 
-                        (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
+                        (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
                         (showHanja ? (
                           <div className="flex flex-col items-center">
                             <span>{pillar.stem}</span>
-                            <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap tracking-tighter text-white/80">{BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
+                            <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap tracking-tighter text-white/80">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
                           </div>
                         ) : (
-                          <span className="text-sm sm:text-base md:text-xl whitespace-nowrap tracking-tighter">{BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
+                          <span className="text-sm sm:text-base md:text-xl whitespace-nowrap tracking-tighter">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
                         ))}
                     </div>
                     <div className="flex-1 flex items-end justify-center">
@@ -1561,7 +1556,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   </div>
                   <div className="flex flex-wrap justify-center gap-0.5 sm:gap-1">
                     {hiddenStems.map((hs, idx) => {
-                      const hsData = BAZI_MAPPING.stems[hs as keyof typeof BAZI_MAPPING.stems];
+                      const hsData = BAZI_MAPPING.stems?.[hs as keyof typeof BAZI_MAPPING.stems];
                       const hsTenGod = getDetailedTenGod(dayMaster, hs);
                       return (
                         <div 
@@ -1613,7 +1608,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   <div className="text-xs text-white/40 font-mono">
                     {cycle.year}
                   </div>
-                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                     <PolarityIcon polarity={cycle.stemPolarity} size={8} />
                     {lang === 'KO' ? cycle.stemTenGodKo : cycle.stemTenGodEn}
                   </div>
@@ -1635,13 +1630,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                     <div className="text-sm font-bold text-white mb-1">{cycle.age}</div>
                     <div 
                       className="text-[10px] md:text-xs font-gothic leading-tight text-center"
-                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                     >
                       {renderPillarText('stem', cycle.stem)}
                     </div>
                     <div 
                       className="text-[10px] md:text-xs font-gothic leading-tight text-center opacity-80"
-                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                     >
                       {renderPillarText('branch', cycle.branch)}
                     </div>
@@ -1649,7 +1644,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                       {isExpanded ? <ChevronUp className="w-3 h-3 text-neon-pink" /> : <ChevronDown className="w-3 h-3 text-white/20" />}
                     </div>
                   </motion.button>
-                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                     <PolarityIcon polarity={cycle.branchPolarity} size={8} />
                     {lang === 'KO' ? cycle.branchTenGodKo : cycle.branchTenGodEn}
                   </div>
@@ -1688,7 +1683,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                   return (
                     <div key={api} className="flex flex-col items-center space-y-1">
                       <div className="text-[10px] font-mono text-white/40">{ap.year}</div>
-                      <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                      <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                         <PolarityIcon polarity={ap.stemPolarity} size={6} />
                         {lang === 'KO' ? ap.stemTenGodKo : ap.stemTenGodEn}
                       </div>
@@ -1704,13 +1699,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                         <div className="text-xs font-bold text-white mb-1">{ap.age}</div>
                         <div 
                           className="text-[10px] font-gothic font-bold text-center"
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                         >
                           {renderPillarText('stem', ap.stem)}
                         </div>
                         <div 
                           className="text-[10px] font-gothic text-center opacity-70"
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                         >
                           {renderPillarText('branch', ap.branch)}
                         </div>
@@ -1718,7 +1713,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           {isYearExpanded ? <ChevronUp className="w-2 h-2 text-neon-cyan" /> : <ChevronDown className="w-2 h-2 text-white/20" />}
                         </div>
                       </motion.button>
-                      <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                      <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                         <PolarityIcon polarity={ap.branchPolarity} size={6} />
                         {lang === 'KO' ? ap.branchTenGodKo : ap.branchTenGodEn}
                       </div>
@@ -1757,7 +1752,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               <div className="text-[13px] font-mono text-white/90 font-bold uppercase">
                                 {t.months[m.month - 1]}
                               </div>
-                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                                 <PolarityIcon polarity={m.stemPolarity} size={6} />
                                 {lang === 'KO' ? m.stemTenGodKo : m.stemTenGodEn}
                               </div>
@@ -1769,13 +1764,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               >
                                 <div 
                                   className="text-[10px] font-gothic font-bold text-center"
-                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                                 >
                                   {renderPillarText('stem', m.stem)}
                                 </div>
                                 <div 
                                   className="text-[10px] font-gothic text-center opacity-70"
-                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                                 >
                                   {renderPillarText('branch', m.branch)}
                                 </div>
@@ -1783,7 +1778,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                   {isMonthExpanded ? <ChevronUp className="w-2 h-2 text-neon-pink" /> : <ChevronDown className="w-2 h-2 text-white/20" />}
                                 </div>
                               </motion.button>
-                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                              <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                                 <PolarityIcon polarity={m.branchPolarity} size={6} />
                                 {lang === 'KO' ? m.branchTenGodKo : m.branchTenGodEn}
                               </div>
@@ -1816,7 +1811,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                               return (
                                 <div key={di} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
                                   <div className="text-[12px] font-mono text-white/90 font-bold">{d.day}</div>
-                                  <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                                  <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                                     <PolarityIcon polarity={d.stemPolarity} size={5} />
                                     {lang === 'KO' ? d.stemTenGodKo : d.stemTenGodEn}
                                   </div>
@@ -1828,18 +1823,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                                   >
                                     <div 
                                       className="text-[10px] font-gothic font-bold text-center"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                                     >
                                       {renderPillarText('stem', d.stem)}
                                     </div>
                                     <div 
                                       className="text-[10px] font-gothic text-center opacity-70"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                                     >
                                       {renderPillarText('branch', d.branch)}
                                     </div>
                                   </motion.button>
-                                  <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                                  <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                                     <PolarityIcon polarity={d.branchPolarity} size={5} />
                                     {lang === 'KO' ? d.branchTenGodKo : d.branchTenGodEn}
                                   </div>
@@ -2637,8 +2632,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                 <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3">
                   <p className="text-xs font-bold text-neon-cyan" dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(
                     lang === 'KO' 
-                      ? `${BAZI_MAPPING.elements[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.ko || result.analysis.dayMasterElement}(${BAZI_MAPPING.elements[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.hanja || ''}) 일간의 십성별 본질` 
-                      : `Essence of Ten Gods for ${result.analysis.dayMasterElement}(${BAZI_MAPPING.elements[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.hanja || ''}) DM`
+                      ? `${BAZI_MAPPING.elements?.[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.ko || result.analysis.dayMasterElement}(${BAZI_MAPPING.elements?.[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.hanja || ''}) 일간의 십성별 본질` 
+                      : `Essence of Ten Gods for ${result.analysis.dayMasterElement}(${BAZI_MAPPING.elements?.[result.analysis.dayMasterElement as keyof typeof BAZI_MAPPING.elements]?.hanja || ''}) DM`
                   ) }} />
                   <ul className="space-y-2 text-[10px] text-white/60 list-disc pl-4">
                     {result.analysis.personalizedInsights && Object.entries(result.analysis.personalizedInsights).map(([key, value]: [string, any]) => (
