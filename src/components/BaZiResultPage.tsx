@@ -1899,7 +1899,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                         <Tooltip 
                           contentStyle={{ backgroundColor: '#050505', border: '1px solid #333', borderRadius: '8px' }}
                           itemStyle={{ color: '#fff' }}
-                          formatter={(value: number) => [`${(value / 8 * 100).toFixed(1)}%`, '']}
+                          formatter={(value: number) => [`${value.toFixed(1)}%`, '']}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -1910,7 +1910,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                       {elementData.map((d, i) => (
                         <div key={i} className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                          <span className="text-sm text-white/80 font-mono">{d.name}: {(d.value / 8 * 100).toFixed(1)}%</span>
+                          <span className="text-sm text-white/80 font-mono">{d.name}: {d.value.toFixed(1)}%</span>
                         </div>
                       ))}
                     </div>
