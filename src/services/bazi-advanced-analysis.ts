@@ -88,8 +88,10 @@ export const calculateAdvancedAnalysis = (
     if (sEl) elementCounts[sEl]++;
     if (bEl) elementCounts[bEl]++;
   });
-  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0);
-  const elementRatios = Object.fromEntries(Object.entries(elementCounts).map(([k, v]) => [k, (v / totalElements) * 100]));
+  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0) || 1;
+  const elementRatios = Object.fromEntries(
+    Object.entries(elementCounts).map(([k, v]) => [k, Number(((v / totalElements) * 100).toFixed(1))])
+  );
 
   const inSeongBranchesCount = pillars.filter(p => {
     const bEl = BAZI_MAPPING.branches[p.branch as keyof typeof BAZI_MAPPING.branches]?.element;
@@ -305,7 +307,7 @@ export const calculateAdvancedAnalysis = (
 
   // 2. Da-Ja-Ron (Abundance of Ten Gods)
   const daJaRon = Object.entries(tenGodsRatio)
-    .filter(([_, ratio]) => ratio > 35)
+    .filter(([_, ratio]) => ratio > 30) // Lowered from 35 to 30 for better detection
     .map(([god, ratio]) => {
       const isBiGyeop = god.includes('비겁') || god.includes('Mirror') || god.includes('Self');
       const isSikSang = god.includes('식상') || god.includes('Artist') || god.includes('Output');
@@ -397,12 +399,36 @@ export const calculateAdvancedAnalysis = (
         } else if (dmElement === 'Metal') {
           inSeongDesc = `"매몰된 보석, 인정 욕구의 화신." 재능은 있으나 밖으로 드러내지 못하고 누군가 알아주기만을 기다릴 수 있어. [${artistCol}:수(식상)]이 없으면 빛을 보지 못하니 스스로를 세상에 알리는 용기가 필요해.`;
           inSeongDescEn = `"A buried gem, an incarnation of the desire for recognition." Talented but hidden, waiting for someone to notice. Without [${artistCol}:Water Output], you won't see the light; you need the courage to show yourself to the world.`;
+        } else if (dmElement === 'Water') {
+          inSeongDesc = `"차가운 지성을 가진 전략가." 분석력과 수용력은 뛰어나지만, 행동보다는 계산이 앞서 기회를 놓칠 수 있어. [${artistCol}:목(식상)]이 있어야 그 지혜가 실질적인 성과로 이어질 수 있어.`;
+          inSeongDescEn = `"A strategist with cold intelligence." Excellent analytical and receptive skills, but over-calculating may lead to missed opportunities. Without [${artistCol}:Wood Output], wisdom won't translate into results.`;
         }
         descKo = inSeongDesc;
         descEn = inSeongDescEn;
+      } else if (isJaeSeong) {
+        let jaeSeongDesc = '';
+        let jaeSeongDescEn = '';
+        if (dmElement === 'Wood') {
+          jaeSeongDesc = `"메마른 대지의 개척자." [${earthCol}:토(재)]가 넘쳐서 결과물에 대한 집착이 강해 쉼 없이 달려가지만, 때로는 그 욕심이 자신을 지치게 할 수 있어. [${gwanCol}:금(관)]이 없으면 결과만 쫓다 실속을 잃을 수 있으니 주의해.`;
+          jaeSeongDescEn = `"Pioneer of a dry land." Abundant [${earthCol}:Earth Wealth] drives you relentlessly for results, but greed may exhaust you. Without [${gwanCol}:Metal Power], chasing results without substance is a risk.`;
+        } else if (dmElement === 'Fire') {
+          jaeSeongDesc = `"황금 벌판의 수확자." [${wealthCol}:금(재)]가 가득해 경제적 감각이 탁월하고 결과 위주의 사고를 하지만, 너무 냉정해 보일 수 있어. [${gwanCol}:수(관)]이 뒷받침되어야 그 부를 온전히 지키고 명예까지 얻을 수 있어.`;
+          jaeSeongDescEn = `"Harvester of a golden field." Abundant [${wealthCol}:Metal Wealth] gives you exceptional economic sense and result-oriented thinking, but you can seem cold. Need [${gwanCol}:Water Power] support to preserve wealth and gain honor.`;
+        } else if (dmElement === 'Earth') {
+          jaeSeongDesc = `"범람하는 재물의 바다." [${wealthCol}:수(재)]가 넘실대니 큰 돈을 만질 기회가 많지만, 그만큼 위험 부담도 커. [${gwanCol}:목(관)]의 기운으로 물길을 터주지 않으면 재다신약([tooltip:재다신약])의 함정에 빠져 재물 때문에 고통받을 수 있어.`;
+          jaeSeongDescEn = `"An overflowing sea of wealth." Floating in [${wealthCol}:Water Wealth], frequent opportunities for big money, but with high risk. Without [${gwanCol}:Wood Power] to guide the flow, you risk suffering due to wealth (Wealth-heavy Weak-self).`;
+        } else if (dmElement === 'Metal') {
+          jaeSeongDesc = `"울창한 숲속의 나무꾼." [${wealthCol}:목(재)]가 빽빽해 일복이 터졌고 결과물도 풍성하지만, 너무 많은 일에 치여 건강을 해칠 수 있어. [${gwanCol}:화(관)]의 빛이 있어야 그 결과물들이 보석처럼 빛을 발하고 인정받을 수 있어.`;
+          jaeSeongDescEn = `"Woodcutter in a dense forest." Plentiful [${wealthCol}:Wood Wealth] means abundant work and fruits, but overwork may harm health. Need [${gwanCol}:Fire Power] light for results to shine and be recognized.`;
+        } else if (dmElement === 'Water') {
+          jaeSeongDesc = `"화려한 네온사인 속의 승부사." [${wealthCol}:화(재)]의 열기가 뜨거워 화려한 투자나 투기적 성향이 강해질 수 있어. [${gwanCol}:토(관)]의 제방이 튼튼해야 그 열기가 방탕함으로 흐르지 않고 확실한 자산이 될 거야.`;
+          jaeSeongDescEn = `"A gambler in vibrant neon lights." Heat of [${wealthCol}:Fire Wealth] leads to flashes of investment or speculation. Need a strong [${gwanCol}:Earth Power] dam to turn that heat into solid assets rather than dissipation.`;
+        }
+        descKo = jaeSeongDesc;
+        descEn = jaeSeongDescEn;
       } else {
-        descKo = `"평범함 속에 감춰진 비범함." 특별히 치우친 기운은 없지만, 그만큼 어떤 환경에도 잘 적응할 수 있는 유연함이 너의 무기야.`;
-        descEn = `"Extraordinariness hidden in ordinariness." No particularly skewed energy, but that flexibility to adapt to any environment is your weapon.`;
+        descKo = lang === 'KO' ? `치우친 기운 속에 피어나는 남다른 재능이야. 특정 오행이 강하다는 건 그만큼 그 분야에서 독보적인 전문가가 될 수 있다는 뜻이기도 해. 과유불급을 경계하며 너만의 강점을 갈고닦아봐.` : `An extraordinary talent blooming within skewed energy. Having strong specific elements means you can become an unrivaled expert in that field. Polish your strengths while guarding against excess.`;
+        descEn = lang === 'EN' ? descKo : `An extraordinary talent blooming within skewed energy.`;
       }
       
       return {

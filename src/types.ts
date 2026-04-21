@@ -1,6 +1,50 @@
 
 export type Language = 'KO' | 'EN';
 
+export type SocialContext = 'military_public' | 'corporate' | 'business_freelance' | 'student' | 'none';
+
+export type JudgmentGrade = 'A' | 'B' | 'C';
+
+export interface BaziMatrix {
+  profile: {
+    social_context: SocialContext;
+    gender: string;
+  };
+  four_pillars: {
+    year: { stem: string; branch: string; element: string };
+    month: { stem: string; branch: string; element: string };
+    day: { stem: string; branch: string; element: string };
+    hour: { stem: string; branch: string; element: string };
+  };
+  analysis: {
+    gyeokguk: string;
+    temperature_index: string;
+    energy_state: string;
+    missing_elements: string[];
+    five_elements_score: Record<string, number>;
+  };
+  interactions: {
+    hap: string[];
+    chung: string[];
+    hyeong: string[];
+    sin_sal: string[];
+    gong_mang: string[];
+  };
+  dynamic_luck: {
+    current_daewoon: string;
+    current_seun: string;
+    momentum_score: number;
+    seun_score: number;
+    elemental_friction: { type: string; level: number };
+  };
+  coordinator: {
+    risk_gravity: number;
+    judgment_grade: JudgmentGrade;
+    alt_action?: string;
+  };
+  remedy_gate: string[];
+}
+
 export interface UserInput {
   name: string;
   birthDate: string;
@@ -8,6 +52,7 @@ export interface UserInput {
   city: string;
   gender?: 'male' | 'female' | 'non-binary' | 'prefer-not-to-tell';
   calendarType?: 'solar' | 'lunar';
+  socialContext?: SocialContext;
 }
 
 export interface BaZiCard {

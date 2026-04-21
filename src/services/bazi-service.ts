@@ -377,10 +377,11 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     if (branchElement) elementCounts[branchElement as keyof typeof elementCounts as keyof typeof elementCounts]++;
   });
 
-  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0);
+  const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0) || 1;
   const elementRatios: Record<string, number> = {};
   Object.entries(elementCounts).forEach(([el, count]) => {
-    elementRatios[el] = totalElements > 0 ? Math.round((count / totalElements) * 100) : 20;
+    // Normalizing to 100% based on 8 positions (4 stems + 4 branches)
+    elementRatios[el] = Number(((count / totalElements) * 100).toFixed(1));
   });
 
   const tenGodsRatio = calculateTenGodsRatio(pillars, lang);

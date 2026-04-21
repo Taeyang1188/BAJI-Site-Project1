@@ -662,6 +662,22 @@ export default function App() {
                         )}
                       </AnimatePresence>
                     </div>
+
+                    {/* Social Context (Optional) */}
+                    <div className="relative flex flex-col gap-1.5 mt-2">
+                       <label className="text-[10px] text-white/50 pl-2 uppercase font-mono">{lang === 'KO' ? '사회적 환경 (선택)' : 'Social Context (Optional)'}</label>
+                       <select 
+                          value={userInput.socialContext || 'none'}
+                          onChange={(e) => setUserInput({ ...userInput, socialContext: e.target.value as any })}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-4 text-sm focus:outline-none focus:border-neon-pink transition-all text-white/80 appearance-none"
+                       >
+                         <option value="none" className="bg-black text-white">{lang === 'KO' ? '선택 안함' : 'None'}</option>
+                         <option value="military_public" className="bg-black text-white">{lang === 'KO' ? '군인/경찰/공무원' : 'Military/Public Service'}</option>
+                         <option value="corporate" className="bg-black text-white">{lang === 'KO' ? '일반 직장인' : 'Corporate Employee'}</option>
+                         <option value="business_freelance" className="bg-black text-white">{lang === 'KO' ? '사업/프리랜서' : 'Business/Freelance'}</option>
+                         <option value="student" className="bg-black text-white">{lang === 'KO' ? '학생/취업준비' : 'Student/Job Seeker'}</option>
+                       </select>
+                    </div>
                   </div>
 
                   <AnimatePresence>
@@ -722,6 +738,7 @@ export default function App() {
                 userName={userInput.name}
                 gender={userInput.gender}
                 city={userInput.city}
+                socialContext={userInput.socialContext}
                 onBack={() => setPage(2)} 
               />
             </motion.div>

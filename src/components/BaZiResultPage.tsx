@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { BaZiResult, Language } from '../types';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } from '../constants';
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
@@ -25,13 +25,24 @@ import {
   Sparkles,
   Share2,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Shield
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
 import { generateCycleVibe, CycleVibeResult } from '../services/cycle-vibe-service';
 import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
+
+const ILJU_BACKGROUND_IMAGES: Record<string, string> = {
+  '己丑': 'https://i.imgur.com/RyKP0u5.jpeg',
+  '庚子': 'https://i.imgur.com/PHSlQOn.jpeg',
+  '庚寅': 'https://i.imgur.com/Isk1umc.jpeg',
+  '庚午': 'https://i.imgur.com/aA94qPC.jpeg',
+  '庚申': 'https://i.imgur.com/7YAltfY.jpeg',
+  '辛丑': 'https://i.imgur.com/KyBoOpe.jpeg',
+  '辛卯': 'https://i.imgur.com/lVuVjGP.jpeg',
+};
 
 const WeatherWidget = ({ city, lang }: { city: string; lang: Language }) => {
   const [location, setLocation] = React.useState<{ lat: number; lon: number } | null>(null);
@@ -345,12 +356,15 @@ const GongmangDetail = ({ result, lang }: { result: BaZiResult, lang: Language }
   );
 };
 
+import { SocialContext } from '../types';
+
 interface BaZiResultPageProps {
   result: BaZiResult;
   lang: Language;
   userName: string;
   gender: string;
   city: string;
+  socialContext?: SocialContext;
   onBack: () => void;
 }
 
@@ -480,7 +494,7 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
   );
 };
 
-export default function BaZiResultPage({ result, lang, userName, gender, city, onBack }: BaZiResultPageProps) {
+export default function BaZiResultPage({ result, lang, userName, gender, city, socialContext, onBack }: BaZiResultPageProps) {
   const t = TRANSLATIONS[lang].result as any;
   const dayMaster = result.pillars[1].stem;
   const currentCycle = result.grandCycles[result.currentCycleIndex];
@@ -811,8 +825,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
     };
 
   const cycleVibe = React.useMemo(() => {
-    return generateCycleVibe(result, lang, userName, gender, city, { maritalStatus, hasChildren });
-  }, [result, lang, userName, gender, city, maritalStatus, hasChildren]);
+    return generateCycleVibe(result, lang, userName, gender, city, { maritalStatus, hasChildren }, socialContext);
+  }, [result, lang, userName, gender, city, maritalStatus, hasChildren, socialContext]);
 
   const dailyVibe = React.useMemo(() => {
     const todayPillar = getTodayPillar(dayMaster);
@@ -1297,17 +1311,218 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, o
                           )}
                         </div>
                       ) : (
-                        <div className="p-4 sm:p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-xl">
+                        <div 
+                          className="p-4 sm:p-6 border rounded-xl relative overflow-hidden"
+                          style={{
+                            backgroundColor: 'rgba(255, 42, 133, 0.1)',
+                            borderColor: 'rgba(255, 42, 133, 0.3)',
+                            backgroundImage: (() => {
+                              const ilju = result.pillars[1].stem + result.pillars[1].branch;
+                              const img = ILJU_BACKGROUND_IMAGES[ilju];
+                              return img ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${img})` : 'none';
+                            })(),
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        >
                           <div className="text-neon-pink text-[10px] sm:text-xs font-bold mb-2 uppercase tracking-widest">
                             {cycleVibe.themes.find(t => t.id === selectedThemeId)?.title || '[운명의 대답]'}
                           </div>
-                          <p className="text-base sm:text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                            <TypingText 
-                              key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
-                              text={cycleVibe.themeAnalyses[selectedThemeId].main} 
-                              speed={20} 
-                            />
-                          </p>
+                          {(() => {
+                            const mainText = cycleVibe.themeAnalyses[selectedThemeId].main;
+                            let parsedJson = null;
+                            try {
+                              if (mainText.startsWith('{') && ['moving', 'taboo', 'dark_curtain', 'destiny_map'].includes(selectedThemeId)) {
+                                parsedJson = JSON.parse(mainText);
+                              }
+                            } catch (e) {}
+
+                            if (parsedJson && parsedJson.theme) {
+                              let gradeColor = 'text-[#facc15]';
+                              let gradeBorder = 'border-[#facc15]/30';
+                              let gradeBg = 'bg-[#facc15]/10';
+
+                              if (parsedJson.grade === 'A') {
+                                gradeColor = 'text-green-400';
+                                gradeBorder = 'border-green-400/30';
+                                gradeBg = 'bg-green-400/10';
+                              } else if (parsedJson.grade === 'C') {
+                                gradeColor = 'text-red-400';
+                                gradeBorder = 'border-red-400/30';
+                                gradeBg = 'bg-red-400/10';
+                              }
+
+                              if (selectedThemeId === 'moving') {
+                                return (
+                                  <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+                                    className="space-y-4"
+                                  >
+                                    <div className="flex items-center gap-3 mb-4">
+                                      <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">[{parsedJson.theme}: 모빌리티 리포트]</h3>
+                                      {parsedJson.grade && (
+                                        <span className={`px-2 py-0.5 border rounded text-xs font-bold ${gradeColor} ${gradeBorder} ${gradeBg}`}>
+                                          Grade {parsedJson.grade}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="space-y-3">
+                                      <p className="text-sm sm:text-base font-display text-white/90">
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">1. 에너지 현황:</strong> <span className="text-white">{parsedJson.energy_status}</span>
+                                      </p>
+                                      <p className="text-sm sm:text-base font-display text-white/90">
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">2. 이동의 가치:</strong> <span className="text-white">{parsedJson.value}</span>
+                                      </p>
+                                      <p className={`text-sm sm:text-base font-display text-white/90 p-3 rounded border ${gradeBg} ${gradeBorder}`}>
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">3. 최종 판결:</strong> <strong className={`${gradeColor} ml-1`}>{parsedJson.judgment}</strong>
+                                      </p>
+                                      {parsedJson.alt_action && (
+                                        <p className="text-sm sm:text-base font-display text-white/90 p-3 rounded border bg-neon-cyan/10 border-neon-cyan/30 mt-2">
+                                          <strong className="text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">전략적 중재 (Alt-Action):</strong> <span className="text-white ml-1">{parsedJson.alt_action}</span>
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="mt-6 pt-4 border-t border-white/10">
+                                      <p className="text-sm sm:text-base font-display text-white/90 mb-3">
+                                        <strong className="text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">4. 전략적 액션 플랜:</strong>
+                                      </p>
+                                      <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm text-white/80">
+                                        <li><strong className="text-white">핵심 방향:</strong> {parsedJson.action_plan.direction}</li>
+                                        <li><strong className="text-white">자산/리스크 관리:</strong> <span className={`${parsedJson.grade === 'A' ? 'text-green-400' : 'text-red-400'}`}>{parsedJson.action_plan.risk_management}</span></li>
+                                        <li><strong className="text-white">에너지 최적지:</strong> {parsedJson.action_plan.optimal_space}</li>
+                                      </ul>
+                                    </div>
+                                  </motion.div>
+                                );
+                              } else if (selectedThemeId === 'taboo') {
+                                return (
+                                  <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+                                    className="space-y-4"
+                                  >
+                                    <div className="flex items-center gap-3 mb-4">
+                                      <h3 className="text-xl sm:text-2xl font-bold text-red-500 tracking-tight">[{parsedJson.theme}: 잠복된 위협]</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                      {parsedJson.risks.map((risk: any, i: number) => (
+                                        <div key={i} className="p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+                                          <h4 className="text-red-400 font-bold mb-1 flex items-center gap-2">
+                                            <AlertTriangle className="w-4 h-4" />
+                                            {risk.name} 
+                                            <span className="text-[10px] px-1.5 py-0.5 border border-red-500/50 rounded bg-red-500/10 uppercase tracking-widest">{risk.severity}</span>
+                                          </h4>
+                                          <p className="text-sm text-white/80">{risk.desc}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-red-500/20">
+                                      <h4 className="text-neon-cyan font-bold mb-3 flex items-center gap-2">
+                                        <Shield className="w-4 h-4" />
+                                        {lang === 'KO' ? '레메디 게이트 (Remedy Gate)' : 'Remedy Gate'}
+                                      </h4>
+                                      <ul className="space-y-2">
+                                        {parsedJson.remedy_gate.map((remedy: string, i: number) => (
+                                          <li key={i} className="text-sm text-neon-cyan/90 bg-neon-cyan/10 p-3 rounded-lg border border-neon-cyan/20">
+                                            {remedy}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </motion.div>
+                                );
+                              } else if (selectedThemeId === 'dark_curtain') {
+                                return (
+                                  <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+                                    className="space-y-4"
+                                  >
+                                    <div className="flex items-center gap-3 mb-4">
+                                      <h3 className="text-xl sm:text-2xl font-bold text-purple-400 tracking-tight">[{parsedJson.theme}: 까르마의 흔적]</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                      {parsedJson.insights.map((insight: string, i: number) => (
+                                        <div key={i} className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-xl relative overflow-hidden group">
+                                          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                          <p className="text-sm font-display text-white/90 relative z-10 leading-relaxed">
+                                            {insight}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                );
+                              } else if (selectedThemeId === 'destiny_map') {
+                                return (
+                                  <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+                                    className="space-y-6"
+                                  >
+                                    <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
+                                      <h3 className="text-xl sm:text-2xl font-bold text-neon-cyan tracking-tight">[{parsedJson.theme}]</h3>
+                                      <div className="text-right">
+                                        <div className="text-[10px] text-white/50 uppercase">Momentum Score</div>
+                                        <div className={`text-2xl font-bold font-mono ${parsedJson.momentum_score > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                          {parsedJson.momentum_score > 0 ? '+' : ''}{parsedJson.momentum_score}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col items-center">
+                                      <h4 className="text-xs font-bold text-white/60 uppercase mb-4 self-start">{lang === 'KO' ? '오행 밸런스 시각화 (Element Radar)' : 'Element Balance Radar'}</h4>
+                                      <div className="w-full h-64 sm:h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={Object.entries(parsedJson.elements || {}).map(([el, ratio]: [string, any]) => ({
+                                            subject: el.split(' ')[0], 
+                                            A: ratio,
+                                            fullMark: 100,
+                                          }))}>
+                                            <PolarGrid stroke="#ffffff20" />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff80', fontSize: 12 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                            <Radar
+                                              name="Elements"
+                                              dataKey="A"
+                                              stroke="#00ffff"
+                                              fill="#00ffff"
+                                              fillOpacity={0.4}
+                                            />
+                                          </RadarChart>
+                                        </ResponsiveContainer>
+                                      </div>
+                                      <div className="w-full grid grid-cols-5 gap-1 mt-4">
+                                        {Object.entries(parsedJson.elements || {}).map(([el, ratio]: [string, any]) => {
+                                          const elName = el.split(' ')[0];
+                                          const color = ELEMENT_COLORS[elName as keyof typeof ELEMENT_COLORS] || '#ffffff';
+                                          return (
+                                            <div key={el} className="flex flex-col items-center">
+                                              <div className="text-[10px] font-mono mb-1" style={{ color }}>{elName}</div>
+                                              <div className="text-xs font-bold text-white font-mono">{ratio}%</div>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="p-4 bg-neon-cyan/5 border border-neon-cyan/20 rounded-xl">
+                                      <p className="text-sm text-neon-cyan/90 leading-relaxed font-display">
+                                        {parsedJson.overview}
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                );
+                              }
+                            } else {
+                              return (
+                                <p className="text-base sm:text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                                  <TypingText 
+                                    key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
+                                    text={mainText} 
+                                    speed={20} 
+                                  />
+                                </p>
+                              );
+                            }
+                          })()}
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
                             <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
                               <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />

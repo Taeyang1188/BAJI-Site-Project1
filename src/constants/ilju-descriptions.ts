@@ -134,37 +134,51 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "丁卯": { 
     ko: "정묘일주는 섬세하고 예술적 감각이 뛰어나. 따뜻한 마음씨로 주변을 챙기는 다정함이 있지.", 
     en: "Jeong-myo is delicate with great artistic sense. You're kind and care for everyone around you.",
-    impression: "감수성이 꽤 예민하네. 남들이 못 느끼는 미묘한 분위기를 잘 잡아내는 것 같아."
+    impression: "감수성이 꽤 예민하네. 남들이 못 느끼는 미묘한 분위기를 잘 잡아내는 것 같아.",
+    cardBg: "https://i.imgur.com/twSFzOK.jpeg",
+    detailImg: "https://i.imgur.com/mfQExEY.png"
   },
   "丁丑": { 
     ko: "정축일주는 차분하고 내실이 있어. 겉으로 드러내지 않아도 실속을 챙기는 지혜가 있지.", 
     en: "Jeong-chuk is calm and substantial. You have the wisdom to secure benefits without showing off.",
-    impression: "조용히 자기 몫은 다 챙기는구나. 꽤 영리하고 실속 있는 타입이야."
+    impression: "조용히 자기 몫은 다 챙기는구나. 꽤 영리하고 실속 있는 타입이야.",
+    cardBg: "https://i.imgur.com/2jjyT8d.jpeg",
+    detailImg: "https://i.imgur.com/VvkO7UV.jpeg"
   },
   "丁亥": { 
     ko: "정해일주는 영감이 뛰어나고 예의가 발라. 맑고 깨끗한 심성으로 타인의 신뢰를 얻지.", 
     en: "Jeong-hae is highly inspired and polite. You gain trust with your clear and pure mind.",
-    impression: "분위기가 꽤 맑네. 왠지 너랑 있으면 복잡한 생각들이 정리될 것 같은 기분이야."
+    impression: "분위기가 꽤 맑네. 왠지 너랑 있으면 복잡한 생각들이 정리될 것 같은 기분이야.",
+    cardBg: "https://i.imgur.com/6XZM6Kf.png",
+    detailImg: "https://i.imgur.com/bFuPn1g.png"
   },
   "丁酉": { 
     ko: "정유일주는 세련된 감각과 예리한 판단력을 지녔어. 귀족적인 품위와 깔끔함이 매력이지.", 
     en: "Jeong-yu has sophisticated senses and sharp judgment. Your dignity is charming.",
-    impression: "취향이 꽤 까다롭네. 너만의 미적 기준이 확실해서 웬만한 건 눈에 안 차겠어."
+    impression: "취향이 꽤 까다롭네. 너만의 미적 기준이 확실해서 웬만한 건 눈에 안 차겠어.",
+    cardBg: "https://i.imgur.com/GTpXu9E.jpeg",
+    detailImg: "https://i.imgur.com/jMHSCOV.jpeg"
   },
   "丁未": { 
     ko: "정미일주는 끈기 있고 열정적이야. 한결같은 모습으로 자신의 자리를 지키는 성실함이 있지.", 
     en: "Jeong-mi is persistent and passionate. You're diligent and consistent in your place.",
-    impression: "한 우물만 파는 고집이 있네. 그 끈기가 결국 널 특별하게 만들 거야."
+    impression: "한 우물만 파는 고집이 있네. 그 끈기가 결국 널 특별하게 만들 거야.",
+    cardBg: "https://i.imgur.com/c6y0hDS.jpeg",
+    detailImg: "https://i.imgur.com/YLRNvfz.jpeg"
   },
   "丁巳": { 
     ko: "정사일주는 화끈하고 활동적이야. 강한 독립심과 추진력으로 목표를 달성하는 힘이 있지.", 
     en: "Jeong-sa is hot and active. You have the power to reach goals with strong drive.",
-    impression: "열기가 꽤 대단하네. 한 번 타오르면 아무도 못 말릴 것 같은 기세야."
+    impression: "열기가 꽤 대단하네. 한 번 타오르면 아무도 못 말릴 것 같은 기세야.",
+    cardBg: "https://i.imgur.com/IcsOXGh.jpeg",
+    detailImg: "https://i.imgur.com/7sT1ZLL.jpeg"
   },
   "戊辰": { 
     ko: "무진일주는 듬직하고 포용력이 넓어. 거대한 산처럼 흔들리지 않는 묵직한 존재감이 있지.", 
     en: "Mu-jin is reliable and broad-minded. You have a heavy presence that doesn't shake like a mountain.",
-    impression: "무게감이 꽤 있네. 웬만한 일에는 눈 하나 깜짝 안 할 것 같은 든든함이 보여."
+    impression: "무게감이 꽤 있네. 웬만한 일에는 눈 하나 깜짝 안 할 것 같은 든든함이 보여.",
+    cardBg: "https://i.imgur.com/otm8Twp.jpeg",
+    detailImg: "https://i.imgur.com/n5DORDL.jpeg"
   },
   "戊寅": { 
     ko: "무인일주는 명예를 중시하고 리더십이 있어. 위엄 있는 모습으로 조직을 이끄는 힘이 있지.", 
@@ -176,17 +190,23 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "戊子": { 
     ko: "무자일주는 신중하고 실속이 있어. 현실적인 경제 관념이 뛰어나서 자수성가하는 타입이지.", 
     en: "Mu-ja is cautious and substantial. You're a self-made type with great economic sense.",
-    impression: "현실 감각이 꽤 철저하네. 헛돈 안 쓰고 차곡차곡 네 성을 쌓아가는 모습이 보여."
+    impression: "현실 감각이 꽤 철저하네. 헛돈 안 쓰고 차곡차곡 네 성을 쌓아가는 모습이 보여.",
+    cardBg: "https://i.imgur.com/6P2Qh2m.png",
+    detailImg: "https://i.imgur.com/Utk9RND.jpeg"
   },
   "戊戌": { 
     ko: "무술일주는 고집이 있고 주관이 뚜렷해. 한 번 믿은 사람이나 가치를 끝까지 지키는 의리가 있지.", 
     en: "Mu-sul is stubborn with clear subjectivity. You're loyal to protecting people or values you trust.",
-    impression: "고집이 꽤 세네. 네가 옳다고 믿는 건 세상이 뒤집혀도 안 바꿀 것 같아."
+    impression: "고집이 꽤 세네. 네가 옳다고 믿는 건 세상이 뒤집혀도 안 바꿀 것 같아.",
+    cardBg: "https://i.imgur.com/5tYrsU1.jpeg",
+    detailImg: "https://i.imgur.com/JvBaHBN.jpeg"
   },
   "戊申": { 
     ko: "무신일주는 재능이 많고 사교적이야. 주변 사람들과 조화를 이루며 실익을 챙기는 능력이 좋지.", 
     en: "Mu-sin is multi-talented and social. You're good at harmonizing while securing benefits.",
-    impression: "사람들 사이에서 꽤 유연하네. 겉으론 맞춰주는 척해도 실속은 네가 다 챙기고 있지?"
+    impression: "사람들 사이에서 꽤 유연하네. 겉으론 맞춰주는 척해도 실속은 네가 다 챙기고 있지?",
+    cardBg: "https://i.imgur.com/OinVeh4.jpeg",
+    detailImg: "https://i.imgur.com/fow39c9.jpeg"
   },
   "戊午": { 
     ko: "무오일주는 자존심이 강하고 열정적이야. 강한 자기 확신으로 목표를 향해 돌진하는 힘이 있지.", 
@@ -212,7 +232,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "己丑": { 
     ko: "기축일주는 끈기 있고 고집이 있어. 묵묵히 자신의 길을 걸어가 결국 결실을 맺는 뚝심이 있지.", 
     en: "Gi-chuk is persistent and stubborn. You have the determination to walk your path and bear fruit.",
-    impression: "끈기가 꽤 지독하네. 한 번 물면 절대 안 놓을 것 같은 집요함이 느껴져."
+    impression: "끈기가 꽤 지독하네. 한 번 물면 절대 안 놓을 것 같은 집요함이 느껴져.",
+    cardBg: "https://i.imgur.com/RyKP0u5.jpeg",
+    detailImg: "https://i.imgur.com/fo0sBSl.jpeg"
   },
   "己亥": { 
     ko: "기해일주는 다정다감하고 지혜로워. 타인과 원만한 관계를 유지하며 실속을 챙기는 능력이 탁월하지.", 
@@ -238,7 +260,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "庚午": { 
     ko: "경오일주는 정의롭고 예의가 발라. 세련된 매너와 위엄으로 사람들의 존경을 받는 리더 타입이지.", 
     en: "Gyeong-o is just and polite. You're a leader type respected for sophisticated manners.",
-    impression: "매너가 꽤 깔끔하네. 겉으론 젠틀해도 속으론 엄격한 기준을 세워두고 있을 것 같아."
+    impression: "매너가 꽤 깔끔하네. 겉으론 젠틀해도 속으론 엄격한 기준을 세워두고 있을 것 같아.",
+    cardBg: "https://i.imgur.com/aA94qPC.jpeg",
+    detailImg: "https://i.imgur.com/X2BIEr4.jpeg"
   },
   "庚辰": { 
     ko: "경진일주는 두뇌가 명석하고 카리스마가 있어. 비범한 재능으로 큰 일을 도모하는 힘이 있지.", 
@@ -250,12 +274,16 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "庚寅": { 
     ko: "경인일주는 활동적이고 진취적이야. 강한 추진력으로 새로운 영역을 개척하는 용기가 돋보이지.", 
     en: "Gyeong-in is active and enterprising. Your courage to pioneer new areas is impressive.",
-    impression: "실행력이 꽤 빠르네. 생각보다 몸이 먼저 나가는 타입이라 가끔은 위험해 보이기도 해."
+    impression: "실행력이 꽤 빠르네. 생각보다 몸이 먼저 나가는 타입이라 가끔은 위험해 보이기도 해.",
+    cardBg: "https://i.imgur.com/Isk1umc.jpeg",
+    detailImg: "https://i.imgur.com/s3DnWRj.jpeg"
   },
   "庚子": { 
     ko: "경자일주는 총명하고 표현력이 뛰어나. 예리한 통찰력으로 사물의 본질을 꿰뚫어 보는 능력이 있지.", 
     en: "Gyeong-ja is intelligent and expressive. You see through the essence of things with sharp insight.",
-    impression: "말투가 꽤 날카롭네. 팩트로 사람 때리는 데 소질이 있을 것 같아."
+    impression: "말투가 꽤 날카롭네. 팩트로 사람 때리는 데 소질이 있을 것 같아.",
+    cardBg: "https://i.imgur.com/PHSlQOn.jpeg",
+    detailImg: "https://i.imgur.com/8iCd4JP.jpeg"
   },
   "庚戌": { 
     ko: "경술일주는 의리가 있고 강직해. 한 번 결심한 일은 어떤 난관이 있어도 끝까지 밀어붙이지.", 
@@ -267,7 +295,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "庚申": { 
     ko: "경신일주는 독립심이 강하고 단단해. 자신의 신념을 지키는 굳건함과 리더십이 매력적이지.", 
     en: "Gyeong-sin is independent and firm. Your steadfastness and leadership are charming.",
-    impression: "멘탈이 꽤 강철 같네. 웬만한 충격에는 흠집도 안 날 것 같은 단단함이 느껴져."
+    impression: "멘탈이 꽤 강철 같네. 웬만한 충격에는 흠집도 안 날 것 같은 단단함이 느껴져.",
+    cardBg: "https://i.imgur.com/7YAltfY.jpeg",
+    detailImg: "https://i.imgur.com/hJ9kr8h.jpeg"
   },
   "辛未": { 
     ko: "신미일주는 겉은 부드러워 보이지만 속은 날카로운 칼날을 품고 있어. 현실적인 실속을 차리는 지혜가 있지.", 
@@ -284,12 +314,16 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "辛卯": { 
     ko: "신묘일주는 예민하고 섬세해. 예술적 감각과 재치가 넘쳐서 주변 사람들을 즐겁게 만들지.", 
     en: "Sin-myo is sensitive and delicate. You entertain others with artistic sense and wit.",
-    impression: "신경이 꽤 예민하네. 너만의 미적 기준에 안 맞는 건 절대 못 참는 스타일이지?"
+    impression: "신경이 꽤 예민하네. 너만의 미적 기준에 안 맞는 건 절대 못 참는 스타일이지?",
+    cardBg: "https://i.imgur.com/lVuVjGP.jpeg",
+    detailImg: "https://i.imgur.com/qHsWASx.jpeg"
   },
   "辛丑": { 
     ko: "신축일주는 끈기 있고 내실이 있어. 어려운 상황에서도 자신만의 가치를 지켜내는 강인함이 있지.", 
     en: "Sin-chuk is persistent and substantial. You protect your values even in tough situations.",
-    impression: "고집이 꽤 은근하네. 겉으론 네네 해도 속으론 절대 네 생각을 안 굽힐 거잖아."
+    impression: "고집이 꽤 은근하네. 겉으론 네네 해도 속으론 절대 네 생각을 안 굽힐 거잖아.",
+    cardBg: "https://i.imgur.com/KyBoOpe.jpeg",
+    detailImg: "https://i.imgur.com/MVEP1bB.jpeg"
   },
   "辛亥": { 
     ko: "신해일주는 총명하고 감수성이 풍부해. 맑고 깨끗한 지혜로 세상을 바라보는 통찰력이 뛰어나지.", 

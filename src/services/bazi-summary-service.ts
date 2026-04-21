@@ -287,8 +287,21 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     else if (sikSangScore === 0) hashtags.push(...pickRandom(["#과묵한포스", "#생각이행동으로", "#신중함의끝", "#조용한강자", "#팩트폭격기"]));
 
     // Jae-Seong (Wealth)
-    if (jaeSeongScore > 35) hashtags.push(...pickRandom(["#현실주의자", "#계산기만렙", "#자본주의괴물", "#재테크요정", "#실속파"]));
-    else if (jaeSeongScore === 0) hashtags.push(...pickRandom(["#무소유의미학", "#과정중심", "#낭만주의자", "#돈보다꿈", "#물욕제로"]));
+    if (jaeSeongScore > 35) {
+      if (strength < 40) {
+        // Jae-da-shin-yak: High wealth elements but weak DM strength
+        hashtags.push(...pickRandom(["#재다신약", "#일복터짐", "#내돈어디에", "#그림의떡", "#열심히일한당신", "#은행원재질"]));
+      } else {
+        // Strong enough to handle wealth
+        if (inSeongScore === 0 && gwanSeongScore === 0) {
+          hashtags.push(...pickRandom(["#자본주의괴물", "#돈냄새콜렉터", "#실외주의", "#수익형인간", "#야망가"]));
+        } else {
+          hashtags.push(...pickRandom(["#현실주의자", "#계산기만렙", "#재테크요정", "#실속파", "#갓생러"]));
+        }
+      }
+    } else if (jaeSeongScore === 0) {
+      hashtags.push(...pickRandom(["#무소유의미학", "#과정중심", "#낭만주의자", "#돈보다꿈", "#물욕제로"]));
+    }
 
     // Gwan-Seong (Power/Officer)
     if (gwanSeongScore > 35) {
@@ -305,11 +318,25 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
         hashtags.push(...pickRandom(["#K-직장인", "#바른생활", "#모범생", "#FM", "#신뢰의아이콘"]));
       }
     }
-    else if (gwanSeongScore === 0) hashtags.push(...pickRandom(["#규칙브레이커", "#자유로운영혼", "#통제불가", "#내맘대로살거야", "#보헤미안"]));
+    else if (gwanSeongScore === 0) {
+      if (jaeSeongScore > 35) {
+        hashtags.push(...pickRandom(["#통제불가불도저", "#일단질러", "#자유로운영혼", "#브레이크고장", "#내맘대로살거야"]));
+      } else {
+        const randomTags = pickRandom(["#규칙브레이커", "#자유로운영혼", "#통제불가", "#내맘대로살거야"]);
+        hashtags.push(...randomTags, "#보헤미안");
+      }
+    }
 
     // In-Seong (Resource)
-    if (inSeongScore > 35) hashtags.push(...pickRandom(["#생각부자", "#프로고민러", "#학구파", "#망상가", "#지식컬렉터"]));
-    else if (inSeongScore === 0) hashtags.push(...pickRandom(["#행동파", "#경험주의", "#일단고", "#눈치백단", "#실전압축형"]));
+    if (inSeongScore > 35) {
+      hashtags.push(...pickRandom(["#생각부자", "#프로고민러", "#학구파", "#망상가", "#지식컬렉터"]));
+    } else if (inSeongScore === 0) {
+      if (jaeSeongScore > 35) {
+        hashtags.push(...pickRandom(["#실전압축형", "#생각보다몸이먼저", "#눈치백단", "#실속파", "#결과중심"]));
+      } else {
+        hashtags.push(...pickRandom(["#행동파", "#경험주의", "#일단고", "#눈치백단", "#실전압축형"]));
+      }
+    }
 
     // 2. Gan-Yeo-Ji-Dong (Day Pillar Stem/Branch same element)
     if (dayPillar && BAZI_MAPPING.stems[dayPillar.stem]?.element === BAZI_MAPPING.branches[dayPillar.branch]?.element) {

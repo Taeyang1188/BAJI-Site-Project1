@@ -15,7 +15,7 @@ const BRANCH_ELEMENTS: Record<string, string> = {
 const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
 
 // 1. Rooting (Tong-geun) Data
-const ROOTING_DATA: Record<string, { strong: string[], mid: string[], weak: string[] }> = {
+export const ROOTING_DATA: Record<string, { strong: string[], mid: string[], weak: string[] }> = {
   '甲': { strong: ['寅', '卯'], mid: ['亥', '未'], weak: ['辰'] },
   '乙': { strong: ['卯', '寅'], mid: ['未', '辰'], weak: ['亥'] },
   '丙': { strong: ['巳', '午'], mid: ['寅'], weak: ['戌', '未'] },
@@ -849,7 +849,7 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     }
     // 수목청화
     if (['壬', '癸'].includes(dayMaster) && ['亥', '子', '丑', '寅', '卯'].includes(monthZhi)) {
-      if ((ratios?.['Water'] || 0) + (ratios?.['Wood'] || 0) >= 60) {
+      if ((ratios?.['Water'] || 0) >= 30 && (ratios?.['Wood'] || 0) >= 15 && ((ratios?.['Water'] || 0) + (ratios?.['Wood'] || 0) >= 60)) {
         const isDirty = (ratios?.['Earth'] || 0) > 20 || (ratios?.['Metal'] || 0) > 30;
         return {
           name: '수목청화',
@@ -863,6 +863,26 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
         };
       }
     }
+    
+    // 수화상전 (수화기제/상쟁)
+    if (['壬', '癸', '丙', '丁'].includes(dayMaster)) {
+      const waterScore = ratios?.['Water'] || 0;
+      const fireScore = ratios?.['Fire'] || 0;
+      if (waterScore >= 35 && fireScore >= 35) {
+        // Checking if one is strictly dominant or if they are in fierce battle
+        return {
+          name: '수화상전',
+          nameEn: 'Water-Fire Conflict',
+          category: 'Image',
+          mainElement: 'Water',
+          confidence: 85,
+          isDirty: true,
+          description: "수(水)와 화(火)가 극명하게 대립하며 거대한 폭발력을 품고 있는 격국.",
+          enDescription: "A structure where Water and Fire are in fierce conflict, containing immense explosive potential."
+        };
+      }
+    }
+
     // 금백수청
     if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '戌', '亥', '子'].includes(monthZhi)) {
       if ((ratios?.['Metal'] || 0) >= 40 && (ratios?.['Water'] || 0) >= 30) {
