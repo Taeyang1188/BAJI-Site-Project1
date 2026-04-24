@@ -191,5 +191,8 @@ export interface BaZiResult {
       type: 'warning' | 'danger';
       element: string;
     }[];
+    genderSpecificAnalysis?: any;
+    overloadAnalysis?: any;
+    advancedEdgeCases?: any;
   };
 }

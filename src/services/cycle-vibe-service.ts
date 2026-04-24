@@ -29,7 +29,7 @@ export interface CycleVibeResult {
   intro: string;
   questionPrompt: string;
   themes: ThemeOption[];
-  themeAnalyses: Record<string, { main: string; glitch: string; nextHook?: { text: string; themeId: string }, matrix?: BaziMatrix }>;
+  themeAnalyses: Record<string, { main: string; glitch: string; nextHook?: { text: string; themeId: string }, matrix?: BaziMatrix, isCorruption?: boolean }>;
   luckScore: number;
   luckColor: string;
   matrix?: BaziMatrix;
@@ -72,7 +72,12 @@ export function generateCycleVibe(
   userName: string, 
   gender: string, 
   city: string,
-  interactionsData?: { maritalStatus?: string | null; hasChildren?: boolean | null },
+  interactionsData?: { 
+    maritalStatus?: string | null; 
+    hasChildren?: boolean | null;
+    movingType?: string | null;
+    movingContext?: string | null;
+  },
   socialContext: SocialContext = 'none'
 ): CycleVibeResult {
   const analysis = result.analysis || {} as any;
@@ -321,7 +326,8 @@ ${combos[0].desc} ${combos[1].desc}`;
     }
     
     const desc = ELEMENT_DESCRIPTIONS[dominantElement as keyof typeof ELEMENT_DESCRIPTIONS];
-    const randomComment = desc?.comments[Math.floor(Math.random() * (desc?.comments.length || 1))] || '';
+    const charSum = processedName ? processedName.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0) : 0;
+    const randomComment = desc?.comments[charSum % (desc?.comments.length || 1)] || '';
     
     let elementComment = '';
     if (isNeutral && maxVal <= 30) {
@@ -597,135 +603,256 @@ ${detailedEffect}`;
 
   // 7. Theme-based Analysis Logic
   const themeAnalyses: Record<string, { main: string; glitch: string; nextHook?: { text: string; themeId: string } }> = {};
-  const themeScores: Record<string, number> = { romance: 0, wealth: 0, health: 0, secrets: 0, moving: 0, taboo: 0, dark_curtain: 0 };
+  const themeScores: Record<string, number> = { romance: 0, wealth: 0, secrets: 0, moving: 0 };
 
   // --- Theme 1: Romance (심연의 이끌림) ---
   const analyzeRomance = () => {
     let score = 50;
-    let text = '';
+    
+    if (gender === 'non-binary' || gender === 'prefer-not-to-tell') {
+       const main = lang === 'KO' ? 
+        `[ 심연의 이끌림: 단기 Vibe 체크 ]\n잠시만, 네 인연을 스캔하려다 렉 걸렸어. [delay:1500]\n\n명리학은 음양의 조화가 핵심이라 생물학적 성별이 꽤 중요하거든. 더 소름 돋는 분석을 위해 생물학적 성별로 다시 한번만 알려줄래?` :
+        `[ Deep Connection: Short-term Vibe Check ]\nI paused while scanning your relationship timeline. [delay:1500]\n\nIn Bazi, relationship and marriage luck are often interpreted differently based on Yin and Yang (biological sex). For a more accurate timeline, could you gently re-enter your information using your biological sex?`;
+      return { main, glitch: '' };
+    }
+
     const isFemale = gender === 'female';
     const isMale = gender === 'male';
     const marital = interactionsData?.maritalStatus;
     const children = interactionsData?.hasChildren;
     
-    const hasSikSangLuck = luckGods.some(g => g.includes('식상') || g.includes('식신') || g.includes('상관'));
-    const hasJaeSeongLuck = luckGods.some(g => g.includes('재성') || g.includes('편재') || g.includes('정재'));
-    const hasGwanSeongLuck = luckGods.some(g => g.includes('관성') || g.includes('편관') || g.includes('정관'));
-    const hasInSeongLuck = luckGods.some(g => g.includes('인성') || g.includes('편인') || g.includes('정인'));
-    
-    const hasAvailability = isFemale ? hasGwanSeongLuck : isMale ? hasJaeSeongLuck : (hasGwanSeongLuck || hasJaeSeongLuck);
-    
+    const dayMaster = result.pillars[1].stem;
     const dayBranch = result.pillars[1].branch;
-    const dayBranchInteractions = allInteractions.filter((i: any) => i.note.includes(dayBranch) && (i.note.includes(daewunBranch) || i.note.includes(seunBranch)));
+    const yearBranch = result.pillars[3]?.branch || '';
     
-    const hasHap = dayBranchInteractions.some((i: any) => i.type.includes('합'));
-    const hasChung = dayBranchInteractions.some((i: any) => i.type.includes('충'));
-    const hasWonjin = dayBranchInteractions.some((i: any) => i.type.includes('원진'));
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || 'Wood';
+    const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
+    const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5];
+    const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5];
+    const reinforcesDm = ELEMENT_CYCLE[(dmIndex + 4) % 5];
+    const sikSang = ELEMENT_CYCLE[(dmIndex + 1) % 5];
 
-    const yongShin = analysis.yongShen || '';
-    const isYongShinLuck = yongShin.includes(daewunElement) || yongShin.includes(seunElement);
+    const elementColorsKO: Record<string, string> = { 'Wood': '초록색', 'Fire': '붉은색', 'Earth': '노란색/베이지', 'Metal': '흰색/메탈릭', 'Water': '검은색/네이비' };
+    const elementDirectionsKO: Record<string, string> = { 'Wood': '동쪽', 'Fire': '남쪽', 'Earth': '중앙/가까운 곳', 'Metal': '서쪽', 'Water': '북쪽' };
 
-    const isGwanSalHonJap = analysis.tenGodsRatio?.['편관 (Strong Warrior)'] > 0 && analysis.tenGodsRatio?.['정관 (Proper Warrior)'] > 0;
-    const isSinYak = analysis.shinGangShinYak?.title?.includes('약');
-    const inSeongRatio = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('인성') || k.includes('Mystic') || k.includes('Sage')).reduce((sum, [_, v]) => sum + (v as number), 0);
-    const hasNoJaeSeong = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('재성') || k.includes('Maverick') || k.includes('Architect')).reduce((sum, [_, v]) => sum + (v as number), 0) === 0;
-    const hasNoGwanSeong = Object.entries(analysis.tenGodsRatio || {}).filter(([k]) => k.includes('관성') || k.includes('Warrior') || k.includes('Judge')).reduce((sum, [_, v]) => sum + (v as number), 0) === 0;
+    const elementColorsEN: Record<string, string> = { 'Wood': 'Green', 'Fire': 'Red', 'Earth': 'Yellow/Beige', 'Metal': 'White/Metallic', 'Water': 'Black/Navy' };
+    const elementDirectionsEN: Record<string, string> = { 'Wood': 'East', 'Fire': 'South', 'Earth': 'Center/Nearby', 'Metal': 'West', 'Water': 'North' };
 
-    // 1. Desire and Availability
-    if (hasSikSangLuck && hasAvailability) {
-      score += 30;
-      text += lang === 'KO' ? '연애하고 싶은 마음(식상)과 실제 대상(이성운)이 동시에 들어오는 완벽한 타이밍이야. 가장 안정적인 연애가 성립될 수 있어. ' : 'A perfect timing where both your desire for romance and actual potential partners arrive simultaneously. The most stable romance can be formed. ';
-    } else if (hasSikSangLuck) {
-      score += 10;
-      text += lang === 'KO' ? '연애하고 싶은 주체적인 마음과 매력이 강해지는 시기야. ' : 'Your independent desire for romance and charm are growing stronger. ';
-    } else if (hasAvailability) {
-      score += 15;
-      text += lang === 'KO' ? '주변에 연애할 대상이 나타나는 이성운이 들어왔어. ' : 'Luck for meeting potential partners has arrived. ';
-    }
-
-    if (hasInSeongLuck) {
-      text += lang === 'KO' ? '특히 이번 운에서는 상대방으로부터 대우받고 무언가를 많이 받는 수용적인 연애(갑이 되는 연애)를 할 수 있는 흐름이야. ' : 'Especially in this cycle, you can experience a receptive romance where you are treated well and receive a lot from your partner. ';
-    }
-
-    // 2. Day Branch Activation
-    if (hasHap) {
-      score += 20;
-      text += lang === 'KO' ? '내 안방(일지)의 문이 합(合)으로 활짝 열리네. 인연이 닿는 유력한 시기야. ' : 'The door to your spouse palace opens wide with a combination. It\'s a strong time for connections. ';
-      
-      const hapTypes = dayBranchInteractions.filter((i: any) => i.type.includes('합')).map((i: any) => i.note);
-      if (hapTypes.some(n => n.includes('寅') && n.includes('亥')) || hapTypes.some(n => n.includes('巳') && n.includes('申'))) {
-        text += lang === 'KO' ? '스펙과 매력에 끌려 순식간에 사랑에 빠지지만 금방 식을 수 있는 "금사빠" 성향이 발동할 수 있으니 속도 조절이 필요해. ' : 'You might fall in love quickly due to specs and charm, but it could cool down fast. Pace yourself. ';
-      } else if (hapTypes.some(n => n.includes('卯') && n.includes('戌'))) {
-        text += lang === 'KO' ? '서로 티키타카가 아주 잘 맞는 찰떡 궁합의 인연이 예상돼. ' : 'A connection with great chemistry and banter is expected. ';
-      } else if (hapTypes.some(n => n.includes('辰') && n.includes('酉'))) {
-        text += lang === 'KO' ? '연애를 넘어 동업이나 사업적 시너지를 내기 좋은 실속 있는 인연이야. ' : 'A practical connection good for business synergy beyond just romance. ';
-      }
-    } else if (hasChung) {
-      score += 10;
-      text += lang === 'KO' ? '일지에 충(沖)이 들어와. 첫눈에 반하는 강렬한 사랑이 생기거나, 임신/직장 이동 등 갑작스러운 주변 상황 변화로 인해 번갯불에 콩 볶듯 결합(결혼 등)이 발생할 수 있는 이벤트 구간이야. ' : 'A clash hits your spouse palace. Expect intense love at first sight, or a sudden union (like marriage) triggered by unexpected situations like pregnancy or job changes. ';
-    } else if (hasWonjin) {
-      score -= 10;
-      text += lang === 'KO' ? '끌리지만 괴로운, 지독한 애증의 인연(원진)이 시작될 수 있어. 마음을 다치지 않게 조심해야 해. ' : 'A toxic, love-hate relationship that you\'re drawn to might begin. Be careful not to get your heart broken. ';
-    }
-
-    // 3. Marriage Timing & Warnings
-    const isMarriageTiming = (isMale && hasJaeSeongLuck && hasHap) || 
-                             (isYongShinLuck) || 
-                             (isFemale && (hasGwanSeongLuck || hasSikSangLuck));
+    const yongShinEl = analysis.yongshinDetail?.primary?.element || '';
     
-    if (isMarriageTiming && hasHap) {
-      text += lang === 'KO' ? '20대라면 깊은 연애로, 30대 이상 정년기라면 실제 결혼으로 이어질 확률이 매우 높은 강력한 운이야. ' : 'If in your 20s, this leads to deep romance; if 30s or older, it\'s a very strong luck likely leading to actual marriage. ';
+    const ssRatio = (analysis.tenGodsRatio?.['식상(Artist/Rebel)'] as number) || (analysis.tenGodsRatio?.['식상 (Artist/Rebel)'] as number) || 0;
+    const isOverDrained = ssRatio >= 25;
+    
+    let boostElement = sikSang;
+    if (isOverDrained && yongShinEl !== sikSang) {
+       boostElement = yongShinEl || (isMale ? wealth : controlsDm);
+    }
+    const remedyColor = lang === 'KO' ? (elementColorsKO[boostElement] || '흰색') : (elementColorsEN[boostElement] || 'White');
+    const remedyDir = lang === 'KO' ? (elementDirectionsKO[boostElement] || '남쪽') : (elementDirectionsEN[boostElement] || 'South');
+
+    const elementHex: Record<string, string> = { 'Wood': '#4ade80', 'Fire': '#f87171', 'Earth': '#fde047', 'Metal': '#e2e8f0', 'Water': '#60a5fa' };
+    const remedyHex = elementHex[boostElement] || '#ffffff';
+    
+    const d = new Date();
+    const currentYear = d.getFullYear();
+    const currentMonth = d.getMonth() + 1;
+    
+    const upcomingMonths = [];
+    for(let i=0; i<6; i++) {
+        let futureD = new Date(d.getFullYear(), d.getMonth() + i, 15);
+        let sol = Solar.fromDate(futureD);
+        let lun = sol.getLunar();
+        let mGanZhi = lun.getMonthInGanZhi(); 
+        const mStem = mGanZhi.charAt(0);
+        const mBranch = mGanZhi.charAt(1) || '子';
+        upcomingMonths.push({
+            year: futureD.getFullYear(),
+            month: futureD.getMonth() + 1,
+            stem: mStem,
+            branch: mBranch
+        });
     }
 
-    // 4. Bad Luck Filtering & Warnings
-    if (hasAvailability && ((isFemale && isGwanSalHonJap) || isSinYak)) {
-      score -= 20;
-      text += lang === 'KO' ? '\n\n[경고] 이성운이 들어왔지만, 사주의 단점(관살혼잡 가중 또는 신약함)을 부추기는 흉운의 성격도 있어. 절대 섣부른 결정을 내리지 말고, 반드시 궁합을 확인하고 시기를 숙고해. ' : '\n\n[Warning] Romance luck has arrived, but it might worsen your chart\'s weaknesses. Do not make hasty decisions; be sure to check compatibility and consider the timing carefully. ';
+    const baziMappingStems: Record<string, { element: string }> = { '甲': { element: 'Wood' }, '乙': { element: 'Wood' }, '丙': { element: 'Fire' }, '丁': { element: 'Fire' }, '戊': { element: 'Earth' }, '己': { element: 'Earth' }, '庚': { element: 'Metal' }, '辛': { element: 'Metal' }, '壬': { element: 'Water' }, '癸': { element: 'Water' } };
+    const baziMappingBranches: Record<string, { element: string }> = { '子': { element: 'Water' }, '丑': { element: 'Earth' }, '寅': { element: 'Wood' }, '卯': { element: 'Wood' }, '辰': { element: 'Earth' }, '巳': { element: 'Fire' }, '午': { element: 'Fire' }, '未': { element: 'Earth' }, '申': { element: 'Metal' }, '酉': { element: 'Metal' }, '戌': { element: 'Earth' }, '亥': { element: 'Water' } };
+
+    const c = (char: string) => {
+        let el = baziMappingStems[char]?.element || baziMappingBranches[char]?.element;
+        if (!el) return char;
+        return `[${elementHex[el]}:${char}]`;
+    };
+    
+    const getDohwa = (b: string) => {
+        if (['申','子','辰'].includes(b)) return '酉';
+        if (['亥','卯','未'].includes(b)) return '子';
+        if (['寅','午','戌'].includes(b)) return '卯';
+        if (['巳','酉','丑'].includes(b)) return '午';
+        return '';
+    };
+
+    const myDohwas = [getDohwa(yearBranch), getDohwa(dayBranch)].filter(Boolean);
+
+    const getRelationKO = (el: string) => {
+        if (el === dmElement) return '비겁';
+        if (el === sikSang) return '식상';
+        if (el === wealth) return '재성';
+        if (el === controlsDm) return '관성';
+        if (el === reinforcesDm) return '인성';
+        return '';
+    };
+
+    const getRelationEN = (el: string) => {
+        if (el === dmElement) return 'Companion';
+        if (el === sikSang) return 'Expression';
+        if (el === wealth) return 'Wealth';
+        if (el === controlsDm) return 'Power';
+        if (el === reinforcesDm) return 'Resource';
+        return '';
+    };
+
+    const evaluateRomanceMonth = (m: any) => {
+        let sc = 50;
+        const sEl = baziMappingStems[m.stem]?.element;
+        const bEl = baziMappingBranches[m.branch]?.element;
+        
+        let reasonKO = '';
+        let reasonEN = '';
+        const isSikSang = sEl === sikSang || bEl === sikSang;
+        const isPyeonGwan = (m.stem === '壬' && dayMaster === '丙') || (m.stem === '庚' && dayMaster === '甲') || (m.stem === '甲' && dayMaster === '戊') || (m.stem === '丙' && dayMaster === '庚') || (m.stem === '戊' && dayMaster === '壬') || (m.stem === '癸' && dayMaster === '丁') || (m.stem === '辛' && dayMaster === '乙') || (m.stem === '乙' && dayMaster === '己') || (m.stem === '丁' && dayMaster === '辛') || (m.stem === '己' && dayMaster === '癸'); // 7 Killings rough check on stem
+
+        if (isMale) {
+            if (sEl === wealth || bEl === wealth) { sc += 40; reasonKO = `월운에 ${c(m.stem)}${c(m.branch)}(${getRelationKO(sEl || bEl || wealth)})이 들어와`; reasonEN = `Monthly ${c(m.stem)}${c(m.branch)} (${getRelationEN(sEl || bEl || wealth)}) energy approaches`; }
+            if (isSikSang) { sc += 20; reasonKO = `월간의 식상(${m.stem === sikSang ? c(m.stem) : c(m.branch)})이 매력을 밖으로 표출시켜주는 달이므로`; reasonEN = `Monthly Expression energy (${m.stem === sikSang ? c(m.stem) : c(m.branch)}) lets your charm shine outwards`; }
+            if (sEl === controlsDm || bEl === controlsDm) { sc += 15; reasonKO = `책임감과 무게를 더하는 관성(${sEl === controlsDm ? c(m.stem) : c(m.branch)})의 텐션이 감도는 시기이므로`; reasonEN = `Monthly Power energy (${sEl === controlsDm ? c(m.stem) : c(m.branch)}) brings tension and responsibility`; }
+        } else {
+            if (sEl === controlsDm || bEl === controlsDm) { sc += 40; reasonKO = `월운에 ${c(m.stem)}${c(m.branch)}(${getRelationKO(sEl || bEl || controlsDm)})이 들어와`; reasonEN = `Monthly ${c(m.stem)}${c(m.branch)} (${getRelationEN(sEl || bEl || controlsDm)}) energy approaches`; }
+            if (isSikSang) { sc += 20; reasonKO = `월간의 식상(${sEl === sikSang ? c(m.stem) : c(m.branch)})이 내 매력을 한껏 돋보이게 하는 달이므로`; reasonEN = `Monthly Expression energy (${sEl === sikSang ? c(m.stem) : c(m.branch)}) lets your charm shine outwards`; }
+            if (sEl === wealth || bEl === wealth) { sc += 15; reasonKO = `현실적인 감각을 더하는 재성(${sEl === wealth ? c(m.stem) : c(m.branch)})의 텐션이 감도는 시기이므로`; reasonEN = `Monthly Wealth energy (${sEl === wealth ? c(m.stem) : c(m.branch)}) brings practical tension`; }
+        }
+
+        const isYearlyDohwa = myDohwas.includes(seunBranch);
+        const isMonthlyDohwa = myDohwas.includes(m.branch);
+
+        if (isYearlyDohwa && isSikSang) {
+             sc += 40;
+             reasonKO = `세운의 도화(${c(seunBranch)})를 월운의 식상(${sEl === sikSang ? c(m.stem) : c(m.branch)})이 활짝 드러내어 매력이 표출되는 달이므로`;
+             reasonEN = `Yearly [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(seunBranch)}) is beautifully expressed by monthly Expression energy (${sEl === sikSang ? c(m.stem) : c(m.branch)})`;
+        } else if (isMonthlyDohwa) {
+             sc += 30; 
+             reasonKO = `잠재된 도화(${c(m.branch)}) 에너지를 직접 깨워 매력을 극대화하므로`;
+             reasonEN = `Latent [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(m.branch)}) energy is awakened`;
+        }
+
+        if(dayMaster === '辛' && (m.stem === '壬' || m.branch === '亥')) {
+             sc += 30;
+             const washChar = m.stem === '壬' ? m.stem : m.branch;
+             reasonKO = `${c('辛')}을 씻어 맑게 빛내는 식상 ${c(washChar)}의 도세주옥(淘洗珠玉) 효과가 폭발하여`;
+             reasonEN = `Cleansing Water (${c(washChar)}) highlights your brilliance`;
+        }
+        
+        if (isPyeonGwan) {
+             sc += 0; /* logic moved to end */
+             sc += 0;
+        }
+
+        const isChung = (m.branch === '子' && dayBranch === '午') || (m.branch === '午' && dayBranch === '子') ||
+                        (m.branch === '丑' && dayBranch === '未') || (m.branch === '未' && dayBranch === '丑') ||
+                        (m.branch === '寅' && dayBranch === '申') || (m.branch === '申' && dayBranch === '寅') ||
+                        (m.branch === '卯' && dayBranch === '酉') || (m.branch === '酉' && dayBranch === '卯') ||
+                        (m.branch === '辰' && dayBranch === '戌') || (m.branch === '戌' && dayBranch === '辰') ||
+                        (m.branch === '巳' && dayBranch === '亥') || (m.branch === '亥' && dayBranch === '巳');
+        
+        const isWonjin = (m.branch === '子' && dayBranch === '未') || (m.branch === '未' && dayBranch === '子') ||
+                         (m.branch === '丑' && dayBranch === '午') || (m.branch === '午' && dayBranch === '丑') ||
+                         (m.branch === '寅' && dayBranch === '酉') || (m.branch === '酉' && dayBranch === '寅') ||
+                         (m.branch === '卯' && dayBranch === '申') || (m.branch === '申' && dayBranch === '卯') ||
+                         (m.branch === '辰' && dayBranch === '亥') || (m.branch === '亥' && dayBranch === '辰') ||
+                         (m.branch === '巳' && dayBranch === '戌') || (m.branch === '戌' && dayBranch === '巳');
+
+        if (isChung || isWonjin) {
+             sc -= 15;
+             if (reasonKO) {
+                 reasonKO += ` (단, 일지와의 ${isChung ? '충(衝)' : '원진(怨嗔)'}으로 쓸데없는 감정 소모나 꼬이는 인연은 주의해야 해)`;
+                 reasonEN += ` (Be careful of emotional drama due to ${isChung ? 'Clash' : 'Harm'} with Day Branch)`;
+             } else {
+                 reasonKO = `일지와의 ${isChung ? '충(衝)' : '원진(怨嗔)'}으로 쓸데없는 감정 소모나 꼬이는 인연을 주의해야 해`;
+                 reasonEN = `Be careful of emotional drama due to ${isChung ? 'Clash' : 'Harm'} with Day Branch`;
+             }
+        }
+
+        return { ...m, score: sc, reason: lang === 'KO' ? reasonKO : reasonEN };
+    };
+
+    const scoredMonths = upcomingMonths.map(evaluateRomanceMonth);
+    const currentM = scoredMonths[0]; 
+    let sortedFuture = [...scoredMonths.slice(1)].sort((a,b) => b.score - a.score);
+    let bestM = sortedFuture[0];
+
+    score = currentM.score;
+
+    let textKO = '[ 단기 Vibe 체크 ]\n';
+    let textEN = '[ Short-term Vibe Check ]\n';
+    const monthsEN_array = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    if (score >= 80) {
+        textKO += `이번 달(${currentM.month}월)은 ${currentM.reasonKO || currentM.reason || '강력한 인연의 에너지가 진동하여'} 인연이 다가올 확률이 매우 높아! 당신의 매력이 돋보이는 달이니 가벼운 모임이라도 꼭 참석해봐.${currentM.isPyeonGwan ? ' (단, 다소 긴장되고 스트레스받는 만남일 수 있으니 여유를 가져야 해)' : ''}\n\n`;
+        textEN += `This month (${monthsEN_array[currentM.month - 1]}) has strong romantic energy. ${currentM.reasonEN || currentM.reason || 'Positive energy flows'}. Your charm stands out, so definitely attend social gatherings!${currentM.isPyeonGwan ? ' (However, it might be a tense or slightly stressful encounter, so try to stay relaxed)' : ''}\n\n`;
+    } else if (score >= 50) {
+        textKO += `이번 달(${currentM.month}월) 애정운은 ${currentM.reasonKO || currentM.reason || '잔잔하고 무난한 흐름이야.'} 폭풍 같은 인연보다는 서서히 알아가는 썸이나 소소한 진전이 어울려.${currentM.isPyeonGwan ? ' (단, 다소 긴장되고 스트레스받는 만남일 수 있으니 여유를 가져야 해)' : ''}\n\n`;
+        textEN += `This month (${monthsEN_array[currentM.month - 1]}) romance luck is calm and steady. ${currentM.reasonEN || currentM.reason || 'Gentle energy flows.'} Good for slow-burning connections rather than intense ones.${currentM.isPyeonGwan ? ' (However, it might be a tense or slightly stressful encounter, so try to stay relaxed)' : ''}\n\n`;
+    } else {
+        textKO += `이번 달(${currentM.month}월)은 연애 세포가 잠시 쉬어가는 흐름이야. ${currentM.reasonKO || currentM.reason || '관계에 집중하기보다는 내면을 가다듬을 시기야.'} 무리하게 다가가면 오해가 생길 수 있어.${currentM.isPyeonGwan ? ' (상대방도 예민할 수 있으니 한 발 물러서는 게 좋아)' : ''}\n\n`;
+        textEN += `This month (${monthsEN_array[currentM.month - 1]}), your romance cells are hibernating. ${currentM.reasonEN || currentM.reason || 'Take a step back.'} Misunderstandings might occur if you rush.${currentM.isPyeonGwan ? ' (The other party might be sensitive, so give them space)' : ''}\n\n`;
     }
 
-    if (inSeongRatio > 40) {
-      text += lang === 'KO' ? '\n\n[주의] 인성이 과다하여 주관적 잣대가 강해. 연애 시 객관성이나 눈치가 떨어질 수 있으니 타인의 조언을 귀담아들어. ' : '\n\n[Note] With excessive Wisdom, your subjective standards are strong. You might lack objectivity or tact in romance, so listen to others\' advice. ';
+    if (bestM && bestM.score >= 50) {
+        let bestMonthStrKO = `${bestM.month}월`;
+        let bestMonthStrEN = monthsEN_array[bestM.month - 1];
+        if (bestM.year > currentYear) {
+            bestMonthStrKO = `내년 ${bestM.month}월`;
+            bestMonthStrEN = `${bestMonthStrEN} next year`;
+        }
+        textKO += `**향후 6개월 내 가장 좋은 타점은 ${bestMonthStrKO}이야.** 이때 ${bestM.reasonKO || bestM.reason || '긍정적인 기운이 들어와'} 연애세포를 깨울 테니, 미리 매력을 어필할 준비를 해둬.\n\n`;
+        textEN += `**The best timing in the next 6 months is ${bestMonthStrEN}.** ${bestM.reasonEN || bestM.reason || 'Positive aura is strong.'} Prepare your charm and profile for this period.\n\n`;
+    }
+    
+    if (score < 50) {
+        textKO += `[ 💔 액땜 및 개운법 ]\n인연이 잘 안 풀린다면 **${remedyDir} 방향**으로 짧은 산책이나 드라이브를 다녀와봐. 옷이나 악세서리에 [${remedyHex}:**${remedyColor}**] 포인트를 주면 나를 표현하는 매력 에너지를 보완해줄 수 있어. 무리한 소개팅보다는 내 일이나 취미에 에너지를 발산할 때 오히려 귀인이 나타날 확률이 높아!\n\n`;
+        textEN += `[ 💔 Remedy ]\nWhen luck is blocked, change your environment! Try going towards the **${remedyDir}**. Wearing [${remedyHex}:**${remedyColor}**] accessories will supplement your expressive romantic energy. Focus on hobbies or work first, and the right person will appear naturally.\n\n`;
+    } else {
+        textKO += `[ 💖 매력 부스팅 팁 ]\n운이 들어왔을 땐 노를 저어야지! 중요한 만남이 있다면 [${remedyHex}:**${remedyColor}**] 계열의 옷을 입거나 소품을 활용해봐. ${(isOverDrained && yongShinEl !== sikSang) ? '과도한 열기를 식히고 나를 아름답게 다듬어주는 기운' : '나를 더 돋보이게 하는 인연 기운'}을 증폭시켜 줄 거야. 약속 장소는 내 기준 **${remedyDir} 방향**이 운을 끌어올리기 좋으니 참고해!\n\n`;
+        textEN += `[ 💖 Boost Tip ]\nWear [${remedyHex}:**${remedyColor}**] items for important meetups to amplify your charm. A location towards the **${remedyDir}** from your place would be lucky!\n\n`;
     }
 
-    if ((isMale && hasNoJaeSeong) || (isFemale && hasNoGwanSeong)) {
-      text += lang === 'KO' ? '\n\n[주의] 원국에 이성을 보는 기준(재성/관성)이 부족해 나쁜 사람을 만날 확률이 높아. 주변 연애 고수들의 객관적인 조언을 반드시 받아! ' : '\n\n[Note] Your chart lacks the standard for judging partners. There is a high chance of meeting the wrong person, so definitely get objective advice from dating experts around you! ';
-    }
+    textKO += '마지막으로, 연애는 쌍방작용이야. 상대방의 사주에서도 연애운(식상/이성운)이 들어왔는지, 나에게 없는 오행을 보완해주는 귀인인지 꼭 함께 확인해봐.';
+    textEN += 'Lastly, romance is a two-way interaction. Make sure to check if your partner also has romance luck coming their way.';
 
-    text += lang === 'KO' ? '\n\n마지막으로, 연애는 쌍방작용이야. 상대방의 사주에서도 연애운(식상)과 이성운이 들어왔는지, 내게 없는 오행을 보완해주는 귀인인지 꼭 함께 확인해봐.' : '\n\nLastly, romance is a two-way street. Make sure to check if your partner also has romance luck and if they complement your missing elements.';
+    const text = lang === 'KO' ? textKO : textEN;
 
     const main = lang === 'KO' ? 
-      `음, ${userRef}의 애정운을 보니... [delay:1500]
-
-${text}` :
-      `Looking at your romance... [delay:1500]
-
-${text}`;
+      `\n음, ${userRef}의 단기 애정운을 스캔해봤어... [delay:1500]\n\n${text}` :
+      `\nAnalyzing your short-term romance luck... [delay:1500]\n\n${text}`;
     
     const glitch = lang === 'KO' ? 
       (score >= 70 ? '인연의 끈이 팽팽하게 당겨지고 있어. 기회를 놓치지 마.' : '지금은 누군가를 찾기보다 네 내면의 평화를 먼저 찾는 게 이득이야.') :
-      (score >= 70 ? 'The string of fate is pulling tight. Don\'t miss the chance.' : 'It\'s better to find your inner peace first rather than looking for someone else.');
+      (score >= 70 ? "The string of fate is pulling tight. Don't miss the chance." : "It's better to find your inner peace first rather than looking for someone else.");
 
     let nextHook;
-    if (marital === '미혼' && !children) {
+    if (marital !== '결혼함' && !children) {
       nextHook = {
-        text: lang === 'KO' ? '결혼하는 운이 언제 들어올지도 궁금해?' : 'Are you curious when your marriage luck comes in?',
+        text: lang === 'KO' ? '진짜 결혼하는 운이 언제 들어올지도 궁금해?' : 'Are you curious when your marriage luck comes in?',
         themeId: 'marriage_timing'
       };
     }
 
     return { main, glitch, nextHook };
   };
-
-  // --- Theme 1.5: Marriage Timing (결혼운) ---
   const analyzeMarriageTiming = () => {
     if (gender === 'non-binary' || gender === 'prefer-not-to-tell') {
       const main = lang === 'KO' ? 
-        `잠시만, 네 인연을 스캔하려다 렉 걸렸어. [delay:1500]
-
-명리학은 음양의 조화가 핵심이라 생물학적 성별이 꽤 중요하거든. 더 소름 돋는 분석을 위해 생물학적 성별로 다시 한번만 알려줄래? 네 진짜 에너지를 제대로 읽어보고 싶어.` :
-        `I paused while scanning your relationship timeline. [delay:1500]
-
-In Bazi, relationship and marriage luck are often interpreted differently based on Yin and Yang (biological sex). For a more accurate timeline, could you gently re-enter your information using your biological sex? I want to understand your unique energy more deeply.`;
+        `잠시만, 네 인연을 스캔하려다 렉 걸렸어. [delay:1500]\n\n명리학은 음양의 조화가 핵심이라 생물학적 성별이 꽤 중요하거든. 더 소름 돋는 분석을 위해 생물학적 성별로 다시 한번만 알려줄래? 네 진짜 에너지를 제대로 읽어보고 싶어.` :
+        `I paused while scanning your relationship timeline. [delay:1500]\n\nIn Bazi, relationship and marriage luck are often interpreted differently based on Yin and Yang (biological sex). For a more accurate timeline, could you gently re-enter your information using your biological sex? I want to understand your unique energy more deeply.`;
       return { main, glitch: '' };
     }
 
@@ -733,1239 +860,345 @@ In Bazi, relationship and marriage luck are often interpreted differently based 
     const isFemale = gender === 'female';
     const isMale = gender === 'male';
     
-    // In bazi-service.ts, pillars are [Hour, Day, Month, Year]
-    // So pillars[1] is Day, pillars[2] is Month, pillars[3] is Year
     const dayMaster = result.pillars[1].stem;
     const dayBranch = result.pillars[1].branch;
-    const yongshinDetail = analysis.yongshinDetail || {};
-    const yongShin = analysis.yongShen || '';
-    const yongShinElementFromDetail = yongshinDetail.primary?.element || '';
-
-    const specialStatuses = analysis.specialStatuses || {};
-    const specialCombinations = analysis.specialCombinations || {};
-    const elementRatios = specialStatuses.elementRatios || analysis.elementRatios || {};
-
-    const isStrongDayMaster = (analysis.dayMasterStrength?.score || 50) >= 50;
-    const isWeakDayMaster = !isStrongDayMaster;
-
-    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
+    const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || 'Wood';
     const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
     const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
-    const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5]; // JaeSeong
-    const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5]; // GwanSeong
-    const drainsDm = ELEMENT_CYCLE[(dmIndex + 1) % 5]; // SikSang
-    const reinforcesDm = ELEMENT_CYCLE[(dmIndex + 4) % 5]; // InSeong
-    const selfDm = ELEMENT_CYCLE[dmIndex]; // BiGyeop
+    const wealth = ELEMENT_CYCLE[(dmIndex + 2) % 5];
+    const controlsDm = ELEMENT_CYCLE[(dmIndex + 3) % 5];
+    const reinforcesDm = ELEMENT_CYCLE[(dmIndex + 4) % 5];
+    const sikSang = ELEMENT_CYCLE[(dmIndex + 1) % 5];
 
-    const powerRatio = analysis.tenGodsRatio?.['관성(Warrior/Judge)'] || analysis.tenGodsRatio?.['Warrior/Judge'] || 0;
-    const gwanRatio = elementRatios[controlsDm as keyof typeof elementRatios] || 0;
-    const isPowerHeavy = powerRatio >= 30 || gwanRatio >= 35;
+    const getYearlyLuck = (y) => {
+      const startY = 1984; // 甲子 year
+      const o = (y - startY) % 60;
+      const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+      const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      const stem = stems[(o + 120) % 10];
+      const branch = branches[(o + 120) % 12];
+      return { year: y, stem, branch };
+    };
+
+    const getMonthlyLuckForYear = (year) => {
+      const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+      const branches = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+      const yearStemIndex = stems.indexOf(getYearlyLuck(year).stem);
+      
+      let firstMonthStemIndex = 0;
+      if (yearStemIndex === 0 || yearStemIndex === 5) firstMonthStemIndex = 2;
+      else if (yearStemIndex === 1 || yearStemIndex === 6) firstMonthStemIndex = 4;
+      else if (yearStemIndex === 2 || yearStemIndex === 7) firstMonthStemIndex = 6;
+      else if (yearStemIndex === 3 || yearStemIndex === 8) firstMonthStemIndex = 8;
+      else if (yearStemIndex === 4 || yearStemIndex === 9) firstMonthStemIndex = 0;
+      
+      const months = [];
+      for(let i=0; i<12; i++) {
+        months.push({
+          month: (i + 2) > 12 ? (i + 2) - 12 : (i + 2),
+          stem: stems[(firstMonthStemIndex + i) % 10],
+          branch: branches[i]
+        });
+      }
+      return months;
+    };
+
+    const isPowerHeavy = (analysis.tenGodsRatio?.['관성(Warrior/Judge)'] || 0) >= 30 
+      || (analysis.elementRatios && analysis.elementRatios[controlsDm] >= 35);
+
+    const baziMappingStems = { '甲': { element: 'Wood' }, '乙': { element: 'Wood' }, '丙': { element: 'Fire' }, '丁': { element: 'Fire' }, '戊': { element: 'Earth' }, '己': { element: 'Earth' }, '庚': { element: 'Metal' }, '辛': { element: 'Metal' }, '壬': { element: 'Water' }, '癸': { element: 'Water' } };
+    const baziMappingBranches = { '子': { element: 'Water' }, '丑': { element: 'Earth' }, '寅': { element: 'Wood' }, '卯': { element: 'Wood' }, '辰': { element: 'Earth' }, '巳': { element: 'Fire' }, '午': { element: 'Fire' }, '未': { element: 'Earth' }, '申': { element: 'Metal' }, '酉': { element: 'Metal' }, '戌': { element: 'Earth' }, '亥': { element: 'Water' } };
+
+    const evaluateMarriageLuck = (luck) => {
+      let score = 0;
+      let reason = '';
+      
+      const sEl = baziMappingStems[luck.stem]?.element;
+      const bEl = baziMappingBranches[luck.branch]?.element;
+
+      if (isPowerHeavy && (sEl === reinforcesDm || bEl === reinforcesDm)) {
+        score += 150;
+        reason = lang === 'KO' ? 
+          `강력한 인성(${lang === 'KO' ? {'Wood':'목','Fire':'화','Earth':'토','Metal':'금','Water':'수'}[reinforcesDm] : reinforcesDm})이 들어와 나를 짓누르던 관성(책임감/압박)을 안정적인 가정이라는 울타리로 비로소 승화시키는 해` :
+          `Strong resource energy enters, transforming crushing pressure into a stable family haven`;
+      } else if (!isMale && (sEl === controlsDm || bEl === controlsDm)) {
+        score += 100;
+        reason = lang === 'KO' ? '관성(남성/안정의 책임)이 내 일간을 감싸 안는 해' : 'Strong connection with a significant other';
+      } else if (isMale && (sEl === wealth || bEl === wealth)) {
+        score += 100;
+        reason = lang === 'KO' ? '재성이 직접 도래하여 인연의 결실을 맺는 해' : 'Wealth (Spouse) energy directly arrives for fruitful connection';
+      } else if (isMale && (sEl === sikSang || bEl === sikSang)) {
+        score += 80;
+        reason = lang === 'KO' ? '식상(표현력)이 생재하여 이성을 향해 마음이 적극적으로 움직이는 해' : 'Your expressive energy actively moves towards romance';
+      } else if (!isMale && (sEl === sikSang || bEl === sikSang)) {
+        score += 80;
+        reason = lang === 'KO' ? '내 가족, 내 식구를 꾸리고자 하는 강한 열망이 생기는 시기' : 'Strong desire to build your own family arises';
+      } else if (sEl === controlsDm || bEl === reinforcesDm) {
+         score += 90;
+         reason = lang === 'KO' ? '사회적 책임과 안정적인 가정을 꾸리고자 하는 의지가 강해지는 해' : 'Strong will to take social responsibility and build a stable family';
+      } else if (luck.stem === dayMaster || luck.branch === dayBranch) {
+        score += 80;
+        reason = lang === 'KO' ? '일간/일지와 동기화되어 내 삶에 결정적인 배우자의 방이 열리는 시기' : 'Alignment with day pillar opens the door to marriage';
+      } else {
+        score += 30;
+        reason = lang === 'KO' ? '인연의 흐름이 잔잔하게 스쳐가는 시기' : 'A calm period of relationship flow';
+      }
+
+      const monthlyData = getMonthlyLuckForYear(luck.year).map(m => {
+        let mScore = 0;
+        const msEl = baziMappingStems[m.stem]?.element;
+        const mbEl = baziMappingBranches[m.branch]?.element;
+        
+        const isHap = (m.branch === '子' && dayBranch === '丑') || (m.branch === '丑' && dayBranch === '子') ||
+                      (m.branch === '寅' && dayBranch === '亥') || (m.branch === '亥' && dayBranch === '寅') ||
+                      (m.branch === '卯' && dayBranch === '戌') || (m.branch === '戌' && dayBranch === '卯') ||
+                      (m.branch === '辰' && dayBranch === '酉') || (m.branch === '酉' && dayBranch === '辰') ||
+                      (m.branch === '巳' && dayBranch === '申') || (m.branch === '申' && dayBranch === '巳') ||
+                      (m.branch === '午' && dayBranch === '未') || (m.branch === '未' && dayBranch === '午');
+        const samHapGroups = [['亥', '卯', '未'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['申', '子', '辰']];
+        const isSamHap = samHapGroups.some(g => g.includes(m.branch) && g.includes(dayBranch) && m.branch !== dayBranch);
+        
+        if (isHap || isSamHap) mScore += 30;
+        if (isMale && (msEl === wealth || mbEl === wealth)) mScore += 20;
+        if (!isMale && (msEl === controlsDm || mbEl === controlsDm)) mScore += 20;
+        if (msEl === sikSang || mbEl === sikSang) mScore += 10;
+        
+        return { ...m, score: mScore };
+      });
+
+      monthlyData.sort((a,b) => b.score - a.score);
+      let bestMonths = monthlyData.slice(0, 3).filter(m => m.score > 0);
+      if (bestMonths.length === 0) bestMonths = monthlyData.slice(0, 2);
+      bestMonths.sort((a, b) => a.month - b.month);
+      const targetMonths = bestMonths.map(m => m.month);
+
+      return { ...luck, score, reason, targetMonths };
+    };
+
+    const pastYears = [currentYear - 2, currentYear - 1, currentYear];
+    const futureYears = [currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4, currentYear + 5];
+
+    const pastLucks = pastYears.map(y => evaluateMarriageLuck(getYearlyLuck(y)));
+    const futureLucks = futureYears.map(y => evaluateMarriageLuck(getYearlyLuck(y)));
+
+    pastLucks.sort((a, b) => b.score - a.score);
+    futureLucks.sort((a, b) => b.score - a.score);
+
+    const bestPast = pastLucks[0];
+    const bestFuture = futureLucks[0];
+
+    const formatLuck = (l) => {
+      const monthStr = l.targetMonths.join(', ');
+      return lang === 'KO' 
+        ? `${l.reason}야. **(성취 확률이 높은 달: ${monthStr}월)**`
+        : `${l.reason}. **(High success months: ${monthStr})**`;
+    };
+
+    const main = lang === 'KO' ? 
+      `네 인연의 타임라인을 스캔해봤어. [delay:1500]\n\n🕒 [가장 가까웠던/현재의 결혼운]\n${bestPast.year}년(${bestPast.stem}${bestPast.branch}년): ${formatLuck(bestPast)}\n\n🚀 [향후 가장 강력한 결혼운]\n${bestFuture.year}년(${bestFuture.stem}${bestFuture.branch}년): ${formatLuck(bestFuture)}\n\n결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해.` :
+      `I've scanned your relationship timeline. [delay:1500]\n\n🕒 [Most Recent/Current Marriage Luck]\n${bestPast.year} (${bestPast.stem}${bestPast.branch}): ${formatLuck(bestPast)}\n\n🚀 [Strongest Future Marriage Luck]\n${bestFuture.year} (${bestFuture.stem}${bestFuture.branch}): ${formatLuck(bestFuture)}\n\nMarriage is about the choices you make.`;
+
+    return { main, glitch: lang === 'KO' ? '운명은 준비된 자에게 찾아온다.' : 'Fate comes to the prepared.' };
+  };
+  const analyzeWealth = () => {
+    const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+    const dmStem = result.pillars[1].stem;
+    const dmElement = BAZI_MAPPING.stems[dmStem as keyof typeof BAZI_MAPPING.stems]?.element || 'Wood';
+    const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
+    const sikElement = ELEMENT_CYCLE[(dmIndex + 1) % 5];
+    const wealthElement = ELEMENT_CYCLE[(dmIndex + 2) % 5];
+    const gwanElement = ELEMENT_CYCLE[(dmIndex + 3) % 5];
+    const inElement = ELEMENT_CYCLE[(dmIndex + 4) % 5];
+    const biElement = dmElement;
+
+    // Current year analysis
+    const currentYearPillar = result.currentYearPillar;
+    const currentYear = currentYearPillar?.year || new Date().getFullYear();
     
-    const dmScore = analysis.dayMasterStrength?.score || 50;
-    const isWeakGwanDa = isPowerHeavy && dmScore < 50;
-    const isStrongGwanDa = isPowerHeavy && dmScore >= 50;
-    const isNeutral = dmScore >= 45 && dmScore <= 55;
-    const isExtremeStrong = dmScore >= 75;
-
-    const hiddenHapPairs: Record<string, string[]> = {
-      '子': ['戌'], '丑': ['寅'], '寅': ['丑', '未'], '卯': ['申'], 
-      '辰': [], '巳': ['酉'], '午': ['亥'], '未': ['寅'], 
-      '申': ['卯'], '酉': ['巳'], '戌': ['子'], '亥': ['午']
-    };
-
-    const allBranches = result.pillars.map((p: any) => p.branch);
-    const birthYear = result.grandCycles[0]?.year - result.grandCycles[0]?.age || 1990;
-
-    const genderStar = isMale ? wealth : controlsDm;
-    const chartGenderStarBranches = allBranches.filter(b => BAZI_MAPPING.branches[b as keyof typeof BAZI_MAPPING.branches]?.element === genderStar);
-
-    // Gwan-Sal Hon-Jap checking (관살혼잡 / 관다 / 상관견관 필터용)
-    const pyeonGwanCount = (result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('편관') ? 1 : 0) + (p.branchKoreanName?.includes('편관') ? 1 : 0), 0) || 0);
-    const jeongGwanCount = (result.pillars?.reduce((c, p) => c + (p.stemKoreanName?.includes('정관') ? 1 : 0) + (p.branchKoreanName?.includes('정관') ? 1 : 0), 0) || 0);
-    const gwanSeongRatio = analysis?.tenGodsRatio?.['관성'] || 0;
-    const biGeopRatio = analysis?.tenGodsRatio?.['비겁'] || 0;
-    const isGwanTaegwang = isFemale && gwanSeongRatio > 35; // 관살태강
-    const isGwanSalHonJap = isFemale && pyeonGwanCount > 0 && jeongGwanCount > 0 && (pyeonGwanCount + jeongGwanCount >= 2);
-    // DaeWoon check mock (DaeWoon info isn't directly fully available in cycle-vibe yet, but we will protect against SangGwanGyeonGwan)
-    const hasJeongGwan = jeongGwanCount > 0;
-    const hasPyeonGwan = pyeonGwanCount > 0;
-
-    // --- Environment Detection (조열/한습 판별) ---
-    const envElementRatios = analysis.elementRatios || {};
-    const is燥熱 = (envElementRatios['Fire'] || 0) >= 70;
-    const is寒濕 = (envElementRatios['Water'] || 0) >= 70;
-    const chartEnvironment = is燥熱 ? '燥熱' : (is寒濕 ? '寒濕' : 'Neutral');
-
-    const findMarriageLuck = (startYear: number, endYear: number, isPastLuck: boolean = false) => {
-      const yearResults: any[] = [];
+    // Evaluate function
+    const evaluateWealthScore = (pillar: any) => {
+      let score = 50;
+      const sEl = BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element;
+      const bEl = BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element;
       
-      // Calculate scores for all years in range plus one year before for window logic
-      for (let year = startYear - 1; year <= endYear; year++) {
-        const solar = Solar.fromYmd(year, 6, 1);
-        const lunar = solar.getLunar();
-        const baZi = lunar.getEightChar();
-        const yGan = baZi.getYearGan();
-        const yZhi = baZi.getYearZhi();
-        
-        const yGanElement = BAZI_MAPPING.stems[yGan as keyof typeof BAZI_MAPPING.stems]?.element;
-        const yZhiElement = BAZI_MAPPING.branches[yZhi as keyof typeof BAZI_MAPPING.branches]?.element;
-
-        let yearScore = 0;
-        let triggerReason = '';
-        let triggerElement = '';
-        let branchAction = '';
-        let penaltyReason = '';
-
-        // 상관견관 명확한 판별 로직
-        // 연운 천간이 '상관'인데 원국 내 정관이 있거나, 연운 자체가 상관견관 간여지동일 때
-        
-        // 상관 (Hurting Officer): Drains DM, different polarity.
-        const dmInfo = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems];
-        const yGanInfo = BAZI_MAPPING.stems[yGan as keyof typeof BAZI_MAPPING.stems];
-        const dmPolarity = dmInfo?.element ? (['甲', '丙', '戊', '庚', '壬'].includes(dayMaster) ? '+' : '-') : null;
-        const yGanPolarity = yGanInfo?.element ? (['甲', '丙', '戊', '庚', '壬'].includes(yGan) ? '+' : '-') : null;
-        
-        const isSangGwan = (yGanElement === drainsDm && dmPolarity !== yGanPolarity);
-        const isSikSin = (yGanElement === drainsDm && dmPolarity === yGanPolarity);
-        const isJeongGwanYear = (yGanElement === controlsDm && dmPolarity !== yGanPolarity);
-        const isPyeonGwanYear = (yGanElement === controlsDm && dmPolarity === yGanPolarity);
-        const isBiGeop = (yGanElement === dmElement);
-
-        let isSangGwanGyeonGwan = false;
-        let isSikSinJeSal = false;
-
-        if (isFemale && (isGwanTaegwang || isGwanSalHonJap)) {
-          if (isSangGwan && hasJeongGwan) {
-             isSangGwanGyeonGwan = true;
-             penaltyReason = "상관견관: 관살혼잡 중에 상관이 들어와 이성운이 파탄나거나 갈등이 극대화되는 흉운 (결혼 불가)";
-          }
-          if (isSikSin && pyeonGwanCount > 0) {
-             isSikSinJeSal = true;
-          }
-          // 무리한 간여지동 (비견/겁재) 연운
-          if (isBiGeop && yGanElement === yZhiElement && biGeopRatio > 25) {
-             penaltyReason = "강력한 간여지동 비겁운: 고집이 거세지고 경쟁이 심화되어 타협과 결합을 상징하는 결혼에는 매우 부적절함";
-          }
-        }
-
-        // --- Age-Appropriate Bias (결혼 적령기 가중치) ---
-        const age = year - birthYear;
-        const isPrimeAge = age >= 26 && age <= 45;
-        const isGoldenWindow = age >= 28 && age <= 40;
-        
-        if (isPrimeAge) {
-          yearScore += 120;
-        }
-        if (isGoldenWindow) {
-          yearScore += 150; // Increased priority for Golden Window
-        }
-
-        const yukHapPairs: Record<string, string> = {
-          '子': '丑', '丑': '子', '寅': '亥', '亥': '寅', '卯': '戌', '戌': '卯',
-          '辰': '酉', '酉': '辰', '巳': '申', '申': '巳', '午': '未', '未': '午'
-        };
-
-        const wonJinPairs: Record<string, string> = {
-          '子': '未', '未': '子', '丑': '午', '午': '丑', '寅': '酉', '酉': '寅',
-          '卯': '申', '申': '卯', '辰': '亥', '亥': '辰', '巳': '戌', '戌': '巳'
-        };
-        const isWonJin = wonJinPairs[dayBranch] === yZhi;
-
-        // Check if the year completes a Sam-hap or Bang-hap with the rest of the chart
-        const samHapDetails = [
-          { group: ['亥', '卯', '未'], element: 'Wood' },
-          { group: ['寅', '午', '戌'], element: 'Fire' },
-          { group: ['巳', '酉', '丑'], element: 'Metal' },
-          { group: ['申', '子', '辰'], element: 'Water' }
-        ];
-        const samHapGroups = samHapDetails.map(d => d.group);
-
-        const bangHapGroups = [
-          ['寅', '卯', '辰'], ['巳', '午', '未'], ['申', '酉', '戌'], ['亥', '子', '丑']
-        ];
-        
-        const completesSamHap = samHapGroups.some(group => 
-          group.includes(yZhi) && 
-          group.filter(b => b !== yZhi).every(b => allBranches.includes(b))
-        );
-        
-        const completesBangHap = bangHapGroups.some(group => 
-          group.includes(yZhi) && 
-          group.filter(b => b !== yZhi).every(b => allBranches.includes(b))
-        );
-
-        // Determine if Hap creates a bad element
-        let isBadHap = false;
-        let isGoodHap = false;
-        let hapElement = '';
-        
-        const activeSamHap = samHapDetails.find(d => d.group.includes(yZhi) && d.group.includes(dayBranch) && yZhi !== dayBranch);
-        if (activeSamHap) {
-          hapElement = activeSamHap.element;
-          const giShinEl = yongshinDetail.giShin?.element || '';
-          const guShinEl = yongshinDetail.guShin?.element || '';
-          const primaryEl = yongshinDetail.primary?.element || '';
-          const heeShinEl = yongshinDetail.heeShin?.element || '';
-          
-          if (giShinEl.includes(hapElement) || guShinEl.includes(hapElement)) {
-            isBadHap = true;
-          } else if (primaryEl.includes(hapElement) || heeShinEl.includes(hapElement)) {
-            isGoodHap = true;
-          }
-        }
-
-        // --- 1. Primary Triggers (Hierarchy) ---
-        
-        // A. Sam-hap/Bang-hap involving Day Branch (안방 활성화 우선순위) -> +90
-        // CRITICAL: Must check if the group is actually completed or has at least 2 elements from the chart
-        const matchedSamHap = samHapGroups.find(group => 
-          group.includes(yZhi) && 
-          group.includes(dayBranch) &&
-          group.filter(b => b !== yZhi).some(b => allBranches.includes(b))
-        );
-        const matchedBangHap = bangHapGroups.find(group => 
-          group.includes(yZhi) && 
-          group.includes(dayBranch) &&
-          group.filter(b => b !== yZhi).some(b => allBranches.includes(b))
-        );
-
-        // --- 0. Gwan-da (Power-heavy) Refined Logic ---
-        if (isWeakGwanDa) {
-          const inseong = ELEMENT_CYCLE[(dmIndex + 4) % 5]; // Inseong
-          const bigyeop = ELEMENT_CYCLE[dmIndex]; // BiGyeop
-          
-          if (yGanElement === inseong || yZhiElement === inseong) {
-            yearScore += 150;
-            triggerReason = lang === 'KO' ? "나를 지켜주는 든든한 안식처(관인상생)" : "A reliable shelter that protects me (Gwan-in-sang-saeng)";
-            triggerElement = inseong;
-          } else if (yGanElement === bigyeop || yZhiElement === bigyeop) {
-            yearScore += 100;
-            triggerReason = lang === 'KO' ? "심리적 안정과 보호(비겁운)" : "Psychological stability and protection (Bi-gyeop)";
-            triggerElement = bigyeop;
-          }
-          
-          if (yGanElement === controlsDm || yZhiElement === controlsDm) yearScore -= 150;
-          if (yGanElement === wealth || yZhiElement === wealth) yearScore -= 100;
-        } else if (isStrongGwanDa) {
-          if (yGanElement === drainsDm || yZhiElement === drainsDm) {
-            yearScore += 130; // Slightly lower than breakthrough to allow priority
-            triggerReason = lang === 'KO' ? "실력 발휘와 에너지 분출(식상운)" : "Display of talent and energy release (Sik-sang)";
-            triggerElement = drainsDm;
-          } else if (yGanElement === wealth || yZhiElement === wealth) {
-            yearScore += 90;
-            triggerReason = lang === 'KO' ? "운명의 주도권을 잡는 돌파(재성운)" : "Breakthrough taking control of destiny (Jae-seong)";
-            triggerElement = wealth;
-          }
-          
-          if (yGanElement === controlsDm || yZhiElement === controlsDm) yearScore -= 50;
-        }
-
-        // Edge Case: Neutral
-        if (isNeutral && (matchedSamHap || matchedBangHap)) {
-          yearScore += 120;
-        }
-
-        const fireRatio = (elementRatios?.Fire || 0) || 0;
-        const earthRatio = (elementRatios?.Earth || 0) || 0;
-        const waterRatio = (elementRatios?.Water || 0) || 0;
-        const metalRatio = (elementRatios?.Metal || 0) || 0;
-        const isHotAndDry = (fireRatio + earthRatio) > 60 || specialStatuses.isFireEarthHeavy || (fireRatio > 40 && waterRatio < 10) || yongshinDetail.primary?.element === 'Metal';
-        const isColdAndWet = (waterRatio + metalRatio) > 60 || specialStatuses.isColdWet || (waterRatio > 40 && fireRatio < 10) || yongshinDetail.primary?.element === 'Fire';
-
-        // Edge Case: Extreme Strong
-        if (isExtremeStrong) {
-          const isHotDryExtreme = isHotAndDry && (dayMaster === '丙' || dayMaster === '丁');
-          // For extremely strong charts, Useful God should be Output (Sik-sang) or Wealth (Jae-seong)
-          // For hot/dry Fire, Water (Power/Jo-hu) is also critical
-          if (yGanElement === drainsDm || yZhiElement === drainsDm || yGanElement === wealth || yZhiElement === wealth || yGanElement === 'Water') {
-            yearScore += 150;
-            if (isHotDryExtreme) {
-              // For hot/dry Fire charts, prioritize Water (Jo-hu) or Metal (Seol-gi/Wealth)
-              // Dry Earth (Mi/Sul) is less effective for Seol-gi and worsens Jo-hu
-              const isDryEarth = yZhi === '未' || yZhi === '戌';
-              if (isDryEarth) yearScore -= 100;
-              
-              triggerReason = lang === 'KO' ? "넘치는 열기를 식히고 에너지를 결실로 바꾸는 시기(조후/설기)" : "Time to cool down the heat and turn energy into fruit (Climate/Seol-gi)";
-              triggerElement = (yGanElement === 'Water' || yZhiElement === 'Water') ? 'Water' : 'Metal';
-            } else {
-              triggerReason = lang === 'KO' ? "넘치는 에너지를 결실로 바꾸는 시기(설기)" : "Time to turn overflowing energy into fruit (Seol-gi)";
-              triggerElement = drainsDm;
-            }
-          }
-        }
-
-        // --- 0. Specific Case Overrides (1991-06-26 Hot/Dry) ---
-        const isHotDryFireStrong = (isExtremeStrong || yongshinDetail.method === "전왕격용신") && (dayMaster === '丙' || dayMaster === '丁') && ((elementRatios?.['Earth'] || 0) > 20 || yongshinDetail.primary?.element === 'Metal');
-        const monthBranch = result.pillars[2].branch;
-        const isWinterWood = (dayMaster === '甲' || dayMaster === '乙') && (['亥', '子', '丑'].includes(monthBranch));
-
-        if (isWinterWood && year === 2026) {
-          yearScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0) + 200;
-          triggerReason = lang === 'KO' ? "차갑게 얼어있던 원국에 따뜻한 해빙과 꽃을 피우는 에너지" : "Thawing of the frozen chart and energy to bloom flowers";
-          triggerElement = 'Fire';
-        }
-
-        if (isHotDryFireStrong && (year === 2028 || year === 2029 || year === 2030 || year === 2031 || year === 2032)) {
-          // For hot/dry Fire, Metal/Water years are gold
-          if (yGanElement === 'Metal' || yZhiElement === 'Metal' || yGanElement === 'Water' || yZhiElement === 'Water') {
-             yearScore += 150;
-             triggerReason = lang === 'KO' ? "뜨거운 열기를 식히고 결실을 맺는 시원한 단비" : "Cooling rain that cools the heat and bears fruit";
-             triggerElement = (yGanElement === 'Water' || yZhiElement === 'Water') ? 'Water' : 'Metal';
-          }
-        }
-
-        let isForcedPenalty = false;
-        
-        if (isHotDryFireStrong && year === 2028) {
-          yearScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0) + 250;
-          triggerReason = lang === 'KO' ? "뜨거운 열기를 식히고 보석을 캐내는 해(무신년)" : "A year to cool down the heat and dig out jewels (Mu-sin Year)";
-          triggerElement = 'Metal';
-        }
-        
-        if (!isForcedPenalty && (matchedSamHap || matchedBangHap)) {
-          // Priority 2: Hap Validity - Must be strong activation (2+ elements including day branch)
-          const group = matchedSamHap || matchedBangHap;
-          if (group) {
-            const isStrongHap = group.includes(dayBranch); 
-            // Count how many elements of the group are present in (Chart + Year)
-            const presentElements = group.filter(b => allBranches.includes(b) || b === yZhi);
-            const hasEnoughElements = presentElements.length >= 2;
-            
-            const isFullHap = completesSamHap || completesBangHap;
-            
-            if (isStrongHap && hasEnoughElements) {
-              const hapBonus = isFullHap ? 110 : 70;
-              yearScore += Math.min(hapBonus, 150); // Cap Sam-hap/Bang-hap at +150 (though current values are lower)
-              
-              const groupName = group.join('');
-              if (!triggerReason || isFullHap) {
-                const hapType = isFullHap ? (lang === 'KO' ? '강력한 활성화' : 'Strong Activation') : (lang === 'KO' ? '기운의 강화' : 'Strengthening Influence');
-                triggerReason = lang === 'KO' ? `안방의 ${hapType}(${groupName})` : `${hapType} of Marriage Palace (${groupName})`;
-                
-                if (matchedSamHap) {
-                  if (group.includes('午')) triggerElement = 'Fire';
-                  else if (group.includes('卯')) triggerElement = 'Wood';
-                  else if (group.includes('酉')) triggerElement = 'Metal';
-                  else if (group.includes('子')) triggerElement = 'Water';
-                } else if (matchedBangHap) {
-                  if (group.includes('寅') || group.includes('卯')) triggerElement = 'Wood';
-                  else if (group.includes('巳') || group.includes('午')) triggerElement = 'Fire';
-                  else if (group.includes('申') || group.includes('酉')) triggerElement = 'Metal';
-                  else if (group.includes('亥') || group.includes('子')) triggerElement = 'Water';
-                }
-              }
-            }
-          }
-        }
-
-        const hasSikSang = yGanElement === drainsDm || yZhiElement === drainsDm || completesSamHap || completesBangHap;
-        const isSikSangSeolGi = (specialStatuses.isFireEarthHeavy || specialStatuses.isGoldBuried) && hasSikSang;
-        
-        if (isSangGwanGyeonGwan) {
-          yearScore -= 500; // Massive penalty for 상관견관 (breaking relationships)
-          branchAction = '상관견관';
-        } else if (penaltyReason) {
-          yearScore -= 300; // General penalty for BiGeop 간여지동
-          branchAction = '흉운주의';
-        }
-
-        if (isSikSangSeolGi && !isSangGwanGyeonGwan && yearScore < 185) {
-          const isMetalSeolGi = yZhiElement === 'Metal' || (yZhi === '酉' || yZhi === '申') || (yZhi === '巳' && allBranches.includes('酉')) || (yZhi === '酉' && allBranches.includes('巳'));
-          const seolGiScore = isMetalSeolGi ? 85 : 70;
-          yearScore = (isPrimeAge ? 100 : 0) + seolGiScore;
-          triggerReason = lang === 'KO' ? '식상 설기(에너지의 결실)' : 'Fruit of Energy (Sik-sang Seol-gi)';
-          triggerElement = isMetalSeolGi ? 'Metal' : drainsDm;
-        }
-
-        const stemHapPairs: Record<string, string> = { '甲': '己', '己': '甲', '乙': '庚', '庚': '乙', '丙': '辛', '辛': '丙', '丁': '壬', '壬': '丁', '戊': '癸', '癸': '戊' };
-        const isStemHap = stemHapPairs[dayMaster] === yGan;
-        const isWealthHap = (isMale && yGanElement === wealth);
-        const isPowerHap = (isFemale && yGanElement === controlsDm);
-        const isBokEum = yGan === dayMaster && yZhi === dayBranch;
-
-        // Stem Hap Transformation (Hap-Hwa)
-        // e.g., Mu-Gye Hap -> Fire (Wealth for Gye Water)
-        const hapHwaMap: Record<string, string> = {
-          '甲己': 'Earth', '乙庚': 'Metal', '丙辛': 'Water', '丁壬': 'Wood', '戊癸': 'Fire'
-        };
-        const combined = [dayMaster, yGan].sort().join('');
-        const transformedElement = hapHwaMap[combined];
-        const isTransformedToGenderStar = transformedElement === genderStar;
-
-        if (isStemHap && (isWealthHap || isPowerHap || isTransformedToGenderStar) && yearScore < 250) {
-          let hapBonus = isTransformedToGenderStar ? 150 : 100;
-          if (specialStatuses.isHotDry && yGanElement === 'Wood') hapBonus = 40;
-          yearScore = (isPrimeAge ? 120 : 0) + (isGoldenWindow ? 150 : 0) + hapBonus;
-          triggerReason = lang === 'KO' ? `다정한 결속(천간 합${isTransformedToGenderStar ? ' 및 화기운 생성' : ''})` : `Tender Bond (Stem Combination${isTransformedToGenderStar ? ' & Transformation' : ''})`;
-          triggerElement = isTransformedToGenderStar ? transformedElement : yGanElement;
-        } else if (isBokEum && yearScore < 200) {
-          yearScore = (isPrimeAge ? 120 : 0) + (isGoldenWindow ? 150 : 0) + 80;
-          triggerReason = lang === 'KO' ? '영토 확정(복음)' : 'Securing Territory (Bok-eum)';
-          triggerElement = yGanElement;
-        }
-
-        // --- 2. Secondary Bonuses (Jo-hu & Others) ---
-        const isThawing = specialStatuses.isColdWet && (yZhiElement === 'Fire' || yGanElement === 'Fire');
-        const isShade = specialStatuses.isHotDry && (yZhi === '辰' || yZhi === '丑');
-        const isJohuResolution = isHotAndDry && (yZhi === '辰' || yZhi === '申' || yZhi === '酉' || yGanElement === 'Water');
-
-        if (isThawing || isShade || isJohuResolution) {
-          let joHuScore = (triggerReason ? 20 : 45);
-          if (isShade && isHotAndDry && !triggerReason) joHuScore = 60;
-          yearScore += joHuScore;
-          if (!triggerReason) {
-            triggerReason = isThawing ? (lang === 'KO' ? '해빙(정서적 해소)' : 'Thawing (Emotional Release)') : (lang === 'KO' ? '조후 해결(그늘과 안식처)' : 'Shade and Resting Place (Climate Resolution)');
-            triggerElement = isThawing ? 'Fire' : 'Earth';
-          }
-        }
-
-        // --- 3. Extra Activations ---
-        const isChungDay = (yZhi === '申' && dayBranch === '寅') || (yZhi === '寅' && dayBranch === '申') || 
-                          (yZhi === '子' && dayBranch === '午') || (yZhi === '午' && dayBranch === '子') ||
-                          (yZhi === '卯' && dayBranch === '酉') || (yZhi === '酉' && dayBranch === '卯') ||
-                          (yZhi === '辰' && dayBranch === '戌') || (yZhi === '戌' && dayBranch === '辰') ||
-                          (yZhi === '巳' && dayBranch === '亥') || (yZhi === '亥' && dayBranch === '巳') ||
-                          (yZhi === '丑' && dayBranch === '未') || (yZhi === '未' && dayBranch === '丑');
-        
-        // Priority 2: Useful God Clash for Weak Charts
-        const isUsefulGodClash = dmScore < 50 && isChungDay && (yZhiElement === 'Metal' || yZhiElement === 'Water');
-        
-        const isHapDay = (yukHapPairs[dayBranch] === yZhi) || samHapGroups.some(group => group.includes(yZhi) && group.includes(dayBranch) && yZhi !== dayBranch);
-        const palaceState = specialStatuses.palaceState;
-
-        if (isUsefulGodClash) {
-          yearScore += 80; // Environment reorganization (+80)
-          if (!triggerReason) triggerReason = lang === 'KO' ? '환경의 긍정적 재편(용신 충)' : 'Positive Environmental Reorganization (Useful God Clash)';
-        } else if (palaceState === 'suppressed' && isChungDay) {
-          yearScore += 35;
-          if (!triggerReason) triggerReason = lang === 'KO' ? '억눌린 안방의 활성화(충)' : 'Activation of Suppressed Palace (Clash)';
-        } else if (palaceState === 'unstable' && isHapDay) {
-          yearScore += 35;
-          if (!triggerReason) triggerReason = lang === 'KO' ? '불안정한 안방의 안착(합)' : 'Settling of Unstable Palace (Combination)';
-        }
-
-        // Priority 1: Breakthrough (Gwan-da Sik-sin-je-sal via Branch Clash or Strong Output)
-        const isSikSangYear = yGanElement === drainsDm || yZhiElement === drainsDm;
-        const isBreakthrough = isPowerHeavy && isSikSangYear && (isChungDay || yZhiElement === drainsDm);
-        
-        if (isBreakthrough) {
-          const breakthroughScore = 450; // Priority 1: Breakthrough (+450)
-          const baseAgeScore = (isPrimeAge ? 100 : 0) + (isGoldenWindow ? 100 : 0);
-          if (yearScore < baseAgeScore + breakthroughScore) {
-            yearScore = baseAgeScore + breakthroughScore;
-            triggerReason = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집는 강력한 결실(식신제살)" : "A powerful breakthrough where you flip the board of destiny with your own will (Sik-sin-je-sal)";
-            triggerElement = drainsDm;
-          }
-        }
-
-        // Destiny's Decalcomania
-        const isDongChak = yGan === daewunStem && yZhi === daewunBranch;
-        let isDongChakYongShin = false;
-        let isDongChakGiShin = false;
-        
-        if (isDongChak) {
-          const dongChakElement = yZhiElement; // Use branch as primary energy
-          const primaryEl = yongshinDetail.primary?.element || '';
-          const heeShinEl = yongshinDetail.heeShin?.element || '';
-          const giShinEl = yongshinDetail.giShin?.element || '';
-          const guShinEl = yongshinDetail.guShin?.element || '';
-          
-          if (primaryEl.includes(dongChakElement) || heeShinEl.includes(dongChakElement)) {
-            isDongChakYongShin = true;
-            yearScore += 500; // Massive bonus
-            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치며 용신이 폭발하는 '운명의 확정' 시기야." : "A period of 'Destiny's Confirmation' where Useful God explodes.";
-          } else if (giShinEl.includes(dongChakElement) || guShinEl.includes(dongChakElement)) {
-            isDongChakGiShin = true;
-            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치며 기신이 폭발하는 맹렬한 시기야." : "A fierce period where Detrimental God explodes.";
-          } else {
-            yearScore += 45;
-            if (!triggerReason) triggerReason = lang === 'KO' ? "대운과 세운이 겹치는 '운명의 데칼코마니' 시기야." : "A period of 'Destiny's Decalcomania'.";
-          }
-        }
-
-        // --- 4. Final Penalty Application (Excluding Breakthrough) ---
-        const primaryEl = yongshinDetail.primary?.element || '';
-        const heeShinEl = yongshinDetail.heeShin?.element || '';
-        const giShinEl = yongshinDetail.giShin?.element || '';
-        const guShinEl = yongshinDetail.guShin?.element || '';
-
-        const isUsefulGodYear = [primaryEl, heeShinEl].some(el => el && (yGanElement === el || yZhiElement === el || triggerElement === el));
-        const isGiShinYear = [giShinEl, guShinEl].some(el => el && (yGanElement === el || yZhiElement === el));
-        const isMonarchStructure = yongshinDetail.method === "전왕격용신";
-
-        // Check if year branch forms a Hap that results in Gwan (Harmful for Gwan-da)
-        const formsGwanHap = isPowerHeavy && samHapGroups.some(group => {
-          const groupElement = group.includes('午') ? 'Fire' : group.includes('卯') ? 'Wood' : group.includes('酉') ? 'Metal' : 'Water';
-          if (groupElement !== controlsDm) return false;
-          // Check if year branch completes or strengthens this group
-          const presentInChart = group.filter(b => allBranches.includes(b));
-          return group.includes(yZhi) && presentInChart.length >= 1;
-        });
-
-        if (!isBreakthrough && !isForcedPenalty) {
-          const overwhelmingElement = Object.entries(elementRatios).find(([el, ratio]) => (ratio as number) >= 50)?.[0];
-          const reinforcesOverwhelming = overwhelmingElement && (
-            triggerElement === overwhelmingElement || 
-            yGanElement === overwhelmingElement || 
-            yZhiElement === overwhelmingElement ||
-            (overwhelmingElement === 'Wood' && (yZhi === '亥' || yZhi === '寅' || yZhi === '卯')) ||
-            (overwhelmingElement === 'Fire' && (yZhi === '寅' || yZhi === '巳' || yZhi === '午')) ||
-            (overwhelmingElement === 'Metal' && (yZhi === '辰' || yZhi === '戌' || yZhi === '丑' || yZhi === '未' || yZhi === '申' || yZhi === '酉')) ||
-            (overwhelmingElement === 'Water' && (yZhi === '申' || yZhi === '亥' || yZhi === '子'))
-          );
-
-          if (reinforcesOverwhelming || formsGwanHap) {
-            yearScore -= 250; // Penalty for feeding the beast
-          } else if (isPowerHeavy && (triggerElement === controlsDm || yGanElement === controlsDm || yZhiElement === controlsDm)) {
-            yearScore -= 150;
-          }
-          
-          // Penalty for Weak Charts with Clash (unless useful god clash)
-          if (dmScore < 50 && isChungDay && !isUsefulGodClash) {
-            yearScore -= 50;
-          }
-
-          // Penalty for Won-jin (Stagnation) in Power-heavy charts
-          if (isWonJin && isPowerHeavy) {
-            yearScore -= 150;
-          }
-        }
-
-        // --- 5. Event Detection & Final Scoring (사건 발생 가능성 및 최종 점수) ---
-        const hasGenderStarInYear = yGanElement === genderStar || yZhiElement === genderStar;
-        const isGenderStemHap = isStemHap && (isWealthHap || isPowerHap);
-        
-        // Check if year branch activates Gender Star in chart via Hap
-        const activatesGenderStarInChart = chartGenderStarBranches.some(b => {
-          if (yukHapPairs[b] === yZhi) return true;
-          return samHapGroups.some(group => group.includes(b) && group.includes(yZhi) && b !== yZhi);
-        });
-        
-        const hasGenderStarEvent = hasGenderStarInYear || isGenderStemHap || activatesGenderStarInChart;
-        const isPalaceActivated = isChungDay || isHapDay;
-        const hasMarriageEvent = hasGenderStarEvent || isPalaceActivated;
-
-        // --- Step C: Gi-shin Filter (기신운 필터) ---
-        const isWealthGiShin = (yGanElement === wealth || yZhiElement === wealth) && (giShinEl.includes(wealth) || guShinEl.includes(wealth));
-        
-        let giShinPenalty = 0;
-        if (!isMonarchStructure) {
-          if (isGiShinYear) {
-            if (dmScore < 50 || isWealthGiShin) {
-              // Weak Day Master or Power-heavy chart with Wealth (feeding power): Gi-shin luck is a critical penalty for marriage
-              giShinPenalty = 300;
-            } else {
-              // Strong/Neutral: Can endure but happiness is low
-              giShinPenalty = 150;
-            }
-          } else if (isWealthGiShin) {
-            // Even if it's not strictly a Gi-shin year (e.g. Stem is Yongshin), if Wealth is present in a Power-heavy chart, it's Jae-saeng-sal
-            giShinPenalty = 200;
-          }
-        }
-
-        // If it's the past and a strong event actually happened, reduce the penalty to highlight the actual event
-        if (isPastLuck && hasGenderStarEvent && isPalaceActivated) {
-            giShinPenalty = giShinPenalty * 0.5; // Don't zero it out completely, but reduce it so it can still surface as an event year
-        }
-        
-        if (isDongChakGiShin) {
-          giShinPenalty *= 3.0; // Massive penalty for DongChak Gi-shin
-        }
-        
-        yearScore -= giShinPenalty;
-
-        let eventScore = 0;
-        if (isPastLuck) {
-            // In the past, actual events (spouse star + palace activation) are prioritized over structural perfection
-            if (hasGenderStarEvent) eventScore += 150;
-            if (isPalaceActivated) eventScore += 150;
-            if (hasGenderStarEvent && isPalaceActivated) eventScore += 400; // Massive synergy for past events to ensure they rank #1
-        } else {
-            // In the future, we prioritize quality and structural perfection
-            if (hasGenderStarEvent) {
-              eventScore += isWealthGiShin ? 50 : 150;
-            }
-            if (isPalaceActivated) {
-              eventScore += (isChungDay && isWealthGiShin) ? 50 : 150;
-            }
-            if (hasGenderStarEvent && isPalaceActivated) {
-              if (!isWealthGiShin) eventScore += 100; // Synergy bonus only if not Gi-shin
-            }
-        }
-
-        // --- Clash Penalty Logic ---
-        const isClashYear = (yZhi === '子' && dayBranch === '午') || (yZhi === '午' && dayBranch === '子');
-        let clashPenalty = 0;
-        if (isClashYear) {
-          clashPenalty = 300; // Base penalty
-          if (chartEnvironment === '燥熱' && yZhi === '子' && dayBranch === '午') {
-            clashPenalty *= 2.0; // 왕신충발 폭발 가중치
-          }
-          // 대운 완충 효과
-          const daeWoon = analysis.daeWoon || {};
-          if (daeWoon.element === 'Water' || daeWoon.element === 'Metal') {
-            clashPenalty *= 0.5;
-          }
-        }
-        yearScore -= clashPenalty;
-
-        // --- Bad Hap Penalty & Jo-hu Solution Bonus ---
-        if (isBadHap) {
-          if (!isPastLuck) {
-            yearScore -= 400; // Massive penalty for future bad haps to prevent them from ranking high
-          } else {
-            yearScore -= 100; // Still penalize past bad haps, but less so they can still show up as events
-          }
-        }
-
-        const isJoHuSolution = !isPastLuck && (
-          (isHotAndDry && (yZhiElement === 'Metal' || yZhiElement === 'Water')) ||
-          (isColdAndWet && (yZhiElement === 'Fire' || yZhiElement === 'Wood'))
-        );
-
-        if (isJoHuSolution) {
-          yearScore += 300; // Massive bonus for future Jo-hu solutions
-        }
-
-        // Final Marriage Ranking Score
-        let finalMarriageScore = yearScore + eventScore;
-        
-        // Event Filter: If no significant marriage event, it's just personal luck
-        if (!hasMarriageEvent && !isJoHuSolution && !isDongChakYongShin) {
-          finalMarriageScore -= 300; 
-        }
-
-        // --- Narrative Mapping ---
-        let clashNarrative = '';
-        if (isClashYear) {
-          clashNarrative = "\n\n이 시기에는 감정적인 혼인신고보다는 충분한 시간을 둔 검증이 필요해.";
-        }
-        
-        let isFullSentence = false;
-        
-        if (isSangGwanGyeonGwan || penaltyReason) {
-            triggerReason = branchAction || "흉운주의";
-            isFullSentence = true; // Use entirely custom sentence
-            let explain = isSangGwanGyeonGwan ? "상관견관(傷官見官): 내 주관과 불만이 커지며 기존의 연애나 직장(관성)과 강하게 충돌하는 시기야." : penaltyReason;
-            finalMarriageScore = -999; // absolutely destroy score
-            
-            yearResults.push({
-              year,
-              score: finalMarriageScore,
-              stem: yGan,
-              branch: yZhi,
-              reason: lang === 'KO' ? `${explain} 억지로 인연을 맺으려 하기보다는 본인의 커리어 성취나 내면의 성장에 집중하는 것이 정답인 해였어.` : "A period of conflict. Focus on career and personal growth rather than forcing relationships.",
-              goldenMonths: [],
-              age,
-              branchAction: branchAction || '관살혼잡 충돌'
-            });
-            continue; // Skip the rest of the standard formatting
-        }
-
-        if ((hasMarriageEvent || isJoHuSolution || isDongChakYongShin) && !isForcedPenalty) {
-          let narrative = '';
-          if (isPastLuck && isClashYear) {
-            narrative = lang === 'KO' ? "안방이 폭발하듯 흔들린 격변의 해. 강렬한 인연이 스쳤으나 감정적 소모가 극심했을 수 있어." : "A year of upheaval where the palace shook explosively. A strong connection may have passed by, but emotional drain was likely severe.";
-          } else if (isPastLuck && isBadHap) {
-            narrative = lang === 'KO' ? "인연의 끌림은 강했으나, 현실적 압박과 스트레스가 가중되었던 맹렬한 시기야." : "The pull of connection was strong, but it was a fierce period with increased realistic pressure and stress.";
-          } else if (isJoHuSolution) {
-            narrative = lang === 'KO' ? "사주의 조후(온도)가 완벽히 해결되며, 심리적 안정과 함께 가장 이상적인 인연이 찾아오는 황금기야." : "The temperature of your chart is perfectly resolved, bringing psychological stability and the most ideal connection in this golden period.";
-          } else if (isSikSinJeSal || isBreakthrough) {
-            narrative = lang === 'KO' ? "내 주관으로 운명의 판을 뒤집어 억눌렸던 에너지를 결실로 바꾸는 식신제살(상관합살)의 황금기야. 네가 원하는 상대, 혹은 조건 좋은 인연을 스스로 확정 짓는 강력한 돌파구가 될 거야." : "A powerful breakthrough where you flip the board of destiny with your own will, turning suppressed energy into fruition (Sik-sin-je-sal).";
-            isFullSentence = true;
-          } else if (isGiShinYear || isWealthGiShin || isBadHap) {
-            narrative = lang === 'KO' ? "인연은 강하게 들어오나 감정적 소모나 현실적 압박이 커지는 시기 (철저한 검증 필요)" : "Strong connection but emotional drain or realistic pressure increases (Thorough verification needed)";
-          } else if (isChungDay && isUsefulGodYear) {
-            narrative = lang === 'KO' ? "안방의 질서를 재편하는 돌파의 해" : "A year of breakthrough reorganizing the palace order";
-          } else if (isHapDay && isUsefulGodYear) {
-            narrative = lang === 'KO' ? "다정한 결속과 안착의 해" : "A year of tender bond and settling down";
-          } else if (isHapDay && !isUsefulGodYear) {
-            narrative = lang === 'KO' ? "인연은 강하나 인내와 희생이 필요한 해" : "Strong connection but requires patience and sacrifice";
-          } else {
-            narrative = lang === 'KO' ? "새로운 인연의 기운이 감도는 해" : "A year with the energy of a new connection";
-          }
-
-          if (narrative) triggerReason = narrative;
-
-          isFullSentence = triggerReason.endsWith('.') || triggerReason.endsWith('야') || triggerReason.endsWith('어') || triggerReason.endsWith('지') || triggerReason.endsWith('다') || triggerReason.endsWith('요');
-
-          const eventText = lang === 'KO' ? 
-            (hasGenderStarEvent && isPalaceActivated ? " (배우자운+안방활성화)" : hasGenderStarEvent ? " (배우자운 등장)" : " (안방 활성화)") :
-            (hasGenderStarEvent && isPalaceActivated ? " (Spouse+Palace Active)" : hasGenderStarEvent ? " (Spouse Event)" : " (Palace Active)");
-          
-          if ((!isJoHuSolution && !isDongChakYongShin) || hasMarriageEvent) {
-            triggerReason += eventText;
-          }
-        }
-
-        // Final Golden Month Calculation
-        let yongShinElement = triggerElement || yongShinElementFromDetail;
-        
-        if (isColdAndWet && !yongShinElement.includes('Fire')) yongShinElement = 'Fire';
-        else if (isHotAndDry && !yongShinElement.includes('Water') && !yongShinElement.includes('Metal')) yongShinElement = 'Water, Metal';
-        else if (!yongShinElement) yongShinElement = (isMale ? wealth : controlsDm);
-
-        const yongShinElements = yongShinElement.split(',').map(e => e.trim());
-        
-        // CRITICAL: Ensure Golden Time follows the trigger element or Jo-hu resolution
-        // Dynamic calculation based on actual month pillars of the year
-        const monthScores: { month: number, zhi: string, zhiElement: string, score: number, hasElementMatch: boolean }[] = [];
-        for (let m = 1; m <= 12; m++) {
-          const monthSolar = Solar.fromYmd(year, m, 15);
-          const monthLunar = monthSolar.getLunar();
-          const monthBaZi = monthLunar.getEightChar();
-          const mGan = monthBaZi.getMonthGan();
-          const mZhi = monthBaZi.getMonthZhi();
-          const mGanElement = BAZI_MAPPING.stems[mGan as keyof typeof BAZI_MAPPING.stems]?.element;
-          const mZhiElement = BAZI_MAPPING.branches[mZhi as keyof typeof BAZI_MAPPING.branches]?.element;
-          
-          let mScore = 0;
-          const hasElementMatch = yongShinElements.some(ye => mGanElement === ye || mZhiElement === ye);
-          
-          // Primary match: Month element matches Yong-shin
-          if (yongShinElements.includes(mGanElement || '')) mScore += 50;
-          if (yongShinElements.includes(mZhiElement || '')) mScore += 70;
-          
-          // Secondary match: Month branch activates Day Branch (Hap/Chung)
-          if (yukHapPairs[dayBranch] === mZhi) mScore += 30;
-          if (wonJinPairs[dayBranch] === mZhi) mScore -= 40;
-          if ((mZhi === '申' && dayBranch === '寅') || (mZhi === '寅' && dayBranch === '申')) mScore += 20;
-          
-          // Jo-hu awareness in month scoring
-          if (isHotAndDry) {
-            if (mZhiElement === 'Water') mScore += 80;
-            if (mZhiElement === 'Metal') mScore += 60;
-            if (mZhi === '辰' || mZhi === '丑') mScore += 40; // Wet Earth
-            if (mZhi === '未' || mZhi === '戌') mScore -= 150; // Heavy Dry Earth penalty
-          } else if (isColdAndWet) {
-            if (mZhiElement === 'Fire') mScore += 80;
-            if (mZhi === '未' || mZhi === '戌') mScore += 60; // Dry Earth
-            if (mZhi === '辰' || mZhi === '丑') mScore -= 150; // Heavy Wet Earth penalty
-          }
-
-          // Sync with Year Context: If year is too wet/cold, prioritize months that balance it
-          const isYearWet = yGanElement === 'Water' || yZhiElement === 'Water' || yZhi === '亥' || yZhi === '子';
-          const isYearDry = yGanElement === 'Fire' || yZhiElement === 'Fire' || yZhi === '巳' || yZhi === '午' || yZhi === '未' || yZhi === '戌';
-          
-          if (isYearWet && (mZhiElement === 'Fire' || mZhi === '未' || mZhi === '戌')) mScore += 40;
-          if (isYearDry && (mZhiElement === 'Water' || mZhi === '辰' || mZhi === '丑')) mScore += 40;
-
-          // Balancing for extremely hot/cold years
-          const isHotYear = yGanElement === 'Fire' && yZhiElement === 'Fire';
-          const isColdYear = yGanElement === 'Water' && yZhiElement === 'Water';
-          if (isHotYear) {
-            if (mZhiElement === 'Fire') mScore -= 50; // Avoid over-heating
-            if (mZhiElement === 'Water' || mZhiElement === 'Metal') mScore += 40; // Balance
-          } else if (isColdYear) {
-            if (mZhiElement === 'Water') mScore -= 50; // Avoid over-cooling
-            if (mZhiElement === 'Fire' || mZhiElement === 'Earth') mScore += 40; // Balance
-          }
-
-          if (mScore > 0) {
-            monthScores.push({ month: m, zhi: mZhi, zhiElement: mZhiElement, score: mScore, hasElementMatch });
-          }
-        }
-
-        // Sort by score descending and take top 2-3
-        const isSeolGiTrigger = triggerReason.includes('설기') || triggerReason.includes('Seol-gi') || triggerReason.includes('무신년');
-        const limit = isSeolGiTrigger ? 2 : 3;
-        
-        const goldenMonths = monthScores
-          .filter(m => {
-            if (isHotAndDry && isSeolGiTrigger) {
-              // Strictly Metal or Water or Wet Earth for hot charts during Seol-gi
-              return m.zhiElement === 'Metal' || m.zhiElement === 'Water' || m.zhi === '辰' || m.zhi === '丑';
-            }
-            if (isColdAndWet && isSeolGiTrigger) {
-              // Strictly Fire or Dry Earth for cold charts during Seol-gi
-              return m.zhiElement === 'Fire' || m.zhi === '未' || m.zhi === '戌';
-            }
-            return !isSeolGiTrigger || m.hasElementMatch;
-          })
-          .sort((a, b) => b.score - a.score)
-          .slice(0, limit)
-          .sort((a, b) => a.month - b.month) // Re-sort by month order for display
-          .map(m => `${m.month}월(${m.zhi})`);
-
-        if (!branchAction) {
-          if (isBreakthrough) branchAction = 'breakthrough';
-          else if (isWonJin) branchAction = 'wonjin';
-          else if (isChungDay) branchAction = 'clash';
-          else if (matchedSamHap || matchedBangHap) branchAction = 'hap';
-          else if (isStemHap) branchAction = 'stemhap';
-        }
-
-        yearResults.push({ 
-          year, 
-          score: finalMarriageScore, 
-          stem: yGan, 
-          branch: yZhi, 
-          reason: triggerReason, 
-          goldenMonths, 
-          age, 
-          triggerElement: yongShinElement,
-          branchAction,
-          isFullSentence
-        });
-      }
-
-      let candidates = yearResults.filter(r => r.year >= startYear);
-
-      if (!isPastLuck) {
-        const userCurrentAge = candidates.length > 0 ? candidates[0].age - (candidates[0].year - currentYear) : 0;
-
-        // 사용자 제안 로직: 현재 나이가 38세 이하인 경우, 38세 초과 연도를 일단 필터링 (적령기 필터)
-        if (userCurrentAge <= 38) {
-          const primeAgeCandidates = candidates.filter(r => r.age <= 38);
-          // 해당 조건 내에 '최소한 괜찮은 수준(score >= 50)'의 운이 한 해라도 있다면 38세 이하로만 고정
-          if (primeAgeCandidates.some(r => r.score >= 50)) {
-            candidates = primeAgeCandidates;
-          } else {
-            // 38세 이하 연도들이 전부 최악의 흉운(score < 50)이라면, 무리해서 그중 하나를 고르기보다 향후 8년까지 풀을 약간 넓혀 탐색
-            candidates = candidates.filter(r => r.year <= currentYear + 8);
-          }
-        } else {
-          // 이미 38세를 초과한 경우, 먼 미래(10년 이상)로 튀는 것을 막기 위해 향후 5년 이내의 후보군으로 한정
-          candidates = candidates.filter(r => r.year <= currentYear + 5);
-        }
-      }
-
-      let best = { year: 0, score: -999, stem: '', branch: '', reason: '', goldenMonths: [] as string[], age: 0, branchAction: '' };
-
-      for (let i = 0; i < candidates.length; i++) {
-        const current = candidates[i];
-        
-        // 필터링된 집합 내에서는 '순수 점수'만으로 최고운을 선정
-        if (current.score > best.score) {
-          best = { ...current };
-        } else if (current.score === best.score) {
-          // 점수가 동점일 경우, 미래운은 더 짧은 시간을 대기할 수 있도록 가까운 연도 선택
-          if (!isPastLuck && (best.year === 0 || current.year < best.year)) {
-            best = { ...current };
-          }
-          // 과거운은 더 최근 연도 선택
-          if (isPastLuck && (best.year === 0 || current.year > best.year)) {
-            best = { ...current };
-          }
-        }
-      }
-      return best;
-    };
-
-    const pastLuck = findMarriageLuck(currentYear - 10, currentYear, true);
-    const futureLuck = findMarriageLuck(currentYear + 1, currentYear + 15, false);
-
-    let finalFutureLuck = { ...futureLuck };
-
-    const formatLuck = (luck: any) => {
-      if (luck.score < 0) {
-        return lang === 'KO' ? 
-        `운의 흐름상 당분간은 억지로 인연을 만들려 하기보다 본인의 커리어 성취나 내면의 확장에 집중하는 것이 훨씬 이로운 시기야. (사주상 관살혼잡이나 흉운의 부작용이 우려됨)` : 
-        `For the time being, it is much more beneficial to focus on your career achievements and inner expansion rather than forcing relationships.`;
-      }
-      
-      const isPast = luck.year < currentYear;
-      const isPrimeAge = luck.age >= 26 && luck.age <= 42;
-      const isEarlyPrime = luck.age >= 26 && luck.age <= 33;
-      const isLatePrime = luck.age >= 34 && luck.age <= 42;
-
-      const isStrongPillar = ['庚戌', '庚辰', '壬辰', '戊戌', '丙午', '壬子'].includes(dayMaster + dayBranch);
-      const isPressureYear = luck.triggerElement === 'Fire' && (dayMaster === '庚' || dayMaster === '辛');
-
-      const goldenTime = luck.goldenMonths && luck.goldenMonths.length > 0 ? (lang === 'KO' ? 
-        (isPast ? ` 특히 ${luck.goldenMonths.join(', ')}은 네 기운이 가장 핫했던 '골든 타임'이었어.` : ` 특히 ${luck.goldenMonths.join(', ')}은 네 기운이 피크를 찍는 '골든 타임'이니까 절대 놓치지 마.`) : 
-        (isPast ? ` Especially ${luck.goldenMonths.join(', ')} was your 'Golden Time' when your energy shone the brightest.` : ` Especially ${luck.goldenMonths.join(', ')} is your 'Golden Time' when your energy peaks.`)) : '';
-
-      const getNarrative = (koPrime: string, koOther: string, enPrime: string, enOther: string) => {
-        if (lang === 'KO') {
-          let finalKo = isEarlyPrime ? koPrime : koOther;
-          
-          // Refine Late Prime (30s) to be more about stability/settling
-          if (isLatePrime) {
-            finalKo = koPrime.replace('결단과 시작', '심리적 안식과 성숙한 결속')
-                             .replace('거대한 변화', '완숙한 정착')
-                             .replace('강력한 타이밍', '안정적인 타이밍');
-          }
-
-          // Point 1: Differentiate 2026 and 2027
-          if (luck.year === 2026) {
-            finalKo = finalKo.replace('결단과 시작', '새로운 변화의 시작')
-                             .replace('거대한 변화', '인생의 새로운 챕터');
-          } else if (luck.year === 2027) {
-            finalKo = finalKo.replace('결단과 시작', '안정적인 결실과 정착')
-                             .replace('거대한 변화', '이미 시작된 변화가 단단한 뿌리를 내리는 완숙함');
-          }
-
-          if (isPast) {
-            finalKo = finalKo.replace(/해이야/g, '해였어')
-                             .replace(/시기야/g, '시기였어')
-                             .replace(/타이밍이지/g, '타이밍이었지')
-                             .replace(/해지/g, '해였지')
-                             .replace(/시기지/g, '시기였지')
-                             .replace(/해입니다/g, '해였어')
-                             .replace(/시기입니다/g, '시기였어')
-                             .replace(/타이밍입니다/g, '타이밍이었어')
-                             .replace(/일어나는/g, '일어났던')
-                             .replace(/이끄는/g, '이끌었던')
-                             .replace(/터뜨리는/g, '터뜨렸던')
-                             .replace(/발생하는/g, '발생했던')
-                             .replace(/찾는/g, '찾았던')
-                             .replace(/닦기에/g, '닦기에') // No change needed
-                             .replace(/나타나는/g, '나타났던')
-                             .replace(/될 거야/g, '될 수 있던 시기였어')
-                             .replace(/타이밍이지/g, '타이밍이었던 것으로 보이네')
-                             .replace(/해이야/g, '해였네!');
-          } else {
-            // Convert any remaining formal endings to informal for future luck
-            finalKo = finalKo.replace(/해입니다/g, '해이야')
-                             .replace(/시기입니다/g, '시기야')
-                             .replace(/타이밍입니다/g, '타이밍이야')
-                             .replace(/생깁니다/g, '생겨')
-                             .replace(/변합니다/g, '변해')
-                             .replace(/있습니다/g, '있어');
-          }
-          
-          return finalKo.replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '');
-        }
-        
-        let finalEn = isEarlyPrime ? enPrime : enOther;
-        if (isLatePrime) {
-          finalEn = enPrime.replace('Decision and Start', 'Psychological Rest and Mature Bond')
-                           .replace('grand change', 'mature settlement')
-                           .replace('strongest timing', 'stable timing');
-        }
-        
-        if (luck.year === 2026) {
-          finalEn = finalEn.replace('Decision and Start', 'Start of New Change');
-        } else if (luck.year === 2027) {
-          finalEn = finalEn.replace('Decision and Start', 'Stable Fruition and Settlement');
-        }
-
-        if (isPast) {
-          finalEn = finalEn.replace(/\bis\b/g, 'was')
-                           .replace(/\bare\b/g, 'were')
-                           .replace(/initiates/g, 'initiated')
-                           .replace(/leads/g, 'led')
-                           .replace(/enters/g, 'entered')
-                           .replace(/takes root/g, 'took root');
-        }
-        
-        return finalEn.replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '');
+      let traits: Record<string, boolean> = {
+        isWealth: false,
+        isSik: false,
+        isGwan: false,
+        isIn: false,
+        isBi: false,
+        isYong: false
       };
 
-      if (luck.reason?.includes('식상운') || luck.reason?.includes('Sik-sang')) {
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 식상운의 해이야. 네 매력이 십분 발휘되면서, 네가 주도적으로 인연을 끌어당기고 관계의 결실을 보기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 그동안 억눌렸던 네 재능과 에너지가 밖으로 터져 나오는 식상운의 해이야. 네 매력이 발휘되며 자연스럽게 인연이 다가오고 안정을 찾기에 좋은 해지.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sang where suppressed talent and energy burst out. Your charm shines, making it a great time to proactively attract a partner and see results.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sang where suppressed energy bursts out. Your charm naturally attracts a partner for stability.${goldenTime}`;
-        return getNarrative(koPrime, koOther, enPrime, enOther);
+      if (sEl === wealthElement || bEl === wealthElement) traits.isWealth = true;
+      if (sEl === sikElement || bEl === sikElement) traits.isSik = true;
+      if (sEl === gwanElement || bEl === gwanElement) traits.isGwan = true;
+      if (sEl === inElement || bEl === inElement) traits.isIn = true;
+      if (sEl === biElement || bEl === biElement) traits.isBi = true;
+
+      // Wealth specific score boosts
+      if (sEl === wealthElement) score += 25;
+      if (bEl === wealthElement) score += 25;
+      if (sEl === sikElement) score += 15;
+      if (bEl === sikElement) score += 15;
+      
+      // General luck boosts
+      if (primEl && (sEl === primEl || bEl === primEl)) {
+        score += 15;
+        traits.isYong = true;
       }
+      if (hEl && (sEl === hEl || bEl === hEl)) score += 10;
+      if (gEl && (sEl === gEl || bEl === gEl)) score -= 20;
 
-      if (luck.reason?.includes('관인상생') || luck.reason?.includes('Gwan-in-sang-saeng')) {
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 나를 억누르던 압박이 든든한 지원군으로 변하는 관인상생의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾고 새로운 시작을 하기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 나를 억누르던 압박이 든든한 지원군으로 변하는 관인상생의 해이야. 널 지켜주는 따뜻한 안식처 같은 인연을 만나 심리적 안정을 찾기에 아주 좋은 타이밍이지.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Gwan-in-sang-saeng where pressure turns into support. A great timing to find emotional stability and start anew with a reliable partner.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Gwan-in-sang-saeng where pressure turns into support. A great timing to find emotional stability with a partner who acts as a reliable shelter.${goldenTime}`;
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
+      const godsStr = (pillar.stemTenGodKo || '') + (pillar.branchTenGodKo || '');
+      if (godsStr.includes('정재')) score += 15;
+      if (godsStr.includes('편재')) score += 20;
+      if (godsStr.includes('식신') || godsStr.includes('상관')) score += 10;
+      if (godsStr.includes('겁재')) score -= 15;
+      if (godsStr.includes('비견')) score -= 10;
 
-      if (luck.branchAction === 'breakthrough' || luck.reason?.includes('식신제살')) {
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 네 주관과 능력으로 운명의 주도권을 잡는 식신제살의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 네 주관과 능력으로 운명의 주도권을 잡는 식신제살의 해이야. 억눌렸던 에너지를 결실로 바꾸며, 네가 주도해서 인생의 동반자를 확정 짓는 강력한 돌파구가 될 거야.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sin-je-sal where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year of Sik-sin-je-sal where you take control of your destiny. It will be a powerful breakthrough to turn suppressed energy into fruit and lead the union.${goldenTime}`;
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.branchAction === 'wonjin') {
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운은 들어오지만 서로의 마음이 어긋나기 쉬운 원진(Won-jin)의 해이야. 급하게 결정하기보다는 서로를 깊이 이해하는 시간이 필요한 정체기라고 볼 수 있지.${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 마음의 갈등이 생기기 쉬운 원진의 기운이 흐르는 시기야. 감정적인 대응보다는 이성적인 대화로 관계를 풀어가는 지혜가 필요한 해지.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of Won-jin where relationship energy enters but hearts can easily mismatch. It's a period of stagnation requiring time to understand each other deeply.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time when Won-jin energy flows, making emotional conflicts likely. A year requiring wisdom to resolve relationships through rational dialogue.${goldenTime}`;
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.reason?.includes('안방의 강력한 활성화') || luck.reason?.includes('Strong Activation of Marriage Palace')) {
-        const evidence = luck.reason.match(/\((.*?)\)/)?.[1] || '';
-        const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50; // Score was heavily penalized
-        
-        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 네 안방 문을 발로 뻥 차고 들어오는 강력한 합(${evidence})의 기운이 역대급 변화를 일으키는 '결단과 시작'의 해이야. 환경의 변화가 곧 반려자와의 결합으로 이어지는 가장 핫한 타이밍이지.${goldenTime}`;
-        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 불안했던 안방을 단단하게 고정하는 강력한 합(${evidence})의 기운 속에서 삶의 안정을 찾는 '재회와 안정'의 시기야. 주변의 축복 속에서 든든한 내 편과 함께 새로운 터전을 닦기에 딱 좋은 해지.${goldenTime}`;
-
-        if (isOverwhelmed) {
-          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 안방의 합(${evidence})이 들어오긴 하는데, 이미 넘쳐나는 기운이 널 짓누르는 해이야. 네 의지보다는 주변 등쌀에 떠밀려 결정하기 쉬우니까 정신 바짝 차려야 해.${goldenTime}`;
-          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 안방이 묶이는 기운 속에서 책임감이 어깨를 무겁게 누르는 시기야. 설렘보다는 "이제는 해야 하나" 하는 의무감이 앞설 수 있는 해지.${goldenTime}`;
-        }
-        
-        if (isStrongPillar && isPressureYear && !isOverwhelmed) {
-          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 자존심 센 너에게 강렬한 에너지의 부딪힘(${evidence})이 발생하는 해이야. 단순한 만남을 넘어, 카리스마 넘치는 인연과 기 싸움 좀 하면서 뜨겁게 엮이는 '결단과 시작'의 타이밍이지.${goldenTime}`;
-        }
-
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' where the Strong Combination (${evidence}) activating your inner palace initiates a grand change. The strongest timing where environmental changes lead to a union.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' where the Strong Combination (${evidence}) settles your inner palace. The best year to build a new foundation with a reliable partner.${goldenTime}`;
-
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.reason === '영토 확정(복음)' || luck.reason === 'Securing Territory') {
-        const isPastInBlock = luck.year <= currentYear;
-        
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 너랑 똑 닮은 도플갱어 같은 기운이 들어와 자리를 잡는 영토 확정(복음)의 해이야. 방황하던 마음이 반려자라는 정착지를 향해 단단하게 뿌리내릴 수 있는 '결단과 시작'의 타이밍이지. ${isPastInBlock ? '이미 그 기운을 느꼈을지도 모르겠네.' : '새로운 울타리를 세울 준비를 해봐.'}${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 너랑 똑같은 기운이 들어와 자리를 잡는 영토 확정(복음)의 기운 속에서 삶의 안정을 찾는 시기야. 마음의 평온을 찾으며 든든한 내 편과 함께 안착하기 좋은 해지.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A timing of 'Decision and Start' where the Securing Territory (Bok-eum) energy firmly takes root towards a partner. ${isPastInBlock ? 'You might have already felt that energy.' : 'Prepare to build a new boundary.'}${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A precious time to find stability within the Securing Territory energy. A good year to settle down with a reliable partner.${goldenTime}`;
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.reason === '식상 설기(에너지의 결실)' || luck.reason === 'Fruit of Energy (Sik-sang Seol-gi)') {
-        const koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 고구마 백 개 먹은 듯 답답했던 에너지를 사이다처럼 뻥 뚫어주는 식상 설기의 흐름이 '결단과 시작'을 이끄는 시기야. 억눌려 있던 열망이 '가정'이라는 실질적인 결과물을 만들어내는 시원한 분출구가 될 거야.${goldenTime}`;
-        const koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 답답했던 에너지가 시원하게 터지는 식상 설기의 흐름 속에서 삶의 무게를 덜어내고 안정을 찾는 해이야. 그동안의 삽질이 결실을 맺어, 평온한 일상을 함께할 동반자와의 인연이 깊어지는 시기지.${goldenTime}`;
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Decision and Start' where the flow of Sik-sang Seol-gi releases blocked energy. Your desires will become a powerful outlet creating a practical outcome called 'family'.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A year to find stability within the flow of Sik-sang Seol-gi. Your efforts bear fruit, deepening the connection with a partner for a peaceful daily life.${goldenTime}`;
-
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.reason?.includes('인연은 오나 압박 가중') || luck.reason?.includes('Connection with increased pressure')) {
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운은 들어오지만, 널 억누르는 책임감과 압박이 더 커지는 시기야. 섣부른 결합보다는 현재의 무게를 어떻게 덜어낼지 먼저 고민해야 하는 해지.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): Connection energy enters, but responsibilities and pressure weighing you down increase. Rather than a hasty union, it's a year to first consider how to lighten your current burden.${goldenTime}`;
-      }
-
-      if (luck.reason?.includes('나를 억눌러온 외부의 기대를 뚫고 나오는 돌파의 해') || luck.reason?.includes('breakthrough where you overcome')) {
-        const koBreakthrough = `${luck.year}년(${luck.stem}${luck.branch}년): 주변에서 "결혼 안 하냐"고 볶아대던 소음을 뚫고 나오는 돌파의 해야. 억눌렸던 에너지가 결실로 바뀌면서, 네 주관으로 인생의 동반자를 확정 짓는 강력한 타이밍이지.${goldenTime}`;
-        const enBreakthrough = `${luck.year} (${luck.stem}${luck.branch}): A year of breakthrough where you overcome external expectations and confirm your partner with your own will. A time when suppressed energy turns into fruit.${goldenTime}`;
-        
-        return getNarrative(koBreakthrough, koBreakthrough, enBreakthrough, enBreakthrough);
-      }
-
-      if (luck.reason?.includes('운명의 데칼코마니') || luck.reason?.includes('Destiny\'s Decalcomania')) {
-        const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-        if (isOverwhelmed) {
-          return lang === 'KO' ?
-            `${luck.year}년(${luck.stem}${luck.branch}년): 대운과 세운이 겹치는 시기지만, 이미 넘쳐나는 기운이 널 압박하는 해이야. 변화를 꾀하기보다는 현재 자리를 지키며 주변 눈치 보느라 바쁜 시기가 될 수 있어.${goldenTime}` :
-            `${luck.year} (${luck.stem}${luck.branch}): A period where the grand cycle and annual pillar match, but the overwhelming energy adds pressure. It's a time of trying to meet external expectations rather than seeking change.${goldenTime}`;
-        }
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 대운과 세운이 똑같은 글자로 들어오는 '운명의 데칼코마니' 시기야. 인생의 역대급 터닝포인트이자, 네 사회적 성취가 반려자와의 정착으로 이어지는 가장 선명한 마침표를 찍는 해지.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): A period of 'Destiny's Decalcomania' where the grand cycle and annual pillar match. A major turning point where your social achievements lead to settling with a partner.${goldenTime}`;
-      }
-
-      if (luck.reason === '에너지 과부하 해소 및 결단' || luck.reason === 'Resolution of Energy Surplus') {
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 꽉 막힌 에너지가 뚫리는 시기야. 널 짓누르던 책임감이나 고민이 해결되면서, 비로소 결혼이라는 인생의 큰 결정을 내릴 수 있는 여유와 용기가 생기는 해지.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): A time when blocked energy is released. As the responsibilities or worries that weighed you down are resolved, you gain the leisure and courage to make the major life decision of marriage.${goldenTime}`;
-      }
-
-      if (luck.reason === '억눌린 안방의 활성화(충)' || luck.reason === 'Activation of Suppressed Palace (Clash)') {
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 잠들어 있던 네 안방을 깨우는 강력한 충(Clash)의 기운이 들어오는 해이야. 남들은 충돌이라 하겠지만, 너한테는 정체된 관계를 깨고 새로운 시작을 선포하는 강력한 돌파구가 될 거야.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): A year where the Strong Clash activating your inner palace initiates a breakthrough. It will be a powerful trigger to break stagnant relationships and declare a new start.${goldenTime}`;
-      }
-
-      if (luck.reason === '불안정한 안방의 안착(합)' || luck.reason === 'Settling of Unstable Palace (Combination)') {
-        const isPastInBlock = luck.year <= currentYear;
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 불안정했던 안방을 단단하게 묶어주는 강력한 합(Combination)의 기운이 들어오는 해이야. 떠돌던 마음이 비로소 안착할 곳을 찾는 <strong>결합과 시작</strong>의 시기지. ${isPastInBlock ? '운명의 짝을 만났거나 가정을 꾸렸을 가능성이 높아.' : '새로운 울타리를 만들 준비를 해봐.'}${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): A year of <strong>Combination and Start</strong> where a strong connection settles your unstable inner palace. ${isPastInBlock ? 'You likely found a partner or build a family.' : 'Prepare to build a new boundary.'}${goldenTime}`;
-      }
-
-      if (luck.reason === '비밀스러운 인연의 시작(암합)' || luck.reason === 'Secret Attraction (Combination)') {
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 겉으로 드러나지 않아도 은밀하게 끌어당기는 강력한 암합(Hidden Combination)의 기운이 한 사람을 네 삶의 울타리 안으로 깊숙이 ${isPast ? '끌어당겼던 시기야.' : '끌어당기는 해이야.'} 예상치 못한 타이밍에 운명처럼 느껴지는 결합이지.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): While connection energy might not be obvious on the surface, a strong unseen attraction (Hidden Combination) pull${isPast ? 'ed' : 's'} someone into your inner circle. A union that feels like fate at an unexpected timing.${goldenTime}`;
-      }
-
-      if (luck.reason === '조후 해결(정서적 안정)' || luck.reason === 'Emotional Grounding (Climate Resolution)' || luck.reason === '조후 해결(그늘과 안식처)' || luck.reason === 'Shade and Resting Place (Climate Resolution)') {
-        const isHotDryCase = luck.reason.includes('그늘') || luck.reason.includes('Shade');
-        let keyword = lang === 'KO' ? '촉촉한 단비' : 'sweet rain';
-        if (specialStatuses.isFireEarthHeavy) keyword = lang === 'KO' ? '안락한 안식처' : 'comfortable shelter';
-        else if (specialStatuses.isWoodHeavy) keyword = lang === 'KO' ? '새로운 질서' : 'new order';
-
-        if (isHotDryCase) {
-          return lang === 'KO' ?
-            `${luck.year}년(${luck.stem}${luck.branch}년): 너무 뜨겁고 메말랐던 네 삶에 드디어 안착할 수 있는 '${keyword}'가 들어오는 해이야. 정서적인 갈증이 해소되면서, 비로소 누군가를 온전히 받아들일 수 있는 마음의 여유가 생겨.${goldenTime}` :
-            `${luck.year} (${luck.stem}${luck.branch}): A year where '${keyword}' finally enters your overly hot and dry life. As emotional thirst is quenched, you gain the peace of mind to fully accept someone.${goldenTime}`;
-        }
-
-        return lang === 'KO' ?
-          `${luck.year}년(${luck.stem}${luck.branch}년): 너무 뜨겁고 건조했던 네 삶에 드디어 ${keyword}가 내리며 정서적인 갈증이 해소${isPast ? '됐던 시기야.' : '되는 시기야.'} 마음의 안정을 찾으면서 자연스럽게 가정을 꾸리고 정착하고 싶은 욕구가 강해지는 타이밍이지.${goldenTime}` :
-          `${luck.year} (${luck.stem}${luck.branch}): ${keyword} finally fall${isPast ? 's' : 's'} on your overly hot and dry life, quenching your emotional thirst. As you find peace of mind, the desire to build a family and settle down naturally grows stronger.${goldenTime}`;
-      }
-
-      if (luck.reason === '재성(이성운)' || luck.reason === 'Wealth (romance)') {
-        const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 재성(이성운)이 강하게 들어오며 '결단과 시작'을 하기에 아주 좋은 시기야. 네 매력이 빛을 발하고, 실질적인 결실을 맺을 확률이 매우 높은 해지.${goldenTime}`;
-        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 삶의 안정을 찾으며 소중한 인연과의 관계를 돈독히 하는 '재회와 안정'의 시기야. 마음의 평온 속에서 든든한 내 편과 함께하기 좋은 해지.${goldenTime}`;
-
-        if (isOverwhelmed) {
-          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 이성운이 들어오긴 하는데, 주변 눈치 보느라 네가 짓눌리는 해이야. 주체적인 선택보다는 상황에 떠밀려 결정하기 쉬우니까 주의해야 해.${goldenTime}`;
-          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 인연의 기운 속에서도 책임감이 무겁게 느껴지는 시기야. 주변 기대에 부응하려 애쓰느라 정작 네 행복을 놓칠 수 있으니 내면의 소리에 집중해봐.${goldenTime}`;
-        }
-
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A great time for 'Decision and Start' as Wealth (romance) energy is strong. Your charm shines, and there's a high probability of practical results.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' finding peace in life and strengthening relationships. A good year to be with a reliable partner.${goldenTime}`;
-
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.reason === '관성(이성운)' || luck.reason === 'Power (romance)') {
-        const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-        let koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 관성(이성운)이 강하게 들어오며 사회적 성취와 함께 '결단과 시작'을 하는 해이야. 믿음직한 인연이 네 삶으로 훅 들어와서 새로운 울타리를 만들게 될 거야.${goldenTime}`;
-        let koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 삶의 책임감을 나누며 안정을 찾는 '재회와 안정'의 시기야. 듬직한 내 편과 함께 미래를 약속하며 삶의 무게를 덜어내기에 딱 좋은 타이밍이지.${goldenTime}`;
-
-        if (isOverwhelmed) {
-          koPrime = `${luck.year}년(${luck.stem}${luck.branch}년): 관성의 기운이 강해지며 널 향한 사회적 압박과 기대가 피크를 찍는 해이야. 결혼이 축복이 아니라 '해결해야 할 숙제'처럼 느껴질 수 있으니 주도권을 잃지 마.${goldenTime}`;
-          koOther = `${luck.year}년(${luck.stem}${luck.branch}년): 책임감이 무겁게 다가오는 시기야. 주변 기대에 맞추려다 본인의 행복을 놓치지 않도록 경계해야 해.${goldenTime}`;
-        }
-
-        const enPrime = `${luck.year} (${luck.stem}${luck.branch}): A year of 'Decision and Start' with social achievement as Power (romance) energy is strong. A trustworthy partner enters your life to build a new boundary.${goldenTime}`;
-        const enOther = `${luck.year} (${luck.stem}${luck.branch}): A time of 'Reunion and Stability' sharing life's responsibilities. The best timing to promise a future and lighten life's burden with a reliable partner.${goldenTime}`;
-
-        return getNarrative(koPrime, koOther, enPrime, enOther);
-      }
-
-      if (luck.isFullSentence) {
-        return lang === 'KO' ? 
-          `${luck.reason.replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}${goldenTime}` :
-          `${luck.reason.replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}${goldenTime}`;
-      }
-
-      const koPrimeFallback = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운이 강하게 들어오며 '결단과 시작'을 하기에 유력한 시기야. ${luck.year < currentYear ? '이미 지나갔거나 현재 진행 중인 강력한 인연의 타이밍이지.' : '앞으로 다가올 가장 강력한 결합의 기회야.'}${goldenTime}`;
-      const koOtherFallback = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운 속에서 '재회와 안정'을 찾는 소중한 시기야. 마음의 평온을 찾으며 든든한 동반자와 함께 안착하기 좋은 해지.${goldenTime}`;
-
-      const isOverwhelmed = luck.score < (isPrimeAge ? 100 : 0) + 50;
-      if (isOverwhelmed) {
-        const koOverwhelmed = `${luck.year}년(${luck.stem}${luck.branch}년): ${luck.reason}의 기운이 들어오지만, 이미 넘쳐나는 에너지가 널 압박하는 해이야. 주체적인 선택보다는 주변의 기대에 부응하려 애쓰는 시기가 될 수 있으니 내면의 목소리에 귀를 기울여봐.${goldenTime}`;
-        return koOverwhelmed;
-      }
-      const enPrimeFallback = `${luck.year} (${luck.stem}${luck.branch}): A likely time for 'Decision and Start' with strong ${luck.reason} energy. ${luck.year < currentYear ? 'A timing of strong connection that has passed or is ongoing.' : 'The strongest upcoming opportunity for a deep union.'}${goldenTime}`;
-      const enOtherFallback = `${luck.year} (${luck.stem}${luck.branch}): A precious time to find 'Reunion and Stability' within ${luck.reason} energy. A good year to settle down with a reliable partner.${goldenTime}`;
-
-      return getNarrative(koPrimeFallback, koOtherFallback, enPrimeFallback, enOtherFallback);
+      return { score: Math.min(Math.max(score, 0), 100), traits };
     };
 
-    const main = lang === 'KO' ? 
-      `네 인연의 타임라인을 스캔해봤어. [delay:1500]
-
-` +
-      `[가장 가까웠던/현재의 결혼운]
-${pastLuck.year}년(${pastLuck.stem}${pastLuck.branch}년): ${formatLuck(pastLuck).replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}
-
-` +
-      `[향후 가장 강력한 결혼운]
-${finalFutureLuck.year}년(${finalFutureLuck.stem}${finalFutureLuck.branch}년): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}
-
-` +
-      `결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해. 이 시기들을 잘 활용해봐.` :
-      `I've scanned your relationship timeline. [delay:1500]
-
-` +
-      `🕒 [Most Recent/Current Marriage Luck]
-${pastLuck.year} (${pastLuck.stem}${pastLuck.branch}): ${formatLuck(pastLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}
-
-` +
-      `🚀 [Strongest Future Marriage Luck]
-${finalFutureLuck.year} (${finalFutureLuck.stem}${finalFutureLuck.branch}): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}
-
-` +
-      `Marriage isn't just about following the flow of luck, but about the choices you make within that flow. Use these timings wisely.`;
-
-    const glitch = lang === 'KO' ? '운명은 준비된 자에게 찾아오는 법이야.' : 'Fate comes to those who are prepared.';
-    return { main, glitch };
-  };
-  // --- Theme 2: Wealth Focus (황금의 늪) ---
-  const analyzeWealth = () => {
-    const jaeSeongScore = Object.entries(tenGodsRatio).reduce((s, [k, v]) => k.includes('재성') ? s + (v as number) : s, 0);
-    const dmStrengthScore = result.analysis?.dayMasterStrength?.score ?? 50;
+    const currentYearData = evaluateWealthScore(currentAnnualPillar || {});
+    const currentYearScore = currentYearData.score;
     
-    const seunAllGods = [seunStemGodKo, seunBranchGodKo];
-    const hasPyunJae = seunAllGods.some(g => g?.includes('편재')) || luckGods.some(g => g?.includes('편재'));
-    const hasJungJae = seunAllGods.some(g => g?.includes('정재')) || luckGods.some(g => g?.includes('정재'));
+    // Evaluate Daewun baseline
+    const daewunScore = evaluateWealthScore(currentCycle || {}).score;
 
-    const isTrueJaeDaSinYak = jaeSeongScore >= 40 && dmStrengthScore <= 35;
-    const isSimpleJaeDaSinYak = jaeSeongScore >= 30 && jaeSeongScore < 40 && dmStrengthScore < 45;
+    // Find best years in current 10-year cycle
+    const annualScores = (currentCycle.annualPillars || []).map((p: any) => ({
+      year: p.year,
+      stem: p.stem,
+      branch: p.branch,
+      ...evaluateWealthScore(p)
+    }));
 
-    let layer1 = ''; // Structure
-    let layer2 = ''; // Annual Flow
-    let layer3 = ''; // Tactical Advice
-    let wealthGlitch = ''; // Glitch
+    annualScores.sort((a: any, b: any) => b.score - a.score);
+    const bestYears = annualScores.filter((y: any) => y.year >= currentYear).slice(0, 2);
+    
+    // If no future best years left in current daewun, just take top 2 overall
+    const topYearsToDisplay = bestYears.length > 0 ? bestYears : annualScores.slice(0, 2);
 
-    if (lang === 'KO') {
-      if (jaeSeongScore >= 40) {
-        layer1 = "사주에 <strong>재물의 기운</strong>이 이미 가득 차 있어. 돈을 쫓는 감각과 결과물을 만들어내는 능력은 탁월하지만, 그 무게가 때로는 본인의 에너지를 압도할 수 있겠네.";
-      } else if (jaeSeongScore === 0) {
-        layer1 = "명식에 드러난 재물운이 약한 편이지만, 이는 오히려 돈에 얽매이지 않는 <strong>자유로운 영혼</strong>임을 뜻해. 성실함과 운의 조력이 만날 때 예상치 못한 큰 성취를 이룰 수 있는 잠재력이 있어.";
-      } else {
-        layer1 = "당장 큰 돈이 쏟아지는 구조는 아니지만, 본인의 <strong>성실함과 운의 조력</strong>에 따라 충분히 남부럽지 않은 성취를 이룰 수 있는 잠재력이 있어.";
-      }
+    let report = '';
+    
+    // Helper to explain the "vibe" of the year
+    const getYearVibeDescription = (traits: Record<string, boolean>) => {
+      if (traits.isWealth && traits.isSik) return lang === 'KO' ? '내 능력과 활동이 바로 돈으로 직결되는 강력한 금전운' : 'very strong cash flow fueled by your active talents';
+      if (traits.isWealth) return lang === 'KO' ? '직접적인 재물 기운이 꽂혀 돈 냄새가 짙게 나는' : 'a direct influx of wealth energy, smelling strongly of money';
+      if (traits.isSik) return lang === 'KO' ? '새로운 아이디어나 활발한 활동이 돈으로 연결되는' : 'opportunities to turn new ideas and actions into cash';
+      if (traits.isGwan && traits.isYong) return lang === 'KO' ? '명예와 직장의 기운이 좋아져 승진이나 입지 강화로 재물을 확보하는' : 'wealth growth driven by career advancement and enhanced reputation';
+      if (traits.isIn && traits.isYong) return lang === 'KO' ? '부동산 계약이나 자격증 같은 문서운으로 자산을 크게 굳히는' : 'excellent chances to secure wealth through documents like real estate or contracts';
+      if (traits.isBi && traits.isYong) return lang === 'KO' ? '인맥과 주변 동료의 기운으로 함께 판을 키워 이득을 보는' : 'benefiting from collaborations and expanding your network to boost resources';
+      return lang === 'KO' ? '전체적인 흐름이 나에게 유리하게 작용하여 뜻밖의 성과를 내는' : 'overall favorable conditions leading to unexpected positive outcomes';
+    };
 
-      if (hasPyunJae) {
-        layer2 = "올해는 <strong>편재(횡재수)</strong>의 기운이 네 주변을 맴돌고 있어. 한 번에 큰 것을 노리고 싶은 도파민이 솟구치는 해가 될 거야.";
-      } else if (hasJungJae) {
-        layer2 = "올해는 <strong>정재(안정 자산)</strong>의 기운이 강해. 무리한 투자보다는 현재의 수익원을 잘 지키고 관리하는 것이 부를 쌓는 지름길이야.";
-      } else {
-        layer2 = "특별한 재물운의 급격한 변동보다는 <strong>안정적인 흐름</strong>을 유지하며 다음 큰 기회를 위해 자본을 비축해야 하는 시기야.";
-      }
-
-      if (isTrueJaeDaSinYak) {
-        layer3 = "올해 가장 경계해야 할 것은 '어설픈 개입'이야. 네게 쥐어진 얄팍한 무기를 믿고 무리하게 투자를 하거나 판을 키우려 들면, 그 거대한 재물의 무게에 짓눌려 빚더미에 앉을 수 있어.";
-        wealthGlitch = "물타기, 영끌, 무리한 확장은 절대 금물. 차라리 부자들 옆에 납작 엎드려 콩고물이나 주워 먹는 게 현명해.";
-      } else if (isSimpleJaeDaSinYak) {
-        layer3 = "돈 냄새는 나는데, 무리해서 쫓아가면 네가 먼저 쓰러질 수 있어.";
-        wealthGlitch = "돈은 보이는데 네 몸이 버겁대. 건강검진에 돈을 쓰거나 운동에 투자해. 몸집을 키워야 그 돈을 들 수 있어.";
-      } else if (hasPyunJae) {
-        layer3 = "하이 리스크 하이 리턴... 하지만 확실한 판이 아니면 승부수를 걸지 마, 아니면 아예 쳐다보지도 마.";
-        wealthGlitch = "도파민에 속지마. 네 판단력은 생각보다 날카로우니까.";
-      } else if (hasJungJae) {
-        layer3 = "지금은 실속을 챙겨야 할 때야. 나가는 돈을 막고 들어오는 돈을 차곡차곡 쌓는 게 네 유일한 구원이자 전략이야.";
-        wealthGlitch = "지루하더라도 엑셀을 켜고 가계부를 써. 1원 단위의 통제가 널 지켜줄 거야.";
-      } else {
-        layer3 = "조급하게 성과를 내려고 하면 오히려 더 꼬일 수 있어. <strong>현 상태를 유지</strong>하면서 다음 상승 운을 기다리는 여유가 필요해.";
-        wealthGlitch = "황금의 그림자가 저 멀리서 아른거리고 있어. 아직은 손을 뻗을 때가 아니야.";
-      }
+    // 1. Current Daewun Overview
+    const daewunLabel = `${currentCycle.age}세-${currentCycle.age + 9}세 대운(${currentCycle.stem}${currentCycle.branch})`;
+    if (daewunScore >= 70) {
+      report += lang === 'KO' 
+        ? `현재 진행 중인 ${daewunLabel}은 큰 재물의 흐름이 들어오는 황금기야. 물이 들어왔으니 힘차게 노를 저어야 할 때지.\n\n`
+        : `The current ${daewunLabel} cycle brings a strong flow of wealth. It's a golden period.\n\n`;
+    } else if (daewunScore >= 40) {
+      report += lang === 'KO' 
+        ? `현재 ${daewunLabel}은 재물이 평탄하게 흐르는 시기야. 무리한 투자보다는 안정적인 축적에 유리해.\n\n`
+        : `The current ${daewunLabel} cycle has a stable wealth flow. Focus on safe accumulation.\n\n`;
     } else {
-      layer1 = jaeSeongScore >= 40 ? "Your chart is full of wealth energy." : "You have steady potential for wealth.";
-      layer2 = hasPyunJae ? "This year brings windfall opportunities." : "Focus on stable income management.";
-      layer3 = "Focus on practical gains and steady growth.";
-      wealthGlitch = "Stay calculated and steady.";
+      report += lang === 'KO'
+        ? `현재 ${daewunLabel}은 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 시기야. 하지만 기회는 항상 존재하는 법이지!\n\n`
+        : `The current ${daewunLabel} cycle is defensive. Focus on securing cash flow rather than big bets, but stay alert for opportunities!\n\n`;
     }
 
-    const main = lang === 'KO' ? 
-      `네 지갑의 운명을 스캔해봤어. [delay:1500]
+    // 2. Current Year
+    const currentYearIntro = lang === 'KO' ? `올해(${currentYear}년 ${currentYearPillar?.stem}${currentYearPillar?.branch}년)는 ` : `This year (${currentYear}) `;
+    if (currentYearScore >= 70) {
+      report += lang === 'KO'
+        ? `${currentYearIntro}${getYearVibeDescription(currentYearData.traits)} 해로, 특히 돋보이는 운을 가지고 있어! 성과가 보상으로 직결되는 짜릿한 한 해가 될 가능성이 높아.\n\n`
+        : `${currentYearIntro}brings ${getYearVibeDescription(currentYearData.traits)}, highlighting exceptionally strong luck! Hard work directly translates to rewards.\n\n`;
+    } else if (currentYearScore >= 40) {
+      report += lang === 'KO'
+        ? `${currentYearIntro}재물 측면에서 무난한 흐름이야. 일확천금보다는 계획했던 대로 차곡차곡 모아가는 재미를 느껴봐.\n\n`
+        : `${currentYearIntro}features ordinary but stable wealth luck. Follow your plans for steady accumulation.\n\n`;
+    } else {
+      report += lang === 'KO'
+        ? `${currentYearIntro}재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹이 강할 수 있어.\n\n`
+          + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n\n`
+        : `${currentYearIntro}brings a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
+          + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n\n`;
+    }
 
-**[자산 운용 성향]**
-${layer1}
+    // 3. Best upcoming years
+    // Exclude current year if it was already highlighted as a top year to avoid repetition
+    let filteredTopYears = topYearsToDisplay;
+    if (currentYearScore >= 40 && topYearsToDisplay.some((y: any) => y.year === currentYear)) {
+       // If current year is in top years AND we already discussed its okay/great state,
+       // we shouldn't redundantly say "The most money-smelling year is THIS year".
+       // We can change the wording.
+       filteredTopYears = topYearsToDisplay.filter((y: any) => y.year !== currentYear);
+    }
+    
+    if (filteredTopYears.length > 0) {
+      // Create descriptions for the best remaining years
+      let yearDescriptionsKO = '';
+      if (lang === 'KO') {
+        const groupedYears: Array<{desc: string, years: any[]}> = [];
+        filteredTopYears.forEach((y: any) => {
+          const desc = getYearVibeDescription(y.traits);
+          const existingGroup = groupedYears.find(g => g.desc === desc);
+          if (existingGroup) {
+            existingGroup.years.push(y);
+          } else {
+            groupedYears.push({ desc, years: [y] });
+          }
+        });
+        
+        yearDescriptionsKO = groupedYears.map(g => {
+          const yearsStr = g.years.map(y => `**${y.year}년(${y.stem}${y.branch}년)**`).join(', ');
+          return `${yearsStr}(${g.desc} 시기)`;
+        }).join(' 그리고 ');
+      }
+      
+      const yearListEN = filteredTopYears.map((y: any) => `**${y.year}**`).join(' and ');
+      
+      report += lang === 'KO'
+        ? `지금 대운 안에서 네가 특히 주목해야 할 타점은 ${yearDescriptionsKO}야. 이 중요한 기회를 잡기 위해 지금부터 멘탈과 시드머니를 장전해둬.`
+        : `In this 10-year cycle, the key timings to watch out for are ${yearListEN}. Prepare your seed money and mental focus to catch these prime opportunities.`;
+    } else if (topYearsToDisplay.length > 0) {
+      // means current year was the only top year left
+      report += lang === 'KO'
+        ? `이미 올해가 대운 내에서 손꼽히는 기회의 해이니, 지금의 흐름을 최대한 활용하는 데 집중해봐!`
+        : `Since this year is already one of the best in your current cycle, focus completely on maximizing the present momentum!`;
+    }
 
-**[올해의 흐름]**
-${layer2}
+    const branches = result.pillars.map((p: any) => p.branch);
+    const hasMaoYouClash = branches.includes('卯') && branches.includes('酉');
+    if (dmElement === 'Metal' && hasMaoYouClash) {
+      report += lang === 'KO' 
+        ? `\n\n[ ⚠️ 특별 자산 방어 경고 ]\n명식에 재물(卯)과 주변의 강력한 금(酉)들이 수시로 충돌하는 군비쟁재(군중이 내 재물을 노림)와 묘유충의 기운이 강해. 이 타점에 돈이 들어오더라도 주변에 **절대 소문내지 말고 비밀리에 자산을 확보해!** 쉽게 들어온 돈은 주변 사람들에 의해 순식간에 흩어질 수 있으니 투자나 동업은 피하고 단단히 묶어둬야 해.`
+        : `\n\n[ ⚠️ Asset Defense Warning ]\nYour chart has a strong internal clash regarding wealth. When money comes in, **do not spread rumors and secure your assets secretly!** Wealth can easily scatter among peers or competitors, so avoid joint investments and hold onto your money carefully.`;
+    }
 
-**[전술적 조언]**
-${layer3}` :
-      `Scanning your wealth destiny... [delay:1500]
+    const glitch = currentYearScore < 50 
+      ? (lang === 'KO' ? '비가 올 땐 독에 금이 가지 않았는지 점검할 때야.' : 'Check your jars for cracks when it rains.')
+      : (lang === 'KO' ? '탐욕은 눈을 가리지만, 현명한 투자는 시야를 넓혀줘.' : 'Greed blinds, but wise investment broadens vision.');
 
-**[Wealth Potential]**
-${layer1}
-
-**[Annual Flow]**
-${layer2}
-
-**[Tactical Advice]**
-${layer3}`;
-
-    return { main, glitch: wealthGlitch };
+    return { main: report, glitch };
   };
-
-  // --- Theme 5: Moving (궤도의 이탈) ---
   const analyzeMoving = () => {
-    let psychology = lang === 'KO' ? "가시적 변화보다는 내면의 타이밍을 재고 있는 보수적 상태" : "Conservative state, timing the inner movement rather than visible change.";
-    const hasBiGyeopYear = seunStemGodKo.includes('비견') || seunBranchGodKo.includes('비견') || seunStemGodKo.includes('겁재') || seunBranchGodKo.includes('겁재');
-    const hasSikSangYear = seunStemGodKo.includes('식신') || seunBranchGodKo.includes('식신') || seunStemGodKo.includes('상관') || seunBranchGodKo.includes('상관');
-    const hasYeokma = matrix.interactions.sin_sal.some((s: string) => s.includes('역마'));
-    const hasChung = matrix.interactions.chung.length > 0;
-    const hasMoveIndicator = hasYeokma || hasChung;
+    const movingType = interactionsData?.movingType || 'moving_house';
+    const movingContext = interactionsData?.movingContext || socialContext || 'none';
+    
+    const isMilitary = movingContext === 'military';
+    const isPublic = movingContext === 'public' || movingContext === 'corporate';
+    const isBusiness = movingContext === 'business' || movingContext === 'freelancer';
 
+    const luckGodsStr = luckGods.join(' ');
+    const hasBiGyeopYear = luckGodsStr.includes('비견') || luckGodsStr.includes('겁재');
+    const hasSikSangYear = luckGodsStr.includes('식신') || luckGodsStr.includes('상관');
+    const hasMoveIndicator = matrix.interactions.chung.length > 0 || matrix.interactions.hyeong.length > 0 || luckGodsStr.includes('편관');
+
+    let psychology = lang === 'KO' ? "이동과 변화에 대한 무의식적 갈망이 관측됨" : "Unconscious desire for movement and change observed.";
+    
     if (hasBiGyeopYear) {
       psychology = lang === 'KO' ? "주관과 독립심이 폭발하며 새로운 환경 구축 욕구가 강함" : "Surge of independence and autonomy, strong desire to build a new environment.";
     } else if (hasSikSangYear) {
@@ -1975,49 +1208,74 @@ ${layer3}`;
     }
 
     let fateAnalysis = lang === 'KO' ? "막힌 운의 물꼬를 트는 전환점이며 전략적 실익 취득 가능" : "A turning point to unlock blocked luck and gain strategic practical benefits.";
-    if (matrix.analysis.energy_state.includes('관다') || matrix.analysis.energy_state.includes('태약')) {
-      fateAnalysis = lang === 'KO' ? "거주지 및 직장 내 억압에서 도망치려는 탈출 기제로 철저한 방어가 필수인 상태" : "Escape mechanism from oppression in home/work; thorough defense is essential.";
-    } else if (matrix.analysis.energy_state.includes('신약')) {
-      fateAnalysis = lang === 'KO' ? "적극적 수익 확장보다는 소진되는 현 에너지를 통제하고 휴식을 취하기 위한 대피" : "Evacuation for rest and energy control rather than aggressive profit expansion.";
-    } else if (matrix.analysis.energy_state.includes('신강') || matrix.analysis.energy_state.includes('태왕')) {
-      fateAnalysis = lang === 'KO' ? "내면의 에너지를 밖으로 표출하며 뚜렷한 주도권과 입지를 확보하는 계기" : "Opportunity to express inner energy and secure clear leadership and position.";
+    let finalVerdict = lang === 'KO' ? "이동을 적극적으로 고려하되, 치밀한 계획이 필요해." : "Consider moving actively, but a meticulous plan is needed.";
+    let altAction = matrix.coordinator.alt_action || '';
+    
+    // Apply context and target specific logic
+    if (movingType === 'job_change') {
+      psychology = lang === 'KO' ? "현재 직장이나 소속에 대한 권태감과 벗어나고자 하는 충동(식상/편관)이 강하게 작용하여 이탈 욕구가 상승 중이야." : "Strong impulse to escape the current affiliation.";
+      fateAnalysis = lang === 'KO' ? "새로운 커리어 점프나 가치 입증을 위해 판을 바꾸는 것이 의미 있는 시그널이 될 수 있지." : "Changing the board for a new career jump can be a meaningful signal.";
+      
+      if (matrix.coordinator.judgment_grade === 'A') {
+        finalVerdict = lang === 'KO' ? "이직 및 퇴사의 타이밍이 맞아. 새로운 무대로 과감히 뛰어들어." : "Perfect timing for job change. Jump into the new stage.";
+      } else if (matrix.coordinator.judgment_grade === 'B') {
+        finalVerdict = lang === 'KO' ? "조건부 이직운. 갈 곳이 명확히 정해진 상태(환승 이직)가 아니라면 타이밍을 늦춰라." : "Conditional job change. Delay if the destination is not clear.";
+      } else {
+        finalVerdict = lang === 'KO' ? "당장 퇴사 버튼을 누르고 싶어도 멈춰라. 무방비 상태의 이탈은 백수로 가는 직행열차야." : "Stop immediately. Leaving unarmed leads to unemployment.";
+      }
+
+      if (isMilitary) {
+        finalVerdict = lang === 'KO' ? "탈주(전역/퇴사)보다는 현재 궤도 내의 전술적 이동이 강력히 요구되는 시점이야." : "Tactical movement within orbit is strongly required over escape.";
+        altAction = lang === 'KO' ? "군/경/소방 등 거대한 '안전 울타리'를 벗어나는 건 방패의 상실을 의미해. 차라리 장기 교육, 파견, 보직 변경으로 기운을 해소하는 생존 전략을 짜봐." : "Use internal dispatches or position changes instead of quitting.";
+      } else if (isPublic) {
+        altAction = lang === 'KO' ? "공공기관/대기업은 한 번 궤도를 이탈하면 재진입이 어려워. 욱하는 ма음에 사표를 던지기보단 휴직이나 연수, 파견 등으로 합법적인 '잠수'를 타는 전략을 써봐." : "Public/Corp systems are hard to re-enter. Use options like long-term training or leave of absence.";
+      } else if (isBusiness) {
+        altAction = lang === 'KO' ? "이동 자체가 현금 흐름에 타격을 줄 수 있어. 업장을 당장 접기보단 운영 방식을 비대면이나 새로운 플랫폼으로 일부 변경하여 이동의 기운(역마)을 액땜해보는 걸 추천해." : "Instead of closing business, apply movement energy to marketing or platform shifts.";
+      }
+
+    } else if (movingType === 'transfer') {
+      psychology = lang === 'KO' ? "조직 내에서의 위치 변동이나 역할 변화, 새로운 권력 구조에 대한 에너지가 강하게 밀려오고 있어." : "Strong energy pushing towards position changes within the organization.";
+      fateAnalysis = lang === 'KO' ? "새로운 부서나 임무를 맡음으로써 네 능력이 새롭게 평가받을 수 있는 기회이자, 낡은 에너지를 환기하는 돌파구야." : "Opportunity to be re-evaluated by taking a new position.";
+      
+      if (matrix.coordinator.judgment_grade === 'A') {
+        finalVerdict = lang === 'KO' ? "강력한 전진 배치 타이밍. 주저하지 말고 핵심 부서나 파견에 자원해라." : "Strong deployment timing. Volunteer for core departments.";
+      } else {
+        finalVerdict = lang === 'KO' ? "전출 및 파견은 흔들리는 네 운을 흡수해주는 아주 훌륭한 '액땜' 방어막이자 긍정적 지살(地殺)의 발현이야." : "Transfers act as a great defense mechanism against shaking luck.";
+      }
+      
+      if (isMilitary) {
+        altAction = lang === 'KO' ? "군 조직 특성상 이동수(역마/충)가 들어왔을 때 전출이나 상급/타 부대 파견으로 대응하는 것은 최고의 승부수야. 짐을 싸라." : "Answering movement energy with transfers is the best tactic in military.";
+      }
+    } else if (movingType === 'moving_house') {
+      psychology = lang === 'KO' ? "주거 환경이나 생활 반경 자체를 완전히 뒤집어엎고 싶은 지살(地殺)이나 역마의 기운이 감돌고 있어." : "Energy of wanting to completely flip the living environment.";
+      fateAnalysis = lang === 'KO' ? "이사나 거주지 이동을 통해 휴식의 질을 통제하고 막힌 지기(地氣)를 뚫어낼 수 있는 풍수적 해킹 도구야." : "Moving house acts as an eco-hack to control the quality of rest.";
+      
+      if (matrix.coordinator.judgment_grade === 'A') {
+        finalVerdict = lang === 'KO' ? "이사를 하기에 최고의 타이밍이야. 새로운 터전이 너에게 새로운 활력을 줄 거야." : "Best timing to move. New place gives new vitality.";
+      } else {
+        finalVerdict = lang === 'KO' ? "가용 예산을 전부 소진하며 무리하게 매매나 이사를 할 타이밍은 아니야. 방어적 이동이 필요해." : "Not the time to exhaust budget on a forced move. Defensive movement needed.";
+        altAction = lang === 'KO' ? "만약 무리한 이사가 부담스럽다면, 집안의 인테리어를 크게 바꾸거나 낡고 습한 가구를 버려서 에너지의 흐름(풍수)을 쇄신해봐." : "If moving is heavy, aggressively rearrange furniture to hack the fengshui.";
+      }
     }
 
-    let finalVerdict = '';
-    if (matrix.coordinator.judgment_grade === 'A') {
-      finalVerdict = lang === 'KO' ? "망설이지 말고 과감하게 이동해라." : "Don't hesitate, move forward boldly.";
-    } else if (matrix.coordinator.judgment_grade === 'B') {
-      finalVerdict = lang === 'KO' ? "조건부 이동. 환경을 면밀히 살피고 필요한 방어책을 챙긴 뒤 움직여라." : "Conditional move. Observe the environment closely and move after securing defenses.";
-    } else {
-      finalVerdict = lang === 'KO' ? "이동을 당장 멈추고 에너지가 찰 때까지 기다려라. 무리한 포지션 변경을 피하고 안전자산을 지켜라." : "Stop moving immediately and wait until energy refills. Avoid forced position changes.";
-    }
-
-    const seunStemEl = BAZI_MAPPING.stems[matrix.dynamic_luck.current_seun.substring(0, 1) as keyof typeof BAZI_MAPPING.stems]?.element;
-    const seunBranchEl = BAZI_MAPPING.branches[matrix.dynamic_luck.current_seun.substring(1, 2) as keyof typeof BAZI_MAPPING.branches]?.element;
+    const seunStemEl = BAZI_MAPPING.stems[matrix.dynamic_luck.current_seun.substring(0, 1)]?.element;
+    const seunBranchEl = BAZI_MAPPING.branches[matrix.dynamic_luck.current_seun.substring(1, 2)]?.element;
     
     let dominantElement = '';
     let maxRatio = 0;
     Object.entries(matrix.analysis.five_elements_score).forEach(([el, val]) => {
-      if ((val as number) > maxRatio) {
-        maxRatio = val as number;
+      if ((val) > maxRatio) {
+        maxRatio = val;
         dominantElement = el;
       }
     });
 
     const isOverloadYear = maxRatio > 35 && (seunStemEl === dominantElement || seunBranchEl === dominantElement);
 
-    if (isOverloadYear) {
-      fateAnalysis = lang === 'KO' ? "넘치는 기운이 과부하를 일으켜 판을 엎으려는 충동 기제로 발동 중이다" : "Overflowing energy is causing an overload, acting as an impulse to flip the table.";
-      finalVerdict = lang === 'KO' ? "이동하고 싶은 충동은 강하나 과열로 인한 실수가 우려되니, 냉정하게 실익을 따져보고 움직여라." : "Strong impulse to move, but overheating might lead to mistakes. Evaluate benefits calmly.";
+    if (isOverloadYear && movingType !== 'transfer') {
+      fateAnalysis = lang === 'KO' ? "넘치는 기운이 과부하를 일으켜 판을 무리하게 엎으려는 충동 기제로 발동 중이야." : "Overflowing energy is causing an overload impulse.";
+      finalVerdict = lang === 'KO' ? "이름값이 아니라 실리를 챙겨. 충동으로 움직이면 화를 부를 수 있으니, 냉정하게 득실을 계산해라." : "Take practical benefits over name value. Rash moves invite disaster.";
       matrix.coordinator.judgment_grade = 'B';
-    }
-
-    if (matrix.analysis.missing_elements.includes('Metal') && matrix.profile.social_context === 'military_public') {
-       if (matrix.coordinator.judgment_grade === 'C' || matrix.coordinator.judgment_grade === 'B') {
-           matrix.coordinator.alt_action = lang === 'KO' 
-            ? "관성이 부족하나 특수 직업(군/경/공직)으로 액땜 중이다. 퇴사나 전역은 치명적이니, 물리적 이사 보다는 부서 전출이나 짧은 휴가로 에너지를 환기하라."
-            : "Lacking authority element but currently neutralizing with field work. Transfers or short vacations are better than moving.";
-       }
     }
 
     const yongshinDetail = analysis.yongshinDetail || {};
@@ -2031,44 +1289,44 @@ ${layer3}`;
        else if (dominantElement === 'Water') yongshinElement = 'Earth';
     }
 
-    const directionsTable: Record<string, string> = {
-      'Wood': lang === 'KO' ? '동쪽 (새로운 기획과 시작의 에너지)' : 'East (Energy of new planning and beginnings)',
-      'Fire': lang === 'KO' ? '남쪽 (열정과 명예가 확장되는 에너지)' : 'South (Energy of passion and reputation expansion)',
-      'Earth': lang === 'KO' ? '중앙 또는 인근 도시 (안정과 기반의 에너지)' : 'Central or nearby city (Energy of stability and foundation)',
-      'Metal': lang === 'KO' ? '서쪽 (결실과 기술적 성취가 보장된 에너지)' : 'West (Energy of guaranteed results and technical achievement)',
-      'Water': lang === 'KO' ? '북쪽 (지혜와 유통의 흐름이 강한 에너지)' : 'North (Energy of wisdom and distribution flow)'
+    const directionsTable = {
+      'Wood': lang === 'KO' ? '동쪽 (새로운 기획과 시작의 에너지)' : 'East (Energy of new planning)',
+      'Fire': lang === 'KO' ? '남쪽 (열정과 명예가 확장되는 에너지)' : 'South (Energy of passion)',
+      'Earth': lang === 'KO' ? '중앙 또는 인근 도시 (안정과 기반의 에너지)' : 'Central (Stability)',
+      'Metal': lang === 'KO' ? '서쪽 (결실과 기술적 성취가 보장된 에너지)' : 'West (Results and achievement)',
+      'Water': lang === 'KO' ? '북쪽 (지혜와 유통의 흐름이 강한 에너지)' : 'North (Wisdom and flow)'
     };
     
-    let bestDirection = directionsTable[yongshinElement] || (lang === 'KO' ? '북쪽 (지혜와 유통의 흐름이 강한 에너지)' : 'North (Energy of wisdom and distribution flow)');
+    let bestDirection = directionsTable[yongshinElement] || (lang === 'KO' ? '북쪽 (지혜와 유통이 강한 방위)' : 'North (Wisdom)');
 
     if (matrix.interactions.gong_mang.length > 0) {
-       const gmElements = matrix.interactions.gong_mang.map((b: string) => BAZI_MAPPING.branches[b as keyof typeof BAZI_MAPPING.branches]?.element);
+       const gmElements = matrix.interactions.gong_mang.map((b) => BAZI_MAPPING.branches[b]?.element);
        if (gmElements.includes(yongshinElement)) {
            const gmWarn = lang === 'KO' 
-            ? `공망 방위(${bestDirection.split(' ')[0]})로의 이동은 밑빠진 독에 물 붓기다. 차라리 차선책인 다른 방위를 택하라.`
-            : `Moving to Void direction (${bestDirection.split(' ')[0]}) is futile. Pick another direction.`;
-           matrix.coordinator.alt_action = (matrix.coordinator.alt_action ? matrix.coordinator.alt_action + "\n" : "") + gmWarn;
+            ? `공망 방위(${bestDirection.split(' ')[0]})로의 이동은 밑빠진 독에 물 붓기야. 차라리 차선책인 다른 방위를 택해.`
+            : `Moving to Void direction is futile. Pick another direction.`;
+           altAction = (altAction ? altAction + "\n" : "") + gmWarn;
        }
     }
 
     let riskCheck = '';
     if (matrix.analysis.energy_state.includes('약')) {
-        riskCheck = lang === 'KO' ? "현금 유동성이 취약해지기 쉬우니 초기 정착 비용을 20% 더 확보해라." : "Cash liquidity is fragile; secure 20% more buffer.";
+        riskCheck = lang === 'KO' ? "현금 유동성이 떨어질 수 있으니 초기 정착/이동 비용을 예상치보다 20% 더 확보해둬." : "Secure 20% more buffer cash.";
     } else if (matrix.analysis.temperature_index.includes('극')) {
-        riskCheck = lang === 'KO' ? "조후가 극단적이니 심리적 스트레스와 조직 마찰에 대비한 심리적 방어벽을 쳐라." : "Extreme temperature; prepare for stress/friction.";
+        riskCheck = lang === 'KO' ? "사주의 온도가 극단적이니 낯선 환경에서의 외로움이나 사람 간의 마찰에 철저히 대비해." : "Prepare for stress or friction in new environment.";
     } else if (matrix.analysis.energy_state.includes('왕') || matrix.analysis.energy_state.includes('강')) {
-        riskCheck = lang === 'KO' ? "과열된 독단적 판단이나 성급한 계약으로 인한 자산 손실 위험이 있으니, 무리한 지출과 동업을 차단해라." : "Overheating risk; avoid rash contracts or partnerships.";
+        riskCheck = lang === 'KO' ? "과열된 독단적 판단의 위험이 높아. 이직/이사 계약 시 반드시 타인의 조언을 최소 한 번은 크로스체크해." : "Avoid rash contracts; get cross-checks.";
     } else {
-        riskCheck = lang === 'KO' ? "새로운 환경 안착 전까지 예측 불가의 지출이 발생할 수 있으니, 파격적인 소비를 잠그고 고정 자산을 통제해라." : "Expect random spending; lock down assets.";
+        riskCheck = lang === 'KO' ? "돌발 변수에 흔들리지 않도록 자산 포트폴리오나 예산을 먼저 단단히 통제해라." : "Lock down assets against random spending.";
     }
 
-    let spatialAdvice = lang === 'KO' ? '주변의 간섭이 차단된 단독 공간' : 'Isolated solo space';
+    let spatialAdvice = lang === 'KO' ? '주변의 간섭이 철저히 차단된 너만의 요새' : 'Isolated solo space';
     if (matrix.analysis.gyeokguk.includes('상관') || matrix.analysis.gyeokguk.includes('식신')) {
-      spatialAdvice = lang === 'KO' ? "트렌드가 빠르고 정보 교류가 활발한 도심 핵심 상권 인근" : "Near active urban centers.";
+      spatialAdvice = lang === 'KO' ? "집이나 직장이 무조건 정보망/트렌드 핵심지(도심)와 가까워야 유리해." : "Near active urban centers.";
     } else if (matrix.analysis.gyeokguk.includes('관') || matrix.analysis.gyeokguk.includes('살')) {
-      spatialAdvice = lang === 'KO' ? "심리적 압박을 분산시키는 고요한 숲세권 혹은 대형 공원 인근" : "Quiet forest or park area.";
+      spatialAdvice = lang === 'KO' ? "타인의 시선에서 벗어나 쉴 수 있는 숲세권/공원 인근, 혹은 폐쇄적 안정감이 있는 곳" : "Quiet forest or park area.";
     } else if (matrix.analysis.gyeokguk.includes('재')) {
-      spatialAdvice = lang === 'KO' ? "현금 흐름이 활발한 금융가 인근 혹은 독립성이 보장된 고층 오피스" : "Financial district or high-rise office.";
+      spatialAdvice = lang === 'KO' ? "이동 자체가 나의 커리어나 현금 흐름 창출과 직결되는 경제/금융 타운 인근" : "Financial district.";
     }
 
     const jsonPayload = {
@@ -2077,7 +1335,7 @@ ${layer3}`;
       energy_status: psychology,
       value: fateAnalysis,
       judgment: finalVerdict,
-      alt_action: matrix.coordinator.alt_action,
+      alt_action: altAction,
       action_plan: {
         direction: bestDirection,
         risk_management: riskCheck,
@@ -2086,261 +1344,35 @@ ${layer3}`;
     };
 
     const glitchText = matrix.coordinator.judgment_grade !== 'C' ?
-      (lang === 'KO' ? "이사나 이직은 단순한 변경이 아닌 에너지 진동수의 재조정이다. 공간을 바꾸는 게 가장 강력한 해킹이다." : "Moving is a frequency adjustment, the ultimate reality hack.") :
-      (lang === 'KO' ? "이동하고픈 충동이 치밀어도 날씨가 나쁠 땐 출항하지 않는 것이 최고의 뱃사공이다." : "The best sailor doesn't sail in bad weather.");
+      (lang === 'KO' ? "이동 자체에 취하지 마, 핵심은 '어떤 장비를 챙겨서 떠나느냐'야." : "Moving is a frequency adjustment. Adjust well.") :
+      (lang === 'KO' ? "이동하고픈 충동이 치밀어도 날씨가 나쁠 땐 닻을 내리고 기다리는 것이 선장의 임무다." : "The best sailor doesn't sail in bad weather.");
 
     return { main: JSON.stringify(jsonPayload), glitch: glitchText, matrix };
   };
-
-  // --- Theme 3: Health/Mental (영혼의 균열) ---
   const analyzeHealth = () => {
-    let text = '';
-    if (isFrozen || (analysis.elementRatios?.Fire || 0) >= 60) {
-      text = lang === 'KO' ? `조후의 불균형이 심해지면서 몸과 마음이 쉽게 지칠 수 있어. 특히 ${isFrozen ? '냉증과 우울감' : '화기와 조급함'}을 다스리는 게 급선무야. ` : `As the temperature imbalance worsens, your body and mind can easily get exhausted. It's urgent to manage ${isFrozen ? 'coldness and depression' : 'heat and impatience'}. `;
-    }
-    if (allInteractions.some((i: any) => i.type === '충')) {
-      text += lang === 'KO' ? `원국에 강한 충이 발생하면서 에너지가 자꾸만 분산되고 있어. 휴식이 최고의 개운법이야. ` : `A strong clash in your chart is constantly scattering your energy. Resting is the best remedy. `;
-    }
-
-    const main = lang === 'KO' ? 
-      `흔들리는 영혼의 균열을 메우고 싶구나. ${text || '다행히 큰 위기는 없지만, 규칙적인 생활로 리듬을 찾는 게 좋아.'} [delay:3000]
-
-평화는 네 안에서 시작될 거야.` :
-      `Regarding your health and peace... ${text || 'Fortunately, there are no major crises, but it is good to find a rhythm with a regular lifestyle.'} [delay:3000]
-
-Peace will begin within you.`;
-    
-    const glitch = lang === 'KO' ? '몸이 보내는 작은 신호를 무시하지 마. 그게 곧 운의 흐름이니까.' : 'Do not ignore the small signals your body sends. That is the flow of luck.';
-    return { main, glitch };
+    return { main: lang === 'KO' ? '건강운은 현재 비공개 상태야.' : 'Health luck is currently private.', glitch: 'Rest up.' };
   };
 
-  // --- Theme 4: Secrets (금기된 페이지) ---
   const analyzeSecrets = () => {
-    let text = '';
-    const hasAmHap = allInteractions.some((i: any) => i.type.includes('암합'));
-    const hasWonjin = allInteractions.some((i: any) => i.type.includes('원진'));
-    const hasChung = allInteractions.some((i: any) => i.type.includes('충'));
-    const hasHyung = allInteractions.some((i: any) => i.type.includes('형'));
-    
-    // 12-stage Life Cycle (12운성) check
-    const seunStage = result.currentYearPillar?.lifeStage;
-    const isMokYok = seunStage === '목욕';
-    const isDeathOrGrave = seunStage === '사' || seunStage === '묘';
-
-    const marital = interactionsData?.maritalStatus;
-    const children = interactionsData?.hasChildren;
-
-    // Corruption Logic (재물과 탐욕)
-    const originalGods = result.pillars.flatMap(p => [p.stemKoreanName, p.branchKoreanName]).filter(Boolean);
-    const hasOriginalInseong = originalGods.some(g => g?.includes('인성') || g?.includes('정인') || g?.includes('편인'));
-    const hasLuckJaeseong = luckGods.some(g => g.includes('재성') || g.includes('정재') || g.includes('편재'));
-    const isDarkDeal = hasAmHap && hasOriginalInseong && hasLuckJaeseong;
-
-    const hasLuckSangGwan = luckGods.some(g => g.includes('상관'));
-    const hasPyunJae = luckGods.some(g => g.includes('편재')) || originalGods.some(g => g?.includes('편재'));
-    const isGamblersMadness = hasLuckSangGwan && hasPyunJae;
-
-    const hasOriginalJae = originalGods.some(g => g?.includes('재성') || g?.includes('정재') || g?.includes('편재'));
-    const hasBiGyeopLuck = luckGods.some(g => g.includes('비견') || g.includes('겁재'));
-    const isGunBiJaengJae = hasBiGyeopLuck && hasOriginalJae;
-    const isBloodMoney = isGunBiJaengJae && hasWonjin;
-
-    let isCorruption = false;
-    let corruptionText = '';
-
-    if (isDarkDeal) {
-      isCorruption = true;
-      corruptionText = lang === 'KO' ? `문서 아래로 오가는 검은 손길... 지금 잡는 그 돈은 네 명예(인성)를 갉아먹는 대가야. 들키지 않을 거라 믿어? 종이는 불을 이기지 못해. ` : `A dark hand moving under the documents... The money you are grabbing now is the price eating away at your honor. Do you believe you won't get caught? Paper cannot beat fire. `;
-    } else if (isGamblersMadness) {
-      isCorruption = true;
-      corruptionText = lang === 'KO' ? `법의 테두리를 벗어난 질주야. 네 기발한 속임수가 통할 것 같지? 하지만 벼랑 끝에 선 건 너 자신이야. 한탕의 꿈이 무덤이 되는 건 한 끗 차이지. ` : `It's a sprint outside the boundaries of the law. Do you think your clever tricks will work? But you are the one standing on the edge of the cliff. The dream of a jackpot becoming a grave is a fine line. `;
-    } else if (isBloodMoney) {
-      isCorruption = true;
-      corruptionText = lang === 'KO' ? `돈 냄새를 맡은 까마귀들이 서로의 눈을 파먹고 있네. 네가 쥔 그 황금은 누군가의 눈물이고 원망이야. 그 돈을 쓰며 잠이 올까? ` : `Crows smelling money are pecking at each other's eyes. The gold you hold is someone's tears and resentment. Can you sleep while spending that money? `;
-    }
-
-    let prefix = '';
-    if (!isCorruption) {
-      if (marital === '기혼') {
-        prefix = lang === 'KO' ? `이미 가정을 이룬 상태에서 이런 기운을 마주하다니, 위태롭네. ` : `Facing this energy while already married is quite precarious. `;
-        if (children) {
-          prefix += lang === 'KO' ? `지켜야 할 것들이 있는데도 흔들리는 마음 때문에 더 괴로울 수 있어. ` : `It might be more painful because your heart is wavering despite having things to protect. `;
-        }
-      } else if (marital === '돌싱') {
-        prefix = lang === 'KO' ? `한 번의 굴레를 벗어났음에도, 또다시 위험한 불꽃에 눈길이 가고 있네. ` : `Even after escaping the cycle once, your eyes are drawn to a dangerous flame again. `;
-      } else {
-        prefix = lang === 'KO' ? `아직 얽매인 곳은 없지만, 남들에게 쉽게 털어놓지 못할 은밀한 서사가 시작되려 해. ` : `You are not bound to anyone yet, but a secret narrative that you can't easily share with others is about to begin. `;
-      }
-    }
-
-    if (hasAmHap && hasChung) {
-      text = lang === 'KO' ? `겉으로는 차갑게 밀어내고 싸우면서도, 지장간 속에서는 몰래 손을 잡는 '암합'의 긴장감이 흐르고 있어. 이건 지독한 집착이야. 낮에는 적이지만 밤에는 서로의 그림자를 쫓는 기묘한 관계에 중독될 수 있어. ` : `While pushing away and fighting on the surface, there's a hidden tension of 'Am-Hap' secretly holding hands underneath. This is a severe obsession. You might get addicted to a bizarre relationship where you are enemies by day but chase each other's shadows by night. `;
-    } else if (hasAmHap) {
-      text = lang === 'KO' ? `겉으론 아무 일 없는 척해도, 네 무의식은 이미 그 사람의 그림자를 쫓고 있어. 들키고 싶지 않은 그 은밀한 긴장감이 네 영혼을 갉아먹고 있네. ` : `Even if you pretend nothing is happening, your subconscious is already chasing their shadow. That secret tension you don't want to be caught in is eating away at your soul. `;
-    }
-
-    if (isMokYok) {
-      text += lang === 'KO' ? `게다가 지금은 '목욕(Mok-Yok)'의 기운이 네 이성을 마비시키고 있어. 품격보다는 본능, 사랑보다는 탐닉이 앞서는 시기지. 이 관계는 축복보다는 치명적인 중독에 가까워. ` : `Moreover, the energy of 'Mok-Yok (Bathing)' is paralyzing your reason right now. It's a time when instinct precedes dignity, and indulgence precedes love. This relationship is closer to a fatal addiction than a blessing. `;
-    } else if (isDeathOrGrave) {
-      text += lang === 'KO' ? `기운이 극도로 침잠된 상태에서 만나는 인연이야. 화려함은 없지만, 서로의 상처를 파고드는 지독한 연민이 사랑으로 착각될 수 있어. ` : `It's a connection met in a state of extremely sunken energy. There's no glamour, but a deep compassion that digs into each other's wounds can be mistaken for love. `;
-    }
-
-    if (!text && hasWonjin) {
-      text = lang === 'KO' ? `미워할수록 더 깊게 중독되는 원진의 굴레에 갇혀 있네. 망할 걸 알면서도 끌리는 불나방 같은 선택을 조심해. ` : `You are trapped in the cycle of Wonjin, where the more you hate, the deeper you get addicted. Be careful of making choices like a moth drawn to a flame, knowing it will ruin you. `;
-    }
-
-    const isSecretAffairTrigger = hasAmHap || isMokYok || hasWonjin || isDeathOrGrave;
-    let consequence = '';
-
-    if (isSecretAffairTrigger && (hasChung || hasHyung)) {
-      consequence = lang === 'KO' ? `비밀은 달콤하지만, 그 대가는 소금보다 쓸 거야. 지금 네가 잡은 그 손은 결국 수갑(관재)이나 낙인(구설)이 되어 돌아올 텐데, 그래도 열어보겠어? ` : `Secrets are sweet, but the price will be more bitter than salt. The hand you are holding now will eventually return as handcuffs (legal issues) or a stigma (gossip). Will you still open it? `;
-    }
-
-    if (isFrozen && isSecretAffairTrigger) {
-      consequence += lang === 'KO' ? `이건 사랑이 아니라 저체온증이 만든 환각이야. 너무 추워서 옆에 있는 독초를 난로라 착각하고 품으려 하는구나. ` : `This is not love, but a hallucination created by hypothermia. You are so cold that you mistake the poisonous plant next to you for a heater and try to embrace it. `;
-    }
-
-    const finalNarrative = isCorruption ? corruptionText : `${prefix}
-
-${text || (lang === 'KO' ? '네 안의 본능이 조용히 숨죽이고 있네. 하지만 언제든 타오를 준비가 되어 있어.' : 'Your instincts are quiet for now, but ready to ignite.')}
-
-${consequence}`;
-
-    const main = lang === 'KO' ? 
-      `금기된 페이지를 열어보고 싶어? [delay:1500]
-
-${finalNarrative} [delay:3000]
-
-비밀은 무덤까지 가져갈 수 있을까?
-
-<span style='color: #9ca3af;'>이 메시지는 1분 뒤 자동 삭제됩니다.</span>` :
-      `Opening the forbidden page... [delay:1500]
-
-${finalNarrative} [delay:3000]
-
-Can you take the secret to your grave?
-
-<span style='color: #9ca3af;'>This message will self-destruct in 1 minute.</span>`;
-    
-    let glitch = '';
-    if (isCorruption) {
-      glitch = lang === 'KO' ? '법의 심판을 비웃는 대가로 네 평안을 팔겠어?' : 'Will you sell your peace in exchange for mocking the judgment of the law?';
-    } else {
-      glitch = lang === 'KO' ? 
-        (isMokYok ? '이성이 본능을 이길 수 없는 시기야. 후회할 짓은 하지 마, 아니면 제대로 즐기든가.' : '비밀이 탄로 나는 순간, 네가 쌓아온 모든 게 흔일릴 수 있다는 걸 명심해.') :
-        (isMokYok ? 'Reason cannot beat instinct right now. Don\'t do anything you\'ll regret, or just enjoy it fully.' : 'Keep in mind that the moment the secret is revealed, everything you\'ve built could be shaken.');
-    }
-
-    return { main, glitch, isCorruption };
+    return { main: lang === 'KO' ? '너만 아는 은밀한 이야기가 있니? 지금은 비밀을 지키는 게 좋겠어.' : 'Keep your secrets guarded for now.', glitch: 'Stay discreet.' };
   };
 
-
-  // --- Theme 6: General Luck (금년운세) ---
   const analyzeGeneral = () => {
-    const prefix = lang === 'KO' ? 
-      `이번에는 대운과 세운의 흐름을 좀 볼까? 보채지는 말아줘. 
-
-` : 
-      `Let's look at your cycles. Don't rush me. 
-
-`;
-    return { main: prefix + main, glitch: glitch };
+    return { main: lang === 'KO' ? '올해의 전반적인 흐름은 나쁘지 않아. 파도를 타듯 유연하게 움직여.' : 'Overall flow is good. Be flexible.', glitch: 'Surf the waves.' };
   };
 
-  // --- Theme 7: Taboo Page (금기된 페이지 - Extreme Risks) ---
   const analyzeTaboo = () => {
-    const risks: { name: string; desc: string; severity: string }[] = [];
-    
-    if (matrix.interactions.hyeong.length > 0) {
-      risks.push({
-        name: lang === 'KO' ? '삼형살 (The Punishment)' : 'Samhyeongsal',
-        desc: lang === 'KO' ? '에너지가 극도로 응축되어 폭발하는 시기. 법적 분쟁, 수술, 혹은 감정적 파국이 배태되어 있음.' : 'A period of extreme energy condensation. Legal disputes, surgery, or emotional catastrophe.',
-        severity: 'Critical'
-      });
-    }
-
-    if (matrix.interactions.chung.length > 0) {
-      risks.push({
-        name: lang === 'KO' ? '충돌 에너지 (Clash)' : 'Clash Energy',
-        desc: lang === 'KO' ? '내부를 향한 강한 타격감. 관계의 단절이나 예기치 않은 사고, 충격적인 변화.' : 'A strong internal blow. Breakup, sudden accidents, shocking changes.',
-        severity: 'High'
-      });
-    }
-
-    if (matrix.analysis.temperature_index.includes('극')) {
-      risks.push({
-        name: lang === 'KO' ? '조후 극단 (Extreme Climate)' : 'Extreme Climate',
-        desc: lang === 'KO' ? `명식의 온도가 ${matrix.analysis.temperature_index}에 달해 이성적 통제가 불가능해지는 구간.` : `Temperature reaches ${matrix.analysis.temperature_index}, rational control is lost.`,
-        severity: 'High'
-      });
-    }
-
-    if (risks.length === 0) {
-      risks.push({
-        name: lang === 'KO' ? '고요한 징조' : 'Quiet Omen',
-        desc: lang === 'KO' ? '특별히 파괴적인 상호작용은 감지되지 않음. 그러나 평화는 폭풍 전야일 수 있음.' : 'No particularly destructive interactions. Peace could be the calm before the storm.',
-        severity: 'Low'
-      });
-    }
-
-    const payload = {
-      theme: lang === 'KO' ? '금기된 페이지' : 'Taboo Page',
-      risks,
-      remedy_gate: matrix.remedy_gate.length > 0 ? matrix.remedy_gate : [lang === 'KO' ? '현재는 큰 리스크가 없으니 멘탈을 굳건히 하라.' : 'Stay mentally strong, no immediate remedies needed.'],
-      grade: matrix.coordinator.judgment_grade
-    };
-
-    return { 
-      main: JSON.stringify(payload), 
-      glitch: lang === 'KO' ? '이 경고를 무시한다면, 운명은 네가 가장 아끼는 것을 먼저 요구할지도 몰라.' : 'If you ignore this warning, fate might demand what you cherish most.'
-    };
+    return { main: lang === 'KO' ? '금기된 행동을 하고 있지는 않은지 스스로를 돌아봐.' : 'Check if you are doing something taboo.', glitch: 'Be careful.' };
   };
 
-  // --- Theme 8: The Dark Curtain (암막의 장막) ---
   const analyzeDarkCurtain = () => {
-    const karmic_insights: string[] = [];
-    
-    if (matrix.interactions.gong_mang.length > 0) {
-      karmic_insights.push(lang === 'KO' 
-        ? `공망(空亡): 헛수고와 채워지지 않는 갈증. 너는 ${matrix.interactions.gong_mang.join(', ')}의 자리에서 아무리 부어도 채워지지 않는 밑빠진 독을 안고 태어났어.` 
-        : `Gongmang (Void): Unfilfillable thirst. You carry the void of ${matrix.interactions.gong_mang.join(', ')}.`);
-    }
-
-    if (matrix.analysis.missing_elements.length > 0) {
-      karmic_insights.push(lang === 'KO'
-        ? `오행의 결핍: 네 삶의 근원적 결손. ${matrix.analysis.missing_elements.join(', ')} 에너지가 절대적으로 부족해. 이건 단순한 약점이 아니라 전생에서부터 이어진 카르마적 상실이야.`
-        : `Missing Elements: Primal deficit. You absolutely lack ${matrix.analysis.missing_elements.join(', ')} energy.`);
-    }
-
-    const payload = {
-      theme: lang === 'KO' ? '암막의 장막' : 'The Dark Curtain',
-      insights: karmic_insights,
-      vibe: lang === 'KO' ? '운명의 틈새에 숨은 그림자를 똑바로 마주해라.' : 'Face the shadow hidden in the cracks of destiny.',
-    };
-
-    return {
-      main: JSON.stringify(payload),
-      glitch: lang === 'KO' ? '결핍을 인정하는 순간, 채워지지 않는 갈증에서 비로소 벗어날 수 있어.' : 'The moment you accept the deficit, you can escape the unquenchable thirst.'
-    }
+    return { main: lang === 'KO' ? '어둠의 장막이 걷히길 기다려.' : 'Wait for the dark curtain to lift.', glitch: 'Stay hidden.' };
   };
 
-  // --- Theme 9: Destiny Map (운명의 지도) ---
   const analyzeDestinyMap = () => {
-    const payload = {
-      theme: lang === 'KO' ? '운명의 지도' : 'Map of Destiny',
-      type: 'destiny_map',
-      grade: matrix.coordinator.judgment_grade,
-      momentum_score: matrix.dynamic_luck.momentum_score,
-      elements: analysis.elementRatios,
-      overview: lang === 'KO' ? `전반적인 에너지 밀집도와 궤적: ${matrix.dynamic_luck.elemental_friction.type}` : `Overall energy density and trajectory: ${matrix.dynamic_luck.elemental_friction.type}`
-    };
-    return {
-      main: JSON.stringify(payload),
-      glitch: lang === 'KO' ? '지도에 그려진 길만이 네 운명이 아니야, 남겨진 여백을 주목해.' : 'The path on the map is not your only destiny. Notice the blank spaces.'
-    }
+    return { main: lang === 'KO' ? '너의 운명 지도를 다시 그리고 있어.' : 'Redrawing your destiny map.', glitch: 'Navigate carefully.' };
   };
 
-  // Populate Analyses
   themeAnalyses['romance'] = analyzeRomance();
   themeAnalyses['marriage_timing'] = analyzeMarriageTiming();
   themeAnalyses['wealth'] = analyzeWealth();
@@ -2361,29 +1393,9 @@ Can you take the secret to your grave?
   }
 
   // Theme Targeting Score Calculation
-  if (isFrozen || (analysis.elementRatios?.Fire || 0) >= 60) themeScores.health += 50;
-  if (allInteractions.some((i: any) => i.type === '충')) themeScores.health += 30;
-
-  const hasAmHapGlobal = allInteractions.some((i: any) => i.type.includes('암합'));
-  const hasDohwa = analysis.shinsal?.some((s: any) => s.name.includes('도화'));
-  const hasWonjinSal = allInteractions.some((i: any) => i.type.includes('원진'));
-  const hasBathGlobal = result.pillars.some((p) => p.lifeStage === '목욕');
-  if (hasAmHapGlobal) themeScores.secrets += 50;
-  if (hasDohwa) themeScores.secrets += 30;
-  if (hasWonjinSal && hasBathGlobal) themeScores.secrets += 40;
-
-  const hasYeokmaGlobal = analysis.shinsal?.some((s: any) => s.name.includes('역마'));
-  const dayBranchGlobal = result.pillars[1].branch;
-  const monthBranchGlobal = result.pillars[2].branch;
-  const hasBranchChungGlobal = allInteractions.some((i: any) => (i.note.includes(dayBranchGlobal) || i.note.includes(monthBranchGlobal)) && i.type.includes('충'));
-  if (hasYeokmaGlobal) themeScores.moving += 50;
-  if (hasBranchChungGlobal) themeScores.moving += 40;
-
-  if (matrix.interactions.hyeong.length > 0 || matrix.interactions.chung.length > 0) themeScores.taboo += 60;
-  if (matrix.analysis.temperature_index.includes('극')) themeScores.taboo += 40;
-
-  if (matrix.interactions.gong_mang.length > 0) themeScores.dark_curtain += 50;
-  if (matrix.analysis.missing_elements.length > 0) themeScores.dark_curtain += 50;
+  themeScores.health = 0;
+  themeScores.taboo = 0;
+  themeScores.dark_curtain = 0;
 
   // 3+1 Strategy
   const allThemes: ThemeOption[] = [
@@ -2399,12 +1411,12 @@ Can you take the secret to your grave?
       question: lang === 'KO' ? "타오르는 열망이 금화가 되어 돌아올까? 아니면 한 줌의 재로 흩어질까? 내가 쥔 재물과 성취의 기회를 설명해줘." : "Will my burning desire return as gold coins? Or will it scatter into a handful of ashes? Explain the opportunities for wealth and achievement I hold.", 
       priority: 100 
     },
-    { 
-      id: 'health', 
-      title: lang === 'KO' ? '[영혼의 균열]' : '[Crack in the Soul]', 
-      question: lang === 'KO' ? "자꾸만 흔들리는 내 몸과 마음... 어떻게 해야 이 고통을 잠재우고 평화를 찾을 수 있을까?" : "My body and mind keep shaking... How can I calm this pain and find peace?", 
-      priority: themeScores.health 
-    },
+    // { 
+    //   id: 'health', 
+    //   title: lang === 'KO' ? '[영혼의 균열]' : '[Crack in the Soul]', 
+    //   question: lang === 'KO' ? "자꾸만 흔들리는 내 몸과 마음... 어떻게 해야 이 고통을 잠재우고 평화를 찾을 수 있을까?" : "My body and mind keep shaking... How can I calm this pain and find peace?", 
+    //   priority: themeScores.health 
+    // },
     { 
       id: 'secrets', 
       title: lang === 'KO' ? '[비밀의 방]' : '[Chamber of Secrets]', 
@@ -2423,18 +1435,18 @@ Can you take the secret to your grave?
       question: lang === 'KO' ? "올해의 전반적인 흐름과 오늘의 기운을 한눈에 보여줘." : "Show me the overall flow of this year and today's energy at a glance.", 
       priority: 90 
     },
-    {
-      id: 'taboo',
-      title: lang === 'KO' ? '[금기된 페이지]' : '[Taboo Page]',
-      question: lang === 'KO' ? "운명에 잠복한 치명적 위협, 삼형살(三刑殺)과 원진살의 폭발 시점을 경고해줘." : "Warn me of the fatal threats lurking in my destiny, the explosion point of Samhyeongsal and Wonjinsal.",
-      priority: themeScores.taboo
-    },
-    {
-      id: 'dark_curtain',
-      title: lang === 'KO' ? '[암막의 장막]' : '[The Dark Curtain]',
-      question: lang === 'KO' ? "내 삶의 밑빠진 독(공망)과 채워지지 않는 결핍(결핍 오행)이 의미하는 카르마를 읽어줘." : "Read the karma of the bottomless pit (Gongmang) and unquenchable deficit (Missing Elements) in my life.",
-      priority: themeScores.dark_curtain
-    },
+    // {
+    //   id: 'taboo',
+    //   title: lang === 'KO' ? '[금기된 페이지]' : '[Taboo Page]',
+    //   question: lang === 'KO' ? "운명에 잠복한 치명적 위협, 삼형살(三刑殺)과 원진살의 폭발 시점을 경고해줘." : "Warn me of the fatal threats lurking in my destiny, the explosion point of Samhyeongsal and Wonjinsal.",
+    //   priority: themeScores.taboo
+    // },
+    // {
+    //   id: 'dark_curtain',
+    //   title: lang === 'KO' ? '[암막의 장막]' : '[The Dark Curtain]',
+    //   question: lang === 'KO' ? "내 삶의 밑빠진 독(공망)과 채워지지 않는 결핍(결핍 오행)이 의미하는 카르마를 읽어줘." : "Read the karma of the bottomless pit (Gongmang) and unquenchable deficit (Missing Elements) in my life.",
+    //   priority: themeScores.dark_curtain
+    // },
     {
       id: 'destiny_map',
       title: lang === 'KO' ? '[운명의 지도]' : '[Map of Destiny]',
@@ -2444,7 +1456,7 @@ Can you take the secret to your grave?
   ];
 
   const topTargeted = allThemes
-    .filter(t => !['romance', 'wealth', 'general', 'destiny_map'].includes(t.id))
+    .filter(t => !['romance', 'wealth', 'general', 'destiny_map', 'taboo', 'dark_curtain', 'health'].includes(t.id))
     .sort((a, b) => b.priority - a.priority)[0];
 
   const displayThemes = [
@@ -2453,9 +1465,9 @@ Can you take the secret to your grave?
     topTargeted,
     allThemes.find(t => t.id === 'secrets')!,
     allThemes.find(t => t.id === 'moving')!,
-    allThemes.find(t => t.id === 'health')!,
-    allThemes.find(t => t.id === 'taboo')!,
-    allThemes.find(t => t.id === 'dark_curtain')!,
+    // allThemes.find(t => t.id === 'health')!,
+    // allThemes.find(t => t.id === 'taboo')!,
+    // allThemes.find(t => t.id === 'dark_curtain')!,
     allThemes.find(t => t.id === 'destiny_map')!,
     allThemes.find(t => t.id === 'general')!
   ].filter(Boolean);

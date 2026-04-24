@@ -33,6 +33,14 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
     ko: '토다매금: 흙이 너무 많아 금(보석)이 묻히는 형국. 재능이 있으나 빛을 보지 못하거나 과도한 보호로 자립심이 약해질 수 있습니다.',
     en: 'To-da-mae-geum: Too much Earth burying the Metal (gem). Indicates hidden talent or weakened independence due to overprotection.'
   },
+  '재다신약': {
+    ko: '재다신약: 재물(목표, 기회)은 너무 많은데 이를 감당할 내 힘(비겁/인성)이 부족한 형국. 빚을 지거나 건강을 해칠 수 있습니다.',
+    en: 'Jae-da-sin-yak: Too much Wealth energy but weak Daily Master. Indicates overwhelming opportunities that one lacks the strength to handle, leading to debt or health issues.'
+  },
+  'Jae-da-sin-yak': {
+    ko: '재다신약: 재물(목표, 기회)은 너무 많은데 이를 감당할 내 힘(비겁/인성)이 부족한 형국. 빚을 지거나 건강을 해칠 수 있습니다.',
+    en: 'Jae-da-sin-yak: Too much Wealth energy but weak Daily Master. Indicates overwhelming opportunities that one lacks the strength to handle, leading to debt or health issues.'
+  },
   '군비쟁재': {
     ko: '군비쟁재: 비견/겁재(나와 같은 기운)가 많아 하나의 재성(재물/결과)을 두고 다투는 형국. 금전 손실이나 경쟁이 치열할 수 있습니다.',
     en: 'Gun-bi-jaeng-jae: Many Peer energies competing for a single Wealth energy. Indicates potential financial loss or fierce competition.'
@@ -127,7 +135,7 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
   }
 };
 
-const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, children: React.ReactNode, lang?: 'KO' | 'EN' }> = ({ term, info, children, lang = 'KO' }) => {
+export const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, children: React.ReactNode, lang?: 'KO' | 'EN' }> = ({ term, info, children, lang = 'KO' }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0, placement: 'top' as 'top' | 'bottom' });
   const containerRef = useRef<HTMLSpanElement>(null);
@@ -239,15 +247,9 @@ const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, 
             >
               <span className="block font-bold text-white mb-2 text-sm">{term}</span>
               {lang === 'KO' ? (
-                <>
-                  <span className="block mb-1 whitespace-pre-wrap text-white text-xs">{tooltipInfo.ko}</span>
-                  <span className="block text-white/50 whitespace-pre-wrap text-xs">{tooltipInfo.en}</span>
-                </>
+                <span className="block whitespace-pre-wrap text-white text-xs">{tooltipInfo.ko}</span>
               ) : (
-                <>
-                  <span className="block mb-1 whitespace-pre-wrap text-white text-xs">{tooltipInfo.en}</span>
-                  <span className="block text-white/50 whitespace-pre-wrap text-xs">{tooltipInfo.ko}</span>
-                </>
+                <span className="block whitespace-pre-wrap text-white text-xs">{tooltipInfo.en}</span>
               )}
             </motion.div>
           )}
@@ -259,6 +261,7 @@ const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, 
 };
 
 export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", lang = 'KO' }) => {
+  const idId = React.useId();
   const elements: React.ReactNode[] = [];
   let i = 0;
   let currentText = '';
@@ -267,9 +270,67 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
   if (!text) return null;
 
   // We no longer auto-wrap terms. Tooltips will only be applied to terms explicitly wrapped in color codes or tooltip tags.
-  let processedText = text;
+  let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
   while (i < processedText.length) {
+    if (processedText.startsWith('\n', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      elements.push(<br key={`${idId}-${keyCount++}`} />);
+      i += 1;
+      continue;
+    }
+
+    if (processedText.startsWith('<h3>', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      let endH3Index = processedText.indexOf('</h3>', i);
+      if (endH3Index !== -1) {
+        const h3Content = processedText.substring(i + 4, endH3Index);
+        elements.push(<h3 key={`${idId}-${keyCount++}`} className="font-bold text-xl mb-4 mt-2 text-white italic drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] tracking-wide">
+          <ParsedText text={h3Content} lang={lang} />
+        </h3>);
+        i = endH3Index + 5;
+        continue;
+      } else {
+        // Tag is open but not closed yet (probably typing)
+        const h3Content = processedText.substring(i + 4);
+        elements.push(<h3 key={`${idId}-${keyCount++}`} className="font-bold text-xl mb-4 mt-2 text-white italic drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] tracking-wide">
+          <ParsedText text={h3Content} lang={lang} />
+        </h3>);
+        i = processedText.length;
+        continue;
+      }
+    }
+
+    if (processedText.startsWith('<strong>', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      let endStrongIndex = processedText.indexOf('</strong>', i);
+      if (endStrongIndex !== -1) {
+        const strongContent = processedText.substring(i + 8, endStrongIndex);
+        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+          <ParsedText text={strongContent} lang={lang} />
+        </span>);
+        i = endStrongIndex + 9;
+        continue;
+      } else {
+        // Tag is open but not closed yet
+        const strongContent = processedText.substring(i + 8);
+        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+          <ParsedText text={strongContent} lang={lang} />
+        </span>);
+        i = processedText.length;
+        continue;
+      }
+    }
+
     if (processedText[i] === '[') {
       // Find the matching closing bracket for this specific opening bracket
       let bracketCount = 1;
@@ -292,7 +353,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
         
         if (tagContent.startsWith('delay:')) {
           if (currentText) {
-            elements.push(<span key={keyCount++}>{currentText}</span>);
+            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
             currentText = '';
           }
           i = endBracketIndex + 1;
@@ -301,7 +362,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
         
         if (tagContent.startsWith('tooltip:')) {
           if (currentText) {
-            elements.push(<span key={keyCount++}>{currentText}</span>);
+            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
             currentText = '';
           }
           const content = tagContent.substring(8);
@@ -313,7 +374,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
             info = { ko: parts[1], en: parts[2] || parts[1] };
           }
           elements.push(
-            <TooltipWrapper key={keyCount++} term={term} info={info} lang={lang}>
+            <TooltipWrapper key={`${idId}-${keyCount++}`} term={term} info={info} lang={lang}>
               {term}
             </TooltipWrapper>
           );
@@ -324,7 +385,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
         const colonIndex = tagContent.indexOf(':');
         if (colonIndex !== -1) {
           if (currentText) {
-            elements.push(<span key={keyCount++}>{currentText}</span>);
+            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
             currentText = '';
           }
           const color = tagContent.substring(0, colonIndex);
@@ -345,7 +406,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
 
           // Recursively parse content in case of nested tags
           elements.push(
-            <span key={keyCount++} style={{ color }}>
+            <span key={`${idId}-${keyCount++}`} style={{ color }}>
               <ParsedText text={processedContent} lang={lang} />
             </span>
           );
@@ -353,6 +414,10 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
           i = endBracketIndex + 1;
           continue;
         }
+      } else {
+        // Tag is open but not yet closed (typing effect), hide it
+        i = processedText.length;
+        continue;
       }
     }
     currentText += processedText[i];
@@ -360,7 +425,7 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
   }
   
   if (currentText) {
-    elements.push(<span key={keyCount++}>{currentText}</span>);
+    elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
   }
 
   return <span className={`whitespace-pre-wrap ${className}`}>{elements}</span>;

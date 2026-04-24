@@ -63,10 +63,15 @@ const HorizontalDial = ({
           return (
             <motion.div
               key={itemIndex}
-              custom={direction}
-              initial={(dir) => ({ rotate: rotateZ + dir * anglePerItem })}
-              animate={{ rotate: rotateZ }}
-              exit={(dir) => ({ rotate: rotateZ - dir * anglePerItem })}
+              custom={{ dir: direction, rz: rotateZ }}
+              variants={{
+                initial: (c: any) => ({ rotate: c.rz + c.dir * anglePerItem }),
+                animate: (c: any) => ({ rotate: c.rz }),
+                exit: (c: any) => ({ rotate: c.rz - c.dir * anglePerItem })
+              }}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               transition={{ type: 'tween', ease: 'easeOut', duration: 0.6 }}
               className="absolute flex flex-col items-center justify-start"
               style={{
@@ -77,25 +82,30 @@ const HorizontalDial = ({
             >
               <motion.div 
                 className="absolute top-0 flex items-center justify-center origin-center -translate-y-1/2"
-                custom={direction}
-                initial={(dir) => ({ 
-                  opacity: 0,
-                  filter: `blur(4px)`,
-                  scale: 0.5,
-                  rotate: -(rotateZ + dir * anglePerItem)
-                })}
-                animate={{ 
-                  opacity,
-                  filter: `blur(${blurAmount}px)`,
-                  scale,
-                  rotate: -rotateZ
+                custom={{ dir: direction, rz: rotateZ }}
+                variants={{
+                  initial: (c: any) => ({ 
+                    opacity: 0,
+                    filter: `blur(4px)`,
+                    scale: 0.5,
+                    rotate: -(c.rz + c.dir * anglePerItem)
+                  }),
+                  animate: (c: any) => ({ 
+                    opacity,
+                    filter: `blur(${blurAmount}px)`,
+                    scale,
+                    rotate: -c.rz
+                  }),
+                  exit: (c: any) => ({ 
+                    opacity: 0,
+                    filter: `blur(4px)`,
+                    scale: 0.5,
+                    rotate: -(c.rz - c.dir * anglePerItem)
+                  })
                 }}
-                exit={(dir) => ({ 
-                  opacity: 0,
-                  filter: `blur(4px)`,
-                  scale: 0.5,
-                  rotate: -(rotateZ - dir * anglePerItem)
-                })}
+                initial="initial"
+                animate="animate"
+                exit="exit"
                 transition={{ type: 'tween', ease: 'easeOut', duration: 0.6 }}
               >
                 {isImage ? (

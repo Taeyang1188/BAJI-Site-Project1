@@ -7,7 +7,7 @@ import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } fr
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
-import { ParsedText } from './ParsedText';
+import { ParsedText, TooltipWrapper } from './ParsedText';
 import { GeJuHelpModal } from './GeJuHelpModal';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { 
@@ -34,14 +34,23 @@ import { generateCycleVibe, CycleVibeResult } from '../services/cycle-vibe-servi
 import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 
-const ILJU_BACKGROUND_IMAGES: Record<string, string> = {
-  '己丑': 'https://i.imgur.com/RyKP0u5.jpeg',
-  '庚子': 'https://i.imgur.com/PHSlQOn.jpeg',
-  '庚寅': 'https://i.imgur.com/Isk1umc.jpeg',
-  '庚午': 'https://i.imgur.com/aA94qPC.jpeg',
-  '庚申': 'https://i.imgur.com/7YAltfY.jpeg',
-  '辛丑': 'https://i.imgur.com/KyBoOpe.jpeg',
-  '辛卯': 'https://i.imgur.com/lVuVjGP.jpeg',
+const ILJU_BACKGROUND_IMAGES: Record<string, { base: string, detailed: string }> = {
+  '己丑': { base: 'https://i.imgur.com/RyKP0u5.jpeg', detailed: 'https://i.imgur.com/RyKP0u5.jpeg' },
+  '庚子': { base: 'https://i.imgur.com/PHSlQOn.jpeg', detailed: 'https://i.imgur.com/PHSlQOn.jpeg' },
+  '庚寅': { base: 'https://i.imgur.com/Isk1umc.jpeg', detailed: 'https://i.imgur.com/Isk1umc.jpeg' },
+  '庚午': { base: 'https://i.imgur.com/aA94qPC.jpeg', detailed: 'https://i.imgur.com/aA94qPC.jpeg' },
+  '庚申': { base: 'https://i.imgur.com/7YAltfY.jpeg', detailed: 'https://i.imgur.com/7YAltfY.jpeg' },
+  '辛丑': { base: 'https://i.imgur.com/KyBoOpe.jpeg', detailed: 'https://i.imgur.com/KyBoOpe.jpeg' },
+  '辛卯': { base: 'https://i.imgur.com/lVuVjGP.jpeg', detailed: 'https://i.imgur.com/lVuVjGP.jpeg' },
+  '乙亥': { base: 'https://i.imgur.com/3nOSRA9.png', detailed: 'https://i.imgur.com/INHddT3.png' },
+  '甲辰': { base: 'https://i.imgur.com/Jej3sQC.png', detailed: 'https://i.imgur.com/sDVDQ82.png' },
+  '壬子': { base: 'https://i.imgur.com/VjDvE52.png', detailed: 'https://i.imgur.com/jTZBawc.png' },
+  '庚戌': { base: 'https://i.imgur.com/gcFLDVe.png', detailed: 'https://i.imgur.com/Vm78FRr.png' },
+  '丙辰': { base: 'https://i.imgur.com/cy1Dpkw.png', detailed: 'https://i.imgur.com/umERQUa.png' },
+  '己酉': { base: 'https://i.imgur.com/3RoRUcx.png', detailed: 'https://i.imgur.com/j7Xq42C.png' },
+  '己亥': { base: 'https://i.imgur.com/tSNZPod.png', detailed: 'https://i.imgur.com/zjlgWhY.png' },
+  '戊寅': { base: 'https://i.imgur.com/6aGeVq2.png', detailed: 'https://i.imgur.com/x4ce1iO.png' },
+  '乙酉': { base: 'https://i.imgur.com/c8ZbId7.png', detailed: 'https://i.imgur.com/LWqXO6c.png' },
 };
 
 const WeatherWidget = ({ city, lang }: { city: string; lang: Language }) => {
@@ -134,7 +143,7 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   return stemEl === branchEl;
 };
 
-const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void }> = ({ text, speed = 30, onComplete }) => {
+const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void, lang?: 'KO' | 'EN' }> = ({ text, speed = 30, onComplete, lang = 'KO' }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [showCursor, setShowCursor] = React.useState(true);
@@ -156,11 +165,21 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
   const charInfos = React.useMemo(() => {
     if (!text) return [];
     
-    const infos: { char: string, delay: number, color?: string, isBlinking?: boolean }[] = [];
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const infos: { char: string, delay: number, color?: string, isBold?: boolean, isTooltip?: boolean, tooltipProps?: any }[] = [];
+    let isBold = false;
     let i = 0;
     while (i < text.length) {
-      if (text[i] === '[') {
+      // Check for tags
+      if (text.startsWith('<strong>', i)) {
+        isBold = true;
+        i += 8;
+        continue;
+      } else if (text.startsWith('</strong>', i)) {
+        isBold = false;
+        i += 9;
+        continue;
+      } else if (text[i] === '[') {
         const endBracketIndex = text.indexOf(']', i + 1);
         if (endBracketIndex !== -1) {
           const tagContent = text.substring(i + 1, endBracketIndex);
@@ -172,13 +191,26 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
             i = endBracketIndex + 1;
             continue;
           }
+          if (tagContent.startsWith('tooltip:')) {
+            const content = tagContent.substring(8);
+            let term = content;
+            let info;
+            if (content.includes('|')) {
+              const parts = content.split('|');
+              term = parts[0];
+              info = { ko: parts[1], en: parts[2] || parts[1] };
+            }
+            infos.push({ char: '', delay: speed, isTooltip: true, tooltipProps: { term, info } });
+            i = endBracketIndex + 1;
+            continue;
+          }
           const colonIndex = tagContent.indexOf(':');
           if (colonIndex !== -1) {
             const color = tagContent.substring(0, colonIndex);
             const content = tagContent.substring(colonIndex + 1);
             
             for (let j = 0; j < content.length; j++) {
-              infos.push({ char: content[j], delay: speed, color });
+              infos.push({ char: content[j], delay: speed, color, isBold });
             }
             i = endBracketIndex + 1;
             continue;
@@ -189,13 +221,13 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
       // Handle normal character
       let delay = speed;
       const char = text[i];
-      if (char === ',') delay = 1500;
+      if (char === ',') delay = 500;
       else if (char === '.') {
-        delay = 2000;
+        delay = 800;
       }
       else if (char === '\n') delay = speed * 15;
 
-      infos.push({ char, delay });
+      infos.push({ char, delay, isBold });
       i++;
     }
     return infos;
@@ -207,10 +239,26 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
       const currentDelay = info.delay;
 
       const timeout = setTimeout(() => {
-        if (info.char !== '') {
+        if (info.isTooltip && info.tooltipProps) {
+          setDisplayedElements(prev => [
+            ...prev,
+            <TooltipWrapper key={`idx-${currentIndex}`} term={info.tooltipProps.term} info={info.tooltipProps.info} lang={lang}>
+              {info.tooltipProps.term}
+            </TooltipWrapper>
+          ]);
+        } else if (info.char !== '') {
+          const boldBaseClass = "font-bold drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]";
+          const boldColorClass = info.color ? "" : "text-neon-pink";
+          
           setDisplayedElements(prev => [
             ...prev, 
-            <span key={currentIndex} style={{ color: info.color }}>{info.char}</span>
+            <span 
+              key={`idx-${currentIndex}`} 
+              style={{ color: info.color }} 
+              className={info.isBold ? `${boldBaseClass} ${boldColorClass}` : ''}
+            >
+              {info.char}
+            </span>
           ]);
         }
         setCurrentIndex(prev => prev + 1);
@@ -219,7 +267,8 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
     } else if (currentIndex === charInfos.length && charInfos.length > 0) {
       onComplete?.();
     }
-  }, [currentIndex, charInfos, onComplete]);
+  }, [currentIndex, charInfos, onComplete, lang]);
+
 
   return (
     <span className="whitespace-pre-wrap">
@@ -528,7 +577,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showHanja, setShowHanja] = useState(true);
   const [showStrengthInfo, setShowStrengthInfo] = useState(false);
   const [showGeJuInfo, setShowGeJuInfo] = useState(false);
-  const [showMuJaDaJaInfo, setShowMuJaDaJaInfo] = useState<{ title: string, description: string } | null>(null);
+  const [showMuJaDaJaInfo, setShowMuJaDaJaInfo] = useState<{ title: string, description: string, enDescription?: string } | null>(null);
   const [showMuJaDaJaHelp, setShowMuJaDaJaHelp] = useState(false);
   const [isCycleVibeExpanded, setIsCycleVibeExpanded] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -541,7 +590,21 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [romanceStep, setRomanceStep] = useState<'marital' | 'children' | 'final'>('marital');
   const [maritalStatus, setMaritalStatus] = useState<string | null>(null);
   const [hasChildren, setHasChildren] = useState<boolean | null>(null);
+
+  // Moving specific states
+  const [movingStep, setMovingStep] = useState<'target' | 'context' | 'final'>('target');
+  const [movingTarget, setMovingTarget] = useState<string | null>(null);
+  const [movingContext, setMovingContext] = useState<string>(socialContext || 'none');
   
+  const interactionsData = useMemo(() => {
+    return {
+      maritalStatus,
+      hasChildren,
+      movingType: movingTarget,
+      movingContext: movingContext
+    };
+  }, [maritalStatus, hasChildren, movingTarget, movingContext]);
+
   const [showAllThemes, setShowAllThemes] = useState(false);
 
   const elementData = useMemo(() => {
@@ -825,8 +888,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     };
 
   const cycleVibe = React.useMemo(() => {
-    return generateCycleVibe(result, lang, userName, gender, city, { maritalStatus, hasChildren }, socialContext);
-  }, [result, lang, userName, gender, city, maritalStatus, hasChildren, socialContext]);
+    return generateCycleVibe(
+      result, 
+      lang, 
+      userName, 
+      gender, 
+      city, 
+      { maritalStatus, hasChildren, movingType: movingTarget, movingContext: movingContext }, 
+      socialContext
+    );
+  }, [result, lang, userName, gender, city, maritalStatus, hasChildren, movingTarget, movingContext, socialContext]);
 
   const dailyVibe = React.useMemo(() => {
     const todayPillar = getTodayPillar(dayMaster);
@@ -1171,6 +1242,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         key={lang + cycleVibe.intro} 
                         text={cycleVibe.intro} 
                         speed={20} 
+                        lang={lang}
                         onComplete={() => setVibePhase('question')}
                       />
                     </p>
@@ -1189,6 +1261,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           key={lang + cycleVibe.questionPrompt} 
                           text={cycleVibe.questionPrompt} 
                           speed={20} 
+                          lang={lang}
                           onComplete={() => setIsQuestionPromptComplete(true)}
                         />
                       </p>
@@ -1211,6 +1284,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     setRomanceStep('marital');
                                   } else {
                                     setRomanceStep('final');
+                                  }
+                                  if (theme.id === 'moving') {
+                                    setMovingStep('target');
+                                  } else {
+                                    setMovingStep('final');
                                   }
                                   setVibePhase('analysis');
                                 }}
@@ -1310,6 +1388,69 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             </motion.div>
                           )}
                         </div>
+                      ) : selectedThemeId === 'moving' && movingStep !== 'final' ? (
+                        <div className="p-4 sm:p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-2xl space-y-4 sm:space-y-6">
+                          {movingStep === 'target' && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                              <p className="text-base sm:text-lg font-display italic text-white">
+                                {lang === 'KO' ? '이동하는 운에 관해서 답변 해줄게. 구체적으로 어떤 이동을 고민하고 있어?' : 'Tell me what kind of movement you are planning?'}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {[
+                                  { id: 'job_change', ko: '이직 / 퇴사', en: 'Job Change / Resignation' },
+                                  { id: 'transfer', ko: '부서이동 / 전출 / 파견', en: 'Transfer / Dispatch' },
+                                  { id: 'moving_house', ko: '이사 / 거주지 이동', en: 'Moving House' }
+                                ].map((choice) => (
+                                  <button
+                                    key={choice.id}
+                                    onClick={() => {
+                                      setMovingTarget(choice.id);
+                                      if (choice.id === 'moving_house') {
+                                        setMovingContext('none');
+                                        setMovingStep('final');
+                                      } else if (socialContext && socialContext !== 'none') {
+                                        setMovingContext(socialContext);
+                                        setMovingStep('final');
+                                      } else {
+                                        setMovingStep('context');
+                                      }
+                                    }}
+                                    className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                  >
+                                    {lang === 'KO' ? choice.ko : choice.en}
+                                  </button>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                          {movingStep === 'context' && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                              <p className="text-base sm:text-lg font-display italic text-white">
+                                {lang === 'KO' ? '보다 정확한 전술을 위해, 혹시 현재 소속된 직군이나 환경이 어떻게 돼?' : 'For a more accurate tactic, what is your current social context?'}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {[
+                                  { id: 'military', ko: '군인 / 경찰 / 소방 / 교정 등 특수조직', en: 'Military / Police / Special Org' },
+                                  { id: 'public', ko: '공무원 / 공공기관 / 대기업', en: 'Public / Corporate' },
+                                  { id: 'business', ko: '사업가 / 자영업', en: 'Business' },
+                                  { id: 'freelancer', ko: '프리랜서 / 특수직', en: 'Freelancer' },
+                                  { id: 'none', ko: '위 항목에 해당 없음 (일반 회사원 / 학생)', en: 'General' },
+                                ].map((choice) => (
+                                  <button
+                                    key={choice.id}
+                                    onClick={() => {
+                                      setMovingContext(choice.id);
+                                      setMovingStep('final');
+                                    }}
+                                    className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-neon-pink/20 border border-white/20 rounded-full text-sm text-white transition-all"
+                                  >
+                                    {lang === 'KO' ? choice.ko : choice.en}
+                                  </button>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
                       ) : (
                         <div 
                           className="p-4 sm:p-6 border rounded-xl relative overflow-hidden"
@@ -1319,7 +1460,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             backgroundImage: (() => {
                               const ilju = result.pillars[1].stem + result.pillars[1].branch;
                               const img = ILJU_BACKGROUND_IMAGES[ilju];
-                              return img ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${img})` : 'none';
+                              return img ? `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${img.base})` : 'none';
                             })(),
                             backgroundSize: 'cover',
                             backgroundPosition: 'center'
@@ -1367,29 +1508,29 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                       )}
                                     </div>
                                     <div className="space-y-3">
-                                      <p className="text-sm sm:text-base font-display text-white/90">
-                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">1. 에너지 현황:</strong> <span className="text-white">{parsedJson.energy_status}</span>
-                                      </p>
-                                      <p className="text-sm sm:text-base font-display text-white/90">
-                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">2. 이동의 가치:</strong> <span className="text-white">{parsedJson.value}</span>
-                                      </p>
-                                      <p className={`text-sm sm:text-base font-display text-white/90 p-3 rounded border ${gradeBg} ${gradeBorder}`}>
-                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">3. 최종 판결:</strong> <strong className={`${gradeColor} ml-1`}>{parsedJson.judgment}</strong>
-                                      </p>
-                                      {parsedJson.alt_action && (
-                                        <p className="text-sm sm:text-base font-display text-white/90 p-3 rounded border bg-neon-cyan/10 border-neon-cyan/30 mt-2">
-                                          <strong className="text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">전략적 중재 (Alt-Action):</strong> <span className="text-white ml-1">{parsedJson.alt_action}</span>
-                                        </p>
+                                      <div className="text-sm sm:text-base font-display text-white/90">
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">1. 에너지 현황:</strong> <ParsedText className="text-white inline" text={parsedJson.energy_status} lang={lang} />
+                                      </div>
+                                      <div className="text-sm sm:text-base font-display text-white/90">
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">2. 이동의 가치:</strong> <ParsedText className="text-white inline" text={parsedJson.value} lang={lang} />
+                                      </div>
+                                      <div className={`text-sm sm:text-base font-display text-white/90 p-3 rounded border ${gradeBg} ${gradeBorder}`}>
+                                        <strong className="text-neon-pink drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]">3. 최종 판결:</strong> <ParsedText className={`${gradeColor} ml-1 font-bold inline`} text={parsedJson.judgment} lang={lang} />
+                                      </div>
+                                      {parsedJson.alt_action && parsedJson.alt_action.trim() !== '' && (
+                                        <div className="text-sm sm:text-base font-display text-white/90 p-3 rounded border bg-neon-cyan/10 border-neon-cyan/30 mt-2">
+                                          <strong className="text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">전략적 중재 (Alt-Action):</strong> <ParsedText className="text-white ml-1 inline" text={parsedJson.alt_action} lang={lang} />
+                                        </div>
                                       )}
                                     </div>
                                     <div className="mt-6 pt-4 border-t border-white/10">
-                                      <p className="text-sm sm:text-base font-display text-white/90 mb-3">
+                                      <div className="text-sm sm:text-base font-display text-white/90 mb-3">
                                         <strong className="text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">4. 전략적 액션 플랜:</strong>
-                                      </p>
+                                      </div>
                                       <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm text-white/80">
-                                        <li><strong className="text-white">핵심 방향:</strong> {parsedJson.action_plan.direction}</li>
-                                        <li><strong className="text-white">자산/리스크 관리:</strong> <span className={`${parsedJson.grade === 'A' ? 'text-green-400' : 'text-red-400'}`}>{parsedJson.action_plan.risk_management}</span></li>
-                                        <li><strong className="text-white">에너지 최적지:</strong> {parsedJson.action_plan.optimal_space}</li>
+                                        <li><strong className="text-white">핵심 방향:</strong> <ParsedText className="inline" text={parsedJson.action_plan.direction} lang={lang} /></li>
+                                        <li><strong className="text-white">자산/리스크 관리:</strong> <ParsedText className={`${parsedJson.grade === 'A' ? 'text-green-400' : 'text-red-400'} inline`} text={parsedJson.action_plan.risk_management} lang={lang} /></li>
+                                        <li><strong className="text-white">에너지 최적지:</strong> <ParsedText className="inline" text={parsedJson.action_plan.optimal_space} lang={lang} /></li>
                                       </ul>
                                     </div>
                                   </motion.div>
@@ -1512,16 +1653,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 );
                               }
                             } else {
-                              return (
-                                <p className="text-base sm:text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                                  <TypingText 
-                                    key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
-                                    text={mainText} 
-                                    speed={20} 
-                                  />
-                                </p>
-                              );
-                            }
+                                return (
+                                  <p className="text-base sm:text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                                    <TypingText 
+                                      key={selectedThemeId + (selectedThemeId === 'romance' || selectedThemeId === 'secrets' ? maritalStatus + hasChildren : '')} 
+                                      text={mainText} 
+                                      speed={20} 
+                                      lang={lang}
+                                    />
+                                  </p>
+                                );
+                              }
                           })()}
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
                             <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
@@ -1602,7 +1744,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         </div>
                       </div>
                       <p className="text-sm sm:text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
-                        <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} />
+                        <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} lang={lang} />
                       </p>
                     </div>
                   )}
@@ -2130,7 +2272,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       ))}
                     </div>
                     <div className="p-4 bg-black/40 rounded-xl border border-white/5">
-                      <p className="text-sm font-display leading-relaxed text-white/90 italic" dangerouslySetInnerHTML={{ __html: `"${colorizeAdvancedAnalysis(getAnalysisText())}"` }} />
+                      <div 
+                        className="text-sm font-display leading-relaxed text-white/90 italic"
+                        dangerouslySetInnerHTML={{ __html: colorizeAdvancedAnalysis(getAnalysisText()) }}
+                      />
                     </div>
                   </div>
                 </div>

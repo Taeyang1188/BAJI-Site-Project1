@@ -86,14 +86,16 @@ export function buildBaziMatrix(result: BaZiResult, socialContext: SocialContext
   let frictionLevel = 10;
   
   if (interactions.chung.length > 1) {
-    frictionType = '격렬한 충돌 (Violent Collision)';
+    frictionType = '격렬한 충돌 (Violent Collision) - 예측 불허의 파편들이 난무하는 시기';
     frictionLevel = 60;
   } else if (interactions.hyeong.length > 0) {
-    frictionType = '내부적 갈등 (Internal Friction)';
+    frictionType = '보이지 않는 족쇄와 심리적 소모전 (Invisible Shackles & Mental Exhaustion) - 늪에 빠진 듯 답답한 관계와 일상';
     frictionLevel = 45;
   } else if (temperature_index.includes('극')) {
-    frictionType = '환경적 압박 (Environmental Pressure)';
+    frictionType = '환경적 압박 (Environmental Pressure) - 극단적 한난조습으로 인한 심리적 롤러코스터';
     frictionLevel = 30;
+  } else {
+    frictionType = '안정적 궤도 비행 (Smooth Flight) - 큰 저항 없이 목적지를 향해 나아가는 시기';
   }
 
   const dynamic_luck = {
