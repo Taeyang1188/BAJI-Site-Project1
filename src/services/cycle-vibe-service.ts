@@ -1094,37 +1094,67 @@ ${detailedEffect}`;
     };
 
     // 1. Current Daewun Overview
-    const daewunLabel = `${currentCycle.age}세-${currentCycle.age + 9}세 대운(${currentCycle.stem}${currentCycle.branch})`;
+    const stemEl = BAZI_MAPPING.stems[currentCycle.stem as keyof typeof BAZI_MAPPING.stems]?.element || 'Wood';
+    const branchEl = BAZI_MAPPING.branches[currentCycle.branch as keyof typeof BAZI_MAPPING.branches]?.element || 'Wood';
+    
+    // We get hex colors based on Bazi elements
+    const getElementColorHex = (element: string) => {
+      const colors: Record<string, string> = { 'Wood': '#22c55e', 'Fire': '#ef4444', 'Earth': '#eab308', 'Metal': '#94a3b8', 'Water': '#3b82f6' };
+      return colors[element] || '#ffffff';
+    };
+    
+    const stemColor = getElementColorHex(stemEl);
+    const branchColor = getElementColorHex(branchEl);
+
+    const daewunLabelKO = `${currentCycle.age}세-${currentCycle.age + 9}세 대운([${stemColor}:${currentCycle.stem}][${branchColor}:${currentCycle.branch}])`;
+    const daewunLabelEN = `Ages ${currentCycle.age}-${currentCycle.age + 9} Daewun ([${stemColor}:${currentCycle.stem}][${branchColor}:${currentCycle.branch}])`;
+
     if (daewunScore >= 70) {
       report += lang === 'KO' 
-        ? `현재 진행 중인 ${daewunLabel}은 큰 재물의 흐름이 들어오는 황금기야. 물이 들어왔으니 힘차게 노를 저어야 할 때지.\n\n`
-        : `The current ${daewunLabel} cycle brings a strong flow of wealth. It's a golden period.\n\n`;
+        ? `현재 진행 중인 ${daewunLabelKO}은 큰 재물의 흐름이 들어오는 황금기야. 물이 들어왔으니 힘차게 노를 저어야 할 때지.\n\n`
+        : `The current ${daewunLabelEN} cycle brings a strong flow of wealth. It's a golden period.\n\n`;
     } else if (daewunScore >= 40) {
       report += lang === 'KO' 
-        ? `현재 ${daewunLabel}은 재물이 평탄하게 흐르는 시기야. 무리한 투자보다는 안정적인 축적에 유리해.\n\n`
-        : `The current ${daewunLabel} cycle has a stable wealth flow. Focus on safe accumulation.\n\n`;
+        ? `현재 ${daewunLabelKO}은 재물이 평탄하게 흐르는 시기야. 무리한 투자보다는 안정적인 축적에 유리해.\n\n`
+        : `The current ${daewunLabelEN} cycle has a stable wealth flow. Focus on safe accumulation.\n\n`;
     } else {
       report += lang === 'KO'
-        ? `현재 ${daewunLabel}은 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 시기야. 하지만 기회는 항상 존재하는 법이지!\n\n`
-        : `The current ${daewunLabel} cycle is defensive. Focus on securing cash flow rather than big bets, but stay alert for opportunities!\n\n`;
+        ? `현재 ${daewunLabelKO}은 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 시기야. 하지만 기회는 항상 존재하는 법이지!\n\n`
+        : `The current ${daewunLabelEN} cycle is defensive. Focus on securing cash flow rather than big bets, but stay alert for opportunities!\n\n`;
     }
 
     // 2. Current Year
-    const currentYearIntro = lang === 'KO' ? `올해(${currentYear}년 ${currentYearPillar?.stem}${currentYearPillar?.branch}년)는 ` : `This year (${currentYear}) `;
+    const currentYearBranch = currentYearPillar?.branch;
+    const chartBranches = result.pillars.map((p: any) => p.branch);
+    const punishments = ['辰', '午', '酉', '亥'];
+    const hasSelfPunishment = currentYearBranch && punishments.includes(currentYearBranch) && chartBranches.includes(currentYearBranch);
+
+    let currentYearIntro = lang === 'KO' ? `올해(${currentYear}년 ${currentYearPillar?.stem}${currentYearPillar?.branch}년)는 ` : `This year (${currentYear}) `;
+    
     if (currentYearScore >= 70) {
       report += lang === 'KO'
-        ? `${currentYearIntro}${getYearVibeDescription(currentYearData.traits)} 해로, 특히 돋보이는 운을 가지고 있어! 성과가 보상으로 직결되는 짜릿한 한 해가 될 가능성이 높아.\n\n`
-        : `${currentYearIntro}brings ${getYearVibeDescription(currentYearData.traits)}, highlighting exceptionally strong luck! Hard work directly translates to rewards.\n\n`;
+        ? `${currentYearIntro}${getYearVibeDescription(currentYearData.traits)} 해로, 특히 돋보이는 운을 가지고 있어! 성과가 보상으로 직결되는 짜릿한 한 해가 될 가능성이 높아.\n`
+        : `${currentYearIntro}brings ${getYearVibeDescription(currentYearData.traits)}, highlighting exceptionally strong luck! Hard work directly translates to rewards.\n`;
     } else if (currentYearScore >= 40) {
       report += lang === 'KO'
-        ? `${currentYearIntro}재물 측면에서 무난한 흐름이야. 일확천금보다는 계획했던 대로 차곡차곡 모아가는 재미를 느껴봐.\n\n`
-        : `${currentYearIntro}features ordinary but stable wealth luck. Follow your plans for steady accumulation.\n\n`;
+        ? `${currentYearIntro}재물 측면에서 무난한 흐름이야. 일확천금보다는 계획했던 대로 차곡차곡 모아가는 재미를 느껴봐.\n`
+        : `${currentYearIntro}features ordinary but stable wealth luck. Follow your plans for steady accumulation.\n`;
     } else {
       report += lang === 'KO'
         ? `${currentYearIntro}재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹이 강할 수 있어.\n\n`
-          + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n\n`
+          + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n`
         : `${currentYearIntro}brings a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
-          + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n\n`;
+          + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n`;
+    }
+
+    if (hasSelfPunishment) {
+      const tooltipTermEN = '[tooltip:Self-Punishment|스스로를 형(刑)하는 기운. 내적 갈등이나 자기 검열이 심해질 수 있으나, 이를 극복하면 큰 성장을 이룰 수 있습니다.|Self-Punishment: Energy that punishes oneself. Can cause internal conflict, but overcoming it leads to great growth.]';
+      const tooltipTermKO = '[tooltip:자형|스스로를 형(刑)하는 기운. 내적 갈등이나 자기 검열이 심해질 수 있으나, 이를 극복하면 큰 성장을 이룰 수 있습니다.|Self-Punishment: Energy that punishes oneself. Can cause internal conflict, but overcoming it leads to great growth.]';
+      report += lang === 'KO'
+        ? `\n다만 현재 느끼는 압박은 사실 외부적인 요인보다 본인의 조급함에서 오는 '${tooltipTermKO}'의 기운 때문이야. 남 탓보다는 내 안의 조급함을 달래는 게 먼저라는 점, 꼭 명심해.\n\n`
+        : `\nHowever, the pressure you feel right now likely comes from your own impatience rather than external factors, due to ${tooltipTermEN} energy. Soothe your inner impatience first before blaming others.\n\n`;
+    } else {
+      report += `\n`;
     }
 
     // 3. Best upcoming years
@@ -1358,7 +1388,7 @@ ${detailedEffect}`;
   };
 
   const analyzeGeneral = () => {
-    return { main: lang === 'KO' ? '올해의 전반적인 흐름은 나쁘지 않아. 파도를 타듯 유연하게 움직여.' : 'Overall flow is good. Be flexible.', glitch: 'Surf the waves.' };
+    return { main, glitch, matrix };
   };
 
   const analyzeTaboo = () => {
@@ -1370,7 +1400,21 @@ ${detailedEffect}`;
   };
 
   const analyzeDestinyMap = () => {
-    return { main: lang === 'KO' ? '너의 운명 지도를 다시 그리고 있어.' : 'Redrawing your destiny map.', glitch: 'Navigate carefully.' };
+    const elRatios = analysis.elementRatios || { Wood: 20, Fire: 20, Earth: 20, Metal: 20, Water: 20 };
+    const jsonPayload = {
+      theme: lang === 'KO' ? '운명의 지도' : 'Destiny Map',
+      momentum_score: luckScore,
+      elements: elRatios,
+      overview: lang === 'KO' 
+        ? `오행의 분포와 대운의 흐름(Momentum)을 시각화한 데이터야. 현재 네 에너지는 ${luckScore}점으로 ${luckScore >= 70 ? '순항 중' : luckScore >= 40 ? '안정적' : '조절 지향적'}인 구간에 들어서 있어.` 
+        : `Visualizing your five elements and momentum. Your current energy is at ${luckScore}, placing you in a ${luckScore >= 70 ? 'strong' : luckScore >= 40 ? 'stable' : 'defensive'} phase.`
+    };
+    
+    const glitchText = lang === 'KO' 
+      ? '지도는 내비게이션이 아냐. 길은 네가 뚫고 가는 거지.' 
+      : 'A map is not a GPS. You forge the path.';
+      
+    return { main: JSON.stringify(jsonPayload), glitch: glitchText };
   };
 
   themeAnalyses['romance'] = analyzeRomance();

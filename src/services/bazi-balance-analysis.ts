@@ -156,8 +156,8 @@ export const calculateBalanceWarnings = (
       warnings.push({
         title: '화다토초(火多土焦)',
         titleEn: 'Fire-Heavy Earth-Scorch',
-        description: `뜨거운 열기에 당신의 [${earthCol}:대지(土)]가 갈라지고 불모지가 된 형국입니다. 조급함은 독이 되니, [${metalCol}:금(金)]의 기운으로 열기를 식히고 [${waterCol}:수(水)]의 기운으로 메마른 땅을 적셔야 합니다. 여유를 갖고 내실을 기하세요.`,
-        enDescription: 'Your land (Earth) is cracked and barren due to intense heat. Impatience is poison; use Metal to cool the heat and Water to moisten the dry land. Take your time and focus on inner stability.',
+        description: `특히 너, 너는 뜨거운 열기에 본인의 [${earthCol}:대지(土)]가 갈라지고 불모지가 된 형국이야. 조급함은 독이 되니, [${metalCol}:금(金)]의 기운으로 열기를 식히고 [${waterCol}:수(水)]의 기운으로 메마른 땅을 적셔야 해. 여유를 갖고 내실을 다져.`,
+        enDescription: `Especially you, your land ([${earthCol}:Earth]) is cracked and barren due to intense heat ([${fireCol}:Fire]). Impatience is poison; use [${metalCol}:Metal] to cool the heat and [${waterCol}:Water] to moisten the dry land. Take your time and focus on inner stability.`,
         type: 'danger',
         element: 'Fire'
       });
