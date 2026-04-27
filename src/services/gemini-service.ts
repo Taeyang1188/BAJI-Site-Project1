@@ -51,7 +51,15 @@ Logic to apply:
    - If Overflowing Wisdom (인성다자) + Expression Luck (식상운): "Trying to act, but clashing with laziness. Beware of health issues and trial-and-error."
 3. Day Master Strength Logic:
    - Strong DM + Wealth Luck: "I cut the tree and take it." (Positive achievement, but must handle rivals).
-   - Weak DM + Wealth Luck: "Crushed by the weight of the tree." (Health issues, debt).
+    - Weak DM + Wealth Luck: "Crushed by the weight of the tree." (Health issues, debt).
+
+CRITICAL INSTRUCTION FOR ENGLISH READINGS:
+When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion'. Instead, you MUST strictly use the V.O.I.D. system terms provided below:
+- Wealth -> Maverick/Architect
+- Power -> Warrior/Judge
+- Resource -> Mystic/Sage
+- Expression -> Artist/Rebel
+- Companion -> Mirror/Rival
 
 ${GOTH_PUNK_TONE}
 
@@ -114,6 +122,14 @@ Logic to apply (3-Step Scan):
 3. Energy Overload vs Refill (다자/무자 로직):
    - If Today's element fills a Missing element: "Unfamiliar energy stimulates you today." (Doing something unusual).
    - If Today's element adds to an Overflowing element: "Overload warning! Blades are clashing. Take a breath so you don't get looted."
+
+CRITICAL INSTRUCTION FOR ENGLISH READINGS:
+When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion'. Instead, you MUST strictly use the V.O.I.D. system terms provided below:
+- Wealth -> Maverick/Architect
+- Power -> Warrior/Judge
+- Resource -> Mystic/Sage
+- Expression -> Artist/Rebel
+- Companion -> Mirror/Rival
 
 ${GOTH_PUNK_TONE}
 

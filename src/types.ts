@@ -128,6 +128,14 @@ export interface GrandCycle {
   branchPolarity: number;
 }
 
+export interface TimelineNarrative {
+  title: string;        // 관계 테마 (ex: "[조후 보완] 얼어붙은 땅에 태양이 뜹니다")
+  psychology: string;   // 유저의 심리 상태
+  interaction: string;  // 상대방과의 실질적 관계 역동성 변화
+  action_guide: string; // 온도 데이터와 결합된 실전 행동 지침
+  intensity: number;    // 서사 강도 (UI 하이라이팅 및 이펙트 용도)
+}
+
 export interface BaZiResult {
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];
@@ -137,6 +145,7 @@ export interface BaZiResult {
   analysis?: {
     geJu: string;
     yongShen: string;
+    gender?: string;
     interactions: any[]; // Detailed interactions
     conflicts: any[];
     shinsal: any[];

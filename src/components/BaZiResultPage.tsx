@@ -7,6 +7,7 @@ import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } fr
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
+import { DestinyMapSection } from './DestinyMapSection';
 import { ParsedText, TooltipWrapper } from './ParsedText';
 import { GeJuHelpModal } from './GeJuHelpModal';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
@@ -143,7 +144,7 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   return stemEl === branchEl;
 };
 
-const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void, lang?: 'KO' | 'EN' }> = ({ text, speed = 30, onComplete, lang = 'KO' }) => {
+const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void, lang?: 'KO' | 'EN', skip?: boolean }> = ({ text, speed = 30, onComplete, lang = 'KO', skip = false }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [showCursor, setShowCursor] = React.useState(true);
@@ -234,6 +235,38 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
   }, [text, speed]);
 
   React.useEffect(() => {
+    if (skip) {
+      if (currentIndex !== charInfos.length) {
+        const elements = charInfos.map((info, idx) => {
+          if (info.isTooltip && info.tooltipProps) {
+            return (
+              <TooltipWrapper key={`idx-${idx}`} term={info.tooltipProps.term} info={info.tooltipProps.info} lang={lang}>
+                {info.tooltipProps.term}
+              </TooltipWrapper>
+            );
+          } else if (info.char !== '') {
+            const boldBaseClass = "font-bold drop-shadow-[0_0_5px_rgba(255,42,133,0.5)]";
+            const boldColorClass = info.color ? "" : "text-neon-pink";
+            
+            return (
+              <span 
+                key={`idx-${idx}`} 
+                style={{ color: info.color }} 
+                className={info.isBold ? `${boldBaseClass} ${boldColorClass}` : ''}
+              >
+                {info.char}
+              </span>
+            );
+          }
+          return null;
+        }).filter(Boolean);
+        setDisplayedElements(elements);
+        setCurrentIndex(charInfos.length);
+        onComplete?.();
+      }
+      return;
+    }
+
     if (currentIndex < charInfos.length) {
       const info = charInfos[currentIndex];
       const currentDelay = info.delay;
@@ -267,7 +300,7 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
     } else if (currentIndex === charInfos.length && charInfos.length > 0) {
       onComplete?.();
     }
-  }, [currentIndex, charInfos, onComplete, lang]);
+  }, [currentIndex, charInfos, onComplete, lang, skip]);
 
 
   return (
@@ -583,6 +616,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showDailyVibe, setShowDailyVibe] = useState(false);
   const [vibePhase, setVibePhase] = useState<'intro' | 'question' | 'analysis'>('intro');
+  const [skipCycleVibeTyping, setSkipCycleVibeTyping] = useState(false);
   const [isQuestionPromptComplete, setIsQuestionPromptComplete] = useState(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
   
@@ -1237,15 +1271,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               ) : (
                 <div className="space-y-6">
                   {vibePhase === 'intro' && (
-                    <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
-                      <TypingText 
-                        key={lang + cycleVibe.intro} 
-                        text={cycleVibe.intro} 
-                        speed={20} 
-                        lang={lang}
-                        onComplete={() => setVibePhase('question')}
-                      />
-                    </p>
+                    <div className="relative">
+                      <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                        <TypingText 
+                          key={lang + cycleVibe.intro} 
+                          text={cycleVibe.intro} 
+                          speed={20} 
+                          lang={lang}
+                          skip={skipCycleVibeTyping}
+                          onComplete={() => setVibePhase('question')}
+                        />
+                      </p>
+                      {!skipCycleVibeTyping && (
+                        <div className="flex justify-end mt-2">
+                          <button onClick={() => setSkipCycleVibeTyping(true)} className="text-xs text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded">
+                            SKIP ▹▹
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {(vibePhase === 'question' || vibePhase === 'analysis') && (
@@ -1255,16 +1299,24 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   )}
 
                   {vibePhase === 'question' && (
-                    <div className="space-y-4">
+                    <div className="space-y-4 relative">
                       <p className="text-lg font-display italic text-neon-pink leading-relaxed whitespace-pre-wrap">
                         <TypingText 
                           key={lang + cycleVibe.questionPrompt} 
                           text={cycleVibe.questionPrompt} 
                           speed={20} 
                           lang={lang}
+                          skip={skipCycleVibeTyping}
                           onComplete={() => setIsQuestionPromptComplete(true)}
                         />
                       </p>
+                      {!isQuestionPromptComplete && !skipCycleVibeTyping && (
+                        <div className="flex justify-end mt-2">
+                          <button onClick={() => setSkipCycleVibeTyping(true)} className="text-xs text-white/40 hover:text-white/80 bg-black/50 px-2 py-1 rounded">
+                            SKIP ▹▹
+                          </button>
+                        </div>
+                      )}
                       
                       <AnimatePresence>
                         {isQuestionPromptComplete && (
@@ -1594,62 +1646,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 );
                               } else if (selectedThemeId === 'destiny_map') {
                                 return (
-                                  <motion.div 
-                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-                                    className="space-y-6"
-                                  >
-                                    <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
-                                      <h3 className="text-xl sm:text-2xl font-bold text-neon-cyan tracking-tight">[{parsedJson.theme}]</h3>
-                                      <div className="text-right">
-                                        <div className="text-[10px] text-white/50 uppercase">Momentum Score</div>
-                                        <div className={`text-2xl font-bold font-mono ${parsedJson.momentum_score > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                          {parsedJson.momentum_score > 0 ? '+' : ''}{parsedJson.momentum_score}
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col items-center">
-                                      <h4 className="text-xs font-bold text-white/60 uppercase mb-4 self-start">{lang === 'KO' ? '오행 밸런스 시각화 (Element Radar)' : 'Element Balance Radar'}</h4>
-                                      <div className="w-full h-64 sm:h-80">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={Object.entries(parsedJson.elements || {}).map(([el, ratio]: [string, any]) => ({
-                                            subject: el.split(' ')[0], 
-                                            A: ratio,
-                                            fullMark: 100,
-                                          }))}>
-                                            <PolarGrid stroke="#ffffff20" />
-                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff80', fontSize: 12 }} />
-                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                            <Radar
-                                              name="Elements"
-                                              dataKey="A"
-                                              stroke="#00ffff"
-                                              fill="#00ffff"
-                                              fillOpacity={0.4}
-                                            />
-                                          </RadarChart>
-                                        </ResponsiveContainer>
-                                      </div>
-                                      <div className="w-full grid grid-cols-5 gap-1 mt-4">
-                                        {Object.entries(parsedJson.elements || {}).map(([el, ratio]: [string, any]) => {
-                                          const elName = el.split(' ')[0];
-                                          const color = ELEMENT_COLORS[elName as keyof typeof ELEMENT_COLORS] || '#ffffff';
-                                          return (
-                                            <div key={el} className="flex flex-col items-center">
-                                              <div className="text-[10px] font-mono mb-1" style={{ color }}>{elName}</div>
-                                              <div className="text-xs font-bold text-white font-mono">{ratio}%</div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="p-4 bg-neon-cyan/5 border border-neon-cyan/20 rounded-xl">
-                                      <p className="text-sm text-neon-cyan/90 leading-relaxed font-display">
-                                        {parsedJson.overview}
-                                      </p>
-                                    </div>
-                                  </motion.div>
+                                  <DestinyMapSection result={result} lang={lang} parsedJson={parsedJson} />
                                 );
                               }
                             } else {

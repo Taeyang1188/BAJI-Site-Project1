@@ -486,6 +486,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     currentYearPillar,
     timeCorrectionMessages: timeResult.messages,
     analysis: {
+      gender: input.gender || 'male',
       geJu,
       yongShen: translatedGod ? `${translatedElement} (${translatedGod})` : translatedElement,
       interactions: interactionsResult.interactions,
