@@ -1697,23 +1697,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         </motion.div>
                       )}
 
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-col gap-3 mt-6 mb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
                         <button 
                           onClick={() => {
                             setVibePhase('question');
                             setSelectedThemeId(null);
                           }}
-                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-xs text-white/60 transition-all"
+                          className="w-fit px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-xs text-white/70 transition-all font-medium"
                         >
                           {lang === 'KO' ? '다른 질문 하기' : 'ASK ANOTHER QUESTION'}
                         </button>
                         {!showDailyVibe && (
                           <button 
                             onClick={handleShowDailyVibe}
-                            className="px-4 py-2 bg-neon-pink/10 hover:bg-neon-pink/20 border border-neon-pink/30 rounded-full text-xs text-neon-pink transition-all flex items-center gap-2"
+                            className="w-fit px-5 py-2.5 bg-neon-pink/10 hover:bg-neon-pink/20 border border-neon-pink/30 rounded-full text-xs text-neon-pink transition-all flex items-center gap-2 font-medium"
                           >
                             <span>{lang === 'KO' ? '오늘 하루는 어떨까?' : 'How about today?'}</span>
-                            <ChevronRight className="w-3 h-3" />
+                            <ChevronRight className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>

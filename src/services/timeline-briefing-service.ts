@@ -41,12 +41,16 @@ export function generateRelationshipDynamics(
     let isSamHap = false;
     let samhapGroup: any = null;
     
-    // Check SamHap / BanHap
+    // Check SamHap / BanHap / BangHap
     const SAMHAP_GROUPS = [
-        { branches: ['申', '子', '辰'], element: 'Water', name: '수국' },
-        { branches: ['寅', '午', '戌'], element: 'Fire', name: '화국' },
-        { branches: ['巳', '酉', '丑'], element: 'Metal', name: '금국' },
-        { branches: ['亥', '卯', '未'], element: 'Wood', name: '목국' }
+        { branches: ['申', '子', '辰'], element: 'Water', name: '수국(삼합)' },
+        { branches: ['寅', '午', '戌'], element: 'Fire', name: '화국(삼합)' },
+        { branches: ['巳', '酉', '丑'], element: 'Metal', name: '금국(삼합)' },
+        { branches: ['亥', '卯', '未'], element: 'Wood', name: '목국(삼합)' },
+        { branches: ['亥', '子', '丑'], element: 'Water', name: '수국(방합)' },
+        { branches: ['寅', '卯', '辰'], element: 'Wood', name: '목국(방합)' },
+        { branches: ['巳', '午', '未'], element: 'Fire', name: '화국(방합)' },
+        { branches: ['申', '酉', '戌'], element: 'Metal', name: '금국(방합)' }
     ];
     
     for (const group of SAMHAP_GROUPS) {

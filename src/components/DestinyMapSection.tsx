@@ -322,15 +322,15 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
       </div>
 
       {/* Radar Chart Section */}
-      <div className={`p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col items-center relative overflow-hidden transition-all duration-1000 ${partnerAnalysisMemo?.isGlowing ? 'shadow-[0_0_60px_-10px_rgba(232,121,249,0.5)] border-fuchsia-500/30' : ''}`}
+      <div className={`p-2.5 sm:p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col items-center relative overflow-hidden transition-all duration-1000 ${partnerAnalysisMemo?.isGlowing ? 'shadow-[0_0_60px_-10px_rgba(232,121,249,0.5)] border-fuchsia-500/30' : ''}`}
            style={{ boxShadow: partnerAnalysisMemo?.isGlowing ? undefined : `0 0 40px -10px ${daewunThemeColor}30` }}
       >
-        <h4 className="text-xs font-bold text-white/60 uppercase mb-4 self-start">
+        <h4 className="text-xs font-bold text-white/60 uppercase mb-2 self-start px-1.5">
           {lang === 'KO' ? '오행 밸런스 시각화 (Element Radar)' : 'Element Balance Radar'}
         </h4>
         <div className="w-full h-64 sm:h-80 relative z-10 pointer-events-none">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart key={sliderIndex} cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+            <RadarChart key={sliderIndex} cx="50%" cy="50%" outerRadius="85%" data={radarData}>
               <PolarGrid stroke="#ffffff20" />
               <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff80', fontSize: 12 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
@@ -540,24 +540,24 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           <AnimatePresence>
           {showScannerResult && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4 overflow-hidden">
-             <div className="grid grid-cols-2 gap-4">
-             <div className="bg-black/40 rounded p-3 flex flex-col justify-center border border-white/5 relative overflow-hidden group">
+          <div className="flex flex-col gap-3">
+             <div className="bg-black/40 rounded-xl p-5 flex flex-col justify-center border border-white/5 relative overflow-hidden group">
                 {partnerAnalysisMemo.isEasterEgg && (
                      <div className="absolute inset-0 bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 )}
-                <div className={`text-xs mb-1 text-left ${partnerAnalysisMemo.isEasterEgg ? 'text-red-400 font-bold' : 'text-white/50'}`}>
+                <div className={`text-xs mb-3 text-left ${partnerAnalysisMemo.isEasterEgg ? 'text-red-400 font-bold' : 'text-white/50'}`}>
                     {partnerAnalysisMemo.titleSync}
                 </div>
-                <div className="flex justify-between items-end mb-2">
-                    <span className="text-xs font-bold text-white/80 flex items-center gap-1">
-                        {partnerAnalysisMemo.syncIcon} {partnerAnalysisMemo.syncTierText}
+                <div className="flex flex-col gap-1 mb-4">
+                    <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
+                        <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
                     </span>
-                    <span className={`text-2xl font-mono font-bold ${partnerAnalysisMemo.isEasterEgg ? 'text-red-500' : 'text-fuchsia-300'}`}>
+                    <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg ? 'text-red-500' : 'text-fuchsia-300'}`}>
                         {partnerAnalysisMemo.syncScore}%
                     </span>
                 </div>
                 {/* Color Gauge Bar */}
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mt-1">
                     <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${partnerAnalysisMemo.syncScore}%` }}
@@ -566,41 +566,39 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                     />
                 </div>
                 {partnerAnalysisMemo.structuralSynergy && (
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider mb-1">
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider mb-2">
                             <span className="shrink-0">⚜️</span>
                             {partnerAnalysisMemo.structuralSynergy.badge}
                         </div>
-                        <div className="text-[11px] text-white/70 leading-relaxed">
+                        <div className="text-xs text-white/70 leading-relaxed">
                             {partnerAnalysisMemo.structuralSynergy.desc}
                         </div>
                     </div>
                 )}
              </div>
-             <div className="bg-black/40 rounded p-3 flex flex-col justify-center border border-white/5">
-                <div className="text-xs text-white/50 mb-1 text-left">{lang === 'KO' ? '관계의 온도' : 'Relationship Temp'}</div>
-                <div className="flex justify-end items-end h-full">
-                  <div className="text-3xl font-mono text-rose-400 font-bold leading-none">{partnerAnalysisMemo.temperature}℃</div>
-                </div>
+             <div className="bg-black/40 rounded-xl p-4 flex flex-row items-center justify-between border border-white/5">
+                <div className="text-xs text-white/50">{lang === 'KO' ? '관계의 온도' : 'Relationship Temp'}</div>
+                <div className="text-2xl font-mono text-rose-400 font-bold leading-none">{partnerAnalysisMemo.temperature}℃</div>
              </div>
           </div>
 
           
 
-          <p className="text-sm text-fuchsia-100/90 leading-relaxed font-display whitespace-pre-wrap">
+          <p className="text-[15px] tracking-tight text-fuchsia-100/90 leading-[1.7] font-display whitespace-pre-wrap mt-4 mb-2">
             {partnerAnalysisMemo.text}
           </p>
 
           {partnerAnalysisMemo.gates && partnerAnalysisMemo.gates.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-fuchsia-500/20">
-               <h5 className="text-xs font-bold text-fuchsia-200 uppercase mb-2">
+            <div className="space-y-3 pt-6 mt-6 border-t border-fuchsia-500/20">
+               <h5 className="text-[13px] font-bold text-fuchsia-200 uppercase mb-4 tracking-widest">
                  {lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}
                </h5>
                {partnerAnalysisMemo.gates.map((g: any, i: number) => (
-                 <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded p-3 relative overflow-hidden group">
-                   <div className="absolute top-0 left-0 w-1 h-full bg-fuchsia-500/50"></div>
-                   <div className="text-xs font-bold text-fuchsia-300 mb-1 pl-2">{g.name}</div>
-                   <div className="text-sm text-fuchsia-50/80 leading-relaxed pl-2">{g.desc}</div>
+                 <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5">
+                   <div className="absolute top-0 left-0 w-1.5 h-full bg-fuchsia-500/50"></div>
+                   <div className="text-[13px] font-bold text-fuchsia-300">{g.name}</div>
+                   <div className="text-[14px] text-fuchsia-50/90 leading-[1.65]">{g.desc}</div>
                  </div>
                ))}
             </div>

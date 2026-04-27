@@ -133,16 +133,32 @@ export function calculateRelationshipDynamics(
 
     const uBranches = userResult.pillars.map(p => p.branch);
     const pBranches = partnerResult.pillars.map(p => p.branch);
-    const hasFireFrame = (b: string[]) => (b.includes('寅') && b.includes('午')) || (b.includes('午') && b.includes('戌')) || (b.includes('寅') && b.includes('戌'));
-    const hasWaterFrame = (b: string[]) => (b.includes('申') && b.includes('子')) || (b.includes('子') && b.includes('辰')) || (b.includes('申') && b.includes('辰'));
+    const getFrames = (b: string[]) => {
+        const frames = [];
+        if ((b.includes('寅') && b.includes('午')) || (b.includes('午') && b.includes('戌')) || (b.includes('寅') && b.includes('戌')) || (b.includes('巳') && b.includes('午') && b.includes('未'))) frames.push('Fire');
+        if ((b.includes('申') && b.includes('子')) || (b.includes('子') && b.includes('辰')) || (b.includes('申') && b.includes('辰')) || (b.includes('亥') && b.includes('子') && b.includes('丑'))) frames.push('Water');
+        if ((b.includes('巳') && b.includes('酉')) || (b.includes('酉') && b.includes('丑')) || (b.includes('巳') && b.includes('丑')) || (b.includes('申') && b.includes('酉') && b.includes('戌'))) frames.push('Metal');
+        if ((b.includes('亥') && b.includes('卯')) || (b.includes('卯') && b.includes('未')) || (b.includes('亥') && b.includes('未')) || (b.includes('寅') && b.includes('卯') && b.includes('辰'))) frames.push('Wood');
+        return frames;
+    };
+    
+    const uFrames = getFrames(uBranches);
+    const pFrames = getFrames(pBranches);
 
-    if ((hasFireFrame(uBranches) && hasWaterFrame(pBranches)) || (hasWaterFrame(uBranches) && hasFireFrame(pBranches))) {
+    if ((uFrames.includes('Fire') && pFrames.includes('Water')) || (uFrames.includes('Water') && pFrames.includes('Fire'))) {
         gates.push({
             name: isKO ? "⚖️ [수화기제] 최고 역동의 밸런스" : "⚖️ [Water & Fire Harmony]",
-            desc: isKO ? "한쪽의 폭발적인 조열함(화국)과 다른 쪽의 응축된 한랭함(수국)이 만나, 서로를 파괴하지 않고 완벽한 시너지(수화기제)를 만들어냅니다." : "Explosive fire and condensed water meet to form a perfect, productive balance."
+            desc: isKO ? "한쪽의 폭발적인 조열함(화/불)과 다른 쪽의 응축된 한랭함(수/물)이 만나, 서로를 파괴하지 않고 완벽한 시너지(수화기제)를 만들어냅니다." : "Explosive fire and condensed water meet to form a perfect, productive balance."
         });
         gateBonus += 25;
+    } else if ((uFrames.includes('Wood') && pFrames.includes('Metal')) || (uFrames.includes('Metal') && pFrames.includes('Wood'))) {
+        gates.push({
+            name: isKO ? "🪓 [금목상쟁의 승화] 동량지재의 조각가" : "🪓 [Metal & Wood Synergy]",
+            desc: isKO ? "거침없이 뻗어나가는 나무(목)를 예리한 금속(금)이 아름답고 쓸모 있는 재목으로 조각하듯, 서로를 자극하여 성장시킵니다." : "Sharp metal carves wild wood into a masterpiece, pushing each other to grow."
+        });
+        gateBonus += 15;
     }
+
     
     if (branchInteraction === 'wonjin') {
         gates.push({
