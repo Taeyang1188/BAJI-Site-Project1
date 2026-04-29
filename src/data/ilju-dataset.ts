@@ -2463,28 +2463,28 @@ export const ILJU_DATASET: Record<string, any> = {
       element: "Metal-Water",
       animal: "Rat",
       nature_symbol: {
-        ko: "얼음 호수 밑의 은장도",
-        en: "Silver Dagger Beneath an Icy Lake",
+        ko: "얼어붙은 심연 속의 은장도",
+        en: "Silver Dagger in the Frozen Abyss",
       },
     },
     core_identity: {
       persona: {
-        ko: "심해의 기계 심장",
-        en: "The Abyssal Machine Heart",
+        ko: "심야의 강물에 가라앉은 하얀 쥐",
+        en: "The White Rat Sunken in the Midnight River",
       },
       goth_punk_vibe: {
-        ko: "영하의 심해에 가라앉은 채 절대 부식되지 않는 백색 강철. 겉으로는 조용하고 이성적이지만, 그 차가운 피부에 데이면 뼈까지 얼어붙습니다.",
-        en: "White steel plunged in a sub-zero abyss, absolutely immune to corrosion. Outwardly quiet and rational, but a single touch of its cold logic will instant-freeze your bones.",
+        ko: "영하의 흑수(黑水) 아래로 끝없이 가라앉는 시퍼런 칼날. 숨막힐 듯 서늘하고 예민한 직관으로 세상을 훑으며, 짙은 멜랑콜리 속에서도 언제든 상대를 찌를 듯한 긴장감을 품고 있습니다.",
+        en: "A cobalt blade sinking endlessly beneath sub-zero black waters. Scanning the world with chilling, hypersensitive intuition, carrying the tension of a ready strike hidden inside profound melancholy.",
       },
       shadow_side: {
-        ko: "타인의 온도에 절대 타협하지 않는 섬뜩한 결벽주의와, 감정이입을 철저히 거세한 사이코패스적 차가움",
-        en: "A terrifying mysophobia that totally blocks any compromise with others' warmth, along with a borderline psychopathic coldness completely castrated of empathy.",
+        ko: "자신의 예민함을 무기로 삼아 상대의 치부를 잔혹하게 해부하며, 지독한 내면의 공허를 오만한 독설로 위장하려는 파괴적 고립주의",
+        en: "A destructive isolationism that weaponizes its sensitivity to brutally dissect others' flaws, disguising a profound inner void with arrogant, venomous remarks.",
       },
     },
     behavior_metrics: {
       drive: 50,
-      empathy: 15,
-      stability: 40,
+      empathy: 35,
+      stability: 30,
       unpredictability: 85,
     },
     compatibility_tags: {
@@ -2493,33 +2493,33 @@ export const ILJU_DATASET: Record<string, any> = {
     },
     narrative_blocks: {
       default: {
-        ko: "자신만의 철칙을 계산기처럼 빠르게 구동하며 세상을 난도질합니다. 이들의 이성은 곧 상대를 난도질하는 무자비한 도끼입니다.",
-        en: "Runs personal iron codes faster than a supercomputer to chop reality to bits. Its rationality is an active, ruthless axe hacking apart the opposition.",
+        ko: "물 위에 뜬 시퍼런 칼날처럼, 당신의 본능은 위태롭고 날카로운 말들로 주변의 공기를 얼어붙게 합니다. 번뜩이는 눈치로 허위식을 베어내지만, 그 예리함은 종종 당신 스스로를 찌르는 처절한 고독이 됩니다.",
+        en: "Like a cobalt blade floating on black water, your instincts freeze the air around you with dangerously sharp words. Your brilliant intuition slices through hypocrisy, but that sharpness often backfires into agonizing solitude.",
       },
       relationship: {
-        ko: "온도계로 측정하듯 사랑을 실험합니다. 선을 넘는 순간 사랑은 즉각 중단되며, 기계 전원을 끄듯 단 한 톨의 감정도 남기지 않습니다.",
-        en: "Experiments on love by strictly reading the thermometer digits. Cross the line, and love is instantly terminated; pulling the plug with absolute zero emotion.",
+        ko: "상대의 눈을 마주치는 순간 영혼의 온도를 감별해 냅니다. 선을 넘는 허튼수작에는 독설이라는 이름의 얼음조각을 던져버리고, 온기가 식으면 가차 없이 등을 돌려 심연으로 사라지는 서늘한 이별의 귀재입니다.",
+        en: "Instantly measures the temperature of one's soul with a single glance. Throws shards of ice named 'venomous truth' at any foolishness crossing the line, and ruthlessly walks away into the abyss when the warmth fades.",
       },
       timing_modifiers: {
         wood: {
-          ko: "얼어붙은 호수 위로 독성 덩굴들이 바다를 뒤덮습니다. 물질에 대한 도착증적 강박과 탐욕(재성)이 시야를 좁히고 극도의 파멸을 부릅니다.",
-          en: "Toxic vines overrun the frozen lake. Paraphilic compulsion for materialism and blind greed narrows vision to a microscopic point, summoning extreme ruin."
+          ko: "얼어붙은 숲속의 사과를 향해 집요하게 이빨을 세우는 쥐떼. 물질을 향한 날 선 탐욕과 강박이 치명적인 속도로 번지며 주변의 잔잔한 호수를 갉아먹습니다.",
+          en: "A swarm of rats tenaciously bearing teeth at apples in a frozen forest. Razor-sharp greed and compulsion for materialism spread at lethal speed, gnawing away at the calm lake."
         },
         fire: {
-          ko: "강철 호수 위로 푸른 번개가 떨어지며 빙하를 깨부숩니다. 극심한 신경쇠약과 강압적인 복종 강요(관성)가 자아를 산산조각 냅니다.",
-          en: "Blue lightning violently smashes the iron lake's glacier. Severe nervous breakdown and the brutal forcing of submission mercilessly shatter the ego."
+          ko: "시퍼런 얼음 칼날 위로 붉은 불망치가 떨어져 산산조각 납니다. 극심한 신경쇠약과 강압적인 통제(관성)에 짓눌려 처절한 반항심이 독기로 뿜어져 나옵니다.",
+          en: "A red fire hammer falls on the sharp ice blade, shattering it into pieces. Crushed by severe nervous breakdowns and coercive control, desperate rebellion spews out as pure venom."
         },
         earth: {
-          ko: "얼음 속에 갇힌 거대한 화석이 기괴하게 떠오릅니다. 폐쇄적인 우월주의와 오만한 영적 집착(인성)이 타인과의 모든 교류를 저주합니다.",
-          en: "A colossal fossil locked in ice gruesomely floats up. Closed superiorism and arrogant spiritual obsession place a curse on any possible human interaction."
+          ko: "진흙탕 속에 파고들어 빛을 잃어버린 은장도. 폐쇄적인 사유의 감옥(인성)에 갇혀, 타인과의 모든 교류를 의심하고 스스로를 무덤에 매장합니다.",
+          en: "A silver dagger losing its light buried in the mud. Trapped in a closed prison of thought, it suspects all human interaction and buries itself in its own grave."
         },
         metal: {
-          ko: "수천 개의 은빛 톱니바퀴가 폭주하며 바다를 소용돌이치게 만듭니다. 파괴적인 독재 성향과 자아 팽창(비겁)이 모든 질서를 으깨버립니다.",
-          en: "Thousands of silver cogwheels rampage, turning the ocean into a vortex. Destructive dictatorial traits and lethal ego-inflation crush all remaining order."
+          ko: "수십 개의 서슬 퍼런 칼날과 날카로운 발톱들이 허공에서 맞부딪혀 피를 부릅니다. 오직 자신만이 옳다는 고독한 날을 세워 모든 연대를 베어버리는 지독한 고립이 벌어집니다.",
+          en: "Dozens of cold, sharp blades and claws clash in midair, drawing blood. Stubbornly insisting only on its rightness, it slashes any solidarity to pieces, falling into extreme isolation."
         },
         water: {
-          ko: "독성 심해의 폭풍이 한계를 모르고 범람합니다. 천재적이지만 저주받은 광기(식상)가 질서를 조롱하며 잔혹한 예술 쇼를 벌입니다.",
-          en: "A toxic abyssal storm floods limitlessly. Genius, yet completely cursed madness actively mocks reality by putting on a terribly cruel art show."
+          ko: "칠흑 같은 자정의 강물을 타고 검은 무리가 독기를 뿜어냅니다. 슬픔과 분노가 뒤섞인 천재적인 영감(상관)이 세상을 찌르며 파멸적인 멜랑콜리의 정점을 찍습니다.",
+          en: "A black swarm spews toxin along the pitch-black midnight river. Genius inspiration mixed with sorrow and rage stabs the world, reaching the absolute peak of destructive melancholy."
         }
       }
     }

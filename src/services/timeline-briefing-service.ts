@@ -267,7 +267,7 @@ export function generateRelationshipDynamics(
         if (stemIsLucky) {
              synthesisKo = `철저한 **${envTextKo}** 위에서, 오히려 이를 무대 삼아 폭발적으로 **${attTextKo}**를 현실로 관철하려는 압도적 기세를 보이고 있습니다.`;
         }
-        synthesisKo = `상대방의 [${actualStem}${partnerDaewun.branch} 대운] 시기입니다. 지금 상대방은, ` + synthesisKo;
+        synthesisKo = `상대방의 [${actualStem}${partnerDaewun.branch} 대운] 시기입니다. 이 시기의 상대방은, ` + synthesisKo;
 
         const checkRootless = (stemEl: string, branchEl: string) => {
              const clashPairs = ['Wood-Metal', 'Fire-Water', 'Earth-Wood', 'Metal-Fire', 'Water-Earth']; // Branch destroys Stem

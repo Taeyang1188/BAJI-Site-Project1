@@ -110,8 +110,33 @@ export function calculateRelationshipDynamics(
     const CHUNG: Record<string, string> = { '子': '午', '午': '子', '丑': '未', '未': '丑', '寅': '申', '申': '寅', '卯': '酉', '酉': '卯', '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳' };
     const WONJIN: Record<string, string> = { '子': '未', '未': '子', '丑': '午', '午': '丑', '寅': '酉', '酉': '寅', '卯': '申', '申': '卯', '辰': '亥', '亥': '辰', '巳': '戌', '戌': '巳' };
     
+    const STEM_HAP: Record<string, string> = { '甲': '己', '己': '甲', '乙': '庚', '庚': '乙', '丙': '辛', '辛': '丙', '丁': '壬', '壬': '丁', '戊': '癸', '癸': '戊' };
+    const STEM_CHUNG: Record<string, string[]> = {
+        '甲': ['庚', '戊'],
+        '乙': ['辛', '己'],
+        '丙': ['壬', '庚'],
+        '丁': ['癸', '辛'],
+        '戊': ['甲', '壬'],
+        '己': ['乙', '癸'],
+        '庚': ['丙', '甲'],
+        '辛': ['丁', '乙'],
+        '壬': ['戊', '丙'],
+        '癸': ['己', '丁']
+    };
+    
     const uDayBranch = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.branch || '';
     const pDayBranch = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.branch || '';
+
+    const uDayStem = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '';
+    const pDayStem = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '';
+
+    let hasStemHap = false;
+    let hasStemChung = false;
+
+    if (uDayStem && pDayStem) {
+        if (STEM_HAP[uDayStem] === pDayStem) hasStemHap = true;
+        if (STEM_CHUNG[uDayStem]?.includes(pDayStem)) hasStemChung = true;
+    }
     
     const gates: { name: string; desc: string }[] = [];
     
@@ -161,9 +186,106 @@ export function calculateRelationshipDynamics(
          }
     }
 
-    if (hasChung || hasWonjin) gatePenalty += 10;
+    if (hasStemHap && hasChung) {
+        gates.push({ name: isKO ? "🌀 [이성적인 모순]" : "🌀 [Rational Contradiction]", desc: isKO ? "머리로는 완벽히 이해하는데, 몸과 현실(지지)이 거부하는 관계입니다." : "You understand each other perfectly in your minds, but reality and instincts reject the connection." });
+        gateBonus += 5;
+    } else if (hasStemHap) {
+        gates.push({ name: isKO ? "🕊️ [정신적 결속] 천간합" : "🕊️ [Spiritual Union] Stem Hap", desc: isKO ? "가치관과 이상형이 맞아떨어집니다. 본능적인 끌림 이전에 생각의 주파수가 통하는 정신적 소울메이트입니다." : "Your values and ideals align perfectly. A spiritual soulmate connection." });
+        gateBonus += 10;
+    }
+
+    if (hasStemChung && hasHap) {
+        gates.push({ name: isKO ? "🔥 [본능적인 중독]" : "🔥 [Instinctive Addiction]", desc: isKO ? "만나기만 하면 가치관으로 싸우는데, 돌아서면 몸이 먼저 그리워지는 지독한 미련입니다." : "You fiercely clash in values, but instinctively crave each other. A toxic yet irresistible addiction." });
+        gatePenalty += 5;
+    } else if (hasStemChung) {
+        gates.push({ name: isKO ? "⚔️ [가치관의 충돌] 천간충" : "⚔️ [Ideological Clash] Stem Chung", desc: isKO ? "서로의 확고한 생각과 가치관이 치열하게 부딪힙니다. 다름을 인정하지 않으면 사사건건 날 선 자존심 싸움으로 번질 수 있습니다." : "Direct clashes in thoughts and values. May lead to pride battles if differences aren't respected." });
+        gatePenalty += 10;
+    }
+
+    if (hasChung) gatePenalty += 15;
+    if (hasWonjin) gatePenalty += 12;
+
+
+    const getCheonEul = (stem: string) => {
+        switch(stem) {
+            case '甲': case '戊': case '庚': return ['丑', '未'];
+            case '乙': case '己': return ['子', '申'];
+            case '丙': case '丁': return ['亥', '酉'];
+            case '辛': return ['寅', '午'];
+            case '壬': case '癸': return ['卯', '巳'];
+            default: return [];
+        }
+    };
+    
+    const _getEls = (r:any) => {
+        if (!r) return [];
+        if (typeof r === 'string') return r.split(',').map((s:string)=>s.trim()).filter(Boolean);
+        return Array.isArray(r) ? r : [];
+    };
+    const _uyh = [..._getEls(userResult.analysis?.yongshinDetail?.primary), ..._getEls(userResult.analysis?.yongshinDetail?.heeShin)].filter(Boolean);
+    const _pyh = [..._getEls(partnerResult.analysis?.yongshinDetail?.primary), ..._getEls(partnerResult.analysis?.yongshinDetail?.heeShin)].filter(Boolean);
+    
+    const uMBR = userResult.pillars.find(p => p.title === 'Month' || p.title === '월주')?.branch || '';
+    const pMBR = partnerResult.pillars.find(p => p.title === 'Month' || p.title === '월주')?.branch || '';
+
+    const uCE = getCheonEul(uDayStem);
+    const pCE = getCheonEul(pDayStem);
+
+    if (uCE.includes(pDayBranch) || uCE.includes(pMBR) || pCE.includes(uDayBranch) || pCE.includes(uMBR)) {
+        gates.push({ name: isKO ? "🏆 [The Crown’s Savior: 천을귀인]" : "🏆 [The Crown's Savior]", desc: isKO ? "상대는 당신의 삶에 닥칠 재앙을 막아주는 천상적 방패입니다. 존재만으로 당신의 격을 높여줍니다." : "The partner functions as a heavenly shield, protecting you from disasters and elevating your status." });
+        gateBonus += 20;
+    }
+
+    const _BR_E: Record<string, string> = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
+    const pDB_E = _BR_E[pDayBranch];
+    const pMB_E = _BR_E[pMBR];
+    const uDB_E = _BR_E[uDayBranch];
+    const uMB_E = _BR_E[uMBR];
+
+    let hasOasis = false;
+    if (pDB_E && _uyh.includes(pDB_E)) hasOasis = true;
+    if (pMB_E && _uyh.includes(pMB_E)) hasOasis = true;
+    if (uDB_E && _pyh.includes(uDB_E)) hasOasis = true;
+    if (uMB_E && _pyh.includes(uMB_E)) hasOasis = true;
+
+    if (hasOasis) {
+        gates.push({ name: isKO ? "💎 [Elemental Oasis: 용신 공급]" : "💎 [Elemental Oasis]", desc: isKO ? "상대는 당신이 사막에서 만난 맑은 오아시스입니다. 당신이 가장 필요로 하는 기운을 숨 쉬듯 뿜어냅니다." : "The partner is an oasis in the desert, radiating the exact energy you desperately need." });
+        gateBonus += 15;
+    }
+
+    const uPYong = _getEls(userResult.analysis?.yongshinDetail?.primary)[0] || '';
+    const pPYong = _getEls(partnerResult.analysis?.yongshinDetail?.primary)[0] || '';
+    
+    let uStrongestEl = '';
+    let pStrongestEl = '';
+    
+    // We can calculate strongest element here
+    uStrongestEl = Object.entries(userAdjustedElements).sort((a:any, b:any) => b[1] - a[1])[0]?.[0] || '';
+    pStrongestEl = Object.entries(partnerAdjustedElements).sort((a:any, b:any) => b[1] - a[1])[0]?.[0] || '';
+
+    const isCrushed = (strong: string, yong: string) => {
+        if (!strong || !yong) return false;
+        if (strong.includes('Wood') && yong.includes('Earth')) return true;
+        if (strong.includes('Earth') && yong.includes('Water')) return true;
+        if (strong.includes('Water') && yong.includes('Fire')) return true;
+        if (strong.includes('Fire') && yong.includes('Metal')) return true;
+        if (strong.includes('Metal') && yong.includes('Wood')) return true;
+        return false;
+    };
+
+    if (isCrushed(pStrongestEl, uPYong) || isCrushed(uStrongestEl, pPYong)) {
+        gates.push({ name: isKO ? "🌑 [Total Solar Eclipse: 용신 극멸]" : "🌑 [Total Solar Eclipse]", desc: isKO ? "상대의 가장 강한 에너지가 당신의 행운의 통로를 원천 봉쇄합니다. 사랑과는 별개로 당신의 세상이 어두워집니다." : "Their strongest energy completely blocks your path to luck and success." });
+        gatePenalty += 20;
+    }
+
+    const isMyoGo = (br: string) => ['辰','戌','丑','未'].includes(br);
+    if (isMyoGo(uDayBranch) && isMyoGo(pDayBranch) && (hasChung || hyungCheck)) {
+        gates.push({ name: isKO ? "⛓️ [Locked Heavens: 진술축미 충돌]" : "⛓️ [Locked Heavens]", desc: isKO ? "서로의 내밀한 창고를 강제로 개방합니다. 숨기고 싶은 치부와 상처가 끊임없이 터져 나와 서로를 괴롭힙니다." : "Forcibly opens inner vaults, causing hidden wounds to bleed continuously." });
+        gatePenalty += 12;
+    }
 
     if (samhapMatch) {
+
          const isShenZi = (uDayBranch === '申' && pDayBranch === '子') || (uDayBranch === '子' && pDayBranch === '申');
          if (isShenZi) {
               gates.push({ name: isKO ? "🌊 [영혼의 주파수: 신자합]" : "🌊 [Soul Resonator: Shen-Zi Hap]", desc: isKO ? "상대방과 깊은 영혼의 결속력을 가집니다. 서로가 함께할 때 큰 시너지(수국)를 만들어냅니다." : "Deep spiritual connection forming powerful synergy." });
@@ -204,21 +326,31 @@ export function calculateRelationshipDynamics(
     } else if (uGongmang.length > 0) {
         const hapChungPairs = ['子丑','丑子','寅亥','亥寅','卯戌','戌卯','辰酉','酉辰','巳申','申巳','午未','未午', 
                                '子午','午子','丑未','未丑','寅申','申寅','卯酉','酉卯','辰戌','戌辰','巳亥','亥巳'];
-        let isVoidBreaker = false;
+        let realVoidBreaker = false;
+        let abstractVoidBreaker = false;
         for (const gm of uGongmang) {
             if (pBranches.some((pb: string) => pb && hapChungPairs.includes(gm + pb))) {
-                isVoidBreaker = true;
-                break;
+                if (uBranches.includes(gm)) {
+                    realVoidBreaker = true;
+                } else {
+                    abstractVoidBreaker = true;
+                }
             }
         }
         
-        if (isVoidBreaker) {
-            if (!isTalgong) {
+        if (!isTalgong) {
+            if (realVoidBreaker) {
                 gates.push({
                     name: isKO ? "🕯️ [The Void Breaker] 공망의 해구" : "🕯️ [The Void Breaker]",
-                    desc: isKO ? "밑 빠진 독이었던 당신의 결핍을 상대가 깨부수거나(충) 메워버립니다(합). 당신의 고질적인 허무주의를 치료해줄 유일한 처방전입니다." : "The partner breaks or fills your bottomless pit. The only prescription for your chronic nihilism."
+                    desc: isKO ? "밑 빠진 독이었던 당신의 현실적 결핍을 상대가 깨부수거나(충) 메워버립니다(합). 당신의 고질적인 한계를 돌파하게 해줄 결정적 처방전입니다." : "The partner breaks or fills your bottomless pit. The decisive prescription for your chronic limitations.",
                 });
                 gateBonus += 15;
+            } else if (abstractVoidBreaker) {
+                gates.push({
+                    name: isKO ? "🪶 [추상적 위안] 공망의 그림자" : "🪶 [Abstract Comfort]",
+                    desc: isKO ? "심리적 허기로 맴돌던 당신의 막연한 갈증을 상대방이 달래줍니다. 치명적인 결핍은 아니더라도 함께 있으면 마음이 편안해지는 소박한 위안입니다." : "Provides light comfort for your psychological hunger. Not a lifesaver, but a pleasant solace.",
+                });
+                gateBonus += 2;
             }
         }
     }
@@ -240,7 +372,11 @@ export function calculateRelationshipDynamics(
             name: isKO ? "⚖️ [수화기제] 최고 역동의 밸런스" : "⚖️ [Water & Fire Harmony]",
             desc: isKO ? "한쪽의 폭발적인 조열함(화/불)과 다른 쪽의 응축된 한랭함(수/물)이 만나, 서로를 파괴하지 않고 완벽한 시너지(수화기제)를 만들어냅니다." : "Explosive fire and condensed water meet to form a perfect, productive balance."
         });
-        gateBonus += 25;
+        if (!hasChung && !hasStemChung) {
+            gateBonus += 25;
+        } else {
+            gateBonus += 20;
+        }
     } else if ((uFrames.includes('Wood') && pFrames.includes('Metal')) || (uFrames.includes('Metal') && pFrames.includes('Wood'))) {
         gates.push({
             name: isKO ? "🪓 [금목상쟁의 승화] 동량지재의 조각가" : "🪓 [Metal & Wood Synergy]",
@@ -276,6 +412,15 @@ export function calculateRelationshipDynamics(
     const uWeak = (userResult.analysis?.dayMasterStrength?.score || 50) < 35;
     const pWeak = (partnerResult.analysis?.dayMasterStrength?.score || 50) < 35;
 
+    if (uWeak && pSikSang > 40) {
+        gates.push({ name: isKO ? "🕷️ [The Abyssal Drain: 에너지 기생]" : "🕷️ [The Abyssal Drain]", desc: isKO ? "상대는 당신의 생명력을 빨아들여 자신의 꽃을 피웁니다. 함께할수록 당신은 원인 모를 무력감에 빠지게 됩니다." : "The partner drains your life force to bloom their own flowers. You fall into unexplainable lethargy." }); 
+        gatePenalty += 15;
+    }
+    if (pWeak && uSikSang > 40) {
+        gates.push({ name: isKO ? "🕷️ [The Abyssal Drain: 에너지 기생 (상대)]" : "🕷️ [The Abyssal Drain (Partner)]", desc: isKO ? "당신이 무의식중에 상대의 기운을 과도하게 끌어다 쓰고 있을 가능성이 있습니다. 상대방이 지쳐가지 않는지 살펴주세요." : "You might be draining the partner's life force to bloom your own flowers." }); 
+        gatePenalty += 15;
+    }
+
     // Jae-Da-Shin-Yak Synergy
     if (uWeak && uJaeSeong > 40 && (pBiGeop > 30 || pInSeong > 30)) {
         gates.push({
@@ -300,7 +445,6 @@ export function calculateRelationshipDynamics(
             if (uWaterMetal > 45 && pFire > 30) { gates.push({ name: isKO ? "[조후 구원] 얼어붙은 심장에 봄을 부르다" : "[Temperature Savior] Melting the Heart", desc: isKO ? "당신의 차가운 내면을 상대의 따뜻한 기운이 녹여주는 구원자적 유대감입니다." : "His warm fire energy melts your cold inner self." }); gateBonus += 15; }
         } else if (uGender === 'male' && pGender === 'female') {
             if (uGwanSal > 35 && pSikSang > 30) { gates.push({ name: isKO ? "[식신제살] 숨 막히는 현실의 해방구" : "[Siksin-Jesal] Ultimate Escape", desc: isKO ? "짓누르는 책임감과 압박을 상대의 자유로움이 완벽히 해소해줍니다." : "Her cheerful rhythm perfectly releases you from heavy responsibilities." }); gateBonus += 15; }
-            if (uWeak && pSikSang > 40) { gates.push({ name: isKO ? "⚠️ [통제 상실] 걷잡을 수 없는 자유" : "⚠️ [Loss of Control] Uncontrollable Freedom", desc: isKO ? "상대의 자유분방함이 신약한 당신의 원칙을 허물며 불안 요소로 체감될 수 있습니다." : "Her free spirit might become a source of anxiety." }); gatePenalty += 10; }
             const uFireEarth = (uElements['Fire(화)'] || uElements['Fire'] || 0) + (uElements['Earth(토)'] || uElements['Earth'] || 0);
             const pWater = pElements['Water(수)'] || pElements['Water'] || 0;
             if (uFireEarth > 45 && pWater > 30) { gates.push({ name: isKO ? "[정신적 휴식] 폭주하는 열기를 식히다" : "[Mental Oasis] Cooling the Heat", desc: isKO ? "과열된 엔진 열기를 상대의 지혜로운 물기운이 씻어 완벽한 휴식을 줍니다." : "Her calm water energy cools down your overheated engine." }); gateBonus += 15; }
@@ -414,7 +558,7 @@ export function calculateRelationshipDynamics(
             if (combo === 'Sik-In' || combo === 'In-Sik') return { badge: "인성용식(印星用食)", desc: "🧠 [지혜의 조율자] 겉잡을 수 없이 뻗어가는 날것의 창의성이나 과도한 에너지(식상)를 파트너의 깊은 지혜(인성)로 정교하게 통제해내어 걸작을 만듭니다.", bonus: 5 };
             if (combo === 'Jae-Gwan' || combo === 'Gwan-Jae') return { badge: "재생관(財生官)", desc: "🤝 [제국의 건설자] 한 명의 현실 감각과 추진력(재성)이 상대방의 명예와 지위(관성)를 단단하게 세워주는 강력한 권력 결탁의 구조입니다.", bonus: 12 };
             if (combo === 'Bi-Jae' || combo === 'Jae-Bi') return { badge: "부하분담(負荷分擔)", desc: "🛡️ [짐을 나누는 동료] 한 명이 감당하기 힘든 벅찬 현실적 무대와 책임(재성)을, 파트너의 강력한 맷집(비겁)이 든든하게 받쳐줍니다.", bonus: 5 };
-            if (combo === 'In-Bi' || combo === 'Bi-In') return { badge: "수기유행(秀氣流行)", desc: "💡 [세상 밖의 등대] 머릿속에만 존재하던 깊은 내면의 지식(인성)을 상대방(비겁)이 세상 밖으로 속 시원히 꺼내어 형체 있는 것으로 조력합니다.", bonus: 5 };
+            if (combo === 'In-Bi' || combo === 'Bi-In') return { badge: "수기유행(秀氣流行)", desc: "💡 [세상 밖의 등대] 한 명의 깊은 사유와 지식(인성)을, 다른 한 명의 강력한 주체성과 실행력(비겁)이 세상 밖으로 속 시원히 꺼내어 형태 있는 것으로 조력합니다.", bonus: 5 };
             return null;
         };
 
@@ -424,25 +568,6 @@ export function calculateRelationshipDynamics(
             structuralSynergy = { badge: comboBadge, desc: gejuSynergy.desc, level: 'gold' };
             if ((gejuSynergy as any).bonus) diseaseBonus += (gejuSynergy as any).bonus;
             if ((gejuSynergy as any).penalty) gatePenalty += (gejuSynergy as any).penalty;
-            
-            // Check if Outcome is Yong-Shin
-            const checkYongShinOutcome = () => {
-                if (uGc === 'Gwan' && pGc === 'In' && uYongHee.includes(pDMElement)) return true;
-                if (uGc === 'In' && pGc === 'Gwan' && uYongHee.includes(pDMElement)) return true;
-                return false; 
-                // simplified check for brevity: We'll just grant +5 generically if the partner provides the user's top Yong-Shin
-            }
-            if (uYongHee.length > 0 || pYongHee.length > 0) {
-               // Give bonus if Partner provides User's YongHee powerfully
-               let partnerProviders = Object.entries(partnerAdjustedElements).filter(([k,v]) => uYongHee.includes(cleanElement(k)) && v > 20);
-               let userProviders = Object.entries(userAdjustedElements).filter(([k,v]) => pYongHee.includes(cleanElement(k)) && v > 20);
-               if (partnerProviders.length > 0) diseaseBonus += 5;
-               if (userProviders.length > 0) diseaseBonus += 5;
-               if (partnerProviders.length > 0 && userProviders.length > 0) {
-                   gates.push({ name: isKO ? "⚖️ [The Mirroring Bonus] 크로스 카르마" : "⚖️ [The Mirroring Bonus] Cross Karma", desc: isKO ? "서로가 서로의 결핍을 완벽하게 채워주는 '구원자'이자 '수혜자'의 역할을 동시에 수행합니다. 역할의 대칭성이 극강의 안정감을 부여합니다." : "You and your partner act as each other's saviors simultaneously, providing unparalleled stability." });
-                   diseaseBonus += 10;
-               }
-            }
         }
 
         // Special GeJu Penalty/Bonus logic
@@ -458,6 +583,18 @@ export function calculateRelationshipDynamics(
                   structuralSynergy = { badge: isKO ? "[전왕/종격 조화: 극한의 동화]" : "[Flow Harmony]", desc: isKO ? "거스를 수 없는 거대한 하나의 기운에 상대가 완벽하게 동화되어 극강의 시너지를 만듭니다." : "They perfectly assimilate into your singular, unstoppable flow of energy, doubling the power.", level: 'gold' };
                   gates.push({ name: isKO ? "⚠️ [과열/폭주 위험] 거울의 독" : "⚠️ [Overheat Risk] Poison of the Mirror", desc: isKO ? "결핍의 교환 쌍방 없이 오직 같은 목표물을 향해 묶인 시너지가 폭발합니다. 하지만 이는 통제 불능의 가속과, 실패 시 함께 잿더미(Burn-out)가 될 수 있는 리스크를 내포합니다." : "Extreme unity of goals creates explosive synergy, but holds an incredible burn-out risk. If you fall, you crash together." });
              }
+        }
+    }
+
+    if (uYongHee.length > 0 || pYongHee.length > 0) {
+        // Give bonus if Partner provides User's YongHee powerfully
+        let partnerProviders = Object.entries(partnerAdjustedElements).filter(([k,v]) => uYongHee.includes(cleanElement(k)) && v > 20);
+        let userProviders = Object.entries(userAdjustedElements).filter(([k,v]) => pYongHee.includes(cleanElement(k)) && v > 20);
+        if (partnerProviders.length > 0) diseaseBonus += 5;
+        if (userProviders.length > 0) diseaseBonus += 5;
+        if (partnerProviders.length > 0 && userProviders.length > 0) {
+            gates.push({ name: isKO ? "⚖️ [The Mirroring Bonus] 크로스 카르마" : "⚖️ [The Mirroring Bonus] Cross Karma", desc: isKO ? "서로가 서로의 결핍을 완벽하게 채워주는 '구원자'이자 '수혜자'의 역할을 동시에 수행합니다. 역할의 대칭성이 극강의 안정감을 부여합니다." : "You and your partner act as each other's saviors simultaneously, providing unparalleled stability." });
+            diseaseBonus += 10;
         }
     }
 
@@ -599,6 +736,8 @@ export function calculateRelationshipDynamics(
     
     if (hasHap) temp += 5;
     if (hasChung) temp += 10; 
+    if (hasStemHap) temp -= 2;
+    if (hasStemChung) temp += 5;
     if (hasWonjin) temp -= 5;
     if (hyungCheck) temp -= 3;
     if (paCheck) temp += 0;
@@ -715,8 +854,8 @@ export function calculateRelationshipDynamics(
                      }
                  }
                  
-                 if (!isEasterEgg && (syncScore < 40 || hasWonjin || hasChung || hyungCheck || paCheck || haeCheck)) {
-                     clashText += "\n\n🛡️ [풀어야 할 과제] 구조적인 오행 충돌(형충파해/원진)로 인해 다름을 맞추어가는 인내심이 크게 요구됩니다. 알 수 없는 끌림과 마찰이 공존합니다.\n";
+                 if (!isEasterEgg && (syncScore < 40 || hasWonjin || hasChung || hasStemChung || hyungCheck || paCheck || haeCheck)) {
+                     clashText += "\n\n🛡️ [풀어야 할 과제] 구조적인 오행 충돌(형충파해/원진/천간충)로 인해 다름을 맞추어가는 인내심이 크게 요구됩니다. 알 수 없는 끌림과 마찰이 공존합니다.\n";
                      clashText += `🤝 [통관신(중재 기운)] 두 사람 사이의 벽을 허물기 위해 의식적으로 ${medStrKo} 기운을 활용해 보세요. 직접 부딪히기보다 제3자나 취미를 매개로 소통하는 것이 이롭습니다.\n`;
                      clashText += "⚡ [Action Guide] 감정적 융화보다는 서로의 다름을 직시하고 한 발짝 물러서는 신중한 거리가 필요합니다.";
                  }
@@ -765,8 +904,8 @@ export function calculateRelationshipDynamics(
                      }
                  }
                  
-                 if (!isEasterEgg && (syncScore < 40 || hasWonjin || hasChung || hyungCheck || paCheck || haeCheck)) {
-                     clashText += "\n\n🛡️ [Unresolved Task] Structural element clash (Hyung/Chung/Wonjin) causes you to speak completely different languages, creating both magnetic pull and friction.\n";
+                 if (!isEasterEgg && (syncScore < 40 || hasWonjin || hasChung || hasStemChung || hyungCheck || paCheck || haeCheck)) {
+                     clashText += "\n\n🛡️ [Unresolved Task] Structural element clash (Hyung/Chung/Wonjin/Stem Clash) causes you to speak completely different languages, creating both magnetic pull and friction.\n";
                      clashText += `🤝 [Mediator] Find a mediator element (${medStrEn}) or a third-party hobby for smoother communication.\n`;
                      clashText += "⚡ [Action Guide] Focus on objective boundaries rather than forcing emotional alignment.";
                  }
@@ -792,6 +931,7 @@ export function calculateRelationshipDynamics(
                 isGlowing,
                 text: resultText,
                 isEasterEgg,
-                gates: uniqueGates
+                gates: uniqueGates,
+                structuralSynergy
             };
         }

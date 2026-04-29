@@ -151,6 +151,83 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         partnerMatchDaewun?.branch
     );
 
+    const innateDyn = calculateRelationshipDynamics(
+        result,
+        partnerResult,
+        result.analysis?.elementRatios || {},
+        partnerResult.analysis?.elementRatios || {},
+        lang as 'KO' | 'EN'
+    );
+
+    const getNextRatios = (res: any) => {
+        const rawRatios = res.analysis?.elementRatios || {};
+        const cycle = res.grandCycles?.[(res.currentCycleIndex || 0) + 1];
+        if (!cycle) return rawRatios;
+        const stemMap: Record<string, string> = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water' };
+        const branchMap: Record<string, string> = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
+        
+        const adjusted: Record<string, number> = {};
+        const cleanEl = (k: string) => {
+            let clean = k.split('(')[0].trim();
+            if (clean === '목') return 'Wood';
+            if (clean === '화') return 'Fire';
+            if (clean === '토') return 'Earth';
+            if (clean === '금') return 'Metal';
+            if (clean === '수') return 'Water';
+            return clean;
+        };
+        Object.entries(rawRatios).forEach(([k, v]) => {
+            const el = cleanEl(k);
+            adjusted[el] = (adjusted[el] || 0) + (v as number);
+        });
+        const sEl = stemMap[cycle.stem] || 'Earth';
+        const bEl = branchMap[cycle.branch] || 'Earth';
+        adjusted[sEl] = (adjusted[sEl] || 0) + 15;
+        adjusted[bEl] = (adjusted[bEl] || 0) + 45;
+        const total = Object.values(adjusted).reduce((a, b: any) => a + b, 0) || 1;
+        Object.keys(adjusted).forEach(k => { adjusted[k] = Math.round((adjusted[k] / total) * 100); });
+        return adjusted;
+    };
+
+    const futureRatios = getNextRatios(result);
+    const pFutureRatios = getNextRatios(partnerResult);
+    const uNextBranch = result.grandCycles?.[(result.currentCycleIndex || 0) + 1]?.branch;
+    const pNextBranch = partnerResult?.grandCycles?.[(partnerResult.currentCycleIndex || 0) + 1]?.branch;
+
+    const futureDyn = calculateRelationshipDynamics(
+        result,
+        partnerResult,
+        futureRatios,
+        pFutureRatios,
+        lang as 'KO' | 'EN',
+        uNextBranch,
+        pNextBranch
+    );
+
+    const isKO = lang === 'KO';
+
+    // V5.4 Weighting Calculation
+    const weightedScore = Math.max(0, Math.min(100, Math.round((innateDyn.syncScore * 0.75) + (dyn.syncScore * 0.25))));
+    const inn = innateDyn.syncScore;
+    const cur = dyn.syncScore;
+    const fut = futureDyn.syncScore;
+
+    if (inn < 65 && cur >= 90 && (cur - fut) >= 20) {
+        dyn.gates.unshift({
+            name: isKO ? "⏳ [한여름 밤의 꿈]" : "⏳ [Midsummer Night's Dream]",
+            desc: isKO ? "지금의 절정은 곧 저물 것입니다. 화려함 뒤에 올 고요를 준비하십시오." : "The current peak will soon set. Prepare for the silence that follows the splendor."
+        });
+    }
+
+    if (fut - cur >= 15 && fut > 85) {
+        dyn.gates.unshift({
+            name: isKO ? "🌊 [밀물: 만개하는 카르마]" : "🌊 [The Rising Tide: Blooming Karma]",
+            desc: isKO ? "가장 뜨거운 계절이 다가오고 있습니다. 지금의 사소한 마찰은 거대한 합(合)의 완성으로 가는 과정일 뿐입니다." : "The hottest season is approaching. Minor frictions now are just a transition toward the completion of a massive karmic union."
+        });
+    }
+
+    dyn.syncScore = weightedScore;
+
     let titleSync = lang === 'KO' ? '무난하고 현실적인 동행' : 'Stable & Practical Connection';
     if (dyn.syncScore >= 95) titleSync = lang === 'KO' ? '✨ 천생연분 (영혼의 단짝)' : '✨ Soulmates (Karmic Bond)';
     else if (dyn.syncScore >= 85) titleSync = lang === 'KO' ? '🔥 찰떡궁합 (최고의 시너지)' : '🔥 Top-tier Synergy';
@@ -632,6 +709,7 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
   const [day, setDay] = useState('1');
   const [time, setTime] = useState('12:00');
   const [gender, setGender] = useState('m');
+  const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -641,7 +719,7 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
       birthTime: time,
       city: 'Seoul',
       gender: gender === 'm' ? 'male' : 'female',
-      calendarType: 'solar'
+      calendarType
     };
     try {
       const res = calculateRealBaZi(input, 37.5, 127.0, lang);
@@ -653,6 +731,12 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 gap-2">
+         <div className="flex bg-black/50 p-1 rounded border border-white/10">
+           <button type="button" onClick={() => setCalendarType('solar')} className={`flex-1 text-[10px] py-1 rounded transition-colors ${calendarType === 'solar' ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white/80'}`}>{lang === 'KO' ? '양력' : 'Solar'}</button>
+           <button type="button" onClick={() => setCalendarType('lunar')} className={`flex-1 text-[10px] py-1 rounded transition-colors ${calendarType === 'lunar' ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white/80'}`}>{lang === 'KO' ? '음력' : 'Lunar'}</button>
+         </div>
+      </div>
       <div className="grid grid-cols-3 gap-2">
         <div>
           <label className="text-[10px] text-white/50">{lang === 'KO' ? '년도' : 'Year'}</label>
