@@ -36,13 +36,36 @@ export interface CycleVibeResult {
 }
 
 const CITY_META_TABLE: Record<string, { impression: string, enImpression: string }> = {
+  // 대한민국
   "강릉": { impression: "푸른 파도와 커피 향이 어우러진 낭만적인 곳이지. 언제 가도 마음이 탁 트이는 기분이야.", enImpression: "A romantic place where blue waves and coffee scent blend. It always makes you feel refreshed." },
-  "부산": { impression: "거친 파도와 역동적인 에너지가 넘치는 곳이지. 활기찬 기운이 여기까지 느껴지는 것 같아.", enImpression: "A place full of rough waves and dynamic energy. I can feel the vibrant energy from here." },
   "춘천": { impression: "안개 낀 호수와 서정적인 분위기가 매력적인 곳이지. 닭갈비 냄새가 여기까지 나는 것 같아.", enImpression: "A charming place with foggy lakes and a lyrical atmosphere. I can almost smell the Dakgalbi from here." },
-  "경주": { impression: "천 년의 세월이 흐르는 신비로운 땅이지. 발길 닿는 곳마다 역사가 살아 숨 쉬는 기분이야.", enImpression: "A mysterious land where a thousand years of time flow. History breathes wherever you step." },
-  "제주": { impression: "현무암 사이를 지나는 바람이 자유로운 곳이지. 이국적인 풍경에 훌쩍 떠나고 싶어지네.", enImpression: "A place where the wind blows freely through basalt rocks. The exotic scenery makes me want to just take off and go." },
-  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 떙기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" },
-  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 떙기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" }
+  "인천": { impression: "인천이라... 서해의 관문이자 하늘길이 열리는 곳이지? 차이나타운의 하얀 짜장면 한 그릇을 떠올리니 문득 입맛이 도네.", enImpression: "Incheon... The gateway to the West Sea and the sky? Thinking of a bowl of white jajangmyeon in Chinatown makes my mouth water." },
+  "부산": { impression: "부산이라... 파도의 포효와 화려한 마천루가 공존하는 곳이지? 뜨끈한 돼지국밥 한 그릇에 정(情)을 말아 먹고 싶어지네!", enImpression: "Busan... A place where the roaring waves and brilliant skyscrapers coexist? I want to mix some affection into a hot bowl of Dwaeji Gukbap!" },
+  "대구": { impression: "대구라... 뜨거운 열정과 섬유의 결이 살아있는 도시지? 매콤한 찜갈비 한 양은냄비면 스트레스를 시원하게 날려버릴 수 있을 것 같아.", enImpression: "Daegu... A city alive with fiery passion and the texture of textiles? A pot of spicy steamed ribs seems like it could blow all the stress away." },
+  "경주": { impression: "경주라... 천년의 세월이 골목마다 고여있는 노천 박물관이지? 달콤한 황남빵 하나 입에 물고 첨성대 야경을 거닐고 싶네.", enImpression: "Gyeongju... An open-air museum where a thousand years of time pools in every alley? I'd like to stroll through the night view of Cheomseongdae with a sweet Hwangnam bread in my mouth." },
+  "전주": { impression: "전주라... 느림의 미학 속에 단아한 기와가 멋스러운 곳이지? 형형색색 전주비빔밥의 화려한 자태를 보니 눈부터 즐거워지는군.", enImpression: "Jeonju... A place where elegant tiles look stylish amidst the aesthetics of slowness? Just seeing the colorful and brilliant Jeonju Bibimbap is a feast for the eyes." },
+  "이천": { impression: "이천? 비옥한 토양과 장인의 숨결이 깃든 도시네. 윤기 흐르는 이천 쌀밥 정식 한 상이면 영혼까지 배부를 것 같아!", enImpression: "Icheon? A city imbued with fertile soil and the breath of artisans. A table full of glossy Icheon rice looks like it could feed the soul!" },
+  "제주": { impression: "제주라... 에메랄드빛 바다와 현무암이 빚어낸 낙원이잖아? 쫀득한 흑돼지 구이에 멜젓의 조화를 떠올리니 지금 당장 떠나고 싶네.", enImpression: "Jeju... Isn't it a paradise forged by emerald seas and basalt rocks? Thinking of the harmony of chewy grilled black pork and meljeot makes me want to leave right away." },
+  "서울": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 땡기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" },
+  "Seoul": { impression: "활기차고 전통이 잘 어우러진 현대적인 곳이지. 갑자기 K-FOOD가 땡기네?", enImpression: "A modern place where vibrant energy and tradition blend well. Suddenly craving some K-FOOD!" },
+
+  // 미국
+  "뉴욕": { impression: "뉴욕이라... 잠들지 않는 도시의 소음조차 예술이 되는 곳이지? 타임스퀘어를 바라보며 쫀득한 뉴욕 베이글 한 입 베어 물고 싶네!", enImpression: "New York... A place where even the noise of the sleepless city becomes art? I'd like to take a bite of a chewy New York bagel while gazing at Times Square!" },
+  "로스앤젤레스": { impression: "LA? 할리우드의 낭만과 끝없는 해변이 펼쳐지는 도시지. 산타모니카 해변에서 노을을 보며 신선한 타코 한 접시 먹고 싶어지네.", enImpression: "LA? The city of Hollywood romance and endless beaches. I want to have a plate of fresh tacos while watching the sunset at Santa Monica beach." },
+  "시카고": { impression: "시카고라... 웅장한 건축물 사이로 날카로운 '윈디 시티'의 바람이 부는 곳이지? 치즈가 폭포처럼 흐르는 딥디쉬 피자가 그립네!", enImpression: "Chicago... A place where the sharp wind of the 'Windy City' blows between magnificent buildings? I miss the deep-dish pizza with its cascading cheese!" },
+  "뉴올리언스": { impression: "뉴올리언스라... 재즈의 선율이 습한 공기를 타고 흐르는 낭만적인 곳이지? 슈가 파우더 가득한 베니에가 갑자기 생각나네.", enImpression: "New Orleans... A romantic place where jazz melodies flow through the humid air? Beignets covered in powdered sugar suddenly come to mind." },
+  "라스베이거스": { impression: "라스베이거스? 사막 위에 피어난 신기루 같은 욕망의 도시지. 화려한 호텔 뷔페에서 전 세계의 맛을 한꺼번에 탐닉하고 싶어지는군!", enImpression: "Las Vegas? The city of desire, like a mirage blooming in the desert. I want to indulge in flavors from all over the world at a lavish hotel buffet!" },
+
+  // 브라질
+  "리우데자네이루": { impression: "리우데자네이루라... 거대 예수상 본 적 있어? 시원한 아사이 보울 한 컵 먹으면서 그 압도적인 풍경을 구경하고 싶다!", enImpression: "Rio de Janeiro... Have you seen the Christ the Redeemer statue? I want to enjoy that overwhelming view with a cool cup of açaí bowl!" },
+  "상파울루": { impression: "상파울루라... 거대한 빌딩 숲이 끝없이 펼쳐진 남미의 심장부 아니야? 육즙 가득한 슈하스코 한 조각 맛보고 싶네!", enImpression: "São Paulo... Isn't it the heart of South America with an endless forest of giant buildings? I'd love a piece of juicy churrasco!" },
+  "브라질리아": { impression: "브라질리아? 미래지향적인 건축물들이 계획적으로 배치된 독특한 수도지. 바삭한 브라질식 튀김 만두인 파스텔 한 입이 당기는군.", enImpression: "Brasília? A unique capital with planned, futuristic architecture. I'm craving a bite of pastel, the crispy Brazilian fried dumpling." },
+
+  // 인도
+  "델리": { impression: "오 델리라고? 고대의 유적과 혼란스러운 시장의 기묘한 조화가 매력적인 곳이지? 진한 버터 치킨 향기를 떠올리니 갑자기 식욕이 돋네.", enImpression: "Oh, Delhi? A place appealing for its bizarre harmony of ancient ruins and chaotic markets? Just thinking of the rich butter chicken scent stimulates my appetite." },
+  "뭄바이": { impression: "뭄바이라... 볼리우드의 화려함과 아라비아해의 바람이 만나는 곳이지? 길거리에서 파는 매콤한 바다 파브의 맛이 문득 궁금해지네.", enImpression: "Mumbai... Where the glamour of Bollywood meets the winds of the Arabian Sea? Suddenly I'm curious about the taste of the spicy street food Vada Pav." },
+  "벵갈루루": { impression: "벵갈루루? 정원 도시이자 첨단 기술이 꿈틀대는 인도의 실리콘밸리지. 진한 필터 커피 한 잔으로 머리를 맑게 깨우고 싶어지네.", enImpression: "Bengaluru? The Silicon Valley of India, wriggling with high tech and known as the Garden City. A strong cup of filter coffee would perfectly clear my head." },
+  "콜카타": { impression: "콜카타? 지성이 숨 쉬는 문화의 중심지이자 역사가 깊은 곳이지. 달콤하고 부드러운 라스굴라 한 알이면 하루의 피로가 다 녹을 것 같아.", enImpression: "Kolkata? The intellectual cultural hub with profound history. A single sweet and soft Rasgulla would melt away the day's fatigue." }
 };
 
 const formatGod = (god: string, stemOrBranch: string, lang: Language) => {

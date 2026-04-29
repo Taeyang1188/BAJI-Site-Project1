@@ -172,8 +172,57 @@ export function calculateRelationshipDynamics(
          }
     }
 
-    const uBranches = userResult.pillars.map(p => p.branch);
-    const pBranches = partnerResult.pillars.map(p => p.branch);
+    const uBranches = userResult.pillars.map((p: any) => p.branch).filter(Boolean);
+    const pBranches = partnerResult.pillars.map((p: any) => p.branch).filter(Boolean);
+
+    // [v5.3] 공망의 심연 (Gongmang Dynamics)
+    const uGongmang = userResult.analysis?.gongmang?.branches || [];
+    const uInteractions = userResult.analysis?.interactions || [];
+    
+    // 탈공 여부 판단 (Talgong Check)
+    const isTalgong = uInteractions.some((interaction: any) => {
+        const type = interaction.type || '';
+        const branches = interaction.branches || [];
+        return (type.includes('합') || type.includes('충') || type.includes('Combine') || type.includes('Clash')) &&
+            branches.some((b: string) => uGongmang.includes(b));
+    });
+    
+    if (pDayBranch && uGongmang.includes(pDayBranch)) {
+        if (isTalgong) {
+            gates.push({
+                name: isKO ? "🔗 [Resonance] 공명(共鳴)" : "🔗 [Resonance]",
+                desc: isKO ? "비어있던 흉터가 같음을 확인합니다. 서로의 결핍을 아는 동질감이 형성됩니다." : "You acknowledge the same empty scar. A resonance forms through understanding each other's voids."
+            });
+            gateBonus += 10;
+        } else {
+            gates.push({
+                name: isKO ? "🕳️ [The Unreachable Shadow] 닿지 않는 그림자" : "🕳️ [The Unreachable Shadow]",
+                desc: isKO ? "상대는 당신의 영혼에 뚫린 구멍을 자극합니다. 가장 가깝게 느껴지는 순간조차 손가락 사이로 빠져나가는 안개처럼, 영원한 갈증을 유발하는 치명적인 함정입니다." : "The partner stimulates the hole in your soul; a fatal trap causing eternal thirst."
+            });
+            gatePenalty += 10;
+        }
+    } else if (uGongmang.length > 0) {
+        const hapChungPairs = ['子丑','丑子','寅亥','亥寅','卯戌','戌卯','辰酉','酉辰','巳申','申巳','午未','未午', 
+                               '子午','午子','丑未','未丑','寅申','申寅','卯酉','酉卯','辰戌','戌辰','巳亥','亥巳'];
+        let isVoidBreaker = false;
+        for (const gm of uGongmang) {
+            if (pBranches.some((pb: string) => pb && hapChungPairs.includes(gm + pb))) {
+                isVoidBreaker = true;
+                break;
+            }
+        }
+        
+        if (isVoidBreaker) {
+            if (!isTalgong) {
+                gates.push({
+                    name: isKO ? "🕯️ [The Void Breaker] 공망의 해구" : "🕯️ [The Void Breaker]",
+                    desc: isKO ? "밑 빠진 독이었던 당신의 결핍을 상대가 깨부수거나(충) 메워버립니다(합). 당신의 고질적인 허무주의를 치료해줄 유일한 처방전입니다." : "The partner breaks or fills your bottomless pit. The only prescription for your chronic nihilism."
+                });
+                gateBonus += 15;
+            }
+        }
+    }
+
     const getFrames = (b: string[]) => {
         const frames = [];
         if ((b.includes('寅') && b.includes('午')) || (b.includes('午') && b.includes('戌')) || (b.includes('寅') && b.includes('戌')) || (b.includes('巳') && b.includes('午') && b.includes('未'))) frames.push('Fire');
