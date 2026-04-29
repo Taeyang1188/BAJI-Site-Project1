@@ -1,3 +1,4 @@
+import { ILJU_DATASET, getIljuData } from '../data/ilju-dataset';
 import { BaZiResult, TimelineNarrative } from '../types';
 import { STEM_ELEMENTS, BRANCH_ELEMENTS } from './bazi-engine';
 
@@ -83,7 +84,29 @@ export function generateRelationshipDynamics(
 
     const isKO = lang === 'KO';
 
-    if (isSamHap && samhapGroup?.element === 'Fire' && (pStrongestEl === 'Water' || pStrongestEl === 'Metal')) {
+    const matchTenGod = (tg: string, type: '관'|'재'|'식'|'인'|'비') => {
+        if (!tg) return false;
+        if (type === '관') return tg.includes('정관') || tg.includes('편관') || tg.includes('살');
+        if (type === '재') return tg.includes('정재') || tg.includes('편재');
+        if (type === '식') return tg.includes('식신') || tg.includes('상관') || tg.includes('식상');
+        if (type === '인') return tg.includes('정인') || tg.includes('편인') || tg.includes('인성');
+        if (type === '비') return tg.includes('비견') || tg.includes('겁재') || tg.includes('비겁');
+        return false;
+    };
+
+    const uDMStem = result?.pillars?.find((p: any) => p.title === 'Day')?.stem || '甲';
+    const pDMStem = partnerResult?.pillars?.find((p: any) => p.title === 'Day')?.stem || '甲';
+    const uDMBranch = result?.pillars?.find((p: any) => p.title === 'Day')?.branch || '子';
+    const pDMBranch = partnerResult?.pillars?.find((p: any) => p.title === 'Day')?.branch || '子';
+    const isMountainSynergy = (uDMStem === '戊' || uDMStem === '己') && (pDMStem === '戊' || pDMStem === '己')
+                          && ((uDMBranch === '寅' && pDMBranch === '午') || (uDMBranch === '午' && pDMBranch === '寅'));
+
+    if (isMountainSynergy) {
+         narrative.title = isKO ? "[거대한 공명] 두 개의 산이 하나로 합쳐지는 지각변동" : "[Massive Resonance] Two Mountains Merging";
+         narrative.psychology = isKO ? "고독하게 서 있던 영토가 서로 맞닿으며, 심연부터 끓어오르는 거대한 지각변동을 경험합니다." : "Experience a massive tectonic shift as your territories touch.";
+         narrative.interaction = isKO ? "결핍의 교환이 아닙니다. 두 개의 산이 하나로 연결되며, 내면의 용암(열정)이 서로의 산맥을 타고 걷잡을 수 없이 증폭되는 압도적인 시기입니다." : "An overwhelming period where your shared lava multiplies exponentially.";
+         narrative.intensity = 0.99;
+    } else if (isSamHap && samhapGroup?.element === 'Fire' && (pStrongestEl === 'Water' || pStrongestEl === 'Metal')) {
         narrative.title = isKO ? `[수화기제] 대운 ${samhapGroup.name}의 폭주를 막는 오아시스` : "[Water-Fire Perfect Balance]";
         narrative.psychology = isKO ? `사주 원국과 대운이 만나 거대한 ${samhapGroup.name}(火)을 형성하며 내면의 에너지가 걷잡을 수 없이 뜨거워지고 조급성(조열함)이 극대화됩니다.` : "Intense fire frame makes you passionate but restless.";
         narrative.interaction = isKO ? `화국(火局)으로 불타오르고 폭주할 뻔한 당신의 거친 템포를, 파트너의 강력한 수(水) 기운이 놀랍도록 평온하게 식혀주며 '수화기제(水火旣济)'의 압도적 시너지를 발휘합니다.` : "Your exploding fire frame is perfectly quenched by partner's water.";
@@ -199,35 +222,70 @@ export function generateRelationshipDynamics(
 
     
     if (partnerDaewun && partnerResult) {
-        const STEM_ELEMENTS = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water' };
-        const BRANCH_ELEMENTS = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
-        const pDaewunStemEl = STEM_ELEMENTS[partnerDaewun.stem] || 'Wood';
-        const pDaewunBranchEl = BRANCH_ELEMENTS[partnerDaewun.branch] || 'Wood';
+        const STEM_ELEMENTS: any = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water', 'Jia':'Wood', 'Yi':'Wood', 'Bing':'Fire', 'Ding':'Fire', 'Wu':'Earth', 'Ji':'Earth', 'Geng':'Metal', 'Xin':'Metal', 'Ren':'Water', 'Gui':'Water', 'Xin (Metal)':'Metal', 'Xin(Metal)':'Metal' };
+        const BRANCH_ELEMENTS: any = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water', 'Zi':'Water', 'Chou':'Earth', 'Yin':'Wood', 'Mao':'Wood', 'Chen':'Earth', 'Si':'Fire', 'Wu':'Fire', 'Wei':'Earth', 'Shen':'Metal', 'You':'Metal', 'Xu':'Earth', 'Hai':'Water' };
         
-        let pFeatureStrKo = "";
-        let pFeatureStrEn = "";
+        let actualStem = partnerDaewun.stem;
+        let actualBranch = partnerDaewun.branch;
+        
+        if (actualStem === '辛' || actualStem === 'Xin') actualStem = '辛';
+        if (actualBranch === '酉' || actualBranch === 'You') actualBranch = '酉';
+        
+        const pDaewunStemEl = STEM_ELEMENTS[actualStem] || partnerDaewun.element || 'Wood';
+        const pDaewunBranchEl = BRANCH_ELEMENTS[actualBranch] || partnerDaewun.element || 'Wood';
+        
+        const yongshinDetail = partnerResult?.analysis?.yongshinDetail || {};
+        const pYongHeeStr = [yongshinDetail.primary?.element || '', yongshinDetail.heeShin?.element || ''].join(',');
+        const pGiGuStr = [yongshinDetail.giShin?.element || '', yongshinDetail.guShin?.element || ''].join(',');
+        
+        const branchIsUnlucky = pGiGuStr.includes(pDaewunBranchEl);
+        const stemIsLucky = pYongHeeStr.includes(pDaewunStemEl);
 
-        if (pDaewunStemEl === 'Fire' || pDaewunBranchEl === 'Fire') {
-            pFeatureStrKo = "감정표현이 솔직해지고 활동 반경을 넓히려 에너지가 발산되는";
-            pFeatureStrEn = "becoming more vibrant and expressive in actions";
-        } else if (pDaewunStemEl === 'Metal' || pDaewunBranchEl === 'Metal') {
-            pFeatureStrKo = "이성적인 판단이 강해져 관계의 선을 명확히 그으려 하는";
-            pFeatureStrEn = "setting stricter boundaries and becoming highly decisive";
-        } else if (pDaewunStemEl === 'Water' || pDaewunBranchEl === 'Water') {
-            pFeatureStrKo = "다소 예민해져 타인보단 본인의 감정에 침잠하거나 유연성이 필요한";
-            pFeatureStrEn = "retreating inward to deeper thoughts and becoming sensitive";
-        } else if (pDaewunStemEl === 'Earth' || pDaewunBranchEl === 'Earth') {
-            pFeatureStrKo = "역동적인 변화보단 현실적인 안정과 울타리를 지키려 방어적으로 변하는";
-            pFeatureStrEn = "seeking practical stability and heavily guarding their peace";
-        } else {
-            pFeatureStrKo = "자신만의 고집이 세져 상대방의 통제를 벗어나려 독립심이 강해지는";
-            pFeatureStrEn = "feeling a spark to start anew and asserting independence";
+        const getEnvText = (tenGod: string, element: string, isUnlucky: boolean) => {
+            if (matchTenGod(tenGod, '관')) return isUnlucky ? `무거운 책임과 규칙을 강요받는 척박한 압박의 무대(${element})` : `사회적 인정과 지위를 구축할 준비가 된 안정적인 무대(${element})`;
+            if (matchTenGod(tenGod, '재')) return isUnlucky ? `극심한 생존과 효율을 쫓아야만 하는 냉혹한 결과의 도마 위(${element})` : `현실적인 이득과 자산을 눈앞에 둔 매력적인 성취의 무대(${element})`;
+            if (matchTenGod(tenGod, '식')) return isUnlucky ? `쉴 새 없이 에너지를 착취당하며 흔들리는 불안정한 무대(${element})` : `자신의 역량을 마음껏 뽐내고 활동 반경을 넓힐 수 있는 자유의 공간(${element})`;
+            if (matchTenGod(tenGod, '인')) return isUnlucky ? `과거에 머물러 현실 감각이 단절된 방어적인 고립의 무대(${element})` : `내면의 안식과 깊은 학문적 평안을 얻을 수 있는 수용의 무대(${element})`;
+            if (matchTenGod(tenGod, '비')) return isUnlucky ? `치열한 경쟁자와 마찰이 난무하는 생존 투쟁의 무대(${element})` : `나의 고유한 영토를 부양하고 조력자가 나타나는 지지적 토대(${element})`;
+            return `변화무쌍한 현실의 시험대(${element})`;
+        };
+
+        const getAttText = (tenGod: string, element: string, isLucky: boolean) => {
+            const elDesc = element === 'Metal' ? 'Metal: certainty/decision' : (element === 'Wood' ? 'Wood: will/growth' : element);
+            if (matchTenGod(tenGod, '관')) return `엄격한 규칙과 이성적 통제력을 앞세워 상황을 지배하려는 주체적 결단력(${elDesc})`;
+            if (matchTenGod(tenGod, '재')) return `철저한 손익 계산에 맞춰 빠르고 매몰차게 결론을 내려는 결과 지향적 본능(${elDesc})`;
+            if (matchTenGod(tenGod, '식')) return `억눌림 없이 자신의 날것의 감정과 가치관을 거침없이 피력하려는 의지(${elDesc})`;
+            if (matchTenGod(tenGod, '인')) return `관계에 섣불리 뛰어들지 않고 본인만의 깊은 생각과 정신적 안식처를 찾으려는 통찰력(${elDesc})`;
+            if (matchTenGod(tenGod, '비')) return `타인의 개입을 차단하고 오직 자신의 강력한 고집만을 관철하려는 주관(${elDesc})`;
+            return `숨겨진 자아를 드러내려는 본능(${elDesc})`;
+        };
+
+        const envTextKo = getEnvText(partnerDaewun.branchTenGodKo || '', pDaewunBranchEl, branchIsUnlucky);
+        const attTextKo = getAttText(partnerDaewun.stemTenGodKo || '', pDaewunStemEl, stemIsLucky);
+
+        let synthesisKo = `**${envTextKo}**라는 환경 속에서, 어떻게든 **${attTextKo}**를 사수하려 방어적이고 고독한 투쟁을 이어가고 있습니다.`;
+        if (stemIsLucky) {
+             synthesisKo = `철저한 **${envTextKo}** 위에서, 오히려 이를 무대 삼아 폭발적으로 **${attTextKo}**를 현실로 관철하려는 압도적 기세를 보이고 있습니다.`;
         }
+        synthesisKo = `상대방의 [${actualStem}${partnerDaewun.branch} 대운] 시기입니다. 지금 상대방은, ` + synthesisKo;
+
+        const checkRootless = (stemEl: string, branchEl: string) => {
+             const clashPairs = ['Wood-Metal', 'Fire-Water', 'Earth-Wood', 'Metal-Fire', 'Water-Earth']; // Branch destroys Stem
+             return clashPairs.includes(`${stemEl}-${branchEl}`);
+        };
+        const isRootless = checkRootless(pDaewunStemEl, pDaewunBranchEl);
         
-        if (pFeatureStrKo) {
-            narrative.psychology += (lang === 'KO')
-                ? `\n\n👉 [상대의 타이밍 읽기] 참고로 지금 상대방은 본인 대운(${partnerDaewun.stem}${partnerDaewun.branch})의 작용으로 인해 예전과 달리 ${pFeatureStrKo} 심리적 국면에 진입해 있습니다. 이타적인 이해력으로 상대의 타이밍을 읽어내는 것이 이번 대운 기간 동안 관계 역동성을 끌어올리는 진짜 열쇠가 됩니다.`
-                : `\n\n👉 [Reading the Partner] Interestingly, your partner's current cycle (${partnerDaewun.stem}${partnerDaewun.branch}) has them ${pFeatureStrEn}. Understanding this subtle shift from their usual self will be your true key to elevating your relationship harmony.`;
+        let edgeTextKo = "";
+        if (isRootless) {
+             edgeTextKo = ` 다만 현실(지지)의 칼날이 너무 날카로워, 이 같은 주체적 다짐이 머릿속에 맴돌 뿐 아직 유연한 실천력으로 뻗어 나오진 못하고 약간 지쳐있는 상태일 수 있습니다. `;
+        } else if (pDaewunStemEl === pDaewunBranchEl) {
+             edgeTextKo = ` 천간과 지지가 동일한 강한 기운(간여지동)으로 들어와, 이 시기의 상대방은 외부의 주장에 절대 꺾이지 않는 돌격전차와 같습니다. 억지로 설득하려 하지 마세요.`;
+        }
+
+        if (lang === 'KO') {
+            narrative.psychology += `\n\n👉 [상대의 타이밍 읽기: 딥 로직 분석]\n참고로 ${synthesisKo}${edgeTextKo} 상대방과 당신 사이의 '동상이몽'을 꿰뚫어 보고, 이타적인 포용력을 발휘하는 것이 이번 대운 동안의 관계 역동성에서 결정적인 역할을 하게 될겁니다.`;
+        } else {
+            narrative.psychology += `\n\n👉 [Reading the Partner]\nInterestingly, your partner currently faces a foundational shift. Your partner is trying to assert a new attitude against the current reality. Understanding this tension will be the key to your relationship over this cycle.`;
         }
     }
 
@@ -444,6 +502,32 @@ export function generateIndividualTimelineBriefing(
              narrative += `[Phase Shift] Moving from the previous cycle, the shift heavily impacts your structural balance.\n\n`;
         }
         narrative += `[Phase Flow] The dynamic shift highly influences your path. Evaluate where this energy pushes you, and balance the tension intentionally.\n`;
+    }
+
+    const dStem = result?.pillars?.find((p: any) => p.title === 'Day')?.stem || '甲';
+    const dBranch = result?.pillars?.find((p: any) => p.title === 'Day')?.branch || '寅';
+    const iljuInfo = getIljuData(dStem, dBranch);
+
+    if (isKO) {
+        if (iljuInfo) {
+            const daewunBranchElement = (BRANCH_ELEMENTS[currentDaewun?.branch || '子'] || 'Wood').toLowerCase() as 'wood' | 'fire' | 'earth' | 'metal' | 'water';
+            let timingMod = iljuInfo.narrative_blocks.timing_modifiers?.[daewunBranchElement];
+            if (!timingMod) {
+                  timingMod = iljuInfo.narrative_blocks.timing_modifier;
+            }
+            const timingModText = timingMod ? timingMod.ko : '이번 사이클에서의 역동적인 흐름에 주목하십시오.';
+            narrative += `\n\n[운명의 화학식] ${timingModText}`;
+        }
+    } else {
+        if (iljuInfo) {
+            const daewunBranchElement = (BRANCH_ELEMENTS[currentDaewun?.branch || '子'] || 'Wood').toLowerCase() as 'wood' | 'fire' | 'earth' | 'metal' | 'water';
+            let timingMod = iljuInfo.narrative_blocks.timing_modifiers?.[daewunBranchElement];
+            if (!timingMod) {
+                  timingMod = iljuInfo.narrative_blocks.timing_modifier;
+            }
+            const timingModText = timingMod && timingMod.en ? timingMod.en : 'Focus on the dynamic flow of this cycle.';
+            narrative += `\n\n[Destiny Equation] ${timingModText}`;
+        }
     }
 
     return narrative;

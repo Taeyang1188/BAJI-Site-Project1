@@ -1,0 +1,295 @@
+import fs from 'fs';
+
+const rawData = JSON.parse(fs.readFileSync('phase2_dump.json', 'utf8'));
+
+const updates = {
+  "甲戌": {
+    "id": "gap-sul",
+    "metadata": {
+      "kr_name": "갑술(甲戌)",
+      "en_name": "Gap-sul (Wood-Dog)",
+      "element": "Wood-Earth",
+      "animal": "Dog",
+      "nature_symbol": {
+        "ko": "화산재 위에 뿌리내린 고독한 거목",
+        "en": "Giant Oak on a Barren Hill"
+      }
+    },
+    "core_identity": {
+      "persona": {
+        "ko": "재를 딛고 선 이단아",
+        "en": "Solitary Pioneer"
+      },
+      "goth_punk_vibe": {
+        "ko": "황량하고 메마른 암석지대에서 오직 홀로 잎을 틔워내는 파괴적인 생명력. 세상의 도움 없이 스스로 토양을 뚫는 맹수와도 같습니다.",
+        "en": "A massive, unyielding tree standing alone on a dry, rocky overlook. A lonely but incredibly stubborn presence that refuses to wither despite the lack of water."
+      },
+      "shadow_side": {
+        "ko": "부러질지언정 결코 휘어지지 않으려는 강박과 타인에 대한 방어적인 배타성",
+        "en": "A rigid dogmatism that rejects all help, and a simmering, explosive frustration from bearing the weight of the world entirely alone."
+      }
+    },
+    "behavior_metrics": { "drive": 90, "empathy": 30, "stability": 45, "unpredictability": 85 },
+    "compatibility_tags": { "ideal_partner": ["Mok-geuk-to", "Hwa-saeng-to"], "caution_partner": ["Jin-sul-chung"] },
+    "narrative_blocks": {
+      "default": {
+        "ko": "지옥 같은 환경에서도 기어코 자신의 영토를 개척해 내고야 마는 파괴적인 잠재력을 가졌습니다.",
+        "en": "An independent powerhouse with a fierce work ethic. You rely on nothing but your own deep roots to extract success from the harshest environments."
+      },
+      "relationship": {
+        "ko": "누군가 자신의 영역을 침범하거나 가르치려 드는 순간, 야성이 깨어나 관계를 단칼에 베어버립니다.",
+        "en": "You offer immense, sturdy shelter but remain emotionally guarded. You demand absolute loyalty and will brutally cut off anyone who threatens your sovereignty."
+      },
+      "timing_modifiers": {
+        "wood": {
+          "ko": "뿌리가 메마른 땅을 찢고 번져갑니다. 극도의 생존 본능과 투쟁심이 발동하여 경쟁자들을 맹렬히 집어삼킵니다.",
+          "en": "Roots violently split the parched earth. A brutal survival instinct activates, ruthlessly consuming competition to secure new territory."
+        },
+        "fire": {
+          "ko": "메마른 숲에 불길이 번집니다. 잠재되었던 맹세와 창작욕이 폭발하지만, 동시에 스스로를 재로 만들어버릴 위험을 품습니다.",
+          "en": "A sudden wildfire through the dry forest. Latent ambition and creativity detonate, threatening to burn you to ashes in the process."
+        },
+        "earth": {
+          "ko": "바위와 흙이 무겁게 짓누릅니다. 당신의 고립된 성채(재성)가 더욱 견고해지지만, 끝없는 소유욕에 자아가 질식할 수 있습니다.",
+          "en": "Heavy rocks and soil pile up. Your isolated fortress thickens, yet endless territorial greed threatens to suffocate your own roots."
+        },
+        "metal": {
+          "ko": "무자비한 도끼날이 굽은 가지들을 쳐냅니다. 혹독한 통제와 시련(관성) 속에서 오히려 파괴력을 거름 삼아 중심을 잡습니다.",
+          "en": "A merciless axe prunes the twisted branches. Amidst severe suppression, you surprisingly use the trauma as fuel to stand taller."
+        },
+        "water": {
+          "ko": "갈라진 땅 위로 마침내 폭우가 쏟아집니다. 굳었던 내면이 이완되며, 직관과 영감(인성)을 거침없이 빨아들입니다.",
+          "en": "A torrential downpour finally hits the cracked earth. The rigid core relaxes, aggressively absorbing intuitive wisdom and deep dark inspiration."
+        }
+      }
+    }
+  },
+  "乙亥": {
+    "metadata": {
+      "kr_name": "을해(乙亥)",
+      "en_name": "Eul-hae (Wood-Pig)",
+      "element": "Wood-Water",
+      "animal": "Pig",
+      "nature_symbol": {
+        "ko": "밤바다를 표류하는 비밀스러운 수초",
+        "en": "Drifting Kelp in the Night Sea"
+      }
+    },
+    "core_identity": {
+      "persona": { "ko": "침묵의 부유자", "en": "Nomadic Dreamer" },
+      "goth_punk_vibe": {
+        "ko": "끝을 알 수 없는 심연의 바다를 헤엄치며, 스며드는 어둠 속의 비밀스러운 조력자",
+        "en": "A tangled mass of kelp floating endlessly on a vast, dark ocean. Adapting to every current while hiding a complex, sprawling ecosystem beneath the surface."
+      },
+      "shadow_side": {
+        "ko": "과도한 공상 속에서 결단을 내리지 못하고 끝없는 우울의 물밑으로 잠식되는 멜랑콜리",
+        "en": "A severe anchorless anxiety, leading to a tendency to drift away from any solid commitment or reality when things get slightly heavy."
+      }
+    },
+    ...rawData["乙亥"],
+    "behavior_metrics": { "drive": 40, "empathy": 85, "stability": 50, "unpredictability": 70 },
+    "compatibility_tags": { "ideal_partner": ["Su-saeng-mok"], "caution_partner": ["Sa-hae-chung"] },
+    "narrative_blocks": {
+      "default": {
+        "ko": "끝없는 영감으로 가득 차 있지만, 단단한 흙에 묶이기를 거부하고 자유롭게 표류하는 몽환적 방랑자입니다.",
+        "en": "You are the ultimate survivor of the fluid world. You absorb immense emotion and adapt your shape to survive any tidal shift."
+      },
+      "relationship": {
+        "ko": "조건 없이 나를 품어줄 거대한 바다를 갈망하면서도, 닻을 내리는 순간 질식할 것을 두려워해 다시 도망칩니다.",
+        "en": "A deep, consuming dependency hidden behind a flexible exterior. You intertwine completely with the partner, but can untangle and drift away like ocean foam."
+      },
+      "timing_modifiers": {
+        "wood": {
+          "ko": "검은 물 위로 수초들이 끝없이 증식합니다. 통제할 수 없는 관계와 몽상(비겁)이 수면을 뒤덮어 빛을 차단합니다.",
+          "en": "Kelp endlessly replicates over the black water. An uncontrolled sprawl of tangled relationships and fantasies suffocates the surface light."
+        },
+        "fire": {
+          "ko": "달빛이 차가운 수면을 따스하게 비추며, 잠기려던 생명력이 표면으로 떠올라 강렬한 매력을 뿜어냅니다.",
+          "en": "Moonlight warms the freezing surface. The sinking vitality floats upward, radiating an intense, nocturnal charm to the horizon."
+        },
+        "earth": {
+          "ko": "거친 진흙이 물의 흐름을 강제로 막아섭니다. 규율(관성)이라는 감옥 속에서 수초가 말라가며 지독한 우울을 경험합니다.",
+          "en": "Thick mud violently constructs a dam. Imprisoned by rigid corporate rules, the drifting flora dries out and experiences suffocating despair."
+        },
+        "metal": {
+          "ko": "빙하처럼 차가운 이성이 물을 얼어붙게 합니다. 감정의 표류는 멈추지만, 생기는 사라지고 가시 돋친 냉소주의가 지배합니다.",
+          "en": "A glacial frost freezes the waters. The chaotic drift halts, but vitality is lost, replaced by a razor-sharp, spiked cynicism."
+        },
+        "water": {
+          "ko": "거대한 해일이 몰아쳐 모든 방향 감각을 상실합니다. 깊은 무의식(인성)의 소용돌이에 완전히 먹혀들어 세상과 단절됩니다.",
+          "en": "A massive tsunami obliterates all sense of direction. You are completely swallowed by the deep whirlpool of collective unconsciousness."
+        }
+      }
+    }
+  },
+  "丙子": {
+    "metadata": {
+      "kr_name": "병자(丙子)",
+      "en_name": "Byeong-ja (Fire-Rat)",
+      "element": "Fire-Water",
+      "animal": "Rat",
+      "nature_symbol": { "ko": "칠흑 같은 호수 위를 비추는 등대", "en": "Lighthouse in a Blizzard" }
+    },
+    ...rawData["丙子"],
+    "core_identity": {
+      "persona": { "ko": "밤의 태양", "en": "Beacon in the Dark" },
+      "goth_punk_vibe": {
+        "ko": "가장 눈부시게 빛나지만 그 발밑에는 얼음같이 차가운 심연을 감춘 우아하고 위태로운 통제자",
+        "en": "A blazing, desperately bright lighthouse cutting through a freezing, blinding snowstorm. A fragile yet brilliant warmth holding back an overwhelming dark chill."
+      },
+      "shadow_side": {
+        "ko": "모두를 비추며 웃고 있지만, 내부의 불꽃이 꺼질까 하는 끝없는 불안과 철저한 이중성",
+        "en": "An exhausting paranoia that the light will fail, leading to erratic behavior and a tendency to burn out trying to save an ungrateful world."
+      }
+    },
+    "narrative_blocks": {
+      "default": {
+        "ko": "물과 불의 강력한 모순을 내면에 품고, 그 격렬한 충돌을 세련된 사교의 가면으로 덮어내는 완벽주의자입니다.",
+        "en": "You are a beacon of hope wrapped in a chilling paradox. You attract followers by offering warmth when society is freezing, yet you keep them at arm's length."
+      },
+      "relationship": {
+        "ko": "온기로 호감을 끌어내지만, 상대가 나의 차가운 심연 밑바닥까지 캐묻고 권리를 주장하면 가차 없이 등을 돌립니다.",
+        "en": "You draw partners out of the darkness, but the intense contrast between your fiery facade and the icy reality you inhabit makes the relationship extremely volatile."
+      },
+      "timing_modifiers": {
+        "wood": {
+          "ko": "밤의 숲이 등대불을 감쌉니다. 지적 호기심(인성)과 감수성이 불꽃을 안정적으로 키워내며 신비로운 아우라를 완성합니다.",
+          "en": "A nocturnal forest embraces the lighthouse. Deep intellectual curiosity violently stabilizes the flame, completing a mystical, untouchable aura."
+        },
+        "fire": {
+          "ko": "어둠이 걷히고 폭발적인 태양풍이 호수를 증발시킵니다. 감춰뒀던 투쟁심과 욕망이 통제를 벗어나 폭주합니다.",
+          "en": "The darkness shatters as a solar storm boils the lake. Hidden ambitions and predatory instincts break containment and run entirely wild."
+        },
+        "earth": {
+          "ko": "짙은 안개와 흙먼지가 불빛을 차단합니다. 현실주의적 욕구(식상)가 이상을 덮어버려, 답답한 무력감 속을 배회합니다.",
+          "en": "Heavy fog and dust block the beam. Materialistic obsessions suffocate your high ideals, leaving you wandering blindly through oppressive smog."
+        },
+        "metal": {
+          "ko": "마치 칼날 같은 서리가 내리며 권력과 재물을 향한 지독한 갈망(재성)이 차갑고 섬뜩하게 반짝입니다.",
+          "en": "Razor-sharp frost descends. A terrifying, cold-blooded hunger for wealth and dominance reflects eerily in the shattered ice."
+        },
+        "water": {
+          "ko": "끝을 알 수 없는 심연의 늪이 불씨를 거세게 위협합니다. 우울과 압박감(관성) 속에서 살아남기 위한 극한의 저항이 시작됩니다.",
+          "en": "An abyssal swamp threatens to swallow the spark entirely. An agonizing battle for survival begins against crushing depressive waves."
+        }
+      }
+    }
+  },
+  "丁丑": {
+    "metadata": {
+      "kr_name": "정축(丁丑)",
+      "en_name": "Jeong-chuk (Fire-Ox)",
+      "element": "Fire-Earth",
+      "animal": "Ox",
+      "nature_symbol": { "ko": "얼어붙은 툰드라 속에서 타오르는 화로", "en": "Furnace in the Ice Cave" }
+    },
+    ...rawData["丁丑"],
+    "core_identity": {
+      "persona": { "ko": "심해의 연금술사", "en": "Enduring Spark" },
+      "goth_punk_vibe": {
+        "ko": "숨이 멎을 듯한 혹한 속에서 집요하게 불씨를 지키며 얼음을 녹여내는 서늘한 독기",
+        "en": "A small, incredibly intense forge operating deep inside a frozen cave. Melting the ice drop by drop through pure, agonizing persistence."
+      },
+      "shadow_side": {
+        "ko": "극한의 인내 속에 응축된 서운함과 분노가 임계점을 넘으면, 자신마저 불태워버리는 맹렬한 파괴 본능",
+        "en": "A deep-seated resentment from constant subterranean struggle, harboring a toxic spite toward those who live carelessly in the sun."
+      }
+    },
+    "narrative_blocks": {
+      "default": {
+        "ko": "가장 차가운 어둠 속에서 누구도 흉내 낼 수 없는 치명적이고도 섬세한 예술성을 빚어내는 존재입니다.",
+        "en": "The ultimate slow-burn operator. You possess terrifying emotional and intellectual stamina, forging your destiny silently in the dark."
+      },
+      "relationship": {
+        "ko": "조건 없이 희생하며 품어주지만, 단 한 번의 신뢰를 깨는 배신에는 절대적인 원한을 품고 파멸의 늪으로 끌어내립니다.",
+        "en": "A relationship of necessary warmth. You provide essential heat, but your frozen exterior requires the partner to bleed while chipping through walls of ice."
+      },
+      "timing_modifiers": {
+        "wood": {
+          "ko": "메마른 땔감이 공급되며 희미하던 화로가 매섭게 타오릅니다. 지독한 지적 탐구(인성)를 통해 세상 밖으로 맹렬하게 분출됩니다.",
+          "en": "Dry timber is violently thrown into the forge. Exhaustive intellectual pursuit fuels an explosive blast, erupting fiercely from the underground."
+        },
+        "fire": {
+          "ko": "동족의 불길들이 모여 폭주하는 마그마가 됩니다. 억눌렸던 투쟁심과 경쟁(비겁)이 극에 달하며 빙하를 산산조각 냅니다.",
+          "en": "Allied flames gather into a raging magma flow. Suppressed competitive instincts reach critical mass, shattering the surrounding glacier completely."
+        },
+        "earth": {
+          "ko": "거대한 산사태가 화로를 덮쳐옵니다. 엄청난 창작의 고통과 희생(식상)이 동반되지만, 그 안에서 기어이 보석을 구워냅니다.",
+          "en": "A massive avalanche buries the forge. Intense creative agony ensues, but you stubbornly bake raw diamonds under the crushing pressure."
+        },
+        "metal": {
+          "ko": "녹아내린 얼음 틈으로 서늘한 황금이 모습을 드러냅니다. 지독하게 인내했던 물질적 갈망(재성)이 가장 차갑고 잔혹하게 실현됩니다.",
+          "en": "Cold gold is revealed within the melting ice. The agonizingly patient hunger for material wealth is realized in the most merciless way."
+        },
+        "water": {
+          "ko": "어둠 속에서 범람한 독기가 불씨를 꺼트리려 합니다. 억압과 고난(관성) 속에서 생사를 건 숨 막히는 사투를 벌이게 됩니다.",
+          "en": "Toxic waters flood the dark cave, desperately trying to extinguish the spark. A suffocating, life-or-death struggle against heavy systemic oppression begins."
+        }
+      }
+    }
+  },
+  "戊寅": {
+    "metadata": {
+      "kr_name": "무인(戊寅)",
+      "en_name": "Mu-in (Earth-Tiger)",
+      "element": "Earth-Wood",
+      "animal": "Tiger",
+      "nature_symbol": { "ko": "험준한 산맥맥맥 위의 파괴적 야성", "en": "Mountain in the Jungle" }
+    },
+    ...rawData["戊寅"],
+    "core_identity": {
+      "persona": { "ko": "고독한 수호자", "en": "Mystical Guardian" },
+      "goth_punk_vibe": {
+        "ko": "거친 야생과 협곡 사이에서 홀로 영토를 지배하며 범접할 수 없는 중압감을 내뿜는 야수의 군주",
+        "en": "A mystical tiger guarding a great, treacherous mountain. Noble, fierce, yet anchored to an unwavering, heavy dominion that crushes intruders."
+      },
+      "shadow_side": {
+        "ko": "절대 타협을 모르는 강박적인 자존심 뒤에 숨겨진, 아무에게도 약점을 보여선 안 된다는 지독한 고립감",
+        "en": "A terrifying inability to compromise, resulting in explosive, destructive outbursts when the surrounding jungle threatens to overrun the mountain."
+      }
+    },
+    "narrative_blocks": {
+      "default": {
+        "ko": "당신은 누군가의 지배를 받기보다 스스로 길을 내어 군림하고 묵직하게 통제하는 절대적 존재입니다.",
+        "en": "You possess massive scale and an aggressive, pioneering spirit. You stand firm in the middle of chaos, imposing your heavy will on everyone."
+      },
+      "relationship": {
+        "ko": "내 사람을 보호하려는 책임감은 거대하지만, 그 과정에서 상대의 사소한 간섭조차 반역으로 느끼고 짓뭉개려 합니다.",
+        "en": "You are a massive, protective presence, but incredibly dictatorial. The partner must live in your jungle and abide strictly by the laws of your mountain."
+      },
+      "timing_modifiers": {
+        "wood": {
+          "ko": "나무뿌리가 커지며 바위산을 갈라냅니다. 스스로를 검열하고 다그치는 야만적인 압박(관성)이 정점으로 치닫습니다.",
+          "en": "Roots wildly split the rocky peaks. A barbaric internal pressure to self-censor and dominate reaches an absolute, painful climax."
+        },
+        "fire": {
+          "ko": "산정상에 뜨거운 태양이 떠오르며 안개를 걷어냅니다. 카리스마 위에 깊은 지혜(인성)가 더해져 종교적일 만큼 숭고한 권위를 장착합니다.",
+          "en": "A scorching sun rises, burning off the mist. Profound wisdom supercharges your raw charisma, cementing an almost religious, untouchable authority."
+        },
+        "earth": {
+          "ko": "산맥이 지진으로 더욱 비대해집니다. 지나친 고집과 투쟁심(비겁)이 독선으로 변모하여 모든 경쟁자를 벼랑 끝으로 몰아붙입니다.",
+          "en": "Earthquakes gorge the mountain range. Extreme stubbornness and feral ambition warp into terrifying arrogance, pushing all rivals off the cliff."
+        },
+        "metal": {
+          "ko": "광맥에서 차가운 검이 벼려져 나옵니다. 짐승의 본능보다 더 날카로운 현실적 처세술(식상)로 적의 심장부로 파고듭니다.",
+          "en": "Cold steel is forged from the hidden ore. You bypass raw instinct, using razor-sharp realistic tactics and charisma to carve out the enemy's core."
+        },
+        "water": {
+          "ko": "어두운 산성비에 산비탈이 처참히 무너져 내립니다. 끝없이 범람하는 물질적 욕망(재성)에 휩쓸려 자아의 균형마저 붕괴될 위험이 있습니다.",
+          "en": "Dark acid rain triggers brutal landslides. The relentless torrent of materialistic greed threatens to wash away your foundational stability."
+        }
+      }
+    }
+  }
+};
+
+const finalObj = {};
+for (const key of Object.keys(updates)) {
+  finalObj[key] = { ...rawData[key], ...updates[key] };
+  // ensure timing_modifier is removed
+  if (finalObj[key].narrative_blocks && finalObj[key].narrative_blocks.timing_modifier) {
+    delete finalObj[key].narrative_blocks.timing_modifier;
+  }
+}
+fs.writeFileSync('phase2_patch1.json', JSON.stringify(finalObj, null, 2));
+

@@ -5,6 +5,7 @@
   "homepage": ".",
   "type": "module",
   "scripts": {
+    "patch": "node patch.mjs",
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",

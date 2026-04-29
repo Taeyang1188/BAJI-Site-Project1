@@ -141,7 +141,15 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
   const partnerAnalysisMemo = useMemo(() => {
     if (!partnerResult) return null;
 
-    const dyn = calculateRelationshipDynamics(result, partnerResult, adjustedElements, partnerAdjustedElements || {}, lang as 'KO' | 'EN');
+    const dyn = calculateRelationshipDynamics(
+        result, 
+        partnerResult, 
+        adjustedElements, 
+        partnerAdjustedElements || {}, 
+        lang as 'KO' | 'EN',
+        currentDaewun?.branch,
+        partnerMatchDaewun?.branch
+    );
 
     let titleSync = lang === 'KO' ? '무난하고 현실적인 동행' : 'Stable & Practical Connection';
     if (dyn.syncScore >= 95) titleSync = lang === 'KO' ? '✨ 천생연분 (영혼의 단짝)' : '✨ Soulmates (Karmic Bond)';
@@ -254,6 +262,26 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
        }
   }
 
+  const renderDaewunBriefing = () => (
+      <div className="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
+        <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-bold text-white/80">{lang === 'KO' ? '대운 해설' : 'Daewun Details'}</h4>
+            <button onClick={() => setShowTimelineDocs(!showTimelineDocs)} className="text-xs text-white/50 hover:text-white">
+                {showTimelineDocs ? (lang === 'KO' ? '닫기' : 'Hide') : (lang === 'KO' ? '펼치기' : 'Show')}
+            </button>
+        </div>
+        <AnimatePresence>
+            {showTimelineDocs && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <p className="text-sm text-white/80 leading-relaxed font-display whitespace-pre-wrap pt-2">
+                      {dynamicOverview}
+                    </p>
+                </motion.div>
+            )}
+        </AnimatePresence>
+      </div>
+  );
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
       
@@ -330,7 +358,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         </h4>
         <div className="w-full h-64 sm:h-80 relative z-10 pointer-events-none">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart key={sliderIndex} cx="50%" cy="50%" outerRadius="85%" data={radarData}>
+            <RadarChart key={sliderIndex} cx="50%" cy="50%" outerRadius="70%" data={radarData}>
               <PolarGrid stroke="#ffffff20" />
               <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff80', fontSize: 12 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
@@ -506,24 +534,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         </div>
       )}
 
-      {/* Dynamic Overview text */}
-      <div className="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
-        <div className="flex justify-between items-center mb-2">
-            <h4 className="text-sm font-bold text-white/80">{lang === 'KO' ? '대운 해설' : 'Daewun Details'}</h4>
-            <button onClick={() => setShowTimelineDocs(!showTimelineDocs)} className="text-xs text-white/50 hover:text-white">
-                {showTimelineDocs ? (lang === 'KO' ? '닫기' : 'Hide') : (lang === 'KO' ? '펼치기' : 'Show')}
-            </button>
-        </div>
-        <AnimatePresence>
-            {showTimelineDocs && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                    <p className="text-sm text-white/80 leading-relaxed font-display whitespace-pre-wrap pt-2">
-                      {dynamicOverview}
-                    </p>
-                </motion.div>
-            )}
-        </AnimatePresence>
-      </div>
+      {(!partnerResult || !partnerAnalysisMemo) && renderDaewunBriefing()}
 
       {partnerResult && partnerAnalysisMemo && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl space-y-4">
@@ -609,6 +620,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         </motion.div>
       )}
 
+               {partnerResult && partnerAnalysisMemo && renderDaewunBriefing()}
     </motion.div>
   );
 }
@@ -682,7 +694,7 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className="text-[10px] text-white/50">{lang === 'KO' ? '태어난 시간' : 'Time'}</label>
-          <input type="time" value={time} onChange={e=>setTime(e.target.value)} placeholder="HH:MM" className="w-full bg-black/50 border border-white/10 rounded p-1 text-xs text-white" />
+          <input type="time" lang={lang === 'KO' ? 'ko-KR' : 'en-US'} value={time} onChange={e=>setTime(e.target.value)} placeholder="HH:MM" className="w-full bg-black/50 border border-white/10 rounded p-1 text-xs text-white" />
         </div>
         <div>
           <label className="text-[10px] text-white/50">{lang === 'KO' ? '성별' : 'Gender'}</label>

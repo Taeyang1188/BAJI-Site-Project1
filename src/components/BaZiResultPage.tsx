@@ -630,6 +630,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [movingTarget, setMovingTarget] = useState<string | null>(null);
   const [movingContext, setMovingContext] = useState<string>(socialContext || 'none');
   
+  const vibeContainerRef = React.useRef<HTMLDivElement>(null);
   const interactionsData = useMemo(() => {
     return {
       maritalStatus,
@@ -1238,6 +1239,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
       {/* Character Commentary */}
       <motion.div 
+        ref={vibeContainerRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="goth-glass p-6 rounded-2xl border-l-4 border-neon-pink flex flex-col gap-4"
@@ -1292,7 +1294,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     </div>
                   )}
 
-                  {(vibePhase === 'question' || vibePhase === 'analysis') && (
+                  {vibePhase === 'question' && (
                     <p className="text-lg font-display italic text-white leading-relaxed whitespace-pre-wrap">
                       <ParsedText lang={lang} text={cycleVibe.intro} />
                     </p>
@@ -1343,6 +1345,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     setMovingStep('final');
                                   }
                                   setVibePhase('analysis');
+                                  setTimeout(() => {
+                                    vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }, 50);
                                 }}
                                 className="p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-left transition-all group"
                               >
@@ -1702,6 +1707,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           onClick={() => {
                             setVibePhase('question');
                             setSelectedThemeId(null);
+                            setTimeout(() => {
+                              vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 50);
                           }}
                           className="w-fit px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-xs text-white/70 transition-all font-medium"
                         >

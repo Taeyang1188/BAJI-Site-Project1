@@ -486,16 +486,16 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
 
 그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
         } else if (!isFireExtreme) {
-          detailedEffect += `상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
+          detailedEffect += `그리고.. 상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
         }
       }
-      if (comboIds.includes('식상생재')) detailedEffect += `식상이 재성으로 이어지는 흐름이라 결과물이 쏠쏠하겠어. `;
+      if (comboIds.includes('식상생재')) detailedEffect += `그리고.. 식상이 재성으로 이어지는 흐름이라 결과물이 쏠쏠하겠어. `;
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
           detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어의 안정성이 흔들릴 수 있으니, 현실적인 이득과 명예 사이에서 균형을 잘 잡는 게 중요해. `;
         }
       }
-      if (comboIds.includes('관인상생')) detailedEffect += `조직의 보호 아래서 가치를 증명하기 좋아. `;
+      if (comboIds.includes('관인상생')) detailedEffect += `그리고.. 조직의 보호 아래서 가치를 증명하기 좋아. `;
       
       main += `
 
