@@ -7,7 +7,7 @@ import { ELEMENT_COLORS } from '../constants';
 import { STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { calculateRealBaZi } from '../services/bazi-service';
 import { generateRelationshipDynamics, generateIndividualTimelineBriefing } from '../services/timeline-briefing-service';
-import { CheckCircle2, Heart, Sparkles, Swords, X, Calendar, Activity, Repeat } from 'lucide-react';
+import { CheckCircle2, Heart, Sparkles, Swords, X, Calendar, Activity, Repeat, Globe } from 'lucide-react';
 
 interface DestinyMapSectionProps {
   result: BaZiResult;
@@ -710,6 +710,55 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
   const [time, setTime] = useState('12:00');
   const [gender, setGender] = useState('m');
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
+  const [city, setCity] = useState(lang === 'KO' ? '서울' : 'Seoul');
+  const [coords, setCoords] = useState({ lat: 37.5665, lon: 126.9780 });
+  const cityInputRef = React.useRef<HTMLInputElement>(null);
+  const autocompleteRef = React.useRef<any>(null);
+
+  useEffect(() => {
+    const initPartnerAutocomplete = async () => {
+      if (cityInputRef.current && window.google?.maps) {
+        try {
+          // Ensure places library is imported
+          let AutocompleteClass;
+          if (window.google.maps.places?.Autocomplete) {
+            AutocompleteClass = window.google.maps.places.Autocomplete;
+          } else {
+            const { Autocomplete } = await window.google.maps.importLibrary("places") as any;
+            AutocompleteClass = Autocomplete;
+          }
+
+          if (autocompleteRef.current) return;
+
+          const autocomplete = new AutocompleteClass(cityInputRef.current, {
+            types: ['(cities)'],
+            fields: ['geometry', 'name']
+          });
+
+          autocompleteRef.current = autocomplete;
+
+          autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (place?.geometry?.location) {
+              const lat = place.geometry.location.lat();
+              const lon = place.geometry.location.lng();
+              setCoords({ lat, lon });
+              const cityName = place.name || cityInputRef.current?.value || '';
+              setCity(cityName);
+            }
+          });
+        } catch (e) {
+          console.error("Error initializing Partner Autocomplete", e);
+        }
+      }
+    };
+
+    initPartnerAutocomplete();
+    
+    return () => {
+      autocompleteRef.current = null;
+    };
+  }, [lang]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -717,12 +766,12 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
       name: 'Partner',
       birthDate: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`,
       birthTime: time,
-      city: 'Seoul',
+      city: city,
       gender: gender === 'm' ? 'male' : 'female',
       calendarType
     };
     try {
-      const res = calculateRealBaZi(input, 37.5, 127.0, lang);
+      const res = calculateRealBaZi(input, coords.lat, coords.lon, lang);
       onSubmit(res);
     } catch (e) {
       console.error(e);
@@ -752,7 +801,7 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
               if (v === '0') { setMonth(v); return; }
               let n = parseInt(v, 10);
               if (!isNaN(n)) {
-                 if (n > 12) v = '12';
+                if (n > 12) v = '12';
               }
               setMonth(v);
             }} 
@@ -768,7 +817,7 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
               if (v === '0') { setDay(v); return; }
               let n = parseInt(v, 10);
               if (!isNaN(n)) {
-                 if (n > 31) v = '31';
+                if (n > 31) v = '31';
               }
               setDay(v);
             }} 
@@ -786,6 +835,21 @@ const PartnerQuickForm: React.FC<{ lang: Language, onSubmit: (res: BaZiResult) =
             <option value="m">{lang === 'KO' ? '남성' : 'Male'}</option>
             <option value="f">{lang === 'KO' ? '여성' : 'Female'}</option>
           </select>
+        </div>
+      </div>
+      {/* City Input */}
+      <div>
+        <label className="text-[10px] text-white/50">{lang === 'KO' ? '태어난 도시' : 'Birth City'}</label>
+        <div className="relative">
+          <Globe className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-fuchsia-400" />
+          <input 
+            ref={cityInputRef}
+            type="text" 
+            value={city} 
+            onChange={e => setCity(e.target.value)}
+            placeholder={lang === 'KO' ? '도시 입력' : 'Enter City'}
+            className="w-full bg-black/50 border border-white/10 rounded p-1 pl-7 text-xs text-white" 
+          />
         </div>
       </div>
       <button type="submit" className="w-full py-2 mt-2 bg-fuchsia-500/20 text-fuchsia-300 rounded font-bold text-xs border border-fuchsia-500/40 hover:bg-fuchsia-500/30 transition-colors">

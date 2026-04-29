@@ -421,14 +421,174 @@ export function calculateRelationshipDynamics(
         gatePenalty += 15;
     }
 
+    const uDayIlju = uDayStem + uDayBranch;
+    const pDayIlju = pDayStem + pDayBranch;
+
+    const ELEMENT_GANYEO: Record<string, { pillars: string[], ko: string, en: string, descKo: string, descEn: string }> = {
+        'Wood': { 
+            pillars: ['甲寅', '乙卯'], 
+            ko: "🌳 [대지의 뿌리] 생명력의 회복", 
+            en: "🌳 [Roots of Life] Vitality Restored",
+            descKo: "원국에 부족한 나무(목) 기운을 상대의 울창한 숲이 채워줍니다. 정체되었던 삶에 활기가 도는 관계입니다.",
+            descEn: "Their lush forest energy fills your missing wood element. Life gains new momentum."
+        },
+        'Fire': { 
+            pillars: ['丙午', '丁巳'], 
+            ko: "🔥 [태양의 온기] 얼어붙은 영혼의 해빙", 
+            en: "🔥 [Solar Warmth] Thawing the Frozen Soul",
+            descKo: "원국에 부족한 불(화) 기운을 상대의 뜨거운 심장이 채워줍니다. 차가웠던 삶에 열정과 사랑이 피어납니다.",
+            descEn: "Their passionate fire energy thaws your cold natal chart. Passion and warmth bloom."
+        },
+        'Earth': { 
+            pillars: ['戊辰', '戊戌', '己丑', '己未'], 
+            ko: "⛰️ [흔들리지 않는 대지] 삶의 중심", 
+            en: "⛰️ [Unshakable Ground] The Center of Life",
+            descKo: "원국에 부족한 흙(토) 기운을 상대의 단단한 대지가 채워줍니다. 방황하던 삶에 안식처와 지지대를 얻는 관계입니다.",
+            descEn: "Their solid earth energy provides the foundation you lack. You find a true home."
+        },
+        'Metal': { 
+            pillars: ['庚申', '辛酉'], 
+            ko: "⚔️ [정교한 칼날] 결단과 정의", 
+            en: "⚔️ [Precision Blade] Decision and Justice",
+            descKo: "원국에 부족한 금(금) 기운을 상대의 예리한 결단력이 채워줍니다. 흐릿했던 삶의 방향이 명확해지는 관계입니다.",
+            descEn: "Their sharp metal energy provides the decisiveness you lack. Your life path becomes clear."
+        },
+        'Water': { 
+            pillars: ['壬子', '癸亥'], 
+            ko: "🌊 [생명의 단비] 갈증을 해소하는 바다", 
+            en: "🌊 [Life-Saving Rain] The Thirst-Quenching Sea",
+            descKo: "원국에 부족한 물(수) 기운을 상대의 거대한 바다가 채워줍니다. 존재만으로도 성격의 건조함과 갈증이 해소되는 관계입니다.",
+            descEn: "Their massive water energy quenches your elemental thirst. They bring fluid grace to your life."
+        }
+    };
+
+    Object.entries(ELEMENT_GANYEO).forEach(([el, info]) => {
+        const uVal = uElements[el + '(수)'] || uElements[el] || 0;
+        const pVal = pElements[el + '(수)'] || pElements[el] || 0;
+
+        if (uVal <= 0 && info.pillars.includes(pDayIlju)) {
+            gates.push({ name: isKO ? info.ko : info.en, desc: isKO ? info.descKo : info.descEn });
+            gateBonus += 20;
+        }
+        if (pVal <= 0 && info.pillars.includes(uDayIlju)) {
+            const partnerDescKo = info.descKo.replace('원국에 부족한', '상대방의').replace('채워줍니다', '당신의 기운이 해결해줍니다').replace('관계입니다', '구원자입니다');
+            const partnerDescEn = info.descEn.replace('Their', 'Your').replace('fills your', 'fills their').replace('You find', 'They find');
+            gates.push({ name: isKO ? info.ko : info.en, desc: isKO ? partnerDescKo : partnerDescEn });
+            gateBonus += 20;
+        }
+    });
+
+    const checkJDSY = (res: any) => {
+        const note = res.analysis?.logicNote || "";
+        return note.includes('재다신약') || note.includes('Jae-da-shin-yak');
+    };
+    const isUJDSY = checkJDSY(userResult);
+    const isPJDSY = checkJDSY(partnerResult);
+
+    // counts for elements (8 characters)
+    const countEl = (res: BaZiResult, targetEl: string) => {
+        let count = 0;
+        res.pillars.forEach(p => {
+            if (STEM_ELEMENTS[p.stem] === targetEl) count++;
+            if (BRANCH_ELEMENTS[p.branch] === targetEl) count++;
+        });
+        return count;
+    };
+
+    const pWoodCount = countEl(partnerResult, 'Wood');
+    const pFireCount = countEl(partnerResult, 'Fire');
+    const pEarthCount = countEl(partnerResult, 'Earth');
+    const pMetalCount = countEl(partnerResult, 'Metal');
+    const pWaterCount = countEl(partnerResult, 'Water');
+
+    const uWoodCount = countEl(userResult, 'Wood');
+    const uFireCount = countEl(userResult, 'Fire');
+    const uEarthCount = countEl(userResult, 'Earth');
+    const uMetalCount = countEl(userResult, 'Metal');
+    const uWaterCount = countEl(userResult, 'Water');
+
+    // --- Advanced Logic: Overload (과유불급) ---
+
+    // 1. Deng-Ra-Gye-Gap (藤羅繫甲)
+    if (uDayStem === '乙' && (partnerResult.pillars.some(p => p.stem === '甲' || p.branch === '寅'))) {
+        const uMetalVal = uElements['Metal(금)'] || uElements['Metal'] || 0;
+        if (uWeak || uMetalVal > 30) {
+            gates.push({ 
+                name: isKO ? "🌿 [등라계갑] 거목을 만난 넝쿨" : "🌿 [Deng-Ra-Gye-Gap]", 
+                desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 타고 하늘로 뻗어 나갑니다. 당신에게 상대는 성장의 발판이자 가장 강력한 보호막입니다. 주도권은 매달리는 자(당신)에게 있습니다." : "As Eul-mok, you climb the partner's giant Gap-mok tree. They are your ladder to the sky and strongest shield. The initiative lies with you." 
+            });
+            gateBonus += 20;
+        }
+    }
+    if (pDayStem === '乙' && (userResult.pillars.some(p => p.stem === '甲' || p.branch === '寅'))) {
+        gates.push({ 
+            name: isKO ? "🛡️ [자비로운 짐] 등라계갑의 버팀목" : "🛡️ [Benevolent Burden]", 
+            desc: isKO ? "상대(을목)는 당신이라는 거목을 타고 하늘로 뻗어 나갑니다. 당신은 상대의 성장을 위해 자신의 에너지를 기꺼이 내어주는 헌신적인 보호막 역할을 하고 있습니다." : "The partner (Eul-mok) climbs you, the Gap-mok tree. You are a devoted shield, giving your energy for their growth." 
+        });
+        // Bonus is smaller or neutral for the supporter as it's a "burden"
+        gateBonus += 5;
+    }
+
+    // 2. Geum-Da-Su-Tak (金多水濁) & Geum-Da-Su-Che
+    if ((uDayStem === '壬' || uDayStem === '癸') && pMetalCount >= 3) {
+        gates.push({
+            name: isKO ? "🧪 [금다수탁] 탁해진 심연" : "🧪 [Geum-Da-Su-Tak]",
+            desc: isKO ? "맑아야 할 당신의 샘물에 거대한 바위(금)들이 쏟아져 들어왔습니다. 이는 생(生)이 아니라 압살입니다. 상대의 과도한 보호와 통제가 당신의 자아를 진흙탕으로 만들고 있습니다." : "Massive rocks (Metal) poured into your clear water. This isn't support; it's smothering. Their excessive control turns your ego into mud."
+        });
+        gatePenalty += 25;
+    }
+    if ((pDayStem === '壬' || pDayStem === '癸') && uMetalCount >= 3) {
+        gates.push({
+            name: isKO ? "🧪 [금다수탁] 의도치 않은 압박" : "🧪 [Geum-Da-Su-Tak (Reverse)]",
+            desc: isKO ? "당신의 과도한 금(Metal) 기운이 상대의 맑은 물을 탁하게 만들고 있을 수 있습니다. 사랑이라는 이름의 통제가 상대를 질식시키고 있지는 않은지 돌아봐야 합니다." : "Your excessive Metal energy might be muddying their clear water. Check if your 'loving control' is suffocating them."
+        });
+        gatePenalty += 15;
+    }
+
+    // 3.1 Mok-Da-Hwa-Sik (木多火熄)
+    if ((uDayStem === '丙' || uDayStem === '丁') && pWoodCount >= 3) {
+        gates.push({
+            name: isKO ? "🕯️ [목다화식] 꺼져가는 불꽃" : "🕯️ [Mok-Da-Hwa-Sik]",
+            desc: isKO ? "상대의 지나친 간섭과 지원이 오히려 당신의 재능(불꽃)을 질식시키고 있습니다. 타오르고 싶어도 숨 쉴 틈이 없습니다." : "Their excessive interference suffocates your talent. You want to burn bright, but there's no room to breathe."
+        });
+        gatePenalty += 20;
+    }
+
+    // 3.2 To-Da-Mae-Geum (土多埋金)
+    if ((uDayStem === '庚' || uDayStem === '辛') && pEarthCount >= 3) {
+        gates.push({
+            name: isKO ? "💎 [토다매금] 묻혀버린 보석" : "💎 [To-Da-Mae-Geum]",
+            desc: isKO ? "상대의 보수적이고 답답한 기운이 당신의 날카로운 천재성을 흙 속에 묻어버렸습니다. 세상에 드러날 기회를 잃어가는 중입니다." : "Their conservative and heavy energy buries your sharp brilliance in the soil. You're losing chances to shine."
+        });
+        gatePenalty += 15;
+    }
+
+    // 3.3 Su-Da-Mok-Pyo (水多木漂)
+    if ((uDayStem === '甲' || uDayStem === '乙') && pWaterCount >= 3) {
+        gates.push({
+            name: isKO ? "🌊 [수다목표] 뿌리 뽑힌 부표" : "🌊 [Su-Da-Mok-Pyo]",
+            desc: isKO ? "과도한 감정과 수용력이 당신의 현실적 기반(뿌리)을 앗아갔습니다. 정착하지 못하고 상대의 감정에 휘말려 표류하는 관계입니다." : "Excessive emotions and receptivity took away your grounded roots. You are drifting in their emotional currents without settling."
+        });
+        gatePenalty += 18;
+    }
+
+    // 3.4 Hwa-Da-To-Cho (火多土焦)
+    if ((uDayStem === '戊' || uDayStem === '己') && pFireCount >= 3) {
+        gates.push({
+            name: isKO ? "🔥 [화다토초] 갈라진 불모지" : "🔥 [Hwa-Da-To-Cho]",
+            desc: isKO ? "상대의 폭발적인 열정이 당신의 인내심을 하얗게 태워버렸습니다. 아무것도 자랄 수 없는 메마른 관계, 갈증만이 남았습니다." : "Their explosive passion scorched your patience. A barren relationship where nothing can grow, leaving only thirst."
+        });
+        gatePenalty += 22;
+    }
+
     // Jae-Da-Shin-Yak Synergy
-    if (uWeak && uJaeSeong > 40 && (pBiGeop > 30 || pInSeong > 30)) {
+    if (isUJDSY && (pBiGeop > 30 || pInSeong > 30)) {
         gates.push({
             name: isKO ? "💼 [재다신약의 구원] 부하분담의 동반자" : "💼 [Saving Wealth] Burden Sharing",
             desc: isKO ? "당신이 감당하기 벅찬 현실의 무게(재성)와 일들을 상대방의 뚝심(비겁/인성)이 든든하게 나눠 짊어집니다." : "They share the heavy weight of your responsibilities with strong support."
         });
         gateBonus += 15;
-    } else if (pWeak && pJaeSeong > 40 && (uBiGeop > 30 || uInSeong > 30)) {
+    } else if (isPJDSY && (uBiGeop > 30 || uInSeong > 30)) {
         gates.push({
             name: isKO ? "🛡️ [재다신약의 구원] 기댈 수 있는 언덕" : "🛡️ [Saving Wealth] A Hill to Lean On",
             desc: isKO ? "상대방이 현실의 과도한 압박(재성)에 치여 지칠 때, 당신의 강한 기운(비겁/인성)이 완벽한 안식처이자 힘이 되어줍니다." : "When they are exhausted by pressure, you provide a perfect shelter and strength."
@@ -458,7 +618,30 @@ export function calculateRelationshipDynamics(
              gates.push({ name: isKO ? "🌋 [절대적 화력의 공유]" : "🌋 [Absolute Firepower]", desc: isKO ? "서로가 서로의 불꽃을 키워주는 위험하고도 완벽한 엔진입니다." : "A dangerously perfect engine feeding each other's flames." });
              gateBonus += 20;
         } else if (uBiGeop > 35 && pBiGeop > 35) { gates.push({ name: isKO ? "⚠️ [숙명의 라이벌] 두 마리 호랑이" : "⚠️ [Rivals of Destiny] Two Tigers", desc: isKO ? "주도권을 향한 자존심 싸움이 치열합니다. 공통의 목표가 없다면 부딪히기 쉽습니다." : "Fierce pride battles. You need a shared goal." }); gatePenalty += 10; }
-        else if (uBiGeop < 20 && pBiGeop < 20) { gates.push({ name: isKO ? "🤝 [도원결의] 편안한 안식처" : "🤝 [Oath of the Peach Garden]", desc: isKO ? "두 사람은 서로를 든든하게 받쳐주는 평화로운 관계지만, 동시에 공유하는 큰 목표가 꼭 필요합니다." : "Peaceful bond, needs a trigger to push forward." }); gateBonus += 10; }
+        else if (uBiGeop < 20 && pBiGeop < 20) { 
+            const GANYEOJIDONG = ['甲寅', '乙卯', '丙午', '丁巳', '戊辰', '戊戌', '己丑', '己未', '庚申', '辛酉', '壬子', '癸亥'];
+            // Using existing uDayStem + uDayBranch
+            const isUGan = GANYEOJIDONG.includes(uDayStem + uDayBranch);
+            const isPGan = GANYEOJIDONG.includes(pDayStem + pDayBranch);
+
+            if (isUGan && isPGan) {
+                gates.push({ 
+                    name: isKO ? "💎 [간여지동의 공명] 강한 영혼의 마주침" : "💎 [Resonance of Independence]", 
+                    desc: isKO ? "둘 다 내면의 뿌리가 매우 강한 간여지동입니다. 서로의 고집을 꺾으려 하기보다, 그 단단한 자립심을 존중하며 같은 곳을 바라볼 때 무적의 파트너가 됩니다." : "Both have incredibly strong inner roots. When you respect each other's independence, you become invincible." 
+                });
+                gateBonus += 15;
+            } else if (isUGan || isPGan) {
+                const who = isUGan ? (isKO ? "당신" : "You") : (isKO ? "상대" : "Partner");
+                gates.push({ 
+                    name: isKO ? "🤝 [외유내강] 엇갈리는 자아" : "🤝 [Soft Outside, Hard Inside]", 
+                    desc: isKO ? who + "은 겉으로는 유해 보여도 내면에 굽히지 않는 고집(간여지동)을 품고 있습니다. 이 역설적인 무게감 때문에 서로의 속도를 맞추는 데 노력이 필요합니다." : who + " has a hidden stubbornness. Effort is needed to synchronize your paces due to this paradoxical weight." 
+                });
+                // No bonus for one-sided GanYeoJiDong as requested
+            } else {
+                gates.push({ name: isKO ? "🤝 [도원결의] 편안한 안식처" : "🤝 [Oath of the Peach Garden]", desc: isKO ? "두 사람은 서로를 든든하게 받쳐주는 평화로운 관계지만, 동시에 공유하는 큰 목표가 꼭 필요합니다." : "Peaceful bond, needs a trigger to push forward." }); 
+                gateBonus += 10; 
+            }
+        }
         if ((uSikSang > 30 && pJaeSeong > 30) || (pSikSang > 30 && uJaeSeong > 30)) { const i = uSikSang > 30 ? "당신의 아이디어" : "상대의 아이디어"; const m = uJaeSeong > 30 ? "당신의 현실 감각" : "상대의 현실 감각"; gates.push({ name: isKO ? "💼 [창과 방패] 비즈니스 콤비" : "💼 [Spear and Shield] Business Combo", desc: isKO ? i+"와 "+m+"가 만나 실질적 성과를 냅니다." : "Ideas meet realistic senses to produce results." }); gateBonus += 15; }
         const uYang = uSikSang + uBiGeop; const pYang = pSikSang + pBiGeop;
         if (Math.abs(uYang - pYang) > 25) { const l = uYang > pYang ? "당신" : "상대"; const s = uYang > pYang ? "상대" : "당신"; gates.push({ name: isKO ? "⚖️ [극성 조화] 추진체와 키잡이" : "⚖️ [Polarity Harmony] Lead and Support", desc: isKO ? l+"이 폭발력 있는 엔진이라면, "+s+"는 방향을 잡는 키잡이입니다." : "One is the engine, the other the steering wheel." }); gateBonus += 10; }
