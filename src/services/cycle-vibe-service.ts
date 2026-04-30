@@ -1516,7 +1516,7 @@ ${detailedEffect}`;
     { 
       id: 'moving', 
       title: lang === 'KO' ? '[궤도의 이탈]' : '[Derailment of Orbit]', 
-      question: lang === 'KO' ? "궤도의 이탈: 지금 머무는 이곳이 네 무덤일까, 아니면 발판일까?" : "Derailment of Orbit: Is the place I'm staying now my grave, or a stepping stone?", 
+      question: lang === 'KO' ? "궤도의 이탈: 지금 머무는 이 곳이 내 무덤이야? 아니면 발판이야? 내가 향할 곳을 알려 줘" : "Derailment of Orbit: Is the place I'm staying now my grave, or a stepping stone? Tell me where I should head.", 
       priority: themeScores.moving 
     },
     { 
@@ -1546,24 +1546,19 @@ ${detailedEffect}`;
     {
       id: 'soul_intersection',
       title: lang === 'KO' ? '[영혼의 교차점]' : '[Intersection of Souls]',
-      question: lang === 'KO' ? "궁합 스캐너, 특정인과의 에너지 흐름과 관계 역동성을 확인해볼게." : "Compatibility Scanner, let's check the energy flow and relationship dynamics with a specific person.",
+      question: lang === 'KO' ? "궁합 스캐너, 내가 원하는 사람과 나의 에너지 흐름, 그리고 관계 역동성을 확인해 줘." : "Compatibility Scanner, let's check the energy flow and relationship dynamics with a specific person.",
       priority: 96
     }
   ];
 
-  const topTargeted = allThemes
-    .filter(t => !['romance', 'wealth', 'general', 'destiny_map', 'soul_intersection', 'taboo', 'dark_curtain', 'health'].includes(t.id))
-    .sort((a, b) => b.priority - a.priority)[0];
-
   const displayThemes = [
+    allThemes.find(t => t.id === 'destiny_map')!,
+    allThemes.find(t => t.id === 'general')!,
     allThemes.find(t => t.id === 'romance')!,
     allThemes.find(t => t.id === 'wealth')!,
-    topTargeted,
-    allThemes.find(t => t.id === 'secrets')!,
-    allThemes.find(t => t.id === 'moving')!,
     allThemes.find(t => t.id === 'soul_intersection')!,
-    allThemes.find(t => t.id === 'destiny_map')!,
-    allThemes.find(t => t.id === 'general')!
+    allThemes.find(t => t.id === 'moving')!,
+    allThemes.find(t => t.id === 'secrets')!
   ].filter(Boolean);
 
   // Remove duplicates and ensure general is always there
