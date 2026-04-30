@@ -165,12 +165,12 @@ export function generateRelationshipDynamics(
         );
 
         if (isStemHap && ((dmStem === '丙' && daewunStem === '辛') || (dmStem === '辛' && daewunStem === '丙'))) {
-            narrative.title = isKO ? "[병신합: 정서적 결합과 정착]" : "[Bing-Xin Hap: Emotional Settlement]";
+            narrative.title = isKO ? "[병신합(丙辛合): 정서적 결합과 정착]" : "[Bing-Xin Combination: Emotional Settlement]";
             narrative.psychology = isKO ? "강렬하게 끌리는 대상(결실)에게 마음이 묶이는 시기입니다. 바람 같던 에너지가 안정되고 싶어 하는 정착 심리가 지배적입니다." : "A period of emotional settlement where your free-spirited energy seeks stability.";
             narrative.interaction = isKO ? "과거엔 결핍을 채우기 위해 방황했다면, 이제는 파트너라는 확고한 목적지(정재)에 이끌려 진지한 책임감을 느끼고 관계에 깊이 뿌리를 내리려 합니다." : "You feel a deep sense of responsibility and root yourself in the relationship.";
             narrative.intensity = 0.95;
         } else if (isStemHap) {
-            narrative.title = isKO ? "[천간합: 강렬한 끌림과 몰입]" : "[Stem Hap: Intense Attraction]";
+            narrative.title = isKO ? "[천간합(天干合): 강렬한 끌림과 몰입]" : "[Stem Combination: Intense Attraction]";
             narrative.psychology = isKO ? "운의 흐름이 나의 자아(일간)와 강하게 결합(천간합)하며, 특정 대상이나 목표에 강렬하게 이끌리고 몰입하게 되는 시기입니다." : "Intense attraction and immersion due to celestial stem transformation.";
             narrative.interaction = isKO ? "이성적 통제를 넘어서 서로에게 자석처럼 끌리는 역동성이 발생합니다. 마음이 단단히 묶이는 듯한 강한 유대감을 형성하게 됩니다." : "Dynamic magnetic attraction forms a strong, binding bond.";
             narrative.intensity = 0.9;

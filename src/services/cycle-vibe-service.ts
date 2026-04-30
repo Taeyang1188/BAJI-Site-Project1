@@ -143,7 +143,7 @@ export function generateCycleVibe(
   
   // 観多判定
   const tenGodsRatio = analysis.tenGodsRatio || {};
-  const gwanRatio = (tenGodsRatio['관성 (Warrior/Judge)'] as number) || 0;
+  const gwanRatio = (tenGodsRatio['관성(Warrior/Judge)'] as number) || (tenGodsRatio['Warrior/Judge'] as number) || 0;
   const isGwanDa = gwanRatio >= 60;
 
   const strength = analysis.dayMasterStrength || { isStrong: false, title: '', score: 50 };
@@ -222,10 +222,10 @@ export function generateCycleVibe(
     const hasGwanSeongLuck = luckGods.some(g => g === '편관' || g === '정관');
     const hasInSeongLuck = luckGods.some(g => g === '편인' || g === '정인');
 
-    const hasSikSangBase = overflow.some(o => o.includes('식상')) || (tenGodsRatio['식상 (Artist/Rebel)'] as number) > 15;
-    const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || (tenGodsRatio['재성 (Maverick/Architect)'] as number) > 15;
-    const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || (tenGodsRatio['관성 (Warrior/Judge)'] as number) > 15;
-    const hasInSeongBase = overflow.some(o => o.includes('인성')) || (tenGodsRatio['인성 (Mystic/Sage)'] as number) > 15;
+    const hasSikSangBase = overflow.some(o => o.includes('식상')) || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 15 || (tenGodsRatio['Artist/Rebel'] as number) > 15;
+    const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || (tenGodsRatio['재성(Maverick/Architect)'] as number) > 15 || (tenGodsRatio['Maverick/Architect'] as number) > 15;
+    const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || (tenGodsRatio['관성(Warrior/Judge)'] as number) > 15 || (tenGodsRatio['Warrior/Judge'] as number) > 15;
+    const hasInSeongBase = overflow.some(o => o.includes('인성')) || (tenGodsRatio['인성(Mystic/Sage)'] as number) > 15 || (tenGodsRatio['Mystic/Sage'] as number) > 15;
 
     const specialCombinations = analysis.specialCombinations || {};
 
@@ -331,7 +331,7 @@ ${combos[0].desc} ${combos[1].desc}`;
     }
 
     const isGeukYak = (strength.title && strength.title.includes('극약')) || (strength.score && strength.score < 20);
-    const hasHeavyGwan = (tenGodsRatio['관성 (Warrior/Judge)'] as number) > 25;
+    const hasHeavyGwan = (tenGodsRatio['관성(Warrior/Judge)'] as number) > 25 || (tenGodsRatio['Warrior/Judge'] as number) > 25;
     
     if (isGeukYak && hasHeavyGwan) {
       strengthComment = `${processedName} 너는 책임감(관성)은 태산 같은데 내 몸(일간)은 작은 언덕인 상태네. "책임감이라는 무게를 견디느라 그동안 얼마나 고단했겠어"라는 말이 먼저 나오네..`;
@@ -500,7 +500,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
       const comboIds = combos.map(c => c.id);
       if (comboIds.includes('상관패인')) {
         const fireRatio = analysis.elementRatios?.Fire || 0;
-        const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상 (Artist/Rebel)'] as number) > 10);
+        const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
           detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. 
@@ -1450,6 +1450,18 @@ ${detailedEffect}`;
     return { main: JSON.stringify(jsonPayload), glitch: glitchText };
   };
 
+  const analyzeSoulIntersection = () => {
+    const jsonPayload = {
+      theme: lang === 'KO' ? '영혼의 교차점' : 'Intersection of Souls',
+    };
+    
+    const glitchText = lang === 'KO' 
+      ? '인연은 정해져 있는게 아냐, 네가 선택하는 것이지.' 
+      : 'Connection is not pre-destined, you choose it.';
+      
+    return { main: JSON.stringify(jsonPayload), glitch: glitchText };
+  };
+
   themeAnalyses['romance'] = analyzeRomance();
   themeAnalyses['marriage_timing'] = analyzeMarriageTiming();
   themeAnalyses['wealth'] = analyzeWealth();
@@ -1460,6 +1472,7 @@ ${detailedEffect}`;
   themeAnalyses['taboo'] = analyzeTaboo();
   themeAnalyses['dark_curtain'] = analyzeDarkCurtain();
   themeAnalyses['destiny_map'] = analyzeDestinyMap();
+  themeAnalyses['soul_intersection'] = analyzeSoulIntersection();
 
   // Next Hook Logic
   const interactionsPool = analysis.interactions || [];
@@ -1529,11 +1542,17 @@ ${detailedEffect}`;
       title: lang === 'KO' ? '[운명의 지도]' : '[Map of Destiny]',
       question: lang === 'KO' ? "내 사주 오행의 구조적 균형과 대운의 관성 점수를 시각적으로 분석해줘." : "Visually analyze the structural balance of my Bazi elements and the momentum score of my Grand Cycle.",
       priority: 95
+    },
+    {
+      id: 'soul_intersection',
+      title: lang === 'KO' ? '[영혼의 교차점]' : '[Intersection of Souls]',
+      question: lang === 'KO' ? "궁합 스캐너, 특정인과의 에너지 흐름과 관계 역동성을 확인해볼게." : "Compatibility Scanner, let's check the energy flow and relationship dynamics with a specific person.",
+      priority: 96
     }
   ];
 
   const topTargeted = allThemes
-    .filter(t => !['romance', 'wealth', 'general', 'destiny_map', 'taboo', 'dark_curtain', 'health'].includes(t.id))
+    .filter(t => !['romance', 'wealth', 'general', 'destiny_map', 'soul_intersection', 'taboo', 'dark_curtain', 'health'].includes(t.id))
     .sort((a, b) => b.priority - a.priority)[0];
 
   const displayThemes = [
@@ -1542,9 +1561,7 @@ ${detailedEffect}`;
     topTargeted,
     allThemes.find(t => t.id === 'secrets')!,
     allThemes.find(t => t.id === 'moving')!,
-    // allThemes.find(t => t.id === 'health')!,
-    // allThemes.find(t => t.id === 'taboo')!,
-    // allThemes.find(t => t.id === 'dark_curtain')!,
+    allThemes.find(t => t.id === 'soul_intersection')!,
     allThemes.find(t => t.id === 'destiny_map')!,
     allThemes.find(t => t.id === 'general')!
   ].filter(Boolean);

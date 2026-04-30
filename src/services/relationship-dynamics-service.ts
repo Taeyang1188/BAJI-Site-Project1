@@ -15,7 +15,7 @@ const cleanElement = (k: string) => {
 
 const getElements = (detailObj: any) => {
     if (!detailObj) return [];
-    return detailObj.element ? detailObj.element.split(',').map((s: string) => s.trim()) : [];
+    return detailObj.element ? detailObj.element.split(/[,/]/).map((s: string) => cleanElement(s.trim())).filter(Boolean) : [];
 };
 
 export interface RelationshipDynamicsResult {
@@ -61,20 +61,24 @@ export function calculateRelationshipDynamics(
         ...getElements(partnerResult.analysis?.yongshinDetail?.guShin)
     ].filter(Boolean) as string[];
 
+    // Calculate baseline benefit using ONLY original innate element ratios (ignoring Daewun adjustments)
+    const uInnateElements = userResult.analysis?.elementRatios || {};
+    const pInnateElements = partnerResult.analysis?.elementRatios || {};
+
     let uBenefitScore = 0;
-    Object.entries(partnerAdjustedElements).forEach(([k, v]) => {
+    Object.entries(pInnateElements).forEach(([k, v]) => {
         const el = cleanElement(k);
         const val = v as number;
-        if (uYongHee.includes(el)) uBenefitScore += (val / 100) * 15;
-        if (uGiGu.includes(el)) uBenefitScore -= (val / 100) * 15;
+        if (uYongHee.includes(el)) uBenefitScore += (val / 100) * 25;
+        if (uGiGu.includes(el)) uBenefitScore -= (val / 100) * 25;
     });
 
     let pBenefitScore = 0;
-    Object.entries(userAdjustedElements).forEach(([k, v]) => {
+    Object.entries(uInnateElements).forEach(([k, v]) => {
         const el = cleanElement(k);
         const val = v as number;
-        if (pYongHee.includes(el)) pBenefitScore += (val / 100) * 15;
-        if (pGiGu.includes(el)) pBenefitScore -= (val / 100) * 15;
+        if (pYongHee.includes(el)) pBenefitScore += (val / 100) * 25;
+        if (pGiGu.includes(el)) pBenefitScore -= (val / 100) * 25;
     });
 
     // Make it symmetric
@@ -186,7 +190,7 @@ export function calculateRelationshipDynamics(
         gates.push({ name: isKO ? "🌀 [이성적인 모순]" : "🌀 [Rational Contradiction]", desc: isKO ? "머리로는 완벽히 이해하는데, 몸과 현실(지지)이 거부하는 관계입니다." : "You understand each other perfectly in your minds, but reality and instincts reject the connection." });
         gateBonus += 5;
     } else if (hasStemHap) {
-        gates.push({ name: isKO ? "🕊️ [정신적 결속] 천간합" : "🕊️ [Spiritual Union] Stem Hap", desc: isKO ? "가치관과 이상형이 맞아떨어집니다. 본능적인 끌림 이전에 생각의 주파수가 통하는 정신적 소울메이트입니다." : "Your values and ideals align perfectly. A spiritual soulmate connection." });
+        gates.push({ name: isKO ? "🕊️ [정신적 결속] 천간합" : "🕊️ [Spiritual Union] Stem Combination", desc: isKO ? "가치관과 이상형이 맞아떨어집니다. 본능적인 끌림 이전에 생각의 주파수가 통하는 정신적 소울메이트입니다." : "Your values and ideals align perfectly. A spiritual soulmate connection." });
         gateBonus += 10;
     }
 
@@ -302,9 +306,9 @@ export function calculateRelationshipDynamics(
 
          const isShenZi = (uDayBranch === '申' && pDayBranch === '子') || (uDayBranch === '子' && pDayBranch === '申');
          if (isShenZi) {
-              gates.push({ name: isKO ? "🌊 [영혼의 주파수: 신자합]" : "🌊 [Soul Resonator: Shen-Zi Hap]", desc: isKO ? "상대방과 깊은 영혼의 결속력을 가집니다. 서로가 함께할 때 큰 시너지(수국)를 만들어냅니다." : "Deep spiritual connection forming powerful synergy." });
+              gates.push({ name: isKO ? "🌊 [영혼의 주파수: 신자합(申子)]" : "🌊 [Soul Resonator: Shen-Zi Combination]", desc: isKO ? "상대방과 깊은 영혼의 결속력을 가집니다. 서로가 함께할 때 큰 시너지(수국)를 만들어냅니다." : "Deep spiritual connection forming powerful synergy." });
          } else {
-              gates.push({ name: isKO ? `🔗 [강력한 결속: ${uDayBranch}${pDayBranch} 반합]` : `🔗 [Strong Bond: Half-Hap]`, desc: isKO ? `두 사람의 내면이 같은 방향(${samhapMatch.element})성을 향해 매끄럽게 융합됩니다.` : "Your inner energies blend seamlessly in the same direction." });
+              gates.push({ name: isKO ? `🔗 [강력한 결속: ${uDayBranch}${pDayBranch} 반합]` : `🔗 [Strong Bond: Half-Combination]`, desc: isKO ? `두 사람의 내면이 같은 방향(${samhapMatch.element})성을 향해 매끄럽게 융합됩니다.` : "Your inner energies blend seamlessly in the same direction." });
          }
     }
 
@@ -632,7 +636,7 @@ export function calculateRelationshipDynamics(
         const uMetalVal = uElements['Metal(금)'] || uElements['Metal'] || 0;
         if (uWeak || uMetalVal > 30) {
             gates.push({ 
-                name: isKO ? "🌿 [등라계갑] 거목을 만난 넝쿨" : "🌿 [Deng-Ra-Gye-Gap]", 
+                name: isKO ? "🌿 [등라계갑(藤羅繫甲)] 거목을 만난 넝쿨" : "🌿 [Deng-Ra-Gye-Gap]", 
                 desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 타고 하늘로 뻗어 나갑니다. 당신에게 상대는 성장의 발판이자 가장 강력한 보호막입니다. 주도권은 매달리는 자(당신)에게 있습니다." : "As Eul-mok, you climb the partner's giant Gap-mok tree. They are your ladder to the sky and strongest shield. The initiative lies with you." 
             });
             gateBonus += 20;
@@ -640,7 +644,7 @@ export function calculateRelationshipDynamics(
     }
     if (pDayStem === '乙' && (userResult.pillars.some(p => p.stem === '甲' || p.branch === '寅'))) {
         gates.push({ 
-            name: isKO ? "🛡️ [자비로운 짐] 등라계갑의 버팀목" : "🛡️ [Benevolent Burden]", 
+            name: isKO ? "🛡️ [자비로운 짐] 등라계갑(藤羅繫甲)의 버팀목" : "🛡️ [Benevolent Burden]", 
             desc: isKO ? "상대(을목)는 당신이라는 거목을 타고 하늘로 뻗어 나갑니다. 당신은 상대의 성장을 위해 자신의 에너지를 기꺼이 내어주는 헌신적인 보호막 역할을 하고 있습니다." : "The partner (Eul-mok) climbs you, the Gap-mok tree. You are a devoted shield, giving your energy for their growth." 
         });
         // Bonus is smaller or neutral for the supporter as it's a "burden"
@@ -650,14 +654,14 @@ export function calculateRelationshipDynamics(
     // 2. Geum-Da-Su-Tak (金多水濁) & Geum-Da-Su-Che
     if ((uDayStem === '壬' || uDayStem === '癸') && pMetalCount >= 3) {
         gates.push({
-            name: isKO ? "🧪 [금다수탁] 탁해진 심연" : "🧪 [Geum-Da-Su-Tak]",
+            name: isKO ? "🧪 [금다수탁(金多水濁)] 탁해진 심연" : "🧪 [Geum-Da-Su-Tak]",
             desc: isKO ? "맑아야 할 당신의 샘물에 거대한 바위(금)들이 쏟아져 들어왔습니다. 이는 생(生)이 아니라 압살입니다. 상대의 과도한 보호와 통제가 당신의 자아를 진흙탕으로 만들고 있습니다." : "Massive rocks (Metal) poured into your clear water. This isn't support; it's smothering. Their excessive control turns your ego into mud."
         });
         gatePenalty += 25;
     }
     if ((pDayStem === '壬' || pDayStem === '癸') && uMetalCount >= 3) {
         gates.push({
-            name: isKO ? "🧪 [금다수탁] 의도치 않은 압박" : "🧪 [Geum-Da-Su-Tak (Reverse)]",
+            name: isKO ? "🧪 [금다수탁(金多水濁)] 의도치 않은 압박" : "🧪 [Geum-Da-Su-Tak (Reverse)]",
             desc: isKO ? "당신의 과도한 금(Metal) 기운이 상대의 맑은 물을 탁하게 만들고 있을 수 있습니다. 사랑이라는 이름의 통제가 상대를 질식시키고 있지는 않은지 돌아봐야 합니다." : "Your excessive Metal energy might be muddying their clear water. Check if your 'loving control' is suffocating them."
         });
         gatePenalty += 15;
@@ -666,7 +670,7 @@ export function calculateRelationshipDynamics(
     // 3.1 Mok-Da-Hwa-Sik (木多火熄)
     if ((uDayStem === '丙' || uDayStem === '丁') && pWoodCount >= 3) {
         gates.push({
-            name: isKO ? "🕯️ [목다화식] 꺼져가는 불꽃" : "🕯️ [Mok-Da-Hwa-Sik]",
+            name: isKO ? "🕯️ [목다화식(木多火熄)] 꺼져가는 불꽃" : "🕯️ [Mok-Da-Hwa-Sik]",
             desc: isKO ? "상대의 지나친 간섭과 지원이 오히려 당신의 재능(불꽃)을 질식시키고 있습니다. 타오르고 싶어도 숨 쉴 틈이 없습니다." : "Their excessive interference suffocates your talent. You want to burn bright, but there's no room to breathe."
         });
         gatePenalty += 20;
@@ -675,7 +679,7 @@ export function calculateRelationshipDynamics(
     // 3.2 To-Da-Mae-Geum (土多埋金)
     if ((uDayStem === '庚' || uDayStem === '辛') && pEarthCount >= 3) {
         gates.push({
-            name: isKO ? "💎 [토다매금] 묻혀버린 보석" : "💎 [To-Da-Mae-Geum]",
+            name: isKO ? "💎 [토다매금(土多埋金)] 묻혀버린 보석" : "💎 [To-Da-Mae-Geum]",
             desc: isKO ? "상대의 보수적이고 답답한 기운이 당신의 날카로운 천재성을 흙 속에 묻어버렸습니다. 세상에 드러날 기회를 잃어가는 중입니다." : "Their conservative and heavy energy buries your sharp brilliance in the soil. You're losing chances to shine."
         });
         gatePenalty += 15;
@@ -684,7 +688,7 @@ export function calculateRelationshipDynamics(
     // 3.3 Su-Da-Mok-Pyo (水多木漂)
     if ((uDayStem === '甲' || uDayStem === '乙') && pWaterCount >= 3) {
         gates.push({
-            name: isKO ? "🌊 [수다목표] 뿌리 뽑힌 부표" : "🌊 [Su-Da-Mok-Pyo]",
+            name: isKO ? "🌊 [수다목표(水多木漂)] 뿌리 뽑힌 부표" : "🌊 [Su-Da-Mok-Pyo]",
             desc: isKO ? "과도한 감정과 수용력이 당신의 현실적 기반(뿌리)을 앗아갔습니다. 정착하지 못하고 상대의 감정에 휘말려 표류하는 관계입니다." : "Excessive emotions and receptivity took away your grounded roots. You are drifting in their emotional currents without settling."
         });
         gatePenalty += 18;
@@ -693,7 +697,7 @@ export function calculateRelationshipDynamics(
     // 3.4 Hwa-Da-To-Cho (火多土焦)
     if ((uDayStem === '戊' || uDayStem === '己') && pFireCount >= 3) {
         gates.push({
-            name: isKO ? "🔥 [화다토초] 갈라진 불모지" : "🔥 [Hwa-Da-To-Cho]",
+            name: isKO ? "🔥 [화다토초(火多土焦)] 갈라진 불모지" : "🔥 [Hwa-Da-To-Cho]",
             desc: isKO ? "상대의 폭발적인 열정이 당신의 인내심을 하얗게 태워버렸습니다. 아무것도 자랄 수 없는 메마른 관계, 갈증만이 남았습니다." : "Their explosive passion scorched your patience. A barren relationship where nothing can grow, leaving only thirst."
         });
         gatePenalty += 22;
@@ -811,7 +815,7 @@ export function calculateRelationshipDynamics(
         const pDM = partnerResult.pillars.find(p => p.title === 'Day')?.stem;
         if (uDM === '戊' && pDM && STEM_ELEMENTS[pDM] === 'Wood') {
              structuralSynergy = { 
-                 badge: isKO ? "[寅亥합: 목과 수의 포용]" : "[In-Hae Hap: Embracing Synergy]", 
+                 badge: isKO ? "[인해합(寅亥): 목과 수의 포용]" : "[In-Hae Combination: Embracing Synergy]", 
                  desc: isKO ? "당신의 강경하고 경직된 통제력(관성)을 상대방의 부드러운 수용력(인성)이 寅亥合으로 감싸안아, 날 선 금목상쟁의 마찰을 따뜻한 에너지로 완화시켜주는 훌륭한 구조입니다." : "The strict authority in you is beautifully softened by the partner's fluid and accepting energy through the In-Hae combination.", 
                  level: 'gold' 
              };
@@ -822,13 +826,14 @@ export function calculateRelationshipDynamics(
     if (!structuralSynergy) {
         // GeJu Synergy Logic (뇌의 궁합)
         const getGeJuClass = (gejuStr: string, tenGods: Record<string, number>, isDom: boolean) => {
-            if (gejuStr) {
-                if (gejuStr.includes('관') || gejuStr.includes('살')) return 'Gwan';
-                if (gejuStr.includes('인')) return 'In';
-                if (gejuStr.includes('식') || gejuStr.includes('상')) return 'Sik';
-                if (gejuStr.includes('재')) return 'Jae';
-                if (gejuStr.includes('비') || gejuStr.includes('겁') || gejuStr.includes('록') || gejuStr.includes('양인')) return 'Bi';
-                if (gejuStr.includes('종') || gejuStr.includes('염상') || gejuStr.includes('곡직') || gejuStr.includes('종혁') || gejuStr.includes('윤하') || gejuStr.includes('가색')) return 'Special';
+            const gLower = (gejuStr || '').toLowerCase();
+            if (gLower) {
+                if (gLower.includes('관') || gLower.includes('살') || gLower.includes('officer') || gLower.includes('killing') || gLower.includes('power') || gLower.includes('warrior') || gLower.includes('judge')) return 'Gwan';
+                if (gLower.includes('인') || gLower.includes('resource') || gLower.includes('mystic') || gLower.includes('sage')) return 'In';
+                if (gLower.includes('식') || gLower.includes('상') || gLower.includes('eating') || gLower.includes('hurting') || gLower.includes('artist') || gLower.includes('rebel')) return 'Sik';
+                if (gLower.includes('재') || gLower.includes('wealth') || gLower.includes('maverick') || gLower.includes('architect')) return 'Jae';
+                if (gLower.includes('비') || gLower.includes('겁') || gLower.includes('록') || gLower.includes('양인') || gLower.includes('friend') || gLower.includes('rob') || gLower.includes('mirror') || gLower.includes('rival') || gLower.includes('prosperity') || gLower.includes('blade')) return 'Bi';
+                if (gLower.includes('종') || gLower.includes('염상') || gLower.includes('곡직') || gLower.includes('종혁') || gLower.includes('윤하') || gLower.includes('가색') || gLower.includes('vibrant') || gLower.includes('flow') || gLower.includes('special')) return 'Special';
             }
             if (isDom) return 'Bi';
             const list = [
@@ -847,7 +852,14 @@ export function calculateRelationshipDynamics(
         const pGeJuRaw = partnerResult.analysis?.geJu || '';
 
         const applySynergy = (c1: string, c2: string) => {
-            const hasGwanSikClash = (uGeJuRaw.includes('정관') && pGeJuRaw.includes('상관')) || (uGeJuRaw.includes('상관') && pGeJuRaw.includes('정관'));
+            const uLower = uGeJuRaw.toLowerCase();
+            const pLower = pGeJuRaw.toLowerCase();
+            const uIsGwan = uLower.includes('정관') || uLower.includes('judge') || uLower.includes('direct officer');
+            const uIsSik = uLower.includes('상관') || uLower.includes('rebel') || uLower.includes('hurting officer');
+            const pIsGwan = pLower.includes('정관') || pLower.includes('judge') || pLower.includes('direct officer');
+            const pIsSik = pLower.includes('상관') || pLower.includes('rebel') || pLower.includes('hurting officer');
+            const hasGwanSikClash = (uIsGwan && pIsSik) || (uIsSik && pIsGwan);
+            
             if (hasGwanSikClash) {
                 return { badge: "상관견관(傷官見官) 리스크", desc: "⚠️ [가치관의 균열] 규율과 저항의 정면충돌입니다. 한 명의 원리원칙이 다른 한 명의 구속을 극도로 싫어하는 자유를 옥죄며 큰 파열음을 낼 수 있습니다.", penalty: 15 };
             }
@@ -905,6 +917,8 @@ export function calculateRelationshipDynamics(
 
 
     let syncScore = Math.max(0, Math.min(100, Math.round(baseScore + gateBonus - gatePenalty)));
+
+    console.log(`[DEBUG_SCORE] lang=${lang}, finalScore=${syncScore}, base=${baseScore}, uYongHee=${JSON.stringify(uYongHee)}, pYongHee=${JSON.stringify(pYongHee)}, disease=${diseaseBonus}, uGeJuRaw=${userResult.analysis?.geJu}, pGeJuRaw=${partnerResult.analysis?.geJu}`);
 
     const uDMStemForEaster = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '甲';
     const pDMStem = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '甲';
@@ -1028,7 +1042,7 @@ export function calculateRelationshipDynamics(
 
     if (isDaewunHap(uDaewunBranch, pDayBranch) || isDaewunHap(pDaewunBranch, uDayBranch)) {
         syncScore = Math.min(100, syncScore + 15);
-        gates.push({ name: isKO ? "🔗 [강력한 결속] 대운 지지 합" : "🔗 [Strong Union] Daewun Hap", desc: isKO ? "대운과 상대의 사주가 합을 이루어, 이 시기에 놀라운 기회와 깊은 운명적 끌림을 경험합니다." : "Daewun period forms a strong karmic union with the partner." });
+        gates.push({ name: isKO ? "🔗 [강력한 결속] 대운 지지 합" : "🔗 [Strong Union] Daewun Combination", desc: isKO ? "대운과 상대의 사주가 합을 이루어, 이 시기에 놀라운 기회와 깊은 운명적 끌림을 경험합니다." : "Daewun period forms a strong karmic union with the partner." });
     }
 
     const uHeat = calculateHeat(userAdjustedElements);

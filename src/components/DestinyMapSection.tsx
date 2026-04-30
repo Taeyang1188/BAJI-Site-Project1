@@ -13,6 +13,7 @@ interface DestinyMapSectionProps {
   result: BaZiResult;
   lang: Language;
   parsedJson: any; 
+  scannerOnly?: boolean;
 }
 
 const KARMA_QUESTS = {
@@ -40,7 +41,7 @@ const KARMA_QUESTS = {
 
 const ELEMENT_KOR: Record<string, string> = { "Wood": "목(木)", "Fire": "화(火)", "Earth": "토(土)", "Metal": "금(金)", "Water": "수(水)" };
 
-export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, lang, parsedJson }) => {
+export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, lang, parsedJson, scannerOnly = false }) => {
 
   const pinyinStem: Record<string, string> = { '甲':'Jia', '乙':'Yi', '丙':'Bing', '丁':'Ding', '戊':'Wu', '己':'Ji', '庚':'Geng', '辛':'Xin', '壬':'Ren', '癸':'Gui' };
   const pinyinBranch: Record<string, string> = { '子':'Zi', '丑':'Chou', '寅':'Yin', '卯':'Mao', '辰':'Chen', '巳':'Si', '午':'Wu', '未':'Wei', '申':'Shen', '酉':'You', '戌':'Xu', '亥':'Hai' };
@@ -53,7 +54,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
   const maxSlider = Math.min(result.grandCycles.length - 1, currentIndex + 1);
   
   const [sliderIndex, setSliderIndex] = useState(currentIndex);
-  const [showPartnerForm, setShowPartnerForm] = useState(false);
+  const [showPartnerForm, setShowPartnerForm] = useState(scannerOnly);
   const [partnerResult, setPartnerResult] = useState<BaZiResult | null>(null);
   
   const [showTimelineDocs, setShowTimelineDocs] = useState(true);
@@ -208,51 +209,55 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
 
     const isKO = lang === 'KO';
 
+    const finalDyn = scannerOnly ? innateDyn : dyn;
+
     // V5.4 Weighting Calculation
-    const weightedScore = Math.max(0, Math.min(100, Math.round((innateDyn.syncScore * 0.75) + (dyn.syncScore * 0.25))));
+    const weightedScore = scannerOnly ? innateDyn.syncScore : Math.max(0, Math.min(100, Math.round((innateDyn.syncScore * 0.75) + (dyn.syncScore * 0.25))));
     const inn = innateDyn.syncScore;
     const cur = dyn.syncScore;
     const fut = futureDyn.syncScore;
 
-    if (inn < 65 && cur >= 90 && (cur - fut) >= 20) {
-        dyn.gates.unshift({
-            name: isKO ? "⏳ [한여름 밤의 꿈]" : "⏳ [Midsummer Night's Dream]",
-            desc: isKO ? "지금의 절정은 곧 저물 것입니다. 화려함 뒤에 올 고요를 준비하십시오." : "The current peak will soon set. Prepare for the silence that follows the splendor."
-        });
+    if (!scannerOnly) {
+        if (inn < 65 && cur >= 90 && (cur - fut) >= 20) {
+            finalDyn.gates.unshift({
+                name: isKO ? "⏳ [한여름 밤의 꿈]" : "⏳ [Midsummer Night's Dream]",
+                desc: isKO ? "지금의 절정은 곧 저물 것입니다. 화려함 뒤에 올 고요를 준비하십시오." : "The current peak will soon set. Prepare for the silence that follows the splendor."
+            });
+        }
+
+        if (fut - cur >= 15 && fut > 85) {
+            finalDyn.gates.unshift({
+                name: isKO ? "🌊 [밀물: 만개하는 카르마]" : "🌊 [The Rising Tide: Blooming Karma]",
+                desc: isKO ? "가장 뜨거운 계절이 다가오고 있습니다. 지금의 사소한 마찰은 거대한 합(合)의 완성으로 가는 과정일 뿐입니다." : "The hottest season is approaching. Minor frictions now are just a transition toward the completion of a massive karmic union."
+            });
+        }
     }
 
-    if (fut - cur >= 15 && fut > 85) {
-        dyn.gates.unshift({
-            name: isKO ? "🌊 [밀물: 만개하는 카르마]" : "🌊 [The Rising Tide: Blooming Karma]",
-            desc: isKO ? "가장 뜨거운 계절이 다가오고 있습니다. 지금의 사소한 마찰은 거대한 합(合)의 완성으로 가는 과정일 뿐입니다." : "The hottest season is approaching. Minor frictions now are just a transition toward the completion of a massive karmic union."
-        });
-    }
-
-    dyn.syncScore = weightedScore;
+    finalDyn.syncScore = weightedScore;
 
     let titleSync = lang === 'KO' ? '무난하고 현실적인 동행' : 'Stable & Practical Connection';
-    if (dyn.syncScore >= 95) titleSync = lang === 'KO' ? '✨ 천생연분 (영혼의 단짝)' : '✨ Soulmates (Karmic Bond)';
-    else if (dyn.syncScore >= 85) titleSync = lang === 'KO' ? '🔥 찰떡궁합 (최고의 시너지)' : '🔥 Top-tier Synergy';
-    else if (dyn.syncScore >= 70) titleSync = lang === 'KO' ? '🤝 상호보완적 조력자' : '🤝 Great Supporters';
-    else if (dyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 성장의 과제' : '🌪️ Friction and Growth';
+    if (finalDyn.syncScore >= 95) titleSync = lang === 'KO' ? '✨ 천생연분 (영혼의 단짝)' : '✨ Soulmates (Karmic Bond)';
+    else if (finalDyn.syncScore >= 85) titleSync = lang === 'KO' ? '🔥 찰떡궁합 (최고의 시너지)' : '🔥 Top-tier Synergy';
+    else if (finalDyn.syncScore >= 70) titleSync = lang === 'KO' ? '🤝 상호보완적 조력자' : '🤝 Great Supporters';
+    else if (finalDyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 성장의 과제' : '🌪️ Friction and Growth';
 
     let syncTierText = lang === 'KO' ? '적합' : 'Good';
     let syncColor = 'bg-fuchsia-400';
     let syncIcon = '✅';
 
-    if (dyn.syncScore >= 90) { syncTierText = lang === 'KO' ? '완벽' : 'Perfect'; syncColor = 'bg-rose-500'; syncIcon = '💘'; }
-    else if (dyn.syncScore >= 70) { syncTierText = lang === 'KO' ? '우수' : 'Excellent'; syncColor = 'bg-fuchsia-500'; syncIcon = '✨'; }
-    else if (dyn.syncScore >= 50) { syncTierText = lang === 'KO' ? '보통' : 'Average'; syncColor = 'bg-fuchsia-300'; syncIcon = '🤝'; }
+    if (finalDyn.syncScore >= 90) { syncTierText = lang === 'KO' ? '완벽' : 'Perfect'; syncColor = 'bg-rose-500'; syncIcon = '💘'; }
+    else if (finalDyn.syncScore >= 70) { syncTierText = lang === 'KO' ? '우수' : 'Excellent'; syncColor = 'bg-fuchsia-500'; syncIcon = '✨'; }
+    else if (finalDyn.syncScore >= 50) { syncTierText = lang === 'KO' ? '보통' : 'Average'; syncColor = 'bg-fuchsia-300'; syncIcon = '🤝'; }
     else { syncTierText = lang === 'KO' ? '주의' : 'Warning'; syncColor = 'bg-white/30'; syncIcon = '⚠️'; }
 
     let bridgeText = lang === 'KO' ? '서로의 에너지가 융화되는 구간입니다.' : 'Your energies blend naturally.';
-    if (dyn.syncScore >= 85) bridgeText = lang === 'KO' ? '서로가 서로에게 부족한 기운을 넘치게 채워주는 강력한 보완 관계입니다.' : 'A powerful complementary relationship where both fill each other\'s void.';
-    else if (dyn.syncScore >= 60) bridgeText = lang === 'KO' ? '서로의 기운이 부드럽게 조화를 이루며 긍정적인 시너지를 만들어냅니다.' : 'Your energies harmonize smoothly.';
-    else if (dyn.syncScore >= 45) bridgeText = lang === 'KO' ? '때로는 마찰이 있지만 양보를 통해 타협점을 찾아가야 하는 현실적 구간입니다.' : 'A practical phase requiring compromise to overcome occasional friction.';
+    if (finalDyn.syncScore >= 85) bridgeText = lang === 'KO' ? '서로가 서로에게 부족한 기운을 넘치게 채워주는 강력한 보완 관계입니다.' : 'A powerful complementary relationship where both fill each other\'s void.';
+    else if (finalDyn.syncScore >= 60) bridgeText = lang === 'KO' ? '서로의 기운이 부드럽게 조화를 이루며 긍정적인 시너지를 만들어냅니다.' : 'Your energies harmonize smoothly.';
+    else if (finalDyn.syncScore >= 45) bridgeText = lang === 'KO' ? '때로는 마찰이 있지만 양보를 통해 타협점을 찾아가야 하는 현실적 구간입니다.' : 'A practical phase requiring compromise to overcome occasional friction.';
     else bridgeText = lang === 'KO' ? '에너지가 크게 충돌하며 잦은 마찰을 빚을 수 있으니, 각자의 공간과 거리두기가 필요합니다.' : 'Strong energies clash severely; maintaining proper distance is highly recommended.';
 
-    if (dyn.isEasterEgg) {
-        titleSync = lang === 'KO' ? '🚨 비상 규격 외의 인연 (Easter Egg)' : '🚨 Out-of-Bounds Fate (Easter Egg)';
+    if (finalDyn.isEasterEgg) {
+        titleSync = lang === 'KO' ? '🚨 규격 외의 인연' : '🚨 Out-of-Bounds Fate';
         syncColor = 'bg-fuchsia-500';
         syncIcon = '⚡';
         bridgeText = lang === 'KO' 
@@ -261,19 +266,19 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
     }
 
     return { 
-        text: dyn.text, 
-        relation: dyn.relation, 
-        isGlowing: dyn.isGlowing, 
-        syncScore: dyn.syncScore, 
-        temperature: dyn.temperature, 
+        text: finalDyn.text, 
+        relation: finalDyn.relation, 
+        isGlowing: finalDyn.isGlowing, 
+        syncScore: finalDyn.syncScore, 
+        temperature: finalDyn.temperature, 
         titleSync, 
-        isEasterEgg: dyn.isEasterEgg,
+        isEasterEgg: finalDyn.isEasterEgg,
         syncTierText,
         syncColor,
         syncIcon,
         bridgeText,
-        gates: dyn.gates,
-        structuralSynergy: dyn.structuralSynergy
+        gates: finalDyn.gates,
+        structuralSynergy: finalDyn.structuralSynergy
     };
   }, [partnerResult, result, lang, adjustedElements, partnerAdjustedElements]);
 
@@ -365,13 +370,16 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
       
       {/* Header */}
+      {!scannerOnly && (
       <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
         <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight" style={{ color: daewunThemeColor }}>
           [{parsedJson.theme}]
         </h3>
       </div>
+      )}
 
       {/* Timeline Controls */}
+      {!scannerOnly && (
       <div className="p-4 bg-black/40 rounded-xl border border-white/5 relative z-20">
         <div className="text-sm font-bold text-white/70 mb-4 flex justify-between items-center">
           <span>{lang === 'KO' ? '대운 흐름 (Timeline)' : 'Daewun Timeline'}</span>
@@ -427,8 +435,10 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           {lang === 'KO' ? currentDaewun.year + '년 ~ : ' + currentDaewun.stem + currentDaewun.branch + ' 대운' : currentDaewun.year + ' ~ : ' + getPinyin(currentDaewun.stem, currentDaewun.branch) + ' Phase'}
         </motion.div>
       </div>
+      )}
 
       {/* Radar Chart Section */}
+      {!scannerOnly && (
       <div className={`p-2.5 sm:p-4 bg-black/40 rounded-xl border border-white/5 flex flex-col items-center relative overflow-hidden transition-all duration-1000 ${partnerAnalysisMemo?.isGlowing ? 'shadow-[0_0_60px_-10px_rgba(232,121,249,0.5)] border-fuchsia-500/30' : ''}`}
            style={{ boxShadow: partnerAnalysisMemo?.isGlowing ? undefined : `0 0 40px -10px ${daewunThemeColor}30` }}
       >
@@ -496,15 +506,16 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           </motion.div>
         )}
       </div>
+      )}
 
       {/* Timeline Briefing for Relationships */}
-      {partnerTimelineBriefing && (
+      {partnerTimelineBriefing && !scannerOnly && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} 
           className={`p-4 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] bg-fuchsia-900/30 border rounded-xl space-y-3 relative overflow-hidden backdrop-blur-md ${partnerTimelineBriefing.intensity > 0.8 ? 'border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]' : 'border-fuchsia-500/50'}`}>
-           <div className="absolute top-0 right-0 p-2 opacity-10">
+           <div className="absolute top-0 right-0 p-2 opacity-10 pointer-events-none">
                <Heart className="w-16 h-16 text-fuchsia-300" />
            </div>
-           <div className="flex items-center gap-2 border-b border-fuchsia-500/20 pb-2">
+           <div className="flex flex-wrap items-center gap-2 border-b border-fuchsia-500/20 pb-2 relative z-10">
              <Repeat className="w-4 h-4 text-fuchsia-400" />
              <h4 className="text-sm font-bold text-fuchsia-100">
                {lang === 'KO' ? '관계 역동성 브리핑' : 'Relationship Dynamics Briefing'}
@@ -512,6 +523,15 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
              <span className="text-xs bg-fuchsia-500/20 text-fuchsia-200 px-2 py-0.5 rounded ml-auto font-mono text-center truncate overflow-hidden whitespace-nowrap min-w-0 max-w-[80px]">
                 {currentDaewun.year} {lang === 'KO' ? currentDaewun.stem + currentDaewun.branch : getPinyin(currentDaewun.stem, currentDaewun.branch)}
              </span>
+             <button 
+               onClick={() => {
+                 setPartnerResult(null);
+                 setShowPartnerForm(true);
+               }}
+               className="text-xs bg-fuchsia-500 hover:bg-fuchsia-400 text-black font-bold px-2 py-1 rounded ml-2 whitespace-nowrap flex-shrink-0 transition-colors shadow-[0_0_10px_rgba(217,70,239,0.5)]"
+             >
+               {lang === 'KO' ? '다시 입력하기' : 'Input Again'}
+             </button>
              <button onClick={() => setShowDynamicsBrief(!showDynamicsBrief)} className="text-xs text-fuchsia-300 ml-2 whitespace-nowrap flex-shrink-0">
                 {showDynamicsBrief ? (lang === 'KO' ? '닫기' : 'Hide') : (lang === 'KO' ? '펼치기' : 'Show')}
              </button>
@@ -543,7 +563,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
       )}
 
       {/* Karma Quests (Daily Action) */}
-      {!partnerResult && (
+      {!partnerResult && !scannerOnly && (
       <div className="p-4 bg-black/40 border border-white/10 rounded-xl relative overflow-hidden">
         {questCompleted && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-green-500/10 z-0 flex items-center justify-center">
@@ -592,9 +612,9 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
 
       {/* Compatibility Scanner Trigger */}
       {!partnerResult && (
-        <div className="p-4 border border-fuchsia-500/30 bg-fuchsia-500/5 rounded-xl cursor-pointer hover:bg-fuchsia-500/10 transition-colors"
-             onClick={() => setShowPartnerForm(!showPartnerForm)}>
-           <div className="flex items-center justify-between">
+        <div className={`p-4 border border-fuchsia-500/30 bg-fuchsia-500/5 rounded-xl ${scannerOnly ? '' : 'cursor-pointer hover:bg-fuchsia-500/10 transition-colors'}`}
+             onClick={() => !scannerOnly && setShowPartnerForm(!showPartnerForm)}>
+           <div className={`flex items-center justify-between ${scannerOnly ? 'cursor-pointer' : ''}`} onClick={() => scannerOnly && setShowPartnerForm(!showPartnerForm)}>
              <div className="flex items-center gap-2">
                <Swords className="w-4 h-4 text-fuchsia-400" />
                <span className="text-sm font-bold text-fuchsia-200">
@@ -604,8 +624,8 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
              <div className="text-xs text-fuchsia-400 bg-fuchsia-500/20 px-2 py-1 rounded-full">New</div>
            </div>
            
-           {showPartnerForm && (
-             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-4 mt-4 border-t border-fuchsia-500/20" onClick={e => e.stopPropagation()}>
+           {(showPartnerForm || scannerOnly) && (
+             <motion.div initial={{ opacity: scannerOnly ? 1 : 0, height: scannerOnly ? 'auto' : 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-4 mt-4 border-t border-fuchsia-500/20" onClick={e => e.stopPropagation()}>
                 {/* Simplified Partner Form */}
                 <PartnerQuickForm lang={lang} onSubmit={(res) => { setPartnerResult(res); setShowPartnerForm(false); }} />
              </motion.div>
@@ -613,15 +633,26 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         </div>
       )}
 
-      {(!partnerResult || !partnerAnalysisMemo) && renderDaewunBriefing()}
+      {(!partnerResult || !partnerAnalysisMemo) && !scannerOnly && renderDaewunBriefing()}
 
       {partnerResult && partnerAnalysisMemo && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-xl space-y-4">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 border-b border-fuchsia-500/20 pb-2">
             <Heart className="w-4 h-4 text-fuchsia-400" />
             <h4 className="text-sm font-bold text-fuchsia-200">
               {lang === 'KO' ? '궁합 스캐너 결과' : 'Compatibility Analysis'}
             </h4>
+            {scannerOnly && (
+               <button 
+                 onClick={() => {
+                   setPartnerResult(null);
+                   setShowPartnerForm(true);
+                 }}
+                 className="text-xs bg-fuchsia-500 hover:bg-fuchsia-400 text-black font-bold px-2 py-1 rounded ml-2 whitespace-nowrap flex-shrink-0 transition-colors shadow-[0_0_10px_rgba(217,70,239,0.5)]"
+               >
+                 {lang === 'KO' ? '다시 입력하기' : 'Input Again'}
+               </button>
+            )}
             <button onClick={() => setShowScannerResult(!showScannerResult)} className="ml-auto text-xs text-fuchsia-300">
                 {showScannerResult ? (lang === 'KO' ? '닫기' : 'Hide') : (lang === 'KO' ? '펼치기' : 'Show')}
             </button>
@@ -629,14 +660,23 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           
           <AnimatePresence>
           {showScannerResult && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4 overflow-hidden">
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4">
           <div className="flex flex-col gap-3">
-             <div className="bg-black/40 rounded-xl p-5 flex flex-col justify-center border border-white/5 relative overflow-hidden group">
+             <div className="bg-black/40 rounded-xl p-5 flex flex-col justify-center border border-white/5 relative group">
                 {partnerAnalysisMemo.isEasterEgg && (
-                     <div className="absolute inset-0 bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                     <div className="absolute inset-0 rounded-xl bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 )}
-                <div className={`text-xs mb-3 text-left ${partnerAnalysisMemo.isEasterEgg ? 'text-red-400 font-bold' : 'text-white/50'}`}>
-                    {partnerAnalysisMemo.titleSync}
+                <div className={`text-xs mb-3 text-left relative z-10 ${partnerAnalysisMemo.isEasterEgg ? 'text-red-400 font-bold' : 'text-white/50'}`}>
+                    <span className={partnerAnalysisMemo.isEasterEgg ? 'group/easter cursor-help inline-block relative' : ''}>
+                        {partnerAnalysisMemo.titleSync}
+                        {partnerAnalysisMemo.isEasterEgg && (
+                            <div className="absolute left-0 bottom-full mb-2 hidden group-hover/easter:block w-[280px] p-2.5 bg-[#1a0510] border border-red-500/50 shadow-[0_4px_15px_rgba(255,0,0,0.3)] text-red-100/90 text-[11px] rounded z-[99999] font-normal leading-relaxed whitespace-normal pointer-events-none">
+                                {lang === 'KO' 
+                                    ? `사용자('${result.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')와 상대방('${partnerResult.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')의 일간이 천간합을 이루며, 궁합 점수가 50점 이상일 때 표시됩니다. 서로의 정신적인 주파수가 일치하여 소울메이트가 될 수 있음을 의미합니다.` 
+                                    : `Triggers when Day Stems '${result.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}' and '${partnerResult.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}' form a Heavenly Stem Match with a score > 50. Indicates soulmate potential.`}
+                            </div>
+                        )}
+                    </span>
                 </div>
                 <div className="flex flex-col gap-1 mb-4">
                     <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
@@ -677,19 +717,35 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
 
           {(() => {
              const fullText = partnerAnalysisMemo.text;
-             const splitTokenKo = "[관계 극성";
-             const splitTokenEn = "[Relationship Polarity";
-             const tokenIdxKo = fullText.indexOf(splitTokenKo);
-             const tokenIdxEn = fullText.indexOf(splitTokenEn);
-             const tokenIdx = tokenIdxKo !== -1 ? tokenIdxKo : (tokenIdxEn !== -1 ? tokenIdxEn : -1);
+             const splitTokenKo1 = "[관계 극성";
+             const splitTokenKo2 = "[심리적/구조적 결합";
+             const splitTokenEn1 = "[Social Bond";
+             const splitTokenEn2 = "[Psychological";
+             const tokenIdxKo1 = fullText.indexOf(splitTokenKo1);
+             const tokenIdxKo2 = fullText.indexOf(splitTokenKo2);
+             const tokenIdxEn1 = fullText.indexOf(splitTokenEn1);
+             const tokenIdxEn2 = fullText.indexOf(splitTokenEn2);
+             let tokenIdx = Math.max(tokenIdxKo1, tokenIdxKo2, tokenIdxEn1, tokenIdxEn2);
+             if (tokenIdx === -1) {
+                // Determine minimum valid index if multiple found, or just max if only one exists (max of -1 and X is X).
+                const indexes = [tokenIdxKo1, tokenIdxKo2, tokenIdxEn1, tokenIdxEn2].filter(idx => idx !== -1);
+                if(indexes.length > 0) {
+                    tokenIdx = Math.min(...indexes);
+                }
+             } else {
+                const indexes = [tokenIdxKo1, tokenIdxKo2, tokenIdxEn1, tokenIdxEn2].filter(idx => idx !== -1);
+                tokenIdx = Math.min(...indexes);
+             }
              const previewText = tokenIdx !== -1 ? fullText.substring(0, tokenIdx).trim() : fullText;
              const hasMoreText = tokenIdx !== -1;
+             const remainingText = tokenIdx !== -1 ? fullText.substring(tokenIdx).trim() : '';
 
              return (
                <>
                  <div className="text-[15px] tracking-tight text-fuchsia-100/90 leading-[1.7] font-display whitespace-pre-wrap mt-4 mb-2">
-                   {showFullRelationText ? fullText : previewText}
+                   {previewText}
                  </div>
+                 
                  {hasMoreText && (
                    <div className="flex justify-center mt-2 mb-6">
                      <button onClick={() => setShowFullRelationText(!showFullRelationText)} className="text-xs text-fuchsia-300 hover:text-fuchsia-200 transition-colors flex items-center justify-center gap-1 bg-fuchsia-900/30 px-3 py-1.5 border border-fuchsia-500/30 rounded-full">
@@ -697,37 +753,47 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                      </button>
                    </div>
                  )}
+
+                 <AnimatePresence>
+                 {showFullRelationText && (
+                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                         <div className="text-[15px] tracking-tight text-fuchsia-100/90 leading-[1.7] font-display whitespace-pre-wrap mt-4 mb-2 pt-4 border-t border-fuchsia-500/20">
+                           {remainingText}
+                         </div>
+                     </motion.div>
+                 )}
+                 </AnimatePresence>
+
+                 {partnerAnalysisMemo.gates && partnerAnalysisMemo.gates.length > 0 && (
+                    <div className="space-y-3 pt-6 mt-6 border-t border-fuchsia-500/20">
+                       <h5 className="text-[13px] font-bold text-fuchsia-200 uppercase mb-4 tracking-widest flex items-center gap-2">
+                         <span>{lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}</span>
+                         <span className="text-[10px] bg-fuchsia-500/20 border border-fuchsia-400/30 text-fuchsia-300 px-2 py-0.5 rounded-full">{partnerAnalysisMemo.gates.length}</span>
+                       </h5>
+                       {partnerAnalysisMemo.gates.slice(0, showFullRelationGates ? undefined : 3).map((g: any, i: number) => (
+                         <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5">
+                           <div className="absolute top-0 left-0 w-1.5 h-full bg-fuchsia-500/50"></div>
+                           <div className="text-[13px] font-bold text-fuchsia-300">{g.name}</div>
+                           <div className="text-[14px] text-fuchsia-50/90 leading-[1.65]">{g.desc}</div>
+                         </div>
+                       ))}
+                       {partnerAnalysisMemo.gates.length > 3 && (
+                           <button onClick={() => setShowFullRelationGates(!showFullRelationGates)} className="mt-3 w-full py-2 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 rounded-lg border border-fuchsia-500/30 text-xs font-bold text-fuchsia-300/80 transition-colors flex items-center justify-center gap-1.5">
+                               {showFullRelationGates ? (lang === 'KO' ? '배지 접기 ▲' : 'Hide Badges ▲') : (lang === 'KO' ? `전체 보기 (+${partnerAnalysisMemo.gates.length - 3}) ▼` : `Show All (+${partnerAnalysisMemo.gates.length - 3}) ▼`)}
+                           </button>
+                       )}
+                    </div>
+                 )}
                </>
              );
           })()}
-
-          {partnerAnalysisMemo.gates && partnerAnalysisMemo.gates.length > 0 && (
-            <div className="space-y-3 pt-6 mt-6 border-t border-fuchsia-500/20">
-               <h5 className="text-[13px] font-bold text-fuchsia-200 uppercase mb-4 tracking-widest flex items-center gap-2">
-                 <span>{lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}</span>
-                 <span className="text-[10px] bg-fuchsia-500/20 border border-fuchsia-400/30 text-fuchsia-300 px-2 py-0.5 rounded-full">{partnerAnalysisMemo.gates.length}</span>
-               </h5>
-               {partnerAnalysisMemo.gates.slice(0, showFullRelationGates ? undefined : 3).map((g: any, i: number) => (
-                 <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5">
-                   <div className="absolute top-0 left-0 w-1.5 h-full bg-fuchsia-500/50"></div>
-                   <div className="text-[13px] font-bold text-fuchsia-300">{g.name}</div>
-                   <div className="text-[14px] text-fuchsia-50/90 leading-[1.65]">{g.desc}</div>
-                 </div>
-               ))}
-               {partnerAnalysisMemo.gates.length > 3 && (
-                   <button onClick={() => setShowFullRelationGates(!showFullRelationGates)} className="mt-3 w-full py-2 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 rounded-lg border border-fuchsia-500/30 text-xs font-bold text-fuchsia-300/80 transition-colors flex items-center justify-center gap-1.5">
-                       {showFullRelationGates ? (lang === 'KO' ? '배지 접기 ▲' : 'Hide Badges ▲') : (lang === 'KO' ? `전체 보기 (+${partnerAnalysisMemo.gates.length - 3}) ▼` : `Show All (+${partnerAnalysisMemo.gates.length - 3}) ▼`)}
-                   </button>
-               )}
-            </div>
-          )}
           </motion.div>
           )}
           </AnimatePresence>
         </motion.div>
       )}
 
-               {partnerResult && partnerAnalysisMemo && renderDaewunBriefing()}
+               {partnerResult && partnerAnalysisMemo && !scannerOnly && renderDaewunBriefing()}
     </motion.div>
   );
 }

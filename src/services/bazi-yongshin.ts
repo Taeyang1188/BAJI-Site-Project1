@@ -272,7 +272,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
   const isStrong = strength.score > 50;
 
   // 観多判定 (Absolute Priority)
-  const gwanRatio = (tenGodsRatio['관성(Warrior/Judge)'] as number) || 0;
+  const gwanRatio = (tenGodsRatio['관성(Warrior/Judge)'] as number) || (tenGodsRatio['Warrior/Judge'] as number) || 0;
   const isGwanDa = gwanRatio >= 40; // Threshold lowered from 60 to 40
   
   console.log("DEBUG: gwanRatio:", gwanRatio);

@@ -14,7 +14,7 @@ import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/ba
 import { 
   ChevronDown, 
   ChevronUp, 
-  MessageSquare, 
+  Play, 
   Sun, 
   Moon, 
   HelpCircle, 
@@ -613,6 +613,15 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showMuJaDaJaInfo, setShowMuJaDaJaInfo] = useState<{ title: string, description: string, enDescription?: string } | null>(null);
   const [showMuJaDaJaHelp, setShowMuJaDaJaHelp] = useState(false);
   const [isCycleVibeExpanded, setIsCycleVibeExpanded] = useState(false);
+  const [showVibeTooltip, setShowVibeTooltip] = useState(false);
+
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showVibeTooltip) {
+      timer = setTimeout(() => setShowVibeTooltip(false), 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [showVibeTooltip]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showDailyVibe, setShowDailyVibe] = useState(false);
   const [vibePhase, setVibePhase] = useState<'intro' | 'question' | 'analysis'>('intro');
@@ -1245,17 +1254,20 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         className="goth-glass p-6 rounded-2xl border-l-4 border-neon-pink flex flex-col gap-4"
       >
         <div className="flex items-start gap-4">
-          <div className="bg-neon-pink/20 p-3 rounded-full shrink-0">
-            <MessageSquare className="w-6 h-6 text-neon-pink" />
+          <div 
+            className="bg-neon-pink/20 p-3 rounded-full shrink-0 cursor-pointer hover:bg-neon-pink/30 transition-colors"
+            onClick={() => { !isCycleVibeExpanded && setIsCycleVibeExpanded(true); setShowVibeTooltip(false); }}
+          >
+            <Play className="w-6 h-6 text-neon-pink" />
           </div>
-          <div className="space-y-1 flex-1">
+          <div className="space-y-1 flex-1 relative">
             <div className="flex flex-wrap items-start sm:items-center justify-between gap-2">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 flex-1 min-w-0">
                 <div className="text-[10px] sm:text-[11px] font-display font-medium text-white/50 uppercase tracking-[0.1em] sm:tracking-[0.2em] whitespace-nowrap shrink-0">{t.seasonVibe}</div>
                 <div className="text-[9px] sm:text-[10px] text-white/30 italic truncate sm:whitespace-normal">{t.seasonVibeDisclaimer}</div>
               </div>
               <button 
-                onClick={() => setIsCycleVibeExpanded(!isCycleVibeExpanded)}
+                onClick={() => { setIsCycleVibeExpanded(!isCycleVibeExpanded); setShowVibeTooltip(false); }}
                 className="text-[10px] font-bold text-neon-pink/60 hover:text-neon-pink transition-colors flex items-center gap-1 uppercase tracking-widest shrink-0 whitespace-nowrap"
               >
                 {isCycleVibeExpanded ? (lang === 'KO' ? '접기' : 'COLLAPSE') : (lang === 'KO' ? '펼치기' : 'EXPAND')}
@@ -1265,11 +1277,34 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             
             <div className="relative">
               {!isCycleVibeExpanded ? (
-                <p className="text-sm font-display italic text-white/60 leading-relaxed cursor-pointer hover:text-white/80 transition-colors" onClick={() => setIsCycleVibeExpanded(true)}>
-                  {lang === 'KO' 
-                    ? `요번 ${new Date().getFullYear()}년도의 너의 행운은 어떨 것 같아? 시험 해 볼까?` 
-                    : `What do you think your luck for ${new Date().getFullYear()} will be? Shall we test it?`}
-                </p>
+                <div className="cursor-pointer relative inline-block mt-2" onClick={() => { setIsCycleVibeExpanded(true); setShowVibeTooltip(false); }}>
+                  {/* Tooltip */}
+                  <AnimatePresence>
+                    {showVibeTooltip && (
+                       <motion.div
+                         initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                         animate={{ opacity: 1, y: 0, scale: 1 }}
+                         transition={{ type: "spring", bounce: 0.6, duration: 0.8 }}
+                         exit={{ opacity: 0, scale: 0.9 }}
+                         className="absolute -top-10 -right-4 sm:-top-8 sm:-right-4 bg-neon-pink text-black font-bold text-[10px] sm:text-[11px] px-3 py-1.5 rounded-lg shadow-[0_0_15px_rgba(255,0,255,0.6)] z-10 whitespace-nowrap pointer-events-none"
+                       >
+                         {lang === 'KO' ? '가장 먼저 운세부터 확인해볼까?' : 'Shall we check your fortune first?'}
+                         <div className="absolute top-full right-6 sm:right-8 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-neon-pink"></div>
+                       </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <p className="text-sm sm:text-[15px] font-display italic font-bold text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse leading-relaxed transition-colors">
+                    <TypingText 
+                           key={`short-${lang}`} 
+                           text={lang === 'KO' 
+                             ? `요번 ${new Date().getFullYear()}년도의 너의 행운은 어떨 것 같아? 시험 해 볼까? (클릭해서 나의 운세 알아보기)` 
+                             : `What do you think your luck for ${new Date().getFullYear()} will be? Click to test it!`}
+                           speed={40} 
+                           lang={lang}
+                           onComplete={() => setShowVibeTooltip(true)}
+                         />
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-6">
                   {vibePhase === 'intro' && (
@@ -1530,7 +1565,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             const mainText = cycleVibe.themeAnalyses[selectedThemeId].main;
                             let parsedJson = null;
                             try {
-                              if (mainText.startsWith('{') && ['moving', 'taboo', 'dark_curtain', 'destiny_map'].includes(selectedThemeId)) {
+                              if (mainText.startsWith('{') && ['moving', 'taboo', 'dark_curtain', 'destiny_map', 'soul_intersection'].includes(selectedThemeId)) {
                                 parsedJson = JSON.parse(mainText);
                               }
                             } catch (e) {}
@@ -1652,6 +1687,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               } else if (selectedThemeId === 'destiny_map') {
                                 return (
                                   <DestinyMapSection result={result} lang={lang} parsedJson={parsedJson} />
+                                );
+                              } else if (selectedThemeId === 'soul_intersection') {
+                                return (
+                                  <DestinyMapSection result={result} lang={lang} parsedJson={parsedJson} scannerOnly={true} />
                                 );
                               }
                             } else {
