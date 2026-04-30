@@ -73,7 +73,7 @@ const formatGod = (god: string, stemOrBranch: string, lang: Language) => {
   const base = god.substring(0, 2);
   const TEN_GODS_HANJA: Record<string, string> = {
     "비견": "比肩", "겁재": "劫財", "식신": "食神", "상관": "傷官",
-    "편재": "偏財", "정재": "正財", "편관": "偏관", "정관": "正官",
+    "편재": "偏財", "정재": "正財", "편관": "偏官", "정관": "正官",
     "편인": "偏印", "정인": "正印"
   };
   const hanja = TEN_GODS_HANJA[base] || '';
@@ -1134,16 +1134,16 @@ ${detailedEffect}`;
 
     if (daewunScore >= 70) {
       report += lang === 'KO' 
-        ? `현재 진행 중인 ${daewunLabelKO}은 큰 재물의 흐름이 들어오는 황금기야. 물이 들어왔으니 힘차게 노를 저어야 할 때지.\n\n`
-        : `The current ${daewunLabelEN} cycle brings a strong flow of wealth. It's a golden period.\n\n`;
+        ? `이번 대운(${daewunLabelKO})의 본질은 **'압도적 자산 증식의 인프라'**에 있어. 물이 쏟아져 들어오며 성과가 기하급수적으로 팽창하는 시기지.\n\n`
+        : `The current ${daewunLabelEN} cycle is a massive infrastructure for wealth multiplication. A golden period where results expand exponentially.\n\n`;
     } else if (daewunScore >= 40) {
       report += lang === 'KO' 
-        ? `현재 ${daewunLabelKO}은 재물이 평탄하게 흐르는 시기야. 무리한 투자보다는 안정적인 축적에 유리해.\n\n`
-        : `The current ${daewunLabelEN} cycle has a stable wealth flow. Focus on safe accumulation.\n\n`;
+        ? `이번 대운(${daewunLabelKO})의 본질은 **'안정적 수익 구조의 완성'**에 있어. 무리한 도박보다는 리스크를 제어하며 자산을 불리기에 최적화된 하드웨어를 갖춘 시기지.\n\n`
+        : `The current ${daewunLabelEN} cycle provides an infrastructure of stable wealth accumulation. Focus on controlling risks and steady growth.\n\n`;
     } else {
       report += lang === 'KO'
-        ? `현재 ${daewunLabelKO}은 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 시기야. 하지만 기회는 항상 존재하는 법이지!\n\n`
-        : `The current ${daewunLabelEN} cycle is defensive. Focus on securing cash flow rather than big bets, but stay alert for opportunities!\n\n`;
+        ? `이번 대운(${daewunLabelKO})의 본질은 **'자산 방어와 리스크 관리 시스템'**에 있어. 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 하드웨어 환경이야.\n\n`
+        : `The current ${daewunLabelEN} cycle is a defensive infrastructure. Focus on securing cash flow and minimizing risks rather than big bets.\n\n`;
     }
 
     // 2. Current Year
@@ -1155,18 +1155,28 @@ ${detailedEffect}`;
     let currentYearIntro = lang === 'KO' ? `올해(${currentYear}년 ${currentYearPillar?.stem}${currentYearPillar?.branch}년)는 ` : `This year (${currentYear}) `;
     
     if (currentYearScore >= 70) {
-      report += lang === 'KO'
-        ? `${currentYearIntro}${getYearVibeDescription(currentYearData.traits)} 해로, 특히 돋보이는 운을 가지고 있어! 성과가 보상으로 직결되는 짜릿한 한 해가 될 가능성이 높아.\n`
-        : `${currentYearIntro}brings ${getYearVibeDescription(currentYearData.traits)}, highlighting exceptionally strong luck! Hard work directly translates to rewards.\n`;
+      if (daewunScore >= 70) {
+        report += lang === 'KO'
+          ? `이 거대한 흐름 위에, ${currentYearIntro}가속 페달까지 밟게 되는 특이점(Anomaly)이야! 올해 찾아오는 ${getYearVibeDescription(currentYearData.traits)} 기운을 더한다면 브레이크 없는 쾌속 질주와 짜릿한 성취를 거둘 수 있을 거야.\n`
+          : `${currentYearIntro}acts as a powerful accelerator on this already massive infrastructure! Bringing ${getYearVibeDescription(currentYearData.traits)}, hard work directly translates to exceptional rewards.\n`;
+      } else if (daewunScore >= 40) {
+        report += lang === 'KO'
+          ? `하지만 이 안정적인 흐름 속에 **특이점(Anomaly)**처럼 강력한 재물운이 꽂히는 구간이 바로 ${currentYearIntro.replace('는 ', '야!')} 대운이 주는 안정감이라는 방패를 들고, 올해 찾아오는 ${getYearVibeDescription(currentYearData.traits)} 기운이라는 창을 휘두른다면 그 어느 때보다 실속 있는 성취를 거둘 수 있을 거야.\n`
+          : `However, as a powerful anomaly in this stable flow, ${currentYearIntro.replace(' (', ' brings ')}${getYearVibeDescription(currentYearData.traits)}, highlighting exceptionally strong luck! With the cycle's stability as your shield, use this year's energy as your spear.\n`;
+      } else {
+        report += lang === 'KO'
+          ? `하지만 이 방어적인 흐름 속에서도 매서운 반격 찬스가 주어지는 구간이 바로 ${currentYearIntro.replace('는 ', '야!')} 올해 찾아오는 ${getYearVibeDescription(currentYearData.traits)} 기운을 활용한다면 위기 속에서도 날카로운 단기 성과를 낼 수 있을 거야.\n`
+          : `Even in this defensive cycle, there is a strong counter-attack opportunity, which is ${currentYearIntro.replace(' (', ' bringing ')}${getYearVibeDescription(currentYearData.traits)}! You can turn crises into sharp short-term achievements.\n`;
+      }
     } else if (currentYearScore >= 40) {
       report += lang === 'KO'
-        ? `${currentYearIntro}재물 측면에서 무난한 흐름이야. 일확천금보다는 계획했던 대로 차곡차곡 모아가는 재미를 느껴봐.\n`
-        : `${currentYearIntro}features ordinary but stable wealth luck. Follow your plans for steady accumulation.\n`;
+        ? `${currentYearIntro}인프라의 한계 내에서 무난하게 돌아가는 흐름이야. 이럴 땐 일확천금보다는 시스템에 맞춰 차곡차곡 모아가는 재미를 느껴봐.\n`
+        : `${currentYearIntro}flows ordinarily within your given infrastructure. Follow your plans for steady accumulation.\n`;
     } else {
       report += lang === 'KO'
-        ? `${currentYearIntro}재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹이 강할 수 있어.\n\n`
+        ? `${currentYearIntro}시스템의 과부하로 재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹(트래픽 초과)이 강할 수 있어.\n\n`
           + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n`
-        : `${currentYearIntro}brings a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
+        : `${currentYearIntro}brings a system overload with a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
           + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n`;
     }
 
@@ -1214,13 +1224,13 @@ ${detailedEffect}`;
       const yearListEN = filteredTopYears.map((y: any) => `**${y.year}**`).join(' and ');
       
       report += lang === 'KO'
-        ? `지금 대운 안에서 네가 특히 주목해야 할 타점은 ${yearDescriptionsKO}야. 이 중요한 기회를 잡기 위해 지금부터 멘탈과 시드머니를 장전해둬.`
-        : `In this 10-year cycle, the key timings to watch out for are ${yearListEN}. Prepare your seed money and mental focus to catch these prime opportunities.`;
+        ? `이 대운의 인프라 위에서 가장 거대한 트래픽(재물운)이 터지는 타점은 ${yearDescriptionsKO}야. 이 중요한 기회를 수익으로 전환하기 위해 지금부터 멘탈과 시드머니를 장전해둬.`
+        : `In this 10-year cycle, the key timings to watch out for massive wealth events are ${yearListEN}. Prepare your seed money and mental focus to maximize these opportunities.`;
     } else if (topYearsToDisplay.length > 0) {
       // means current year was the only top year left
       report += lang === 'KO'
-        ? `이미 올해가 대운 내에서 손꼽히는 기회의 해이니, 지금의 흐름을 최대한 활용하는 데 집중해봐!`
-        : `Since this year is already one of the best in your current cycle, focus completely on maximizing the present momentum!`;
+        ? `이미 올해가 이 대운 내에서 손꼽히는 거대한 이벤트 구간이니, 지금의 흐름을 최대한 활용하는 데 집중해봐!`
+        : `Since this year is already one of the biggest wealth event windows in your current cycle, focus completely on maximizing the present momentum!`;
     }
 
     const branches = result.pillars.map((p: any) => p.branch);

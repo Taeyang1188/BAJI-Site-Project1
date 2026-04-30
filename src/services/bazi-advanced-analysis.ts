@@ -325,19 +325,19 @@ export const calculateAdvancedAnalysis = (
         let biGyeopDesc = '';
         let biGyeopDescEn = '';
         if (dmElement === 'Wood') {
-          biGyeopDesc = `"빽빽한 숲속의 치열한 생존 경쟁." 주변에 사람이 많아 든든하지만, 한정된 자원을 두고 다투는 경쟁이 매우 치열해. [${wealthCol}:토(재)]가 부족하면 재산 분탈([tooltip:군비쟁재])이 일어나기 쉬우니 금전 거래에 각별히 주의해야 해.`;
+          biGyeopDesc = `"빽빽한 숲속의 치열한 생존 경쟁." 주변에 사람이 많아 든든하지만, 한정된 자원을 두고 다투는 경쟁이 매우 치열해. [${wealthCol}:토(재성)]이 부족하면 재산 분탈([tooltip:군비쟁재])이 일어나기 쉬우니 금전 거래에 각별히 주의해야 해.`;
           biGyeopDescEn = `"Fierce survival competition in a dense forest." Surrounded by many people, but competition for limited resources is intense. Without [${wealthCol}:Earth Wealth], property disputes are likely; be extra cautious with financial transactions.`;
         } else if (dmElement === 'Fire') {
-          biGyeopDesc = `"맹렬하게 타오르는 불바다." 열정과 에너지가 넘쳐 주변을 압도하지만, 감정 조절이 안 되면 주변을 태워버릴 수 있어. [${wealthCol}:금(재)]가 녹아내리지 않도록 냉철한 이성과 평정심을 유지하는 것이 성공의 열쇠야.`;
+          biGyeopDesc = `"맹렬하게 타오르는 불바다." 열정과 에너지가 넘쳐 주변을 압도하지만, 감정 조절이 안 되면 주변을 태워버릴 수 있어. [${wealthCol}:금(재성)]이 녹아내리지 않도록 냉철한 이성과 평정심을 유지하는 것이 성공의 열쇠야.`;
           biGyeopDescEn = `"A fiercely blazing sea of fire." Overwhelming passion and energy, but uncontrolled emotions can burn those around you. Maintaining cool reason and composure to prevent [${wealthCol}:Metal Wealth] from melting is the key to success.`;
         } else if (dmElement === 'Earth') {
-          biGyeopDesc = `"거대하고 단단한 산맥." 고집과 주관이 너무 강해 타인의 의견이 들어갈 틈이 부족할 수 있어. [${wealthCol}:수(재)]가 막히면 융통성 없는 고집불통이 될 수 있으니, 유연한 사고와 포용력을 기르는 연습이 필요해.`;
+          biGyeopDesc = `"거대하고 단단한 산맥." 고집과 주관이 너무 강해 타인의 의견이 들어갈 틈이 부족할 수 있어. [${wealthCol}:수(재성)]가 막히면 융통성 없는 고집불통이 될 수 있으니, 유연한 사고와 포용력을 기르는 연습이 필요해.`;
           biGyeopDescEn = `"A massive and solid mountain range." Strong convictions may leave little room for others' opinions. If [${wealthCol}:Water Wealth] is blocked, you may become inflexible; practice cultivating flexible thinking and tolerance.`;
         } else if (dmElement === 'Metal') {
-          biGyeopDesc = `"강철로 이루어진 무적의 군단." 결단력과 추진력이 독보적이지만, 너무 날카로워 주변 사람들에게 의도치 않게 상처를 주기 쉬워. [${wealthCol}:목(재)]가 꺾이지 않도록 부드러운 카리스마와 배려심을 갖춰야 해.`;
+          biGyeopDesc = `"강철로 이루어진 무적의 군단." 결단력과 추진력이 독보적이지만, 너무 날카로워 주변 사람들에게 의도치 않게 상처를 주기 쉬워. [${wealthCol}:목(재성)]이 꺾이지 않도록 부드러운 카리스마와 배려심을 갖춰야 해.`;
           biGyeopDescEn = `"An invincible army of steel." Unrivaled decisiveness and drive, but so sharp you may unintentionally hurt others. You must possess soft charisma and consideration to prevent [${wealthCol}:Wood Wealth] from breaking.`;
         } else if (dmElement === 'Water') {
-          biGyeopDesc = `"범람하는 거대한 강물." 지혜와 유연함이 넘치지만, 명확한 방향성을 잃으면 방탕함이나 깊은 우울감에 빠지기 쉬워. [${wealthCol}:화(재)]가 꺼지지 않도록 뚜렷한 목표 의식과 자기 통제력을 가져야 해.`;
+          biGyeopDesc = `"범람하는 거대한 강물." 지혜와 유연함이 넘치지만, 명확한 방향성을 잃으면 방탕함이나 깊은 우울감에 빠지기 쉬워. [${wealthCol}:화(재성)]가 꺼지지 않도록 뚜렷한 목표 의식과 자기 통제력을 가져야 해.`;
           biGyeopDescEn = `"A flooding massive river." Abundant wisdom and flexibility, but without clear direction, you may fall into dissipation or deep depression. Maintain a clear sense of purpose and self-control to keep [${wealthCol}:Fire Wealth] from extinguishing.`;
         }
         descKo = biGyeopDesc;
@@ -346,19 +346,19 @@ export const calculateAdvancedAnalysis = (
         let sikSangDesc = '';
         let sikSangDescEn = '';
         if (dmElement === 'Wood') {
-          sikSangDesc = `"충동적 실행력과 호기심의 끝판왕." 생각이 떠오르면 즉시 실행하지만, 뒷심이 부족해 여러 개를 벌려놓고 끝맺지 못하는 경우가 많아. [${gwanCol}:금(관)]의 기운이 부족하면 통제가 어려울 수 있으니 주의해.`;
+          sikSangDesc = `"충동적 실행력과 호기심의 끝판왕." 생각이 떠오르면 즉시 실행하지만, 뒷심이 부족해 여러 개를 벌려놓고 끝맺지 못하는 경우가 많아. [${gwanCol}:금(관성)]의 기운이 부족하면 통제가 어려울 수 있으니 주의해.`;
           sikSangDescEn = `"The ultimate impulsive executor and curiosity seeker." You act immediately on ideas but often fail to finish what you start. Without [${gwanCol}:Metal Power], control can be difficult.`;
         } else if (dmElement === 'Fire') {
-          sikSangDesc = `"만능 해결사, 하지만 실속은 남에게." 타인을 돕는 데 에너지를 다 쓰지만 정작 자신의 결과물은 챙기지 못할 수 있어. [${gwanCol}:수(관)]이 없으면 빛 좋은 개살구가 될 수 있으니 실속을 챙겨야 해.`;
+          sikSangDesc = `"만능 해결사, 하지만 실속은 남에게." 타인을 돕는 데 에너지를 다 쓰지만 정작 자신의 결과물은 챙기지 못할 수 있어. [${gwanCol}:수(관성)]이 없으면 빛 좋은 개살구가 될 수 있으니 실속을 챙겨야 해.`;
           sikSangDescEn = `"The universal fixer, but others get the benefits." You spend energy helping others but may fail to secure your own results. Without [${gwanCol}:Water Power], it might be all show and no substance.`;
         } else if (dmElement === 'Earth') {
-          sikSangDesc = `"날카로운 비판가, 완벽주의자." 언변이 뛰어나고 분석적이지만, 때로는 타인에게 상처를 주는 독설이 될 수 있어. [${gwanCol}:목(관)]이 없으면 절제 없는 비판으로 고립될 수 있으니 유연함이 필요해.`;
+          sikSangDesc = `"날카로운 비판가, 완벽주의자." 언변이 뛰어나고 분석적이지만, 때로는 타인에게 상처를 주는 독설이 될 수 있어. [${gwanCol}:목(관성)]이 없으면 절제 없는 비판으로 고립될 수 있으니 유연함이 필요해.`;
           sikSangDescEn = `"A sharp critic and perfectionist." Eloquent and analytical, but can be hurtful. Without [${gwanCol}:Wood Power], unrestrained criticism may lead to isolation; flexibility is needed.`;
         } else if (dmElement === 'Metal') {
-          sikSangDesc = `"예술적 감수성과 깊은 고독." 감수성이 풍부하고 창의적이지만, 현실 세계와의 괴리감으로 인해 우울감에 빠지기 쉬워. [${gwanCol}:화(관)]이 없으면 자기만의 세계에 갇힐 수 있으니 사회적 교류가 중요해.`;
+          sikSangDesc = `"예술적 감수성과 깊은 고독." 감수성이 풍부하고 창의적이지만, 현실 세계와의 괴리감으로 인해 우울감에 빠지기 쉬워. [${gwanCol}:화(관성)]이 없으면 자기만의 세계에 갇힐 수 있으니 사회적 교류가 중요해.`;
           sikSangDescEn = `"Artistic sensitivity and deep loneliness." Rich in sensitivity and creativity, but prone to depression due to a sense of detachment from reality. Without [${gwanCol}:Fire Power], you might get trapped in your own world; social interaction is important.`;
         } else if (dmElement === 'Water') {
-          sikSangDesc = `"자유로운 영혼, 방랑자." 호기심이 많고 틀에 얽매이는 것을 극도로 싫어해. [${gwanCol}:토(관)]이 없으면 방종으로 흐를 수 있으니 스스로 규칙을 정하고 지키는 연습이 필요해.`;
+          sikSangDesc = `"자유로운 영혼, 방랑자." 호기심이 많고 틀에 얽매이는 것을 극도로 싫어해. [${gwanCol}:토(관성)]이 없으면 방종으로 흐를 수 있으니 스스로 규칙을 정하고 지키는 연습이 필요해.`;
           sikSangDescEn = `"A free spirit, a wanderer." Highly curious and hates being confined by rules. Without [${gwanCol}:Earth Power], it may lead to indulgence; practice setting and keeping your own rules.`;
         }
         descKo = sikSangDesc;
@@ -367,19 +367,19 @@ export const calculateAdvancedAnalysis = (
         let gwanSeongDesc = '';
         let gwanSeongDescEn = '';
         if (dmElement === 'Wood') {
-          gwanSeongDesc = `"도끼에 찍히는 나무." 지나친 책임감과 타인의 시선에 대한 의식으로 스스로를 옭아매고 있어. [${inSeongCol}:수(인)]이 없으면 스트레스로 인해 건강이 상할 수 있으니, 남의 기대보다 내 마음의 소리에 귀 기울여야 해.`;
+          gwanSeongDesc = `"도끼에 찍히는 나무." 지나친 책임감과 타인의 시선에 대한 의식으로 스스로를 옭아매고 있어. [${inSeongCol}:수(인성)]이 없으면 스트레스로 인해 건강이 상할 수 있으니, 남의 기대보다 내 마음의 소리에 귀 기울여야 해.`;
           gwanSeongDescEn = `"A tree struck by an axe." You bind yourself with excessive responsibility and consciousness of others' opinions. Without [${inSeongCol}:Water Resource], stress may harm your health; listen to your inner voice rather than others' expectations.`;
         } else if (dmElement === 'Fire') {
-          gwanSeongDesc = `"폭우 속에 갇힌 불꽃." 주변의 압박과 억압으로 인해 자신의 열정과 능력을 제대로 펼치지 못하고 있어. [${inSeongCol}:목(인)]이 없으면 무기력증에 빠질 수 있으니, 자신을 지지해주는 환경을 찾는 것이 시급해.`;
+          gwanSeongDesc = `"폭우 속에 갇힌 불꽃." 주변의 압박과 억압으로 인해 자신의 열정과 능력을 제대로 펼치지 못하고 있어. [${inSeongCol}:목(인성)]이 없으면 무기력증에 빠질 수 있으니, 자신을 지지해주는 환경을 찾는 것이 시급해.`;
           gwanSeongDescEn = `"A flame trapped in heavy rain." You cannot properly unfold your passion and abilities due to surrounding pressure and suppression. Without [${inSeongCol}:Wood Resource], you may fall into lethargy; finding a supportive environment is urgent.`;
         } else if (dmElement === 'Earth') {
-          gwanSeongDesc = `"뿌리가 너무 깊어 갈라지는 땅." 명예와 권력에 대한 집착이 강해 주변 사람들과 마찰을 빚을 수 있어. [${inSeongCol}:화(인)]이 없으면 고집불통으로 낙인찍힐 수 있으니, 타인과 타협하고 포용하는 자세를 길러야 해.`;
+          gwanSeongDesc = `"뿌리가 너무 깊어 갈라지는 땅." 명예와 권력에 대한 집착이 강해 주변 사람들과 마찰을 빚을 수 있어. [${inSeongCol}:화(인성)]이 없으면 고집불통으로 낙인찍힐 수 있으니, 타인과 타협하고 포용하는 자세를 길러야 해.`;
           gwanSeongDescEn = `"Earth cracking from roots too deep." Strong obsession with honor and power may cause friction with those around you. Without [${inSeongCol}:Fire Resource], you might be branded as stubborn; cultivate an attitude of compromise and embrace.`;
         } else if (dmElement === 'Metal') {
-          gwanSeongDesc = `"불에 녹아내리는 칼." 과도한 업무나 엄격한 규율이 자신을 변형시키고 고통스럽게 할 수 있어. [${inSeongCol}:토(인)]이 없으면 인내심의 한계에 부딪혀 폭발할 수 있으니, 적절한 감정 분출구와 휴식이 필수야.`;
+          gwanSeongDesc = `"불에 녹아내리는 칼." 과도한 업무나 엄격한 규율이 자신을 변형시키고 고통스럽게 할 수 있어. [${inSeongCol}:토(인성)]이 없으면 인내심의 한계에 부딪혀 폭발할 수 있으니, 적절한 감정 분출구와 휴식이 필수야.`;
           gwanSeongDescEn = `"A blade melting in fire." Excessive work or strict discipline may deform and distress you. Without [${inSeongCol}:Earth Resource], you may hit the limit of patience and explode; an emotional outlet and rest are essential.`;
         } else if (dmElement === 'Water') {
-          gwanSeongDesc = `"흙탕물이 된 강물." 조직의 틀에 갇혀 자신의 지혜와 유연함을 잃어버릴 위험이 있어. [${inSeongCol}:금(인)]이 없으면 판단력이 흐려지고 이용당하기 쉬우니, 맑은 정신을 유지하고 주관을 뚜렷이 세워야 해.`;
+          gwanSeongDesc = `"흙탕물이 된 강물." 조직의 틀에 갇혀 자신의 지혜와 유연함을 잃어버릴 위험이 있어. [${inSeongCol}:금(인성)]이 없으면 판단력이 흐려지고 이용당하기 쉬우니, 맑은 정신을 유지하고 주관을 뚜렷이 세워야 해.`;
           gwanSeongDescEn = `"A river turned into muddy water." Risk of losing wisdom and flexibility trapped in organizational frameworks. Without [${inSeongCol}:Metal Resource], judgment may blur and you may be exploited; maintain a clear mind and firm convictions.`;
         }
         descKo = gwanSeongDesc;
@@ -409,19 +409,19 @@ export const calculateAdvancedAnalysis = (
         let jaeSeongDesc = '';
         let jaeSeongDescEn = '';
         if (dmElement === 'Wood') {
-          jaeSeongDesc = `"메마른 대지의 개척자." [${earthCol}:토(재)]가 넘쳐서 결과물에 대한 집착이 강해 쉼 없이 달려가지만, 때로는 그 욕심이 자신을 지치게 할 수 있어. [${gwanCol}:금(관)]이 없으면 결과만 쫓다 실속을 잃을 수 있으니 주의해.`;
+          jaeSeongDesc = `"메마른 대지의 개척자." [${earthCol}:토(재성)]이 넘쳐서 결과물에 대한 집착이 강해 쉼 없이 달려가지만, 때로는 그 욕심이 자신을 지치게 할 수 있어. [${gwanCol}:금(관성)]이 없으면 결과만 쫓다 실속을 잃을 수 있으니 주의해.`;
           jaeSeongDescEn = `"Pioneer of a dry land." Abundant [${earthCol}:Earth Wealth] drives you relentlessly for results, but greed may exhaust you. Without [${gwanCol}:Metal Power], chasing results without substance is a risk.`;
         } else if (dmElement === 'Fire') {
-          jaeSeongDesc = `"황금 벌판의 수확자." [${wealthCol}:금(재)]가 가득해 경제적 감각이 탁월하고 결과 위주의 사고를 하지만, 너무 냉정해 보일 수 있어. [${gwanCol}:수(관)]이 뒷받침되어야 그 부를 온전히 지키고 명예까지 얻을 수 있어.`;
+          jaeSeongDesc = `"황금 벌판의 수확자." [${wealthCol}:금(재성)]이 가득해 경제적 감각이 탁월하고 결과 위주의 사고를 하지만, 너무 냉정해 보일 수 있어. [${gwanCol}:수(관성)]이 뒷받침되어야 그 부를 온전히 지키고 명예까지 얻을 수 있어.`;
           jaeSeongDescEn = `"Harvester of a golden field." Abundant [${wealthCol}:Metal Wealth] gives you exceptional economic sense and result-oriented thinking, but you can seem cold. Need [${gwanCol}:Water Power] support to preserve wealth and gain honor.`;
         } else if (dmElement === 'Earth') {
-          jaeSeongDesc = `"범람하는 재물의 바다." [${wealthCol}:수(재)]가 넘실대니 큰 돈을 만질 기회가 많지만, 그만큼 위험 부담도 커. [${gwanCol}:목(관)]의 기운으로 물길을 터주지 않으면 재다신약([tooltip:재다신약])의 함정에 빠져 재물 때문에 고통받을 수 있어.`;
+          jaeSeongDesc = `"범람하는 재물의 바다." [${wealthCol}:수(재성)]가 넘실대니 큰 돈을 만질 기회가 많지만, 그만큼 위험 부담도 커. [${gwanCol}:목(관성)]의 기운으로 물길을 터주지 않으면 재다신약([tooltip:재다신약])의 함정에 빠져 재물 때문에 고통받을 수 있어.`;
           jaeSeongDescEn = `"An overflowing sea of wealth." Floating in [${wealthCol}:Water Wealth], frequent opportunities for big money, but with high risk. Without [${gwanCol}:Wood Power] to guide the flow, you risk suffering due to wealth (Wealth-heavy Weak-self).`;
         } else if (dmElement === 'Metal') {
-          jaeSeongDesc = `"울창한 숲속의 나무꾼." [${wealthCol}:목(재)]가 빽빽해 일복이 터졌고 결과물도 풍성하지만, 너무 많은 일에 치여 건강을 해칠 수 있어. [${gwanCol}:화(관)]의 빛이 있어야 그 결과물들이 보석처럼 빛을 발하고 인정받을 수 있어.`;
+          jaeSeongDesc = `"울창한 숲속의 나무꾼." [${wealthCol}:목(재성)]이 빽빽해 일복이 터졌고 결과물도 풍성하지만, 너무 많은 일에 치여 건강을 해칠 수 있어. [${gwanCol}:화(관성)]의 빛이 있어야 그 결과물들이 보석처럼 빛을 발하고 인정받을 수 있어.`;
           jaeSeongDescEn = `"Woodcutter in a dense forest." Plentiful [${wealthCol}:Wood Wealth] means abundant work and fruits, but overwork may harm health. Need [${gwanCol}:Fire Power] light for results to shine and be recognized.`;
         } else if (dmElement === 'Water') {
-          jaeSeongDesc = `"화려한 네온사인 속의 승부사." [${wealthCol}:화(재)]의 열기가 뜨거워 화려한 투자나 투기적 성향이 강해질 수 있어. [${gwanCol}:토(관)]의 제방이 튼튼해야 그 열기가 방탕함으로 흐르지 않고 확실한 자산이 될 거야.`;
+          jaeSeongDesc = `"화려한 네온사인 속의 승부사." [${wealthCol}:화(재성)]의 열기가 뜨거워 화려한 투자나 투기적 성향이 강해질 수 있어. [${gwanCol}:토(관성)]의 제방이 튼튼해야 그 열기가 방탕함으로 흐르지 않고 확실한 자산이 될 거야.`;
           jaeSeongDescEn = `"A gambler in vibrant neon lights." Heat of [${wealthCol}:Fire Wealth] leads to flashes of investment or speculation. Need a strong [${gwanCol}:Earth Power] dam to turn that heat into solid assets rather than dissipation.`;
         }
         descKo = jaeSeongDesc;

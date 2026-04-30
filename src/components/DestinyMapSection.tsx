@@ -59,6 +59,8 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
   const [showTimelineDocs, setShowTimelineDocs] = useState(true);
   const [showDynamicsBrief, setShowDynamicsBrief] = useState(true);
   const [showScannerResult, setShowScannerResult] = useState(true);
+  const [showFullRelationGates, setShowFullRelationGates] = useState(false);
+  const [showFullRelationText, setShowFullRelationText] = useState(false);
   
   const [questCompleted, setQuestCompleted] = useState(false);
   const [questSeed, setQuestSeed] = useState(0);
@@ -673,22 +675,50 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
 
           
 
-          <p className="text-[15px] tracking-tight text-fuchsia-100/90 leading-[1.7] font-display whitespace-pre-wrap mt-4 mb-2">
-            {partnerAnalysisMemo.text}
-          </p>
+          {(() => {
+             const fullText = partnerAnalysisMemo.text;
+             const splitTokenKo = "[관계 극성";
+             const splitTokenEn = "[Relationship Polarity";
+             const tokenIdxKo = fullText.indexOf(splitTokenKo);
+             const tokenIdxEn = fullText.indexOf(splitTokenEn);
+             const tokenIdx = tokenIdxKo !== -1 ? tokenIdxKo : (tokenIdxEn !== -1 ? tokenIdxEn : -1);
+             const previewText = tokenIdx !== -1 ? fullText.substring(0, tokenIdx).trim() : fullText;
+             const hasMoreText = tokenIdx !== -1;
+
+             return (
+               <>
+                 <div className="text-[15px] tracking-tight text-fuchsia-100/90 leading-[1.7] font-display whitespace-pre-wrap mt-4 mb-2">
+                   {showFullRelationText ? fullText : previewText}
+                 </div>
+                 {hasMoreText && (
+                   <div className="flex justify-center mt-2 mb-6">
+                     <button onClick={() => setShowFullRelationText(!showFullRelationText)} className="text-xs text-fuchsia-300 hover:text-fuchsia-200 transition-colors flex items-center justify-center gap-1 bg-fuchsia-900/30 px-3 py-1.5 border border-fuchsia-500/30 rounded-full">
+                         {showFullRelationText ? (lang === 'KO' ? '접기 ▲' : 'Show Less ▲') : (lang === 'KO' ? '더보기 ▼' : 'Show More ▼')}
+                     </button>
+                   </div>
+                 )}
+               </>
+             );
+          })()}
 
           {partnerAnalysisMemo.gates && partnerAnalysisMemo.gates.length > 0 && (
             <div className="space-y-3 pt-6 mt-6 border-t border-fuchsia-500/20">
-               <h5 className="text-[13px] font-bold text-fuchsia-200 uppercase mb-4 tracking-widest">
-                 {lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}
+               <h5 className="text-[13px] font-bold text-fuchsia-200 uppercase mb-4 tracking-widest flex items-center gap-2">
+                 <span>{lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}</span>
+                 <span className="text-[10px] bg-fuchsia-500/20 border border-fuchsia-400/30 text-fuchsia-300 px-2 py-0.5 rounded-full">{partnerAnalysisMemo.gates.length}</span>
                </h5>
-               {partnerAnalysisMemo.gates.map((g: any, i: number) => (
+               {partnerAnalysisMemo.gates.slice(0, showFullRelationGates ? undefined : 3).map((g: any, i: number) => (
                  <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5">
                    <div className="absolute top-0 left-0 w-1.5 h-full bg-fuchsia-500/50"></div>
                    <div className="text-[13px] font-bold text-fuchsia-300">{g.name}</div>
                    <div className="text-[14px] text-fuchsia-50/90 leading-[1.65]">{g.desc}</div>
                  </div>
                ))}
+               {partnerAnalysisMemo.gates.length > 3 && (
+                   <button onClick={() => setShowFullRelationGates(!showFullRelationGates)} className="mt-3 w-full py-2 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 rounded-lg border border-fuchsia-500/30 text-xs font-bold text-fuchsia-300/80 transition-colors flex items-center justify-center gap-1.5">
+                       {showFullRelationGates ? (lang === 'KO' ? '배지 접기 ▲' : 'Hide Badges ▲') : (lang === 'KO' ? `전체 보기 (+${partnerAnalysisMemo.gates.length - 3}) ▼` : `Show All (+${partnerAnalysisMemo.gates.length - 3}) ▼`)}
+                   </button>
+               )}
             </div>
           )}
           </motion.div>

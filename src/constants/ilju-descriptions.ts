@@ -101,7 +101,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "丙子": { 
     ko: "병자일주는 예의 바르고 단정해. 내면의 열정을 절제된 행동으로 보여주는 품격이 있지.", 
     en: "Byeong-ja is polite and neat. You have that dignity to show passion through restrained actions.",
-    impression: "겉으론 차분해 보여도 속엔 불꽃을 품고 있네. 꽤 절제된 카리스마가 느껴져."
+    impression: "겉으론 차분해 보여도 속엔 불꽃을 품고 있네. 꽤 절제된 카리스마가 느껴져.",
+    cardBg: "https://i.imgur.com/tSSVRg4.png",
+    detailImg: "https://i.imgur.com/CAtBkuw.png"
   },
   "丙戌": { 
     ko: "병술일주는 의리가 있고 활동적이야. 한 번 시작한 일은 끝까지 책임지는 열정이 돋보이지.", 
@@ -302,7 +304,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "辛未": { 
     ko: "신미일주는 겉은 부드러워 보이지만 속은 날카로운 칼날을 품고 있어. 현실적인 실속을 차리는 지혜가 있지.", 
     en: "Sin-mi looks soft outside but holds a sharp blade inside. You have the wisdom to secure benefits.",
-    impression: "속내를 꽤 잘 숨기네. 웃는 얼굴 뒤에 예리한 칼날을 숨기고 있는 거 다 알아."
+    impression: "속내를 꽤 잘 숨기네. 웃는 얼굴 뒤에 예리한 칼날을 숨기고 있는 거 다 알아.",
+    cardBg: "https://i.imgur.com/lmrwmTe.png",
+    detailImg: "https://i.imgur.com/YqXLSgq.png"
   },
   "辛巳": { 
     ko: "신사일주는 예의 바르고 세련된 감각을 지녔어. 합리적인 사고와 깔끔한 일 처리 능력이 돋보이지.", 
@@ -328,17 +332,23 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "辛亥": { 
     ko: "신해일주는 총명하고 감수성이 풍부해. 맑고 깨끗한 지혜로 세상을 바라보는 통찰력이 뛰어나지.", 
     en: "Sin-hae is intelligent and sensitive. You see the world with clear and pure wisdom.",
-    impression: "생각이 꽤 맑고 예리하네. 가끔은 너무 투명해서 남들이 못 보는 진실을 봐버리는 것 같아."
+    impression: "생각이 꽤 맑고 예리하네. 가끔은 너무 투명해서 남들이 못 보는 진실을 봐버리는 것 같아.",
+    cardBg: "https://i.imgur.com/7rVSyTH.jpeg",
+    detailImg: "https://i.imgur.com/KZyXfKq.jpeg"
   },
   "辛酉": { 
     ko: "신유일주는 고결하고 자존심이 매우 강해. 자신만의 완벽한 세계를 추구하는 장인 정신이 있지.", 
     en: "Sin-yu is noble and very proud. You have a craftsmanship spirit pursuing perfection.",
-    impression: "자기 관리가 꽤 철저하네. 너 스스로한테 가장 엄격한 잣대를 들이대고 있는 거 아니야?"
+    impression: "자기 관리가 꽤 철저하네. 너 스스로한테 가장 엄격한 잣대를 들이대고 있는 거 아니야?",
+    cardBg: "https://i.imgur.com/yPX68Cd.png",
+    detailImg: "https://i.imgur.com/P5hDceW.png"
   },
   "壬申": { 
     ko: "임신일주는 지혜롭고 다재다능해. 넓은 바다처럼 모든 것을 수용하고 변화에 대응하는 능력이 좋지.", 
     en: "Im-sin is wise and versatile. You're great at accepting everything and responding to changes.",
-    impression: "머리 회전이 꽤 빠르네. 어떤 상황에 던져놔도 금방 적응해서 네 몫을 챙길 것 같아."
+    impression: "머리 회전이 꽤 빠르네. 어떤 상황에 던져놔도 금방 적응해서 네 몫을 챙길 것 같아.",
+    cardBg: "https://i.imgur.com/j3QjQKl.jpeg",
+    detailImg: "https://i.imgur.com/eOw7MU1.jpeg"
   },
   "壬午": { 
     ko: "임오일주는 재치 있고 사교적이야. 현실적인 감각과 따뜻한 마음씨를 동시에 지닌 타입이지.", 
@@ -376,7 +386,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "癸酉": { 
     ko: "계유일주는 총명하고 섬세해. 맑은 샘물처럼 깨끗한 심성과 예리한 통찰력을 지닌 지혜로운 타입이지.", 
     en: "Gye-yu is intelligent and delicate. A wise type with a clean mind and sharp insight.",
-    impression: "생각이 꽤 예리하네. 겉으론 조용해도 속으론 남들의 약점까지 다 파악하고 있을 것 같아."
+    impression: "생각이 꽤 예리하네. 겉으론 조용해도 속으론 남들의 약점까지 다 파악하고 있을 것 같아.",
+    cardBg: "https://i.imgur.com/CtyUASY.jpeg",
+    detailImg: "https://i.imgur.com/6rnIkxM.jpeg"
   },
   "癸未": { 
     ko: "계미일주는 온화해 보이지만 생활력이 강해. 현실적인 어려움을 지혜롭게 극복해 나가는 인내심이 있지.", 
@@ -388,12 +400,16 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "癸巳": { 
     ko: "계사일주는 재치 있고 사교적이야. 현실적인 이익을 포착하는 감각과 타인과 소통하는 능력이 뛰어나지.", 
     en: "Gye-sa is witty and social. Excellent at sensing profits and communicating with others.",
-    impression: "눈치가 꽤 빠르네. 어디에 줄을 서야 실속을 챙길 수 있는지 본능적으로 아는 타입이야."
+    impression: "눈치가 꽤 빠르네. 어디에 줄을 서야 실속을 챙길 수 있는지 본능적으로 아는 타입이야.",
+    cardBg: "https://i.imgur.com/xcDf2j1.jpeg",
+    detailImg: "https://i.imgur.com/Iltd5mH.jpeg"
   },
   "癸卯": { 
     ko: "계묘일주는 다정다감하고 예술적 감각이 풍부해. 주변 사람들에게 편안함과 즐거움을 주는 매력이 있지.", 
     en: "Gye-myo is affectionate and rich in artistic sense. You give comfort and joy to everyone.",
-    impression: "분위기가 꽤 유연하네. 굳이 애쓰지 않아도 사람들이 너한테 마음을 열게 만드는 묘한 힘이 있어."
+    impression: "분위기가 꽤 유연하네. 굳이 애쓰지 않아도 사람들이 너한테 마음을 열게 만드는 묘한 힘이 있어.",
+    cardBg: "https://i.imgur.com/AmvSOnp.jpeg",
+    detailImg: "https://i.imgur.com/qzKuVCG.jpeg"
   },
   "癸丑": { 
     ko: "계축일주는 끈기 있고 내면의 힘이 강해. 묵묵히 노력하여 결국 자신의 목표를 달성하는 뚝심이 돋보이지.", 
@@ -405,6 +421,8 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "癸亥": { 
     ko: "계해일주는 지혜롭고 포용력이 넓어. 넓은 바다처럼 모든 것을 품어주는 넉넉한 마음씨와 강한 주관이 있지.", 
     en: "Gye-hae is wise and broad-minded. You have a generous heart and strong subjectivity.",
-    impression: "생각의 깊이가 꽤 깊네. 겉으론 맞춰주는 것 같아도 속으론 너만의 거대한 바다를 품고 있구나."
+    impression: "생각의 깊이가 꽤 깊네. 겉으론 맞춰주는 것 같아도 속으론 너만의 거대한 바다를 품고 있구나.",
+    cardBg: "https://i.imgur.com/QSBAQM7.jpeg",
+    detailImg: "https://i.imgur.com/wOvhsQz.jpeg"
   }
 };

@@ -172,10 +172,6 @@ export function calculateRelationshipDynamics(
          gateBonus += 5;
     } else {
          if (hasHap) gateBonus += 15;
-         if (hyungCheck) {
-             gatePenalty += 12;
-             gates.push({ name: isKO ? "🔪 [Surgical Adjustment: 구조조정의 칼날]" : "🔪 [Surgical Adjustment]", desc: isKO ? "서로의 뼈를 깎아 맞추는 고통스러운 수술대에 올랐습니다. 이 관계는 '사랑'보다는 '교정'에 가깝습니다. 서로를 바꾸려 할수록 메스는 더 깊숙이 들어옵니다." : "A relationship built on mutual correction. The more you try to change each other, the deeper the scalpel goes." });
-         }
          if (paCheck) {
              gatePenalty += 5;
              gates.push({ name: isKO ? "🧊 [Shattered Glass: 유리 파편의 미학]" : "🧊 [Shattered Glass]", desc: isKO ? "겉은 매끄러워 보이지만 내면엔 미세한 균열이 가득합니다. 어느 한쪽이 선을 넘는 순간, 관계는 복구 불가능한 파편으로 흩어질 준비가 되어 있습니다." : "Smooth on the surface, but filled with micro-cracks inside. One wrong move could shatter it completely." });
@@ -231,8 +227,26 @@ export function calculateRelationshipDynamics(
     const uCE = getCheonEul(uDayStem);
     const pCE = getCheonEul(pDayStem);
 
-    if (uCE.includes(pDayBranch) || uCE.includes(pMBR) || pCE.includes(uDayBranch) || pCE.includes(uMBR)) {
-        gates.push({ name: isKO ? "🏆 [The Crown’s Savior: 천을귀인]" : "🏆 [The Crown's Savior]", desc: isKO ? "상대는 당신의 삶에 닥칠 재앙을 막아주는 천상적 방패입니다. 존재만으로 당신의 격을 높여줍니다." : "The partner functions as a heavenly shield, protecting you from disasters and elevating your status." });
+    const uHasSavior = uCE.includes(pDayBranch) || uCE.includes(pMBR);
+    const pHasSavior = pCE.includes(uDayBranch) || pCE.includes(uMBR);
+
+    if (uHasSavior && pHasSavior) {
+        gates.push({ 
+            name: isKO ? "🏆 [Double Crown Savior: 쌍방 천을귀인]" : "🏆 [Double Crown Savior]", 
+            desc: isKO ? "서로가 서로의 삶에 나타난 최고의 선물입니다. 같이 있는 것만으로 보이지 않는 재앙이 막아지고 사회적 지위가 귀하게 격상되는 기적 같은 관계입니다." : "You are the greatest gifts to each other. Being together elevates both your statuses and its mere presence blocks misfortune." 
+        });
+        gateBonus += 30;
+    } else if (uHasSavior) {
+        gates.push({ 
+            name: isKO ? "🏆 [The Crown’s Savior: 천을귀인]" : "🏆 [The Crown's Savior]", 
+            desc: isKO ? "상대는 당신의 삶에 닥칠 재앙을 막아주는 천상적 방패입니다. 존재만으로 당신의 격을 높여주며 당신을 지켜주는 수호천사와 같습니다." : "The partner functions as a heavenly shield, protecting you from disasters and elevating your status." 
+        });
+        gateBonus += 20;
+    } else if (pHasSavior) {
+        gates.push({ 
+            name: isKO ? "🏆 [The Crown’s Savior: 당신이 그의 천을귀인]" : "🏆 [You are the Savior]", 
+            desc: isKO ? "당신은 상대방의 삶에 닥칠 재앙을 막아주는 천상적 방패이자 귀인입니다. 당신의 넉넉한 기운이 상대의 격을 높여주고 위기에서 구해냅니다." : "You function as a heavenly shield for the partner, protecting them from disasters and elevating their status." 
+        });
         gateBonus += 20;
     }
 
@@ -296,6 +310,37 @@ export function calculateRelationshipDynamics(
 
     const uBranches = userResult.pillars.map((p: any) => p.branch).filter(Boolean);
     const pBranches = partnerResult.pillars.map((p: any) => p.branch).filter(Boolean);
+
+    // [New] Cross-branch Hyung Check & In-Sa-Sin Samhyeongsal
+    let crossHyung = false;
+    for(const ub of uBranches) {
+        for(const pb of pBranches) {
+            if(isHyung(ub, pb)) crossHyung = true;
+        }
+    }
+    const combinedBranches = Array.from(new Set([...uBranches, ...pBranches]));
+    const hasInSaSin = combinedBranches.includes('寅') && combinedBranches.includes('巳') && combinedBranches.includes('申');
+    const hasPartialInSaSin = (combinedBranches.includes('寅') && combinedBranches.includes('巳')) || 
+                              (combinedBranches.includes('巳') && combinedBranches.includes('申')) || 
+                              (combinedBranches.includes('寅') && combinedBranches.includes('申'));
+    const hasChukSulMi = combinedBranches.includes('丑') && combinedBranches.includes('戌') && combinedBranches.includes('未');
+    const hasPartialChukSulMi = (combinedBranches.includes('丑') && combinedBranches.includes('戌')) || 
+                                (combinedBranches.includes('戌') && combinedBranches.includes('未')) || 
+                                (combinedBranches.includes('丑') && combinedBranches.includes('未'));
+
+    if (hasInSaSin || hasChukSulMi) {
+        gates.push({
+            name: isKO ? `⚠️ [운명의 심판대: ${hasInSaSin ? '인사신' : '축술미'} 삼형살]` : `⚠️ [Judgment of Fate: Samhyeongsal]`,
+            desc: isKO ? "두 사람의 기운이 모여 거대한 충돌(삼형살)을 완성합니다. 강한 권력 투쟁이나 서로를 고통스럽게 개조하려는 극단적인 갈등이 잠재되어 있습니다. 잦은 타협과 거리가 필요합니다." : "Your combined energies trigger a massive cosmic collision. Extreme power struggles and attempts to forcefully remodel each other are highly likely. Keep boundaries."
+        });
+        gatePenalty += 20;
+    } else if (hasPartialInSaSin || hasPartialChukSulMi || crossHyung) {
+        gates.push({ 
+            name: isKO ? "🔪 [Surgical Adjustment: 교정과 마찰의 형살]" : "🔪 [Surgical Adjustment]", 
+            desc: isKO ? "서로의 뼈를 깎아 맞추는 고통스러운 수술대에 올랐습니다. 서로의 기운이 만나 부분적인 형살(마찰)을 일으킵니다. 이 관계는 '사랑'보다는 '교정'에 가깝습니다. 서로를 바꾸려 할수록 갈등이 커집니다." : "A relationship built on mutual correction. Combines to create partial punishment (Hyung). The more you try to change each other, the deeper the scalpel goes." 
+        });
+        gatePenalty += 15;
+    }
 
     // [v5.3] 공망의 심연 (Gongmang Dynamics)
     const uGongmang = userResult.analysis?.gongmang?.branches || [];
@@ -418,6 +463,79 @@ export function calculateRelationshipDynamics(
     }
     if (pWeak && uSikSang > 40) {
         gates.push({ name: isKO ? "🕷️ [The Abyssal Drain: 에너지 기생 (상대)]" : "🕷️ [The Abyssal Drain (Partner)]", desc: isKO ? "당신이 무의식중에 상대의 기운을 과도하게 끌어다 쓰고 있을 가능성이 있습니다. 상대방이 지쳐가지 않는지 살펴주세요." : "You might be draining the partner's life force to bloom your own flowers." }); 
+        gatePenalty += 15;
+    }
+
+    // [New] 괴강살(Gwaegangsal) & Ego (Authority/Stubbornness) Clash Check
+    const GWAEGANG_PILLARS = ['庚辰', '庚戌', '壬辰', '戊戌'];
+    const uGwaegangPillars = userResult.pillars.filter(p => GWAEGANG_PILLARS.includes((p.stem||'') + (p.branch||'')));
+    const pGwaegangPillars = partnerResult.pillars.filter(p => GWAEGANG_PILLARS.includes((p.stem||'') + (p.branch||'')));
+    
+    const uGwaegangElements = uGwaegangPillars.map(p => STEM_ELEMENTS[p.stem as string] || '').filter(Boolean);
+    const pGwaegangElements = pGwaegangPillars.map(p => STEM_ELEMENTS[p.stem as string] || '').filter(Boolean);
+
+    const uGwaegang = uGwaegangPillars.length > 0;
+    const pGwaegang = pGwaegangPillars.length > 0;
+
+    let pGwaegangFatal = false;
+    let pGwaegangSavior = false;
+    
+    for (const el of pGwaegangElements) {
+        if (isCrushed(el, uPYong)) pGwaegangFatal = true;
+        if (uPYong && el.toLowerCase() === uPYong.toLowerCase()) pGwaegangSavior = true;
+    }
+
+    let uGwaegangFatal = false;
+    let uGwaegangSavior = false;
+    
+    for (const el of uGwaegangElements) {
+        if (isCrushed(el, pPYong)) uGwaegangFatal = true;
+        if (pPYong && el.toLowerCase() === pPYong.toLowerCase()) uGwaegangSavior = true;
+    }
+
+    // Partner -> User Effect
+    if (pGwaegangFatal) {
+        let penalty = 30;
+        if (uWeak) penalty = 40;
+        gates.push({
+            name: isKO ? "⚔️ [Fatal Suppression: 괴강살의 억압]" : "⚔️ [Fatal Suppression]",
+            desc: isKO ? "상대의 거대한 괴강살이 당신의 용신(숨통)을 정확히 타격합니다. 상대의 틀에 당신의 자아가 갇혀 소멸될 수 있는 강력한 실존적 위협이 감지됩니다. 이 관계는 당신을 질식시킬 위험이 있습니다." : "Their massive Gwaegang energy fatally strikes your most needed element. A powerful existential threat where your ego could be suffocated."
+        });
+        gatePenalty += penalty;
+    } else if (pGwaegangSavior) {
+        gates.push({
+            name: isKO ? "💎 [The Ruthless Savior: 잔혹한 구원자]" : "💎 [The Ruthless Savior]",
+            desc: isKO ? "상대의 강압적인 에너지가 역설적으로 당신에게 가장 필요한 기운입니다. 뼈를 깎는 스파르타식 훈련 같지만, 그 묵직한 압박 덕분에 당신이 제련되고 단단해집니다." : "Their oppressive energy is paradoxically what you need most. A Spartan-like relationship that refines you into a jewel."
+        });
+        gateBonus += 30;
+    } else if (pGwaegang && (uBiGeop > 30 || uGwanSal > 30) && !uWeak) {
+        gates.push({
+            name: isKO ? "⚡ [Dominance vs Ego: 체제의 억압과 아집]" : "⚡ [Dominance vs Ego (Partner)]",
+            desc: isKO ? "상대의 막강한 카리스마(괴강살)가 당신의 굳건한 아집과 자존심을 통제하려 들며 거센 마찰이 발생합니다. 숨막히는 권력 투쟁이 될 수 있으니 주의가 필요합니다." : "Their highly dominant energy (Gwaegang) clashes with your stubborn ego. Intense power struggles may block harmony."
+        });
+        gatePenalty += 15;
+    }
+
+    // User -> Partner Effect
+    if (uGwaegangFatal) {
+        let penalty = 30;
+        if (pWeak) penalty = 40;
+        gates.push({
+            name: isKO ? "⚔️ [Fatal Suppression: 나의 억압과 상대의 질식]" : "⚔️ [Fatal Suppression (You)]",
+            desc: isKO ? "당신의 거대한 괴강살이 상대의 용신(숨통)을 정확히 타격하고 있습니다. 당신의 의도와 상관없이 상대방의 자아와 가능성이 당신의 틀 안에서 질식하고 있을 수 있습니다." : "Your massive Gwaegang energy fatally strikes their most needed element, potentially suffocating their ego and potential."
+        });
+        gatePenalty += penalty;
+    } else if (uGwaegangSavior) {
+        gates.push({
+            name: isKO ? "💎 [The Ruthless Savior: 스파르타식 교관]" : "💎 [The Ruthless Savior (You)]",
+            desc: isKO ? "당신의 강요와 통제가 상대에게 꼭 필요한 자극제이자 진정한 구원으로 작용합니다. 때로는 당신의 거친 방식이 상대를 더 크게 성장시킵니다." : "Your dominant nature acts as a necessary stimulant and salvation for them. Your rough ways help them grow immensely."
+        });
+        gateBonus += 30;
+    } else if (uGwaegang && (pBiGeop > 30 || pGwanSal > 30) && !pWeak) {
+        gates.push({
+            name: isKO ? "⚡ [Dominance vs Ego: 나의 통제와 상대의 아집]" : "⚡ [Dominance vs Ego]",
+            desc: isKO ? "당신의 강력한 지배력(괴강살)이 상대의 굽히지 않는 아집과 자존심을 누르려 하며 잔혹한 스파크가 튑니다. 주도권 싸움이 잦으며, 파국으로 치달을 수 있습니다." : "Your highly dominant energy clashes with their stubborn ego, creating intense power struggles. Respect is vital."
+        });
         gatePenalty += 15;
     }
 
