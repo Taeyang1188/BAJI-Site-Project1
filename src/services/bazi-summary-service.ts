@@ -345,10 +345,10 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
 
     // 3. Interactions (Hap/Chung/Hyeong)
     const interactions = result.analysis?.interactions || [];
-    if (interactions.some((i: any) => i.type === 'Chung' || i.type === 'Hyeong')) {
+    if (interactions.some((i: any) => i.type.includes('충') || i.type.includes('형') || i.type.includes('파') || i.type.includes('원진'))) {
       hashtags.push(...pickRandom(["#변화무쌍", "#스펙터클", "#롤러코스터인생", "#다이나믹", "#반전매력"]));
     }
-    if (interactions.some((i: any) => i.type === 'Hap')) {
+    if (interactions.some((i: any) => i.type.includes('합'))) {
       hashtags.push(...pickRandom(["#평화주의자", "#금사빠", "#인간관계장인", "#둥글둥글", "#친화력갑"]));
     }
 
@@ -406,10 +406,10 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
 
     // 3. Interactions (Hap/Chung/Hyeong)
     const interactions = result.analysis?.interactions || [];
-    if (interactions.some((i: any) => i.type === 'Chung' || i.type === 'Hyeong')) {
+    if (interactions.some((i: any) => i.type.includes('충') || i.type.includes('형') || i.type.includes('파') || i.type.includes('원진'))) {
       hashtags.push(...pickRandom(["#EverChanging", "#Spectacular", "#RollercoasterLife", "#Dynamic", "#PlotTwist"]));
     }
-    if (interactions.some((i: any) => i.type === 'Hap')) {
+    if (interactions.some((i: any) => i.type.includes('합'))) {
       hashtags.push(...pickRandom(["#Pacifist", "#FallsInLoveFast", "#SocialGenius", "#EasyGoing", "#FriendlyAF"]));
     }
 

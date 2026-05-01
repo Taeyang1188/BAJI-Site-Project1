@@ -155,3 +155,78 @@ Output Template (in ${lang === 'KO' ? 'Korean' : 'English'}):
     return "The oracle is currently offline. Please try again later.";
   }
 };
+
+export const generatePersonaTestWithGemini = async (
+  result: BaZiResult,
+  targetName: string,
+  lang: Language
+): Promise<any> => {
+  const isKo = lang === 'KO';
+  const name = targetName || (isKo ? '당신' : 'You');
+  
+  const prompt = `
+You are a 'V.O.I.D Destiny Consultant' conducting a psychological test based on Bazi data.
+You need to generate a 3-phase question sequence and a final report in JSON format.
+
+User's Bazi Data:
+- Day Pillar (일주): ${result.pillars[2].stem}${result.pillars[2].branch} (${result.pillars[2].stemKoreanName} 일간)
+- Month Branch (월지): ${result.pillars[1].branch}
+- Strongest Ten God (가장 강한 십성): ${
+    Object.entries(result.analysis?.tenGodsRatio || {}).sort((a,b) => b[1]-a[1])[0]?.[0] || '균형'
+  }
+- Missing Elements (무자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r === 0).map(([k]) => k).join(', ')}
+- Overflowing Elements (다자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r > 30).map(([k]) => k).join(', ')}
+
+Follow this logic for generating the JSON:
+- Maintain an 'Observer POV': Act like a system that already knows their exact destiny. You are not asking to figure them out, you are holding up a mirror to their fate. 
+- Phase 1 (Core Identity / Day Pillar attack): Start strongly by poking at their Day Pillar and Month Branch character. e.g. "Looking at your data, you seem polite and heavy, but you actually hate when people tell you what to do, right?"
+  - routeAYes: Piercing confirmation of their self-awareness.
+  - routeBNo: If they say 'No', use their other Bazi trait (e.g. cold/hot elements, Ten Gods) to throw a 'positive bypass'. e.g. "Ah, so your thick social mask is working well. Or maybe that cold rationality is hiding your pride." (Do NOT just say "you are wrong", interpret their denial through their Bazi).
+  - routeCUnk: Cynical but relatable situational example.
+- Phase 2 (Behavioral Check): Target their Strongest Ten God. e.g. If rules/power is strong, "When someone says nonsense in a group chat, your logical circuits want to crush them with facts, right? The data says so."
+  - routeAYes: Confirmation
+  - routeBNo: Same as Phase 1, interpret their 'No' as either a mask or another Bazi trait taking over.
+  - routeCUnk: Situational example
+- Phase 3 (Deep Shadow Strike): Hit their psychological weak spot based on missing elements or overall balance. Provide a deep, dark inner truth. e.g. "Despite acting strong, the data shows an emptiness. Do you sometimes feel trapped in your own fortress?"
+
+Report: Synthesis based on the persona. 
+- trueNature: Short phrase (e.g. "A lonely tiger wearing a cat mask")
+- socialMask: Short phrase
+- advice: Cynical but warm advice from the V.O.I.D. system.
+
+Output purely a valid JSON string (no markdown formatting) matching this structure exactly in ${isKo ? 'Korean' : 'English'}, replacing {{target}} with the provided name and using natural conversational tone:
+{
+  "title": "String (Cluster title)",
+  "phases": [
+    {
+      "question": "String",
+      "routeAYes": { "text": "String" },
+      "routeBNo": { "text": "String" },
+      "routeCUnk": { "text": "String" }
+    }
+  ],
+  "report": {
+    "trueNature": "String",
+    "socialMask": "String",
+    "advice": "String"
+  }
+}
+Note: phases array MUST contain Exactly 3 objects.
+Use the name '${name}' directly in the text (if Korean, append proper suffixes naturally, e.g., ${name}은/는).
+`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+    const resultText = response.text || "{}";
+    return JSON.parse(resultText);
+  } catch (error) {
+    console.error("Gemini API Error in Persona:", error);
+    return null;
+  }
+};

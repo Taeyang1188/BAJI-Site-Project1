@@ -10,6 +10,7 @@ import { AdvancedAnalysisSection } from './AdvancedAnalysisSection';
 import { DestinyMapSection } from './DestinyMapSection';
 import { ParsedText, TooltipWrapper } from './ParsedText';
 import { GeJuHelpModal } from './GeJuHelpModal';
+import PersonaTestSection from './PersonaTestSection';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { 
   ChevronDown, 
@@ -1414,7 +1415,21 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                   {vibePhase === 'analysis' && selectedThemeId && (
                     <div className="space-y-4 sm:space-y-6">
-                      {(selectedThemeId === 'romance' || selectedThemeId === 'secrets') && romanceStep !== 'final' ? (
+                      {selectedThemeId === 'psych_test' ? (
+                        <div className="w-full">
+                           <PersonaTestSection 
+                             userName={userName}
+                             ilju={result.pillars[1] ? `${result.pillars[1].stem}${result.pillars[1].branch}` : '壬申'}
+                             baziResult={result}
+                             lang={lang}
+                             onComplete={() => {
+                               setSelectedThemeId(null);
+
+                               setVibePhase('question');
+                             }}
+                           />
+                        </div>
+                      ) : (selectedThemeId === 'romance' || selectedThemeId === 'secrets') && romanceStep !== 'final' ? (
                         <div className="p-4 sm:p-6 bg-neon-pink/10 border border-neon-pink/30 rounded-2xl space-y-4 sm:space-y-6">
                           {romanceStep === 'marital' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
@@ -1714,24 +1729,24 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         </div>
                       )}
 
-                      {cycleVibe.themeAnalyses[selectedThemeId].nextHook && (
+                      {selectedThemeId !== 'psych_test' && cycleVibe.themeAnalyses[selectedThemeId]?.nextHook && (
                         <motion.div 
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-xl"
                         >
                           <p className="text-xs sm:text-sm font-display text-white/90 italic mb-3">
-                            <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId].nextHook?.text || ''} />
+                            <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId]?.nextHook?.text || ''} />
                           </p>
                           <button
                             onClick={() => {
-                              const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
+                              const nextId = cycleVibe.themeAnalyses[selectedThemeId]?.nextHook?.themeId;
                               if (nextId) setSelectedThemeId(nextId);
                             }}
                             className="text-[10px] sm:text-xs font-bold text-neon-cyan hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1"
                           >
                             {(() => {
-                              const nextId = cycleVibe.themeAnalyses[selectedThemeId].nextHook?.themeId;
+                              const nextId = cycleVibe.themeAnalyses[selectedThemeId]?.nextHook?.themeId;
                               if (nextId === 'marriage_timing') return lang === 'KO' ? '결혼운 확인하기' : 'CHECK MARRIAGE LUCK';
                               if (nextId === 'romance') return lang === 'KO' ? '인연의 실타래 풀기' : 'UNTANGLE ROMANCE';
                               return lang === 'KO' ? '비밀의 페이지 열기' : 'OPEN THE SECRET PAGE';

@@ -239,7 +239,8 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
     if (finalDyn.syncScore >= 95) titleSync = lang === 'KO' ? '✨ 천생연분 (영혼의 단짝)' : '✨ Soulmates (Karmic Bond)';
     else if (finalDyn.syncScore >= 85) titleSync = lang === 'KO' ? '🔥 찰떡궁합 (최고의 시너지)' : '🔥 Top-tier Synergy';
     else if (finalDyn.syncScore >= 70) titleSync = lang === 'KO' ? '🤝 상호보완적 조력자' : '🤝 Great Supporters';
-    else if (finalDyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 성장의 과제' : '🌪️ Friction and Growth';
+    else if (finalDyn.syncScore <= 15) titleSync = lang === 'KO' ? '☠️ 파국과 영혼의 소진 (치명적 상극)' : '☠️ Catastrophe and Soul Drain';
+    else if (finalDyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 뼈를 깎는 인내' : '🌪️ Severe Friction & Unrelenting Patience';
 
     let isExtremeMode = false;
     let extremeModeDesc: string | null = null;
@@ -262,13 +263,15 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
     if (finalDyn.syncScore >= 90) { syncTierText = lang === 'KO' ? '완벽' : 'Perfect'; syncColor = 'bg-rose-500'; syncIcon = '💘'; }
     else if (finalDyn.syncScore >= 70) { syncTierText = lang === 'KO' ? '우수' : 'Excellent'; syncColor = 'bg-fuchsia-500'; syncIcon = '✨'; }
     else if (finalDyn.syncScore >= 50) { syncTierText = lang === 'KO' ? '보통' : 'Average'; syncColor = 'bg-fuchsia-300'; syncIcon = '🤝'; }
-    else { syncTierText = lang === 'KO' ? '주의' : 'Warning'; syncColor = 'bg-white/30'; syncIcon = '⚠️'; }
+    else if (finalDyn.syncScore >= 20) { syncTierText = lang === 'KO' ? '주의' : 'Warning'; syncColor = 'bg-yellow-500/80'; syncIcon = '⚠️'; }
+    else { syncTierText = lang === 'KO' ? '경고(위험)' : 'DANGER'; syncColor = 'bg-red-600'; syncIcon = '🚨'; }
 
     let bridgeText = lang === 'KO' ? '서로의 에너지가 융화되는 구간입니다.' : 'Your energies blend naturally.';
     if (finalDyn.syncScore >= 85) bridgeText = lang === 'KO' ? '서로가 서로에게 부족한 기운을 넘치게 채워주는 강력한 보완 관계입니다.' : 'A powerful complementary relationship where both fill each other\'s void.';
     else if (finalDyn.syncScore >= 60) bridgeText = lang === 'KO' ? '서로의 기운이 부드럽게 조화를 이루며 긍정적인 시너지를 만들어냅니다.' : 'Your energies harmonize smoothly.';
     else if (finalDyn.syncScore >= 45) bridgeText = lang === 'KO' ? '때로는 마찰이 있지만 양보를 통해 타협점을 찾아가야 하는 현실적 구간입니다.' : 'A practical phase requiring compromise to overcome occasional friction.';
-    else bridgeText = lang === 'KO' ? '에너지가 크게 충돌하며 잦은 마찰을 빚을 수 있으니, 각자의 공간과 거리두기가 필요합니다.' : 'Strong energies clash severely; maintaining proper distance is highly recommended.';
+    else if (finalDyn.syncScore > 15) bridgeText = lang === 'KO' ? '에너지가 크게 충돌하며 잦은 마찰을 빚을 수 있으니, 각자의 공간과 거리두기가 필요합니다.' : 'Strong energies clash severely; maintaining proper distance is highly recommended.';
+    else bridgeText = lang === 'KO' ? '에너지가 극단적으로 대립하며, 서로 맞부딪힐 때마다 돌이킬 수 없는 감정적, 기운적 파괴를 낳는 최악의 궤도에 놓여 있습니다.' : 'Extreme energetic opposition leads to irreversible emotional and energetic destruction. Immediate distance is required.';
 
     if (finalDyn.isEasterEgg) {
         titleSync = lang === 'KO' ? '🚨 규격 외의 인연' : '🚨 Out-of-Bounds Fate';
@@ -680,11 +683,11 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           {showScannerResult && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4">
           <div className="flex flex-col gap-3">
-             <div className="bg-black/40 rounded-xl p-5 flex flex-col justify-center border border-white/5 relative group">
-                {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
+             <div className={`bg-black/40 rounded-xl p-5 flex flex-col justify-center border relative group ${partnerAnalysisMemo.syncScore <= 15 ? 'border-red-900/50 shadow-[0_0_15px_rgba(220,38,38,0.1)]' : 'border-white/5'}`}>
+                {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode || partnerAnalysisMemo.syncScore <= 15) && (
                       <div className="absolute inset-0 rounded-xl bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 )}
-                <div className={`text-xs mb-3 text-left relative z-10 ${(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) ? 'text-red-400 font-bold' : 'text-white/50'}`}>
+                <div className={`text-xs mb-3 text-left relative z-10 ${(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode || partnerAnalysisMemo.syncScore <= 15) ? 'text-red-400 font-bold' : 'text-white/50'}`}>
                     <span className={(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) ? 'group/easter cursor-help inline-block relative' : ''}>
                         {partnerAnalysisMemo.titleSync}
                         {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
@@ -721,13 +724,28 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                     <>
                         <div className="flex flex-col gap-1 mb-4">
                             {!(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
-                                <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
+                                <motion.span 
+                                    className="text-sm font-bold text-white/80 flex items-center gap-1.5"
+                                    animate={partnerAnalysisMemo.syncScore <= 15 ? {
+                                        x: [0, -5, 5, -5, 5, -2, 2, 0],
+                                        color: ["#ffffff", "#ef4444", "#ffffff", "#ef4444"]
+                                    } : {}}
+                                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                                >
                                     <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
-                                </span>
+                                </motion.span>
                             )}
-                            <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode ? 'text-red-500' : 'text-fuchsia-300'}`}>
+                            <motion.span 
+                                className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode ? 'text-red-500' : 'text-fuchsia-300'}`}
+                                animate={partnerAnalysisMemo.syncScore <= 15 ? {
+                                    scale: [1, 1.2, 0.9, 1.1, 1],
+                                    color: ["#facc15", "#ef4444", "#facc15", "#ef4444", "#dc2626"]
+                                } : {}}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                style={partnerAnalysisMemo.syncScore <= 15 ? { color: "#dc2626" } : {}}
+                            >
                                 {partnerAnalysisMemo.syncScore}%
-                            </span>
+                            </motion.span>
                         </div>
                         <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mt-1">
                             <motion.div 

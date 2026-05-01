@@ -1491,6 +1491,12 @@ ${detailedEffect}`;
 
   // 3+1 Strategy
   const allThemes: ThemeOption[] = [
+    {
+      id: 'psych_test',
+      title: lang === 'KO' ? '[심리 테스트]' : '[Psychological Test]',
+      question: lang === 'KO' ? "내 진짜 성격, 그리고 내가 사회에서 쓰고 있는 가면의 정체가 궁금해." : "I'm curious about my true personality and the mask I wear in society.",
+      priority: 105
+    },
     { 
       id: 'romance', 
       title: lang === 'KO' ? '[심연의 이끌림]' : '[Attraction of the Abyss]', 
@@ -1554,6 +1560,7 @@ ${detailedEffect}`;
   ];
 
   const displayThemes = [
+    allThemes.find(t => t.id === 'psych_test')!,
     allThemes.find(t => t.id === 'destiny_map')!,
     allThemes.find(t => t.id === 'general')!,
     allThemes.find(t => t.id === 'romance')!,
