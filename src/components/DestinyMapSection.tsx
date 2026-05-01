@@ -241,6 +241,20 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
     else if (finalDyn.syncScore >= 70) titleSync = lang === 'KO' ? '🤝 상호보완적 조력자' : '🤝 Great Supporters';
     else if (finalDyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 성장의 과제' : '🌪️ Friction and Growth';
 
+    let isExtremeMode = false;
+    let extremeModeDesc: string | null = null;
+    if (finalDyn.intensityMode || /일방적|고리|나방|고립|Sacrifice|Karma|Moth|Isolation/.test(finalDyn.relation)) {
+        titleSync = finalDyn.relation;
+        isExtremeMode = true;
+        if (finalDyn.relation.includes('일방적') || finalDyn.relation.includes('Sacrifice')) {
+            extremeModeDesc = lang === 'KO' ? "점수의 높고 낮음과 관계없이, 한쪽이 다른 쪽의 에너지를 끝없이 소모해야 유지되는 상태입니다." : "Regardless of the score, one side endlessly drains the other's energy.";
+        } else if (finalDyn.relation.includes('고리') || finalDyn.relation.includes('Karma')) {
+            extremeModeDesc = lang === 'KO' ? "극단적인 갈등 요소가 있음에도 불구하고, 거부할 수 없는 에너지의 강한 끌림으로 묶인 강력하고 지독한 인연입니다." : "A powerful, unavoidable karmic bond entangled tightly despite extreme conflict.";
+        } else if (finalDyn.relation.includes('나방') || finalDyn.relation.includes('고립') || finalDyn.relation.includes('Moth') || finalDyn.relation.includes('Isolation')) {
+            extremeModeDesc = lang === 'KO' ? "서로에게 가장 피해야 할 치명적인 에너지를 오히려 증폭시켜버려, 깊이 빠질수록 현실의 기반이 흔들릴 수 있는 결속입니다." : "A bond that amplifies each other's most fatal vulnerabilities, threatening to crumble your foundation the deeper you fall.";
+        }
+    }
+
     let syncTierText = lang === 'KO' ? '적합' : 'Good';
     let syncColor = 'bg-fuchsia-400';
     let syncIcon = '✅';
@@ -278,7 +292,11 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         syncIcon,
         bridgeText,
         gates: finalDyn.gates,
-        structuralSynergy: finalDyn.structuralSynergy
+        structuralSynergy: finalDyn.structuralSynergy,
+        intensityMode: finalDyn.intensityMode,
+        happinessScore: finalDyn.happinessScore,
+        isExtremeMode,
+        extremeModeDesc
     };
   }, [partnerResult, result, lang, adjustedElements, partnerAdjustedElements]);
 
@@ -663,13 +681,13 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4">
           <div className="flex flex-col gap-3">
              <div className="bg-black/40 rounded-xl p-5 flex flex-col justify-center border border-white/5 relative group">
-                {partnerAnalysisMemo.isEasterEgg && (
-                     <div className="absolute inset-0 rounded-xl bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
+                      <div className="absolute inset-0 rounded-xl bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 )}
-                <div className={`text-xs mb-3 text-left relative z-10 ${partnerAnalysisMemo.isEasterEgg ? 'text-red-400 font-bold' : 'text-white/50'}`}>
-                    <span className={partnerAnalysisMemo.isEasterEgg ? 'group/easter cursor-help inline-block relative' : ''}>
+                <div className={`text-xs mb-3 text-left relative z-10 ${(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) ? 'text-red-400 font-bold' : 'text-white/50'}`}>
+                    <span className={(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) ? 'group/easter cursor-help inline-block relative' : ''}>
                         {partnerAnalysisMemo.titleSync}
-                        {partnerAnalysisMemo.isEasterEgg && (
+                        {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
                             <div className="absolute left-0 bottom-full mb-2 hidden group-hover/easter:block w-[280px] p-2.5 bg-[#1a0510] border border-red-500/50 shadow-[0_4px_15px_rgba(255,0,0,0.3)] text-red-100/90 text-[11px] rounded z-[99999] font-normal leading-relaxed whitespace-normal pointer-events-none">
                                 {lang === 'KO' 
                                     ? `사용자('${result.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')와 상대방('${partnerResult.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')의 일간이 천간합을 이루며, 궁합 점수가 50점 이상일 때 표시됩니다. 서로의 정신적인 주파수가 일치하여 소울메이트가 될 수 있음을 의미합니다.` 
@@ -678,23 +696,50 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                         )}
                     </span>
                 </div>
-                <div className="flex flex-col gap-1 mb-4">
-                    <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
-                        <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
-                    </span>
-                    <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg ? 'text-red-500' : 'text-fuchsia-300'}`}>
-                        {partnerAnalysisMemo.syncScore}%
-                    </span>
-                </div>
-                {/* Color Gauge Bar */}
-                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mt-1">
-                    <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${partnerAnalysisMemo.syncScore}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full ${partnerAnalysisMemo.syncColor}`} 
-                    />
-                </div>
+                {partnerAnalysisMemo.intensityMode ? (
+                    <div className="flex flex-col mb-4">
+                        <span className="text-sm font-bold text-white/80 flex items-center gap-1.5 mb-2">
+                            <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
+                        </span>
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="flex flex-row justify-between items-end">
+                                <span className="text-[2.2rem] leading-none font-mono font-bold text-red-500">
+                                    {partnerAnalysisMemo.syncScore}% <span className="text-sm text-red-500/80 font-normal">Intensity</span>
+                                </span>
+                                <span className="text-[1.2rem] leading-none font-mono font-bold text-yellow-500 pb-1">
+                                    {partnerAnalysisMemo.happinessScore}% <span className="text-xs text-yellow-500/80 font-normal">Happiness</span>
+                                </span>
+                            </div>
+                            <div className="flex flex-col gap-1.5 w-full mt-1">
+                                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} animate={{ width: `${partnerAnalysisMemo.syncScore}%` }} transition={{ duration: 1, ease: "easeOut" }} className="h-full bg-red-600" />
+                                </div>
+                                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} animate={{ width: `${partnerAnalysisMemo.happinessScore}%` }} transition={{ duration: 1, ease: "easeOut" }} className="h-full bg-yellow-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex flex-col gap-1 mb-4">
+                            <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
+                                <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
+                            </span>
+                            <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg ? 'text-red-500' : 'text-fuchsia-300'}`}>
+                                {partnerAnalysisMemo.syncScore}%
+                            </span>
+                        </div>
+                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mt-1">
+                            <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${partnerAnalysisMemo.syncScore}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className={`h-full ${partnerAnalysisMemo.syncColor}`} 
+                            />
+                        </div>
+                    </>
+                )}
                 {partnerAnalysisMemo.structuralSynergy && (
                     <div className="mt-4 pt-4 border-t border-white/10">
                         <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider mb-2">
@@ -770,13 +815,28 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                          <span>{lang === 'KO' ? '관계 역학 (Dynamics Gates)' : 'Relationship Dynamics'}</span>
                          <span className="text-[10px] bg-fuchsia-500/20 border border-fuchsia-400/30 text-fuchsia-300 px-2 py-0.5 rounded-full">{partnerAnalysisMemo.gates.length}</span>
                        </h5>
-                       {partnerAnalysisMemo.gates.slice(0, showFullRelationGates ? undefined : 3).map((g: any, i: number) => (
-                         <div key={i} className="bg-black/30 border border-fuchsia-400/20 rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5">
-                           <div className="absolute top-0 left-0 w-1.5 h-full bg-fuchsia-500/50"></div>
-                           <div className="text-[13px] font-bold text-fuchsia-300">{g.name}</div>
-                           <div className="text-[14px] text-fuchsia-50/90 leading-[1.65]">{g.desc}</div>
-                         </div>
-                       ))}
+                       {partnerAnalysisMemo.gates.slice(0, showFullRelationGates ? undefined : 3).map((g: any, i: number) => {
+                           const getBadgeColor = (name: string) => {
+                               if (/천을귀인|골든|크로스 카르마|수화기제|밀물|Double Crown|Elemental Oasis|기적의 조각|운명의 조력|도원결의|재다신약|조후 구원|식신제살|동조|구원자|The Crown|Golden|Savior|Miracle|Destined|정신적 결속|천간합|Spiritual Union|Stem Combination/.test(name)) return 'yellow';
+                               if (/원진|귀문|형살|충돌|충|가치관의 충돌|파괴적|블랙홀|Black Hole|통제불능|과부하|맹독|사약|잠식|독소|Shattered|압박|극멸|Locked|탁해진|꺼져가는|묻혀버린|뿌리 뽑힌|불모지|기생|억압|답답한|파멸적|독|Total Solar Eclipse|Overload|Toxic|Drain|Clash/.test(name)) return 'red';
+                               if (/연금술|Alchemist|동량지재|금목상쟁|공망|거울|모순|극성|숙명|창과 방패|통제 상실|반전|Contradiction|Mirror|Risk|절대적 화력의 공유|Absolute Firepower|강력한 결속|Strong Bond|Strong Union/.test(name)) return 'green';
+                               return 'purple';
+                           };
+                           const colorMap: Record<string, { border: string, line: string, text: string }> = {
+                               yellow: { border: 'border-yellow-400/20', line: 'bg-yellow-500/60', text: 'text-yellow-300' },
+                               red: { border: 'border-red-400/20', line: 'bg-red-500/60', text: 'text-red-400' },
+                               green: { border: 'border-emerald-400/20', line: 'bg-emerald-500/50', text: 'text-emerald-300' },
+                               purple: { border: 'border-fuchsia-400/20', line: 'bg-fuchsia-500/50', text: 'text-fuchsia-300' }
+                           };
+                           const c = colorMap[getBadgeColor(g.name)] || colorMap.purple;
+                           return (
+                             <div key={i} className={`bg-black/30 border ${c.border} rounded-xl px-5 py-4 relative overflow-hidden flex flex-col gap-1.5`}>
+                               <div className={`absolute top-0 left-0 w-1.5 h-full ${c.line}`}></div>
+                               <div className={`text-[13px] font-bold ${c.text}`}>{g.name}</div>
+                               <div className="text-[14px] text-zinc-300 leading-[1.65] whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: g.desc }}></div>
+                             </div>
+                           );
+                       })}
                        {partnerAnalysisMemo.gates.length > 3 && (
                            <button onClick={() => setShowFullRelationGates(!showFullRelationGates)} className="mt-3 w-full py-2 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 rounded-lg border border-fuchsia-500/30 text-xs font-bold text-fuchsia-300/80 transition-colors flex items-center justify-center gap-1.5">
                                {showFullRelationGates ? (lang === 'KO' ? '배지 접기 ▲' : 'Hide Badges ▲') : (lang === 'KO' ? `전체 보기 (+${partnerAnalysisMemo.gates.length - 3}) ▼` : `Show All (+${partnerAnalysisMemo.gates.length - 3}) ▼`)}

@@ -27,6 +27,8 @@ export interface RelationshipDynamicsResult {
     isEasterEgg: boolean;
     gates: { name: string; desc: string }[];
     structuralSynergy?: { badge: string; desc: string; level: 'gold' | 'silver' };
+    intensityMode?: boolean;
+    happinessScore?: number;
 }
 
 export function calculateRelationshipDynamics(
@@ -346,45 +348,229 @@ export function calculateRelationshipDynamics(
         gatePenalty += 15;
     }
 
-    // [New] Cross-Chart Samhap Synergy
-    SAMHAP_GROUPS.forEach(group => {
-        const count = group.branches.filter(b => combinedBranches.includes(b)).length;
-        if (count === 3) {
-            const uCount = group.branches.filter(b => uBranches.includes(b)).length;
-            const pCount = group.branches.filter(b => pBranches.includes(b)).length;
-            
-            if (uCount < 3 && pCount < 3) {
-                gates.push({
-                    name: isKO ? `🌐 [에너지 협력: ${group.name}]` : `🌐 [Energy Synergy: ${group.element} Harmony]`,
-                    desc: isKO 
-                        ? `서로의 사주가 만나 '${group.name}'을 완성합니다. 혼자선 부족했던 에너지가 상대를 통해 강력하게 순환하며 거대한 목적을 달성하게 돕습니다.` 
-                        : `Your combined branches complete the ${group.element} Trinity. You provide the missing pieces for each other to achieve grand goals.`
-                });
-                gateBonus += 10;
-            } else if (uCount === 3 || pCount === 3) {
-                gates.push({
-                    name: isKO ? `🌊 [에너지 공명: ${group.name}]` : `🌊 [Energy Resonance: ${group.element}]`,
-                    desc: isKO
-                        ? `한 명의 강력한 '${group.name}' 기운을 다른 한 명이 지지하고 증폭시켜 줍니다. 같은 지향점을 가진 동료로서 최고의 추진력을 얻습니다.`
-                        : `One person's strong ${group.element} Trinity is amplified by the other. You share a common direction and gain incredible momentum.`
-                });
-                gateBonus += 5;
+    // [New] Cross-Chart Samhap & Banghap Synergy
+    const BANGHAP_GROUPS = [
+        { branches: ['亥', '子', '丑'], element: 'Water', name: '해자축 수국방합' },
+        { branches: ['寅', '卯', '辰'], element: 'Wood', name: '인묘진 목국방합' },
+        { branches: ['巳', '午', '未'], element: 'Fire', name: '사오미 화국방합' },
+        { branches: ['申', '酉', '戌'], element: 'Metal', name: '신유술 금국방합' }
+    ];
+
+    // [New] Cross-Chart Energy Flow (Samhap & Banghap Synergy + Mass Calculation)
+    const crossMass: Record<string, number> = { 'Wood': 0, 'Fire': 0, 'Earth': 0, 'Metal': 0, 'Water': 0 };
+    const crossCombos: Record<string, string[]> = { 'Wood': [], 'Fire': [], 'Earth': [], 'Metal': [], 'Water': [] };
+
+    [...SAMHAP_GROUPS, ...BANGHAP_GROUPS].forEach(group => {
+        const uHas = group.branches.filter(b => uBranches.includes(b));
+        const pHas = group.branches.filter(b => pBranches.includes(b));
+        const combined = Array.from(new Set([...uHas, ...pHas]));
+        const count = combined.length;
+
+        if (count === 3 && uHas.length > 0 && pHas.length > 0) {
+            const shortName = group.name.replace('수국방합', '방합').replace('목국방합', '방합').replace('화국방합', '방합').replace('금국방합', '방합');
+            if (uHas.length < 3 && pHas.length < 3) {
+                crossMass[group.element] += 1.5;
+                crossCombos[group.element].push(`${shortName}`);
+            } else if (uHas.length === 3 && pHas.length > 0) {
+                crossMass[group.element] += 1.0;
+                crossCombos[group.element].push(`${shortName}`);
+            } else if (pHas.length === 3 && uHas.length > 0) {
+                crossMass[group.element] += 1.0;
+                crossCombos[group.element].push(`${shortName}`);
+            } else if (uHas.length === 3 && pHas.length === 3) {
+                crossMass[group.element] += 1.5;
+                crossCombos[group.element].push(`${shortName}`);
             }
         } else if (count === 2) {
-             const uHas = group.branches.filter(b => uBranches.includes(b));
-             const pHas = group.branches.filter(b => pBranches.includes(b));
-             if (uHas.length > 0 && pHas.length > 0) {
+             // Only count if it's collaborative
+             if (uHas.length > 0 && pHas.length > 0 && !(uHas.length === 2 && pHas.length === 2 && uHas[0]===pHas[0]&&uHas[1]===pHas[1])) {
                  const center = group.branches[1];
-                 if (combinedBranches.includes(center)) {
-                     gates.push({
-                         name: isKO ? `🔗 [에너지 연결: ${group.name} 반합]` : `🔗 [Energy Link: ${group.element} Harmony (Half)]`,
-                         desc: isKO 
-                             ? `두 사람의 사주가 만나 '${group.name}'의 핵심 기운을 형성합니다. 완벽한 삼합은 아니더라도, 서로의 존재가 특정 목적을 향한 강력한 추진력이 됩니다.`
-                             : `Your combined branches form a critical part of the ${group.element} Trinity. While not a full Samhap, it still provides significant momentum.`
-                     });
-                     gateBonus += 5;
-                 }
+                 const isWangji = ['子', '午', '卯', '酉'].includes(center) && combined.includes(center);
+                 const mass = isWangji ? 0.7 : 0.3;
+                 crossMass[group.element] += mass;
+                 crossCombos[group.element].push(`${group.name.substring(0,2)}합`);
              }
+        }
+    });
+
+    const getValence = (el: string, yongHee: string[], giGu: string[]): { tier: number, name: string } => {
+        if (yongHee.length > 0 && el === yongHee[0]) return { tier: 1, name: 'Vital' };
+        if (yongHee.length > 1 && el === yongHee[1]) return { tier: 2, name: 'Support' };
+        if (giGu.length > 1 && el === giGu[1]) return { tier: 4, name: 'Danger' };
+        if (giGu.length > 0 && el === giGu[0]) return { tier: 5, name: 'Fatal' };
+        if (yongHee.includes(el)) return { tier: 2, name: 'Support' };
+        if (giGu.includes(el)) return { tier: 4, name: 'Danger' };
+        return { tier: 3, name: 'Neutral' };
+    };
+
+    const getN = (el: string) => {
+        if (el === 'Wood') return ['Metal', 'Fire'];
+        if (el === 'Fire') return ['Water', 'Earth'];
+        if (el === 'Earth') return ['Wood', 'Metal'];
+        if (el === 'Metal') return ['Fire', 'Water'];
+        if (el === 'Water') return ['Earth', 'Wood'];
+        return [];
+    };
+
+    const elKORap: Record<string, string> = {'Wood': '목(木)', 'Fire': '화(火)', 'Earth': '토(土)', 'Metal': '금(金)', 'Water': '수(水)'};
+
+    interface EnergyBadge {
+        type: string;
+        el: string;
+        elKO: string;
+        mass: number;
+        combos: string[];
+        uTierEff: number;
+        pTierEff: number;
+    }
+    const energyBadges: EnergyBadge[] = [];
+
+    Object.keys(crossMass).forEach(el => {
+        const mass = crossMass[el];
+        if (mass === 0) return;
+
+        const uVal = getValence(el, uYongHee, uGiGu);
+        const pVal = getValence(el, pYongHee, pGiGu);
+
+        const nEls = getN(el);
+        const uHasN = nEls.some(n => uYongHee.includes(n) && (userAdjustedElements[n] || 0) > 15);
+        const pHasN = nEls.some(n => pYongHee.includes(n) && (partnerAdjustedElements[n] || 0) > 15);
+
+        const uTier = uVal.tier;
+        const pTier = pVal.tier;
+
+        const uTamned = (uTier >= 4) && uHasN;
+        const pTamned = (pTier >= 4) && pHasN;
+
+        const baseScoreMap: Record<number, number> = { 1: 15, 2: 7, 3: 0, 4: -10, 5: -20 };
+        let uScore = baseScoreMap[uTier] * mass;
+        let pScore = baseScoreMap[pTier] * mass;
+
+        if (uTamned) uScore = Math.abs(uScore) * 0.5;
+        if (pTamned) pScore = Math.abs(pScore) * 0.5;
+
+        const uScoreBounded = uScore > 0 ? uScore : 0;
+        const pScoreBounded = pScore > 0 ? pScore : 0;
+        const uPenaltyBounded = uScore < 0 ? Math.abs(uScore) : 0;
+        const pPenaltyBounded = pScore < 0 ? Math.abs(pScore) : 0;
+        
+        gateBonus += Math.min(30, uScoreBounded + pScoreBounded);
+        gatePenalty += Math.min(30, uPenaltyBounded + pPenaltyBounded);
+
+        if (mass < 0.7) return;
+        
+        const isSurge = mass >= 1.4 || crossCombos[el].length >= 2;
+        const elKO = elKORap[el];
+
+        const effectiveUTier = uTamned ? 2 : uTier;
+        const effectivePTier = pTamned ? 2 : pTier;
+        let relTier = 3;
+        if (effectiveUTier >= 4 && effectivePTier >= 4) relTier = 5;
+        else if (effectiveUTier >= 4 || effectivePTier >= 4) relTier = 4;
+        else if (effectiveUTier <= 2 && effectivePTier <= 2) relTier = 1;
+        else if (effectiveUTier <= 2 || effectivePTier <= 2) relTier = 2;
+
+        let type = 'NEUTRAL';
+        if (isSurge) {
+             if (uTamned || pTamned) type = 'ALCHEMIST';
+             else if (relTier === 5) type = 'BLACK_HOLE';
+             else if (relTier === 4) type = 'OVERLOAD';
+             else if (relTier === 1) type = 'GOLDEN_ENERGY';
+             else type = 'GREAT_WAVE';
+        } else {
+             if (relTier === 5) type = 'TOXIC_INJECTION';
+             else if (relTier === 4) type = 'COLD_PRESSURE';
+             else if (uTamned || pTamned) type = 'DANGEROUS_CHARM';
+             else if (relTier === 1) type = 'SMALL_MIRACLE';
+             else if (relTier === 2) type = 'SUPPORT_STREAM';
+        }
+
+        energyBadges.push({
+            type,
+            el,
+            elKO,
+            mass,
+            combos: Array.from(new Set(crossCombos[el])),
+            uTierEff: effectiveUTier,
+            pTierEff: effectivePTier
+        });
+    });
+
+    const groupedBadges = energyBadges.reduce((acc: Record<string, EnergyBadge[]>, curr) => {
+        if (!acc[curr.type]) acc[curr.type] = [];
+        acc[curr.type].push(curr);
+        return acc;
+    }, {});
+
+    Object.keys(groupedBadges).forEach(type => {
+        const badges = groupedBadges[type];
+        const elKOs = badges.map(b => b.elKO).join(', ');
+        const els = badges.map(b => b.el).join(', ');
+        const comboTags = badges.flatMap(b => b.combos).map(c => `#${c}`).join(' ');
+
+        let gateName = '';
+        let gateDesc = '';
+
+        if (type === 'ALCHEMIST') {
+            gateName = isKO ? `✨ [심연의 연금술: ${elKOs}의 승화]` : `✨ [The Alchemist: Sublimation of ${els}]`;
+            gateDesc = isKO 
+                ? `두 분의 사주가 만나 폭주할 뻔한 ${elKOs} 기운을 용신의 힘으로 길들였습니다.\n\n<span class="text-[10px] text-fuchsia-400 opacity-80">${comboTags}</span>`
+                : `A toxic surge of ${els} is brilliantly tamed and utilized.\n\n<span class="text-[10px] text-fuchsia-400 opacity-80">${comboTags}</span>`;
+        } else if (type === 'BLACK_HOLE') {
+            gateName = isKO ? `⚠️ [The Black Hole: 통제불능의 ${elKOs} 폭주]` : `⚠️ [The Black Hole: Runaway ${els} Energy]`;
+            gateDesc = isKO 
+                ? `합이 중첩되어 최악의 기운인 ${elKOs}가 통제 불능 상태로 폭주합니다. 서로를 수렁으로 끌어내릴 수 있습니다.\n\n<span class="text-[10px] text-red-400 opacity-80">${comboTags}</span>`
+                : `An overwhelming toxic surge of ${els} drastically drains both of you.\n\n<span class="text-[10px] text-red-400 opacity-80">${comboTags}</span>`;
+                } else if (type === 'OVERLOAD' || type === 'COLD_PRESSURE') {
+            gateName = isKO ? `🩸 [에너지 과부하: 서늘한 압박 (${elKOs})]` : `🩸 [Energy Overload: Cold Pressure (${els})]`;
+            
+            const uBurden = badges.some(b => b.uTierEff >= 4);
+            const pBurden = badges.some(b => b.pTierEff >= 4);
+            let targetKO = '한 쪽';
+            let targetEN = 'one';
+            if (uBurden && !pBurden) {
+                 targetKO = '당신(나)';
+                 targetEN = 'you';
+            } else if (!uBurden && pBurden) {
+                 targetKO = '상대방';
+                 targetEN = 'your partner';
+            } else if (uBurden && pBurden) {
+                 targetKO = '서로';
+                 targetEN = 'both of you';
+            }
+
+            gateDesc = isKO
+                ? `합의 작용으로 ${elKOs} 기운이 증폭되지만, 이는 ${targetKO}의 큰 무력감을 댓가로 삼아 에너지 불균형이 극심해집니다.\n\n<span class="text-[10px] text-rose-400 opacity-80">${comboTags}</span>`
+                : `Huge ${els} synergy forms, but acts as a heavy burden for ${targetEN}.\n\n<span class="text-[10px] text-rose-400 opacity-80">${comboTags}</span>`;
+        } else if (type === 'GOLDEN_ENERGY' || type === 'SMALL_MIRACLE') {
+            gateName = isKO ? `🏆 [골든 에너지: ${elKOs} 용신의 조력]` : `🏆 [Golden Energy: Descent of ${els}]`;
+            gateDesc = isKO
+                ? `가장 필요했던 완벽한 ${elKOs} 기운이 쏟아집니다. 한계를 부수고 비약적인 발전을 선물합니다.\n\n<span class="text-[10px] text-yellow-500 opacity-80">${comboTags}</span>`
+                : `Massive vital ${els} energy descends upon you both.\n\n<span class="text-[10px] text-yellow-500 opacity-80">${comboTags}</span>`;
+        } else if (type === 'GREAT_WAVE') {
+            gateName = isKO ? `🌊 [The Great Wave: 압도적 ${elKOs}의 파동]` : `🌊 [The Great Wave: Overwhelming ${els}]`;
+            gateDesc = isKO
+                ? `사주가 강하게 결합하여 웅장한 ${elKOs} 에너지를 형성합니다. 이 기운은 관계를 든든하게 받쳐주는 거대한 파동이 됩니다.\n\n<span class="text-[10px] text-blue-400 opacity-80">${comboTags}</span>`
+                : `Magnificent ${els} energy forms, providing strong momentum.\n\n<span class="text-[10px] text-blue-400 opacity-80">${comboTags}</span>`;
+        } else if (type === 'TOXIC_INJECTION') {
+            gateName = isKO ? `☠️ [맹독성 주입: 사약의 완성 (${elKOs})]` : `☠️ [Toxic Injection: Poisonous ${els}]`;
+            gateDesc = isKO 
+                ? `끈질긴 합이 맹독(${elKOs})이 되어 서로를 찌릅니다. 파괴적인 고집이 조용히 자라납니다.\n\n<span class="text-[10px] text-purple-400 opacity-80">${comboTags}</span>`
+                : `A minor but toxic ${els} link injects poison into the connection.\n\n<span class="text-[10px] text-purple-400 opacity-80">${comboTags}</span>`;
+        } else if (type === 'DANGEROUS_CHARM') {
+            gateName = isKO ? `🔥 [위험하지만 매력적인 도전 (${elKOs})]` : `🔥 [Dangerous Charm: Tamed ${els}]`;
+            gateDesc = isKO
+                ? `위험할 수 있는 ${elKOs} 기운이 용신의 조절력 덕분에 매력적인 도전 과제로 다듬어집니다.\n\n<span class="text-[10px] text-orange-400 opacity-80">${comboTags}</span>`
+                : `Risky ${els} links are tamed into mutual attraction.\n\n<span class="text-[10px] text-orange-400 opacity-80">${comboTags}</span>`;
+        } else if (type === 'SUPPORT_STREAM') {
+            gateName = isKO ? `🤝 [운명의 조력: 서포트 스트림 (${elKOs})]` : `🤝 [Destined Help: Support Stream (${els})]`;
+            gateDesc = isKO
+                ? `파생된 ${elKOs} 기운이 잔잔하게 부족한 면을 보완해줍니다.\n\n<span class="text-[10px] text-green-400 opacity-80">${comboTags}</span>`
+                : `Derived ${els} energy gently supports the relationship.\n\n<span class="text-[10px] text-green-400 opacity-80">${comboTags}</span>`;
+        }
+
+        if (gateName) {
+            gates.push({ name: gateName, desc: gateDesc });
         }
     });
 
@@ -731,56 +917,78 @@ export function calculateRelationshipDynamics(
         gateBonus += 5;
     }
 
+        const overrideGlobalSyndrome = (elKO: string, elEN: string, newNameKO: string, newNameEN: string, newDescKO: string, newDescEN: string, patternPenalty: number) => {
+        const keywords = [elKO, elEN];
+        const existingIdx = gates.findIndex(g => 
+            (g.name.includes('과부하') || g.name.includes('Overload') || g.name.includes('Black Hole') || g.name.includes('폭주')) 
+            && keywords.some(k => g.name.includes(k))
+        );
+        
+        if (existingIdx !== -1) {
+            gates[existingIdx] = { name: isKO ? newNameKO : newNameEN, desc: isKO ? newDescKO : newDescEN };
+            gatePenalty += 5; // Add a small extra penalty on top of the base mass penalty
+        } else {
+            gates.push({ name: isKO ? newNameKO : newNameEN, desc: isKO ? newDescKO : newDescEN });
+            gatePenalty += patternPenalty;
+        }
+    };
+
     // 2. Geum-Da-Su-Tak (金多水濁) & Geum-Da-Su-Che
     if ((uDayStem === '壬' || uDayStem === '癸') && pMetalCount >= 3) {
-        gates.push({
-            name: isKO ? "🧪 [금다수탁(金多水濁)] 탁해진 심연" : "🧪 [Geum-Da-Su-Tak]",
-            desc: isKO ? "맑아야 할 당신의 샘물에 거대한 바위(금)들이 쏟아져 들어왔습니다. 이는 생(生)이 아니라 압살입니다. 상대의 과도한 보호와 통제가 당신의 자아를 진흙탕으로 만들고 있습니다." : "Massive rocks (Metal) poured into your clear water. This isn't support; it's smothering. Their excessive control turns your ego into mud."
-        });
-        gatePenalty += 25;
+        overrideGlobalSyndrome('금', 'Metal', 
+            "🧪 [금다수탁(金多水濁)] 탁해진 심연", "🧪 [Geum-Da-Su-Tak]",
+            "맑아야 할 당신의 샘물에 거대한 바위(금)들이 쏟아져 들어왔습니다. 이는 생(生)이 아니라 압살입니다. 상대의 과도한 보호와 통제가 당신의 자아를 진흙탕으로 만들고 있습니다.",
+            "Massive rocks (Metal) poured into your clear water. This isn't support; it's smothering. Their excessive control turns your ego into mud.",
+            25
+        );
     }
     if ((pDayStem === '壬' || pDayStem === '癸') && uMetalCount >= 3) {
-        gates.push({
-            name: isKO ? "🧪 [금다수탁(金多水濁)] 의도치 않은 압박" : "🧪 [Geum-Da-Su-Tak (Reverse)]",
-            desc: isKO ? "당신의 과도한 금(Metal) 기운이 상대의 맑은 물을 탁하게 만들고 있을 수 있습니다. 사랑이라는 이름의 통제가 상대를 질식시키고 있지는 않은지 돌아봐야 합니다." : "Your excessive Metal energy might be muddying their clear water. Check if your 'loving control' is suffocating them."
-        });
-        gatePenalty += 15;
+        overrideGlobalSyndrome('금', 'Metal',
+            "🧪 [금다수탁(金多水濁)] 의도치 않은 압박", "🧪 [Geum-Da-Su-Tak (Reverse)]",
+            "당신의 과도한 금(Metal) 기운이 상대의 맑은 물을 탁하게 만들고 있을 수 있습니다. 사랑이라는 이름의 통제가 상대를 질식시키고 있지는 않은지 돌아봐야 합니다.",
+            "Your excessive Metal energy might be muddying their clear water. Check if your 'loving control' is suffocating them.",
+            15
+        );
     }
 
     // 3.1 Mok-Da-Hwa-Sik (木多火熄)
     if ((uDayStem === '丙' || uDayStem === '丁') && pWoodCount >= 3) {
-        gates.push({
-            name: isKO ? "🕯️ [목다화식(木多火熄)] 꺼져가는 불꽃" : "🕯️ [Mok-Da-Hwa-Sik]",
-            desc: isKO ? "상대의 지나친 간섭과 지원이 오히려 당신의 재능(불꽃)을 질식시키고 있습니다. 타오르고 싶어도 숨 쉴 틈이 없습니다." : "Their excessive interference suffocates your talent. You want to burn bright, but there's no room to breathe."
-        });
-        gatePenalty += 20;
+        overrideGlobalSyndrome('목', 'Wood',
+            "🕯️ [목다화식(木多火熄)] 꺼져가는 불꽃", "🕯️ [Mok-Da-Hwa-Sik]",
+            "상대의 지나친 간섭과 지원이 오히려 당신의 재능(불꽃)을 질식시키고 있습니다. 타오르고 싶어도 숨 쉴 틈이 없습니다.",
+            "Their excessive interference suffocates your talent. You want to burn bright, but there's no room to breathe.",
+            20
+        );
     }
 
     // 3.2 To-Da-Mae-Geum (土多埋金)
     if ((uDayStem === '庚' || uDayStem === '辛') && pEarthCount >= 3) {
-        gates.push({
-            name: isKO ? "💎 [토다매금(土多埋金)] 묻혀버린 보석" : "💎 [To-Da-Mae-Geum]",
-            desc: isKO ? "상대의 보수적이고 답답한 기운이 당신의 날카로운 천재성을 흙 속에 묻어버렸습니다. 세상에 드러날 기회를 잃어가는 중입니다." : "Their conservative and heavy energy buries your sharp brilliance in the soil. You're losing chances to shine."
-        });
-        gatePenalty += 15;
+        overrideGlobalSyndrome('토', 'Earth',
+            "💎 [토다매금(土多埋金)] 묻혀버린 보석", "💎 [To-Da-Mae-Geum]",
+            "상대의 보수적이고 답답한 기운이 당신의 날카로운 천재성을 흙 속에 묻어버렸습니다. 세상에 드러날 기회를 잃어가는 중입니다.",
+            "Their conservative and heavy energy buries your sharp brilliance in the soil. You're losing chances to shine.",
+            15
+        );
     }
 
     // 3.3 Su-Da-Mok-Pyo (水多木漂)
     if ((uDayStem === '甲' || uDayStem === '乙') && pWaterCount >= 3) {
-        gates.push({
-            name: isKO ? "🌊 [수다목표(水多木漂)] 뿌리 뽑힌 부표" : "🌊 [Su-Da-Mok-Pyo]",
-            desc: isKO ? "과도한 감정과 수용력이 당신의 현실적 기반(뿌리)을 앗아갔습니다. 정착하지 못하고 상대의 감정에 휘말려 표류하는 관계입니다." : "Excessive emotions and receptivity took away your grounded roots. You are drifting in their emotional currents without settling."
-        });
-        gatePenalty += 18;
+        overrideGlobalSyndrome('수', 'Water',
+            "🌊 [수다목표(水多木漂)] 뿌리 뽑힌 부표", "🌊 [Su-Da-Mok-Pyo]",
+            "과도한 감정과 수용력이 당신의 현실적 기반(뿌리)을 앗아갔습니다. 정착하지 못하고 상대의 감정에 휘말려 표류하는 관계입니다.",
+            "Excessive emotions and receptivity took away your grounded roots. You are drifting in their emotional currents without settling.",
+            18
+        );
     }
 
     // 3.4 Hwa-Da-To-Cho (火多土焦)
     if ((uDayStem === '戊' || uDayStem === '己') && pFireCount >= 3) {
-        gates.push({
-            name: isKO ? "🔥 [화다토초(火多土焦)] 갈라진 불모지" : "🔥 [Hwa-Da-To-Cho]",
-            desc: isKO ? "상대의 폭발적인 열정이 당신의 인내심을 하얗게 태워버렸습니다. 아무것도 자랄 수 없는 메마른 관계, 갈증만이 남았습니다." : "Their explosive passion scorched your patience. A barren relationship where nothing can grow, leaving only thirst."
-        });
-        gatePenalty += 22;
+        overrideGlobalSyndrome('화', 'Fire',
+            "🔥 [화다토초(火多土焦)] 갈라진 불모지", "🔥 [Hwa-Da-To-Cho]",
+            "상대의 폭발적인 열정이 당신의 인내심을 하얗게 태워버렸습니다. 아무것도 자랄 수 없는 메마른 관계, 갈증만이 남았습니다.",
+            "Their explosive passion scorched your patience. A barren relationship where nothing can grow, leaving only thirst.",
+            22
+        );
     }
 
     // Jae-Da-Shin-Yak Synergy
@@ -1308,14 +1516,118 @@ export function calculateRelationshipDynamics(
                  resultText += tempText + clashText;
             }
 
-            const uniqueGates = Array.from(new Set(gates.map(g => g.name)))
+            let uniqueGates = Array.from(new Set(gates.map(g => g.name)))
                  .map(name => gates.find(g => g.name === name)!);
+
+            // [v5.9] Element Aggregation
+            const elementsKO = { '수국': '수(水)', '목국': '목(木)', '화국': '화(火)', '금국': '금(金)' };
+            const elementsEN = { 'Water': 'Water', 'Wood': 'Wood', 'Fire': 'Fire', 'Metal': 'Metal' };
+            const aggregatedGates: { name: string; desc: string }[] = [];
+            
+            for (const elKey in elementsKO) {
+                const elMatches = uniqueGates.filter(g => g.name.includes(elKey) || g.name.includes(elementsEN[elKey as keyof typeof elementsEN]));
+                if (elMatches.length >= 2) {
+                    const elNameKO = elementsKO[elKey as keyof typeof elementsKO];
+                    const elNameEN = elementsEN[elKey as keyof typeof elementsEN];
+                    let aggName = '';
+                    const isToxic = elMatches.some(g => g.name.includes('맹독') || g.name.includes('파멸') || g.name.includes('폭주') || g.name.includes('희생적') || g.name.includes('독이 든') || g.name.includes('작은 희생'));
+                    const isCharm = elMatches.some(g => g.name.includes('매력적인') || g.name.includes('위험하지만') || g.name.includes('정화'));
+
+                    if (isToxic && !isCharm) {
+                        aggName = isKO ? `⚠️ [The Black Hole: 통제불능의 ${elNameKO} 폭주]` : `⚠️ [The Black Hole: Runaway ${elNameEN} Energy]`;
+                    } else if (isCharm) {
+                        aggName = isKO ? `✨ [The Alchemist: ${elNameKO}의 극적인 승화]` : `✨ [The Alchemist: Dramatic ${elNameEN} Sublimation]`;
+                    } else {
+                        if (elKey.includes('수') || elKey === 'Water') {
+                             aggName = isKO ? `🌊 [The Deep Ocean: 압도적 ${elNameKO}의 파동]` : `🌊 [The Deep Ocean: Overwhelming ${elNameEN} Wave]`;
+                        } else if (elKey.includes('화') || elKey === 'Fire') {
+                             aggName = isKO ? `🔥 [The Great Inferno: 압도적 ${elNameKO}의 화력]` : `🔥 [The Great Inferno: Overwhelming ${elNameEN} Heat]`;
+                        } else if (elKey.includes('목') || elKey === 'Wood') {
+                             aggName = isKO ? `🌳 [The Great Forest: 압도적 ${elNameKO}의 조화]` : `🌳 [The Great Forest: Overwhelming ${elNameEN} Harmony]`;
+                        } else if (elKey.includes('금') || elKey === 'Metal') {
+                             aggName = isKO ? `⚔️ [The Iron Storm: 압도적 ${elNameKO}의 결속]` : `⚔️ [The Iron Storm: Overwhelming ${elNameEN} Bond]`;
+                        }
+                    }
+
+                    aggregatedGates.push({
+                        name: aggName,
+                        desc: isKO 
+                            ? `두 사람의 사주가 만나 여러 형태의 ${elNameKO} 에너지를 강렬하게 자극하여 하나로 융합시킵니다. 세세한 기운들이 모여 관계 전체를 뒤흔드는 거대한 파동이 되었습니다.`
+                            : `Your charts trigger multiple ${elNameEN} structures simultaneously, merging into a massive wave that echoes throughout the relationship.`
+                    });
+                    
+                    uniqueGates = uniqueGates.filter(g => !elMatches.includes(g));
+                }
+            }
+            uniqueGates.push(...aggregatedGates);
+
+            // [v5.9] Hierarchical Filtering
+            const isElementalBadge = (g) => g.desc.includes('text-[10px]') || g.desc.includes('Mass:');
+            
+            // Prioritize Structural Badges (Tier 1) over Elemental ones (Tier 2)
+            const structuralGates = uniqueGates.filter(g => !isElementalBadge(g));
+            const elementalGates = uniqueGates.filter(g => isElementalBadge(g));
+            
+            const finalGates = [...structuralGates, ...elementalGates];
+
+            const stemToEl: Record<string, string> = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water' };
+            const brToEl: Record<string, string> = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
+            const isSaeng = (sender: string, receiver: string) => {
+                if (sender === 'Wood' && receiver === 'Fire') return true;
+                if (sender === 'Fire' && receiver === 'Earth') return true;
+                if (sender === 'Earth' && receiver === 'Metal') return true;
+                if (sender === 'Metal' && receiver === 'Water') return true;
+                if (sender === 'Water' && receiver === 'Wood') return true;
+                return false;
+            };
+
+            const uStemEl = stemToEl[uDayStem];
+            const pStemEl = stemToEl[pDayStem];
 
             let relation = isKO ? "평범한 동행" : "Ordinary Companion";
             if (syncScore > 80) relation = isKO ? "천생연분" : "Soulmate";
             else if (syncScore > 60) relation = isKO ? "성장 파트너" : "Growth Partner";
             else if (syncScore > 40) relation = isKO ? "현실적 조율기" : "Practical Phase";
             else relation = isKO ? "숙제와 성찰" : "Task and Reflection";
+
+            let intensityMode = false;
+            let happinessScore = 0;
+
+            // 1. [설기(洩氣)의 블랙홀] Energy Parasite
+            if (uStemEl && pStemEl && isSaeng(uStemEl, pStemEl) && (partnerAdjustedElements[pStemEl] || 0) >= 35 && uWeak) {
+                finalGates.push({
+                    name: isKO ? "🕷️ [Energy Parasite: 밑 빠진 독]" : "🕷️ [Energy Parasite: Bottomless Drain]",
+                    desc: isKO ? "당신이 가진 생명력을 상대방이 블랙홀처럼 빨아들이고 있습니다. 상대는 만족하지만, 당신은 만날수록 소모되는 구조입니다." : "The partner drains your life force like a black hole. They are satisfied, but you are depleted.",
+                });
+                relation = isKO ? "🚨 일방적 희생" : "🚨 One-sided Sacrifice";
+            }
+
+            // 2. [삼형살(三刑殺)의 질량 보존] Karmic Handcuffs
+            if (syncScore >= 90 && (hasInSaSin || hasChukSulMi)) {
+                finalGates.push({
+                    name: isKO ? "⛓️ [Karmic Handcuffs: 업보의 수갑]" : "⛓️ [Karmic Handcuffs]",
+                    desc: isKO ? "이 관계의 100점은 행복의 크기가 아니라, 끊어낼 수 없는 인연의 질량입니다. 서로를 개조하려는 고통스러운 투쟁이 멈추지 않습니다." : "This high score reflects the unseverable mass of karma, not happiness. A painful struggle to reform each other never stops."
+                });
+                intensityMode = true;
+                happinessScore = 20;
+                relation = isKO ? "⛓️ 업보의 고리: 지독한 카르마" : "⛓️ Ring of Karma";
+            }
+
+            // 3. [조후의 극단화] Suffocation
+            const isExtremeHeat = temp >= 75;
+            const isExtremeCold = temp <= 10;
+            const pDayBrEl = brToEl[pDayBranch];
+            const pDayBrIsGiGu = uGiGu.includes(pDayBrEl);
+            const worsensHeat = isExtremeHeat && pDayBrIsGiGu && ['Fire', 'Wood'].includes(pDayBrEl);
+            const worsensCold = isExtremeCold && pDayBrIsGiGu && ['Water', 'Metal'].includes(pDayBrEl);
+            
+            if (worsensHeat || worsensCold) {
+                finalGates.push({
+                    name: isKO ? "☠️ [Suffocation: 숨 막히는 결속]" : "☠️ [Suffocation: Choking Bond]",
+                    desc: isKO ? "함께 있으면 세상에 우리 둘만 있는 것 같지만, 실상은 서로의 산소를 나누어 마시며 질식해가는 관계입니다." : "It feels like it's just the two of you in the world, but in reality, you are suffocating each other by sharing limited oxygen."
+                });
+                relation = worsensHeat ? (isKO ? "🔥 타오르는 불나방" : "🔥 Scorching Moth") : (isKO ? "❄️ 얼어붙은 고립" : "❄️ Frozen Isolation");
+            }
 
             let isGlowing = syncScore >= 85 || isEasterEgg;
 
@@ -1326,7 +1638,9 @@ export function calculateRelationshipDynamics(
                 isGlowing,
                 text: resultText,
                 isEasterEgg,
-                gates: uniqueGates,
-                structuralSynergy
+                gates: finalGates,
+                structuralSynergy,
+                intensityMode,
+                happinessScore
             };
         }
