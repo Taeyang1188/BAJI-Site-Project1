@@ -31,8 +31,7 @@ const defaultOptions: PersonaOption[] = [
 
 export function getDominantTenGodGroup(result: BaZiResult): string {
   const ratios = result.analysis?.tenGodsRatio || {};
-  let maxGroup = '비겁';
-  let maxVal = -1;
+  const geju = result.analysis?.geJu || '';
   
   const extractRatio = (names: string[]) => {
     return Object.entries(ratios).reduce((sum, [k, v]) => {
@@ -49,12 +48,26 @@ export function getDominantTenGodGroup(result: BaZiResult): string {
     '인성': extractRatio(['인성', 'Mystic', '편인', '정인']),
   };
 
+  let maxGroup = '';
+  let maxVal = 0;
+  
   for (const [key, val] of Object.entries(groups)) {
     if (val > maxVal) {
       maxVal = val;
       maxGroup = key;
     }
   }
+
+  // Fallback to Geju if ratios are missing or identical
+  if (!maxGroup || maxVal === 0) {
+    if (geju.includes('비견') || geju.includes('겁재') || geju.includes('록') || geju.includes('인')) return '비겁';
+    if (geju.includes('식신') || geju.includes('상관')) return '식상';
+    if (geju.includes('재')) return '재성';
+    if (geju.includes('관') || geju.includes('살')) return '관성';
+    if (geju.includes('인')) return '인성';
+    return '비겁'; // Final fallback
+  }
+  
   return maxGroup;
 }
 
@@ -128,6 +141,14 @@ const spouseReportsYes: Record<string, string> = {
   '인성': '수동적 공격과 고집으로 상대를 조종합니다. 말하지 않아도 다 알아주길 바라는 심보로 입을 한일자로 다물고 침묵 시위를 벌이며 숨막히게 옭아맵니다.'
 };
 
+const spouseReportsNo: Record<string, string> = {
+  '비겁': '밖에서 잃어버린 자신의 존재감을 만만하게 생각하는 연인 앞에서 징징거리며 폭발시킵니다. "넌 무조건 내 편이잖아"라며 선을 마구 넘나듭니다.',
+  '식상': '밖에서는 인싸 놀이 다 하고 들어와 연인 앞에서는 에너지가 고갈된 채, 짜증 섞인 감정 쓰레기통으로 사용하며 "내가 힘드니까 좀 받아줘"를 시전합니다.',
+  '재성': '징징거리는 무해한 척을 하면서도 은근슬쩍 가장 값비싼 정신적 위로와 금전적 혜택을 쪽쪽 빨아먹는, 생존 본능만 남은 피도 눈물도 없는 기생충 같은 모습입니다.',
+  '관성': '대외적으로는 존경받는 완벽한 사람인데, 연인 앞에서는 바닥 치는 자존감을 드러내며 끊임없이 가스라이팅을 통해 불안감을 위로받으려 징징거립니다.',
+  '인성': '숨쉬는 것조차 연인에게 허락을 받을 기세로 책임을 떠넘깁니다. 세상에 홀로 남겨진 비운의 주인공처럼 매달려 상대의 에너지를 끝도 없이 고갈시킵니다.'
+};
+
 export function getNextNode(bazi: BaZiResult, targetName: string, answers: Record<string, string>): PersonaNode {
   // Parsing some basic stuff from bazi
   const dmStem = bazi.pillars[2]?.stem || '甲';
@@ -165,19 +186,32 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
 
   // If all questions are answered, return the final persona report
   if (answers.q_shadow) {
+    const familyBase = familyReports[dom] || familyReports['비겁'];
+    const familyText = isStrong 
+      ? familyBase.replace('방관자', '지배적 관찰자').replace('어른아이', '독선적 보호자')
+      : familyBase.replace('방관자', '눈치 보는 외톨이').replace('산타', '애정 결핍 방랑자');
+
+    const socialBase = socialReports[dom] || socialReports['비겁'];
+    const socialText = isStrong
+      ? socialBase + ' 주변을 압도하려는 기운 때문에 사람들이 당신의 눈치를 보게 만듭니다.'
+      : socialBase + ' 상처받지 않기 위해 먼저 선을 긋지만, 사실은 누군가 먼저 다가오길 갈구하는 모순이 있습니다.';
+
+    const adviceBase = adviceReports[dom] || adviceReports['비겁'];
+    const adviceText = adviceBase + (hasConflict ? ' 특히 지금처럼 감정의 격랑이 심할 땐 제발 입부터 닫는 연습을 해라.' : ' 너무 무난하게 살려고 발버둥 치는 게 네 인생의 가장 큰 리스크다.');
+
     return {
       id: 'report',
       isEnd: true,
       report: {
-        family: familyReports[dom] || familyReports['비겁'],
+        family: familyText,
         spouse: spouseText,
         children: childrenText,
         siblings: siblingReports[dom] || siblingReports['비겁'],
-        social: socialReports[dom] || socialReports['비겁'],
+        social: socialText,
         ideal: idealTexts[idealKey],
         trueSelf: `${dmQuestions[dmStem] ? dmQuestions[dmStem].replace('{{target은는}} ', '').replace('?', '.') : '자기 자신을 가장 사랑하면서도 가장 혐오하는 모순적 존재.'}`,
         shadow: shadowReports[dom] || shadowReports['인성'],
-        advice: adviceReports[dom] || adviceReports['비겁']
+        advice: adviceText
       }
     };
   }
@@ -255,6 +289,34 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
     return {
       id: 'q_dom',
       question: prefix + (domQuestions[dom] || domQuestions['비겁']),
+      options: defaultOptions
+    };
+  }
+
+  // Step 6.5: Element Balance Check
+  if (!answers.q_element) {
+    const elementRatios = bazi.analysis?.elementRatios || {};
+    const overflow = Object.entries(elementRatios).find(([_, r]) => (r as number) > 40);
+    const missing = Object.entries(elementRatios).find(([_, r]) => (r as number) === 0);
+    
+    let question = `오행의 흐름을 보니 에너지가 꽤 치우쳐 있네. 사실 넌 남들한텐 여유로운 척하지만, 실상은 아주 사소한 일에도 변덕이 심해서 스스로 피곤하게 만드는 스타일이지?`;
+    if (overflow) {
+      const el = overflow[0].split('(')[0];
+      const elMsgs: Record<string, string> = {
+        'Wood': '나무(木)의 기운이 너무 강해. 의욕만 앞서서 판만 존나게 벌려놓고, 정작 마무리는 흐지부지해서 주변 사람들 발암 걸리게 하는 타입 아냐?',
+        'Fire': '불(火)의 기운이 폭발직전이야. 감정 조절 안 돼서 홧김에 내뱉은 말로 다 타버리게 만들고 나중에 혼자 후회하며 자책하는 거 일상이지?',
+        'Earth': '흙(土)의 기운이 너무 무거워. 생각만 존나게 많고 행동으로 옮기기는 싫어서, 기회가 와도 "귀찮아" 한마디로 다 날려버리는 게으른 완벽주의자지?',
+        'Metal': '금(金)의 기운이 날이 바짝 서 있어. 너 스스로한테도 타인한테도 너무 엄격해서, 숨 쉴 틈 없이 조여대다가 결국 관계 다 끊어먹는 칼잡이잖아.',
+        'Water': '물(水)의 기운이 너무 깊어. 속을 도저히 알 수가 없어. 겉으론 웃고 있어도 속으론 음흉하게 딴생각하거나, 우울의 늪에 빠지면 답도 없이 잠수 타지?'
+      };
+      question = elMsgs[el] || question;
+    } else if (missing) {
+      question = `사주에 특정 기운이 아예 결여되어 있네. 그래서 넌 특정 상황만 되면 브레이크가 안 걸리고 제어 불능 상태가 돼서 남들이 보기에 "쟤 왜 저래?" 싶은 눈빛 받게 되는 거 아냐?`;
+    }
+
+    return {
+      id: 'q_element',
+      question: question,
       options: defaultOptions
     };
   }
