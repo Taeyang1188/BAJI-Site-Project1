@@ -282,7 +282,7 @@ export default function App() {
       }
     }
     return null;
-  }, [page, debouncedInput.birthDate, debouncedInput.birthTime, debouncedInput.gender, coords.lat, coords.lon, lang]);
+  }, [page, debouncedInput, coords.lat, coords.lon, lang]);
 
   const handleReveal = () => {
     // 1. Honeypot Check
