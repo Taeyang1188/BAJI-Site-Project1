@@ -1040,7 +1040,7 @@ ${detailedEffect}`;
     
     // Evaluate function
     const evaluateWealthScore = (pillar: any) => {
-      let score = 50;
+      let score = 40;
       const sEl = BAZI_MAPPING.stems[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element;
       const bEl = BAZI_MAPPING.branches[pillar.branch as keyof typeof BAZI_MAPPING.branches]?.element;
       
@@ -1060,10 +1060,10 @@ ${detailedEffect}`;
       if (sEl === biElement || bEl === biElement) traits.isBi = true;
 
       // Wealth specific score boosts
-      if (sEl === wealthElement) score += 25;
-      if (bEl === wealthElement) score += 25;
-      if (sEl === sikElement) score += 15;
-      if (bEl === sikElement) score += 15;
+      if (sEl === wealthElement) score += 20;
+      if (bEl === wealthElement) score += 20;
+      if (sEl === sikElement) score += 10;
+      if (bEl === sikElement) score += 10;
       
       // General luck boosts
       if (primEl && (sEl === primEl || bEl === primEl)) {
@@ -1071,14 +1071,16 @@ ${detailedEffect}`;
         traits.isYong = true;
       }
       if (hEl && (sEl === hEl || bEl === hEl)) score += 10;
-      if (gEl && (sEl === gEl || bEl === gEl)) score -= 20;
+      if (gEl && (sEl === gEl || bEl === gEl)) score -= 25;
 
       const godsStr = (pillar.stemTenGodKo || '') + (pillar.branchTenGodKo || '');
-      if (godsStr.includes('정재')) score += 15;
-      if (godsStr.includes('편재')) score += 20;
+      if (godsStr.includes('정재')) score += 10;
+      if (godsStr.includes('편재')) score += 15;
       if (godsStr.includes('식신') || godsStr.includes('상관')) score += 10;
-      if (godsStr.includes('겁재')) score -= 15;
-      if (godsStr.includes('비견')) score -= 10;
+      if (godsStr.includes('겁재')) score -= 20;
+      if (godsStr.includes('비견')) score -= 15;
+      
+      if (!traits.isWealth && !traits.isSik) score -= 10;
 
       return { score: Math.min(Math.max(score, 0), 100), traits };
     };
