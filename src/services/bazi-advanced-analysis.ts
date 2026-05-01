@@ -824,13 +824,17 @@ export const calculateAdvancedAnalysis = (
     }
 
     let detailChildDesc = '';
+    
+    const isExtremeFemaleMaternity = gender === 'female' && gods.SikSang >= 30 && gods.GwanSeong <= 15;
+    const isExtremeMaleIsolated = gender === 'male' && gods.GwanSeong >= 35 && gods.JaeSeong <= 10;
+    
     if (targetChildGod > 0) {
       if (gods.SikSang > 20) {
         detailChildDesc += lang === 'KO' 
           ? ' 식상(친밀도)이 발달해 자녀가 나이를 먹어서도 스스럼없이 스킨십을 나눌 정도로 정서적, 물리적 친밀도가 매우 높아.' 
           : ' With developed Output (intimacy), you share a very high emotional and physical closeness with your children, even as they grow older.';
       }
-      if (gods.GwanSeong > 20) {
+      if (gods.GwanSeong > 20 && !isExtremeMaleIsolated) {
         detailChildDesc += lang === 'KO'
           ? ' 관성(사회적 능력)이 뚜렷해 남들에게 자랑할 만한 훌륭한 타이틀과 능력을 갖춘 자식을 둘 확률이 커.'
           : ' With clear Power (social ability), you are highly likely to have children with excellent titles and abilities you can be proud of.';
@@ -840,7 +844,7 @@ export const calculateAdvancedAnalysis = (
           ? ' 다만 자식 별이나 자리에 충돌(훼손)이 감지되니, 양육 과정에서 정서적 갈등이나 예상치 못한 장애 요소가 있을 수 있어 세심한 주의가 필요해.'
           : ' However, a clash (damage) is detected in the child star or palace, so careful attention is needed as there may be emotional conflicts or unexpected obstacles during parenting.';
       }
-      if (gender === 'female' && gods.SikSang > 20) {
+      if (gender === 'female' && gods.SikSang > 20 && !isExtremeFemaleMaternity) {
         detailChildDesc += lang === 'KO'
           ? ' 여성의 경우 자녀 출산을 기점으로 에너지가 자식에게 쏠리며 남편(관성)과 심리적으로 멀어지거나, 자녀를 매개로 주도권을 쥐게 되는 부부 역학의 변화가 생길 수 있어.'
           : ' For women, after childbirth, energy shifts towards the child, which may create psychological distance from the husband (Power) or shift the relationship dynamic to taking the lead through the child.';
@@ -851,7 +855,18 @@ export const calculateAdvancedAnalysis = (
       ? '\n\n[#f97316:[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.]'
       : '\n\n[#f97316:[Note] Judging a child 100% based only on the parent\'s chart has limits. For the most perfect analysis, checking the mutual complementarity through a 1:1 compatibility reading with your child later is the ultimate conclusion.]';
 
-    childrenDesc = `${baseChildDesc}${detailChildDesc}${finalOverride}`;
+    let childWarningDesc = '';
+    if (isExtremeFemaleMaternity) {
+      childWarningDesc = lang === 'KO' 
+        ? '\n\n[#ef4444:🌑 득자부별(得子夫別): 지독한 모성]\n자식이라는 우주를 품는 순간, 남편이 서 있을 자리가 좁아집니다. 당신의 강한 모성적 에너지가 배우자의 권위와 영역을 무의식적으로 밀어내고 있습니다.'
+        : '\n\n[#ef4444:🌑 Intense Maternity]\nThe moment you embrace the universe called a child, the space for your husband narrows. Your strong maternal energy unconsciously pushes away your spouse’s authority and domain.';
+    } else if (isExtremeMaleIsolated) {
+      childWarningDesc = lang === 'KO'
+        ? '\n\n[#ef4444:🥀 고립된 가장: 마른 뿌리]\n자식이라는 책임감이 너무 무거워 아내의 내조(기운)를 바닥까지 긁어 쓰고 있습니다. 아내는 당신의 아이를 위해 자신을 소멸시키고 있으며, 이 불균형이 관계의 균열을 만듭니다.'
+        : '\n\n[#ef4444:🥀 Isolated Head: Withered Root]\nThe weight of responsibility towards your children drains your wife’s support to the very bottom. Your wife is exhausting herself for your children, creating an imbalance that cracks the relationship.';
+    }
+
+    childrenDesc = `${baseChildDesc}${detailChildDesc}${childWarningDesc}${finalOverride}`;
 
     relationships.children = {
       title: lang === 'KO' ? '자식 및 결과물' : 'Children & Outcomes',

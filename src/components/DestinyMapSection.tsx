@@ -698,10 +698,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                 </div>
                 {partnerAnalysisMemo.intensityMode ? (
                     <div className="flex flex-col mb-4">
-                        <span className="text-sm font-bold text-white/80 flex items-center gap-1.5 mb-2">
-                            <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
-                        </span>
-                        <div className="flex flex-col gap-2 w-full">
+                        <div className="flex flex-col gap-2 w-full mt-2">
                             <div className="flex flex-row justify-between items-end">
                                 <span className="text-[2.2rem] leading-none font-mono font-bold text-red-500">
                                     {partnerAnalysisMemo.syncScore}% <span className="text-sm text-red-500/80 font-normal">Intensity</span>
@@ -723,10 +720,12 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                 ) : (
                     <>
                         <div className="flex flex-col gap-1 mb-4">
-                            <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
-                                <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
-                            </span>
-                            <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg ? 'text-red-500' : 'text-fuchsia-300'}`}>
+                            {!(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
+                                <span className="text-sm font-bold text-white/80 flex items-center gap-1.5">
+                                    <span className="text-lg">{partnerAnalysisMemo.syncIcon}</span> {partnerAnalysisMemo.syncTierText}
+                                </span>
+                            )}
+                            <span className={`text-[2.2rem] leading-none font-mono font-bold ${partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode ? 'text-red-500' : 'text-fuchsia-300'}`}>
                                 {partnerAnalysisMemo.syncScore}%
                             </span>
                         </div>
