@@ -689,9 +689,9 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
                         {partnerAnalysisMemo.titleSync}
                         {(partnerAnalysisMemo.isEasterEgg || partnerAnalysisMemo.isExtremeMode) && (
                             <div className="absolute left-0 bottom-full mb-2 hidden group-hover/easter:block w-[280px] p-2.5 bg-[#1a0510] border border-red-500/50 shadow-[0_4px_15px_rgba(255,0,0,0.3)] text-red-100/90 text-[11px] rounded z-[99999] font-normal leading-relaxed whitespace-normal pointer-events-none">
-                                {lang === 'KO' 
-                                    ? `사용자('${result.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')와 상대방('${partnerResult.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}')의 일간이 천간합을 이루며, 궁합 점수가 50점 이상일 때 표시됩니다. 서로의 정신적인 주파수가 일치하여 소울메이트가 될 수 있음을 의미합니다.` 
-                                    : `Triggers when Day Stems '${result.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}' and '${partnerResult.pillars.find((p: any) => p.title === 'Day' || p.title === '일주')?.stem}' form a Heavenly Stem Match with a score > 50. Indicates soulmate potential.`}
+                                {partnerAnalysisMemo.isEasterEgg ? (lang === 'KO' 
+                                    ? `사주의 특수 법칙에 따라 0에 수렴해야 할 점수가 반전되어 도출된, 극도로 치명적이고 강렬한 기운의 끌림입니다.` 
+                                    : `A rare twist of fate—an intense, rule-breaking attraction derived from special energetic structures.`) : partnerAnalysisMemo.extremeModeDesc}
                             </div>
                         )}
                     </span>
