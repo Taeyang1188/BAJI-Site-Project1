@@ -144,7 +144,7 @@ export function calculateRelationshipDynamics(
     
     const gates: { name: string; desc: string }[] = [];
     
-    // SamHap / BanHap check
+    // SamHap / BanHap check (Primary for Day Branches)
     const SAMHAP_GROUPS = [
         { branches: ['申', '子', '辰'], element: 'Water', name: '신자진 수국' },
         { branches: ['寅', '午', '戌'], element: 'Fire', name: '인오술 화국' },
@@ -344,6 +344,86 @@ export function calculateRelationshipDynamics(
             desc: isKO ? "서로의 뼈를 깎아 맞추는 고통스러운 수술대에 올랐습니다. 서로의 기운이 만나 부분적인 형살(마찰)을 일으킵니다. 이 관계는 '사랑'보다는 '교정'에 가깝습니다. 서로를 바꾸려 할수록 갈등이 커집니다." : "A relationship built on mutual correction. Combines to create partial punishment (Hyung). The more you try to change each other, the deeper the scalpel goes." 
         });
         gatePenalty += 15;
+    }
+
+    // [New] Cross-Chart Samhap Synergy
+    SAMHAP_GROUPS.forEach(group => {
+        const count = group.branches.filter(b => combinedBranches.includes(b)).length;
+        if (count === 3) {
+            const uCount = group.branches.filter(b => uBranches.includes(b)).length;
+            const pCount = group.branches.filter(b => pBranches.includes(b)).length;
+            
+            if (uCount < 3 && pCount < 3) {
+                gates.push({
+                    name: isKO ? `🌐 [에너지 협력: ${group.name}]` : `🌐 [Energy Synergy: ${group.element} Harmony]`,
+                    desc: isKO 
+                        ? `서로의 사주가 만나 '${group.name}'을 완성합니다. 혼자선 부족했던 에너지가 상대를 통해 강력하게 순환하며 거대한 목적을 달성하게 돕습니다.` 
+                        : `Your combined branches complete the ${group.element} Trinity. You provide the missing pieces for each other to achieve grand goals.`
+                });
+                gateBonus += 10;
+            } else if (uCount === 3 || pCount === 3) {
+                gates.push({
+                    name: isKO ? `🌊 [에너지 공명: ${group.name}]` : `🌊 [Energy Resonance: ${group.element}]`,
+                    desc: isKO
+                        ? `한 명의 강력한 '${group.name}' 기운을 다른 한 명이 지지하고 증폭시켜 줍니다. 같은 지향점을 가진 동료로서 최고의 추진력을 얻습니다.`
+                        : `One person's strong ${group.element} Trinity is amplified by the other. You share a common direction and gain incredible momentum.`
+                });
+                gateBonus += 5;
+            }
+        } else if (count === 2) {
+             const uHas = group.branches.filter(b => uBranches.includes(b));
+             const pHas = group.branches.filter(b => pBranches.includes(b));
+             if (uHas.length > 0 && pHas.length > 0) {
+                 const center = group.branches[1];
+                 if (combinedBranches.includes(center)) {
+                     gates.push({
+                         name: isKO ? `🔗 [에너지 연결: ${group.name} 반합]` : `🔗 [Energy Link: ${group.element} Harmony (Half)]`,
+                         desc: isKO 
+                             ? `두 사람의 사주가 만나 '${group.name}'의 핵심 기운을 형성합니다. 완벽한 삼합은 아니더라도, 서로의 존재가 특정 목적을 향한 강력한 추진력이 됩니다.`
+                             : `Your combined branches form a critical part of the ${group.element} Trinity. While not a full Samhap, it still provides significant momentum.`
+                     });
+                     gateBonus += 5;
+                 }
+             }
+        }
+    });
+
+    // [v5.8] Same-Age (Birth Year) Dynamics
+    const uYearBranch = userResult.pillars.find(p => p.title === 'Year' || p.title === '년주' || p.title === 'Year Pillar')?.branch || '';
+    const pYearBranch = partnerResult.pillars.find(p => p.title === 'Year' || p.title === '년주' || p.title === 'Year Pillar')?.branch || '';
+    const isSameYear = uYearBranch && pYearBranch && uYearBranch === pYearBranch;
+
+    if (isSameYear) {
+        const sharedBranchEl = BRANCH_ELEMENTS[uYearBranch] || '';
+        const uRatio = userAdjustedElements[sharedBranchEl] || 0;
+        const pRatio = partnerAdjustedElements[sharedBranchEl] || 0;
+        
+        if (uRatio > 35 && pRatio > 35) {
+            gates.push({
+                name: isKO ? "📛 [동갑이라서 더 답답한 관계]" : "📛 [Frustrating Same-Age Relationship]",
+                desc: isKO 
+                    ? `같은 '${uYearBranch}띠'로서 공유하는 ${sharedBranchEl} 기운이 양쪽 모두에게 과다하여(오행의 편중), 서로의 발전을 돕기보다 고집과 정체를 강화하는 늪과 같은 구조입니다.`
+                    : `Sharing the ${uYearBranch} zodiac means you both have an overflow of ${sharedBranchEl} energy. Instead of growing, you reinforce each other's stubbornness and stagnation.`
+            });
+            gatePenalty += 15;
+        } else {
+            const dmGenMap: Record<string, string> = { 'Wood': 'Fire', 'Fire': 'Earth', 'Earth': 'Metal', 'Metal': 'Water', 'Water': 'Wood' };
+            const uDMEl = STEM_ELEMENTS[uDayStem] || '';
+            const pDMEl = STEM_ELEMENTS[pDayStem] || '';
+            
+            const isComplementary = uDMEl === pDMEl || dmGenMap[uDMEl] === pDMEl || dmGenMap[pDMEl] === uDMEl;
+            const isYongHeeMatch = uYongHee.includes(sharedBranchEl) && pYongHee.includes(sharedBranchEl);
+
+            if (isComplementary || isYongHeeMatch) {
+                gates.push({
+                    name: isKO ? "✨ [동갑의 시너지: 주파수 동조]" : "✨ [Same-Age Synergy: Frequency Sync]",
+                    desc: isKO
+                        ? "띠가 같다는 표면적 공통점을 넘어, 일주의 에너지가 상생하거나 서로에게 필요한 기운(용신)을 공유하고 있습니다. 같은 시대를 호흡하며 서로의 등을 맡길 수 있는 강력한 동료입니다."
+                        : "Beyond sharing a zodiac sign, your core energies (Day Masters) support each other or share a common needed element. You are powerful allies sharing the same era."
+                });
+                gateBonus += 10;
+            }
+        }
     }
 
     // [v5.3] 공망의 심연 (Gongmang Dynamics)
