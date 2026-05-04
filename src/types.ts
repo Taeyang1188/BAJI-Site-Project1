@@ -136,6 +136,29 @@ export interface TimelineNarrative {
   intensity: number;    // 서사 강도 (UI 하이라이팅 및 이펙트 용도)
 }
 
+export interface PersonaOption {
+  id: string;
+  label: string;
+}
+
+export interface PersonaNode {
+  id: string;
+  question?: string;
+  options?: PersonaOption[];
+  isEnd?: boolean;
+  report?: {
+    family: string;
+    spouse?: string;
+    children?: string;
+    siblings: string;
+    social: string;
+    ideal: string;
+    trueSelf: string;
+    shadow: string;
+    advice: string;
+  };
+}
+
 export interface BaZiResult {
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];

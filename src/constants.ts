@@ -32,7 +32,8 @@ export const TRANSLATIONS = {
       locationSynced: "COORDINATES LOCKED. ✨",
       errorTitle: "GLITCH IN THE MATRIX",
       errorDesc: "The stars are literally ghosting us. Check your data and try again.",
-      errorButton: "TRY AGAIN, BABE"
+      errorButton: "TRY AGAIN, BABE",
+      throttleMessage: "The universe is too complex right now. Take a breath."
     },
     wheel: {
       alignment: "CURRENT ALIGNMENT",
@@ -156,7 +157,8 @@ export const TRANSLATIONS = {
       locationSynced: "좌표 고정됨. ✨",
       errorTitle: "매트릭스 오류",
       errorDesc: "별들이 우리를 무시하고 있어. 데이터를 확인하고 다시 시도해봐.",
-      errorButton: "다시 시도하기"
+      errorButton: "다시 시도하기",
+      throttleMessage: "우주의 기운이 너무 복잡하여 잠시 휴식이 필요해"
     },
     wheel: {
       alignment: "현재 정렬",

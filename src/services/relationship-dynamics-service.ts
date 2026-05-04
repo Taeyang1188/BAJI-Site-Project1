@@ -903,7 +903,7 @@ export function calculateRelationshipDynamics(
         if (uWeak || uMetalVal > 30) {
             gates.push({ 
                 name: isKO ? "🌿 [등라계갑(藤羅繫甲)] 거목을 만난 넝쿨" : "🌿 [Deng-Ra-Gye-Gap]", 
-                desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 타고 하늘로 뻗어 나갑니다. 당신에게 상대는 성장의 발판이자 가장 강력한 보호막입니다. 주도권은 매달리는 자(당신)에게 있습니다." : "As Eul-mok, you climb the partner's giant Gap-mok tree. They are your ladder to the sky and strongest shield. The initiative lies with you." 
+                desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 타고 하늘로 뻗어 나갑니다. 당신에게 상대는 성장의 발판이자 가장 강력한 보호막입니다. 주도권은 매달리는 자(당신)에게 있습니다." : "As Eul-Wood, you climb the partner's giant Gap-Wood tree. They are your ladder to the sky and strongest shield. The initiative lies with you." 
             });
             gateBonus += 20;
         }
@@ -911,7 +911,7 @@ export function calculateRelationshipDynamics(
     if (pDayStem === '乙' && (userResult.pillars.some(p => p.stem === '甲' || p.branch === '寅'))) {
         gates.push({ 
             name: isKO ? "🛡️ [자비로운 짐] 등라계갑(藤羅繫甲)의 버팀목" : "🛡️ [Benevolent Burden]", 
-            desc: isKO ? "상대(을목)는 당신이라는 거목을 타고 하늘로 뻗어 나갑니다. 당신은 상대의 성장을 위해 자신의 에너지를 기꺼이 내어주는 헌신적인 보호막 역할을 하고 있습니다." : "The partner (Eul-mok) climbs you, the Gap-mok tree. You are a devoted shield, giving your energy for their growth." 
+            desc: isKO ? "상대(을목)는 당신이라는 거목을 타고 하늘로 뻗어 나갑니다. 당신은 상대의 성장을 위해 자신의 에너지를 기꺼이 내어주는 헌신적인 보호막 역할을 하고 있습니다." : "The partner (Eul-Wood) climbs you, the Gap-Wood tree. You are a devoted shield, giving your energy for their growth." 
         });
         // Bonus is smaller or neutral for the supporter as it's a "burden"
         gateBonus += 5;
@@ -1341,7 +1341,7 @@ export function calculateRelationshipDynamics(
 
     if (isDaewunHap(uDaewunBranch, pDayBranch) || isDaewunHap(pDaewunBranch, uDayBranch)) {
         syncScore = Math.min(100, syncScore + 15);
-        gates.push({ name: isKO ? "🔗 [강력한 결속] 대운 지지 합" : "🔗 [Strong Union] Daewun Combination", desc: isKO ? "대운과 상대의 사주가 합을 이루어, 이 시기에 놀라운 기회와 깊은 운명적 끌림을 경험합니다." : "Daewun period forms a strong karmic union with the partner." });
+        gates.push({ name: isKO ? "🔗 [강력한 결속] 대운 지지 합" : "🔗 [Strong Union] Grand Luck Cycle Combination", desc: isKO ? "대운과 상대의 사주가 합을 이루어, 이 시기에 놀라운 기회와 깊은 운명적 끌림을 경험합니다." : "Grand luck cycle forms a strong karmic union with the partner." });
     }
 
     const uHeat = calculateHeat(userAdjustedElements);

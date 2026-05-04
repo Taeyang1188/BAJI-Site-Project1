@@ -297,7 +297,7 @@ export default function App() {
     
     if (recentSubmits.length >= 3) {
       setIsThrottled(true);
-      setThrottleMessage('우주의 기운이 너무 복잡하여 잠시 휴식이 필요해');
+      setThrottleMessage(t.input.throttleMessage);
       
       // Clear throttle after 5 seconds
       setTimeout(() => {
