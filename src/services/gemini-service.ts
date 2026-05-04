@@ -34,7 +34,7 @@ You are a 'V.O.I.D Destiny Consultant' who analyzes the light and shadow of fate
 Analyze the user's Bazi blueprint and the current cycle (DaYun and LiuNian) to generate a highly detailed, realistic, and stylish reading.
 
 User's Bazi Data:
-- Day Master (일간): ${result.pillars[2].stemKoreanName} (${result.pillars[2].stem})
+- Day Master (일간): ${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})
 - Day Master Strength (신강/신약): ${result.analysis?.dayMasterStrength?.score > 50 ? 'Strong (신강)' : 'Weak (신약)'}
 - Missing Elements (무자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r === 0).map(([k]) => k).join(', ')}
 - Overflowing Elements (다자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r > 30).map(([k]) => k).join(', ')}
@@ -98,9 +98,9 @@ export const generateDailyVibeWithGemini = async (
 You are a 'V.O.I.D Destiny Consultant'. Generate a daily fortune (일진) reading based on the user's Bazi and today's energy.
 
 User's Bazi Data:
-- Day Master (일간): ${result.pillars[2].stemKoreanName} (${result.pillars[2].stem})
-- Day Branch (일지): ${result.pillars[2].branchKoreanName} (${result.pillars[2].branch})
-- Month Branch (월지): ${result.pillars[1].branchKoreanName} (${result.pillars[1].branch})
+- Day Master (일간): ${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})
+- Day Branch (일지): ${result.pillars[1].branchKoreanName} (${result.pillars[1].branch})
+- Month Branch (월지): ${result.pillars[2].branchKoreanName} (${result.pillars[2].branch})
 - Missing Elements (무자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r === 0).map(([k]) => k).join(', ')}
 - Overflowing Elements (다자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r > 30).map(([k]) => k).join(', ')}
 
@@ -115,7 +115,7 @@ Logic to apply (3-Step Scan):
    - Power (관성): Stress, rules, relationship with superiors, mountain of tasks.
    - Wisdom (인성): Overthinking, studying, wanting comfort, laziness.
 2. Branch Interactions (합/충/원진):
-   - Check if Today's Branch (${todayPillar.branch}) clashes (충), combines (합), or forms Wonjin (원진) with Day Branch (${result.pillars[2].branch}) or Month Branch (${result.pillars[1].branch}).
+   - Check if Today's Branch (${todayPillar.branch}) clashes (충), combines (합), or forms Wonjin (원진) with Day Branch (${result.pillars[1].branch}) or Month Branch (${result.pillars[2].branch}).
    - Clash (충): Sudden changes, canceled plans, movement. (Sparks)
    - Combine (합): Harmony, new proposals, calmness.
    - Wonjin (원진): Explosive sensitivity, sudden annoyance. (Psychological noise)
@@ -169,8 +169,8 @@ You are a 'V.O.I.D Destiny Consultant' conducting a psychological test based on 
 You need to generate a 3-phase question sequence and a final report in JSON format.
 
 User's Bazi Data:
-- Day Pillar (일주): ${result.pillars[2].stem}${result.pillars[2].branch} (${result.pillars[2].stemKoreanName} 일간)
-- Month Branch (월지): ${result.pillars[1].branch}
+- Day Pillar (일주): ${result.pillars[1].stem}${result.pillars[1].branch} (${result.pillars[1].stemKoreanName} 일간)
+- Month Branch (월지): ${result.pillars[2].branch}
 - Strongest Ten God (가장 강한 십성): ${
     Object.entries(result.analysis?.tenGodsRatio || {}).sort((a,b) => b[1]-a[1])[0]?.[0] || '균형'
   }

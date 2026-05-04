@@ -43,8 +43,8 @@ export function getDominantTenGodGroup(result: BaZiResult): string {
 
 export function getNextNode(bazi: BaZiResult, targetName: string, answers: Record<string, string>, lang: string = 'KO'): PersonaNode {
   const isKO = lang === 'KO';
-  const dmStem = bazi.pillars[2]?.stem || '甲';
-  const dmElement = bazi.pillars[2]?.element || 'Earth';
+  const dmStem = bazi.pillars.find(p => p.title === 'Day')?.stem || bazi.pillars[1]?.stem || '甲';
+  const dmElement = bazi.pillars.find(p => p.title === 'Day')?.element || bazi.pillars[1]?.element || 'Wood';
   const strength = bazi.analysis?.dayMasterStrength?.score ?? 50;
   const dom = getDominantTenGodGroup(bazi);
   const ratios = bazi.analysis?.tenGodsRatio || {};
@@ -57,7 +57,7 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
   const isMu = (type: string) => getValue(type) < 5;
   const isDa = (type: string) => getValue(type) > 35;
   
-  const dayBranch = bazi.pillars[2]?.branch || '寅';
+  const dayBranch = bazi.pillars.find(p => p.title === 'Day')?.branch || bazi.pillars[1]?.branch || '寅';
   const ilju = `${dmStem}${dayBranch}`;
   const ganyeo = ['甲寅', '乙卯', '丙午', '丁巳', '戊辰', '戊戌', '己丑', '己未', '庚申', '辛酉', '壬子', '癸亥'];
   const isGanyeo = ganyeo.includes(ilju);
@@ -83,7 +83,7 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
   const isReportPhase = answers.q_final !== undefined || questionKeys.length >= MAX_QUESTIONS;
 
   if (isReportPhase) {
-    const dayBranch = bazi.pillars[2]?.branch || '寅';
+    const dayBranch = bazi.pillars.find(p => p.title === 'Day')?.branch || bazi.pillars[1]?.branch || '寅';
     const ilju = `${dmStem}${dayBranch}`;
     
     const getSavageTrueSelf = () => {
