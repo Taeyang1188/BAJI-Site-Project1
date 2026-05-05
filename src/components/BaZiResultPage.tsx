@@ -145,6 +145,16 @@ const getGanYeoJiDong = (stem: string, branch: string) => {
   return stemEl === branchEl;
 };
 
+const getRomanized = (hanja: string) => {
+  const map: Record<string, string> = {
+    '甲': 'Gap', '乙': 'Eul', '丙': 'Byeong', '丁': 'Jeong', '戊': 'Mu',
+    '己': 'Gi', '庚': 'Gyeong', '辛': 'Sin', '壬': 'Im', '癸': 'Gye',
+    '子': 'Ja', '丑': 'Chuk', '寅': 'In', '卯': 'Myo', '辰': 'Jin', '巳': 'Sa',
+    '午': 'Oh', '未': 'Mi', '申': 'Sin', '酉': 'Yu', '戌': 'Sul', '亥': 'Hae'
+  };
+  return map[hanja] || hanja;
+};
+
 const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => void, lang?: 'KO' | 'EN', skip?: boolean }> = ({ text, speed = 30, onComplete, lang = 'KO', skip = false }) => {
   const [displayedElements, setDisplayedElements] = React.useState<React.ReactNode[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -695,7 +705,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const getYongshinName = (god: string) => {
     if (lang === 'KO') return god;
     const parts = god.split(/[,/]/).map(s => s.trim());
-    return parts.map(p => BAZI_MAPPING.yongshin[p as keyof typeof BAZI_MAPPING.yongshin]?.en || p).join(', ');
+    return parts.map(p => {
+      const yongshinMatch = BAZI_MAPPING.yongshin[p as keyof typeof BAZI_MAPPING.yongshin]?.en;
+      if (yongshinMatch) return yongshinMatch;
+      const tenGodMatch = BAZI_MAPPING.tenGods[p as keyof typeof BAZI_MAPPING.tenGods]?.en;
+      if (tenGodMatch) return tenGodMatch;
+      return p;
+    }).join(', ');
   };
 
   const getStrengthLevel = (level: string) => {
@@ -715,11 +731,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     const dmIdx = elementsOrder.indexOf(dmElement);
     
     const godOffsets: Record<string, number> = {
-      "비겁": 0,
-      "식상": 1,
-      "재성": 2,
-      "관성": 3,
-      "인성": 4,
+      "비겁": 0, "비견": 0, "겁재": 0,
+      "식상": 1, "식신": 1, "상관": 1,
+      "재성": 2, "편재": 2, "정재": 2,
+      "관성": 3, "편관": 3, "정관": 3,
+      "인성": 4, "편인": 4, "정인": 4,
     };
 
     const categories = godCategory.split(/[,/]/).map(s => s.trim());
@@ -1890,7 +1906,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
                         (showHanja ? (
                           <div className="flex flex-col items-center">
-                            <span>{pillar.stem}</span>
+                            <span>{pillar.stem}({getRomanized(pillar.stem)})</span>
                             <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap tracking-tighter text-white/80">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.en || pillar.stem}</span>
                           </div>
                         ) : (
@@ -1941,7 +1957,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
                         (showHanja ? (
                           <div className="flex flex-col items-center">
-                            <span>{pillar.branch}</span>
+                            <span>{pillar.branch}({getRomanized(pillar.branch)})</span>
                             <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap tracking-tighter">{branchData?.en || pillar.branch}</span>
                           </div>
                         ) : (
@@ -2008,7 +2024,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       <div className="space-y-6">
         <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center flex items-center justify-center gap-2">
           {t.grandCycle}
-          <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'야. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년이지.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'이야. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생겨.", en: "Daewoon (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
+          <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'야. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년이지.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'이야. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생겨.", en: "Life Seasons (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
             <HelpCircle className="w-3 h-3 cursor-help" />
           </BaziTooltip>
         </h3>
@@ -2269,15 +2285,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         </AnimatePresence>
       </div>
 
-      {/* Saju Analysis Button & Report */}
-      <div className="flex flex-col items-center space-y-6 pt-8">
-        <button 
-          onClick={() => setShowAnalysis(!showAnalysis)}
-          className="px-6 py-3 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-bold tracking-widest uppercase hover:bg-neon-pink hover:text-white transition-all rounded-lg shadow-[0_0_15px_rgba(255,20,147,0.4)]"
-        >
-          {lang === 'KO' ? '사주 풀이하기 (Extract Soul Details)' : 'Extract Soul Details'}
-        </button>
-
+      {/* Saju Analysis Report Section */}
+      <div id="analysis-report-section" className="flex flex-col items-center space-y-6 pt-8">
         <AnimatePresence>
           {showAnalysis && (
             <motion.div
@@ -3316,7 +3325,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       {/* Soul Summary Report Card */}
       <SoulSummaryCard result={result} lang={lang} />
 
-      <div className="flex justify-center pt-12 pb-20">
+      <div className="flex justify-center pt-12 pb-[calc(100px+env(safe-area-inset-bottom))]">
         <motion.button 
           whileTap={{ scale: 0.95 }}
           onClick={onBack}
@@ -3324,6 +3333,42 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         >
           {t.back}
         </motion.button>
+      </div>
+      
+      {/* 
+        Sticky Bottom Action Bar 
+        iOS Notch / Home Indicator 대응 
+      */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] px-4 bg-gradient-to-t from-[#0B0118] via-[#0B0118]/90 to-transparent backdrop-blur-sm pointer-events-none flex justify-center">
+        <div className="w-full max-w-sm sm:max-w-md pointer-events-auto">
+          <motion.button 
+            animate={{ 
+              boxShadow: ["0 0 10px rgba(255,0,122,0.4)", "0 0 25px rgba(255,0,122,0.8)", "0 0 10px rgba(255,0,122,0.4)"],
+              scale: [1, 1.02, 1]
+            }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              if (showAnalysis) {
+                setShowAnalysis(false);
+              } else {
+                setShowAnalysis(true);
+                setTimeout(() => {
+                  const el = document.getElementById('analysis-report-section');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
+              }
+            }}
+            className="w-full py-4 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-black text-[15px] sm:text-base tracking-[0.2em] rounded-[2rem] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.4)] relative overflow-hidden"
+          >
+            {/* Button Shine Effect (optional purely CSS) */}
+            <div className="absolute inset-0 bg-white/10 w-[50%] -skew-x-12 -translate-x-[150%] animate-[shine_3s_infinite]" />
+            {showAnalysis ? (lang === 'KO' ? '내 사주 자세히 닫기' : 'Hide Soul Details') : (lang === 'KO' ? '내 사주 자세히 보기' : 'Extract Soul Details')}
+          </motion.button>
+        </div>
       </div>
     </div>
   );
@@ -3468,7 +3513,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
           <div className="pt-4 w-full">
             <button 
               disabled
-              className="w-full py-4 bg-black/40 backdrop-blur-md border border-dashed border-white/20 rounded-2xl text-white/30 text-sm font-display tracking-widest uppercase cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
+              className="w-full py-4 bg-black/40 backdrop-blur-md border border-dashed border-white/20 rounded-2xl text-white/30 text-sm font-display tracking-widest uppercase cursor-not-allowed flex items-center justify-center gap-2 shadow-lg mb-28"
             >
               <Share2 className="w-4 h-4" />
               {lang === 'KO' ? '리포트 공유하기 (준비 중)' : 'Share Report (Coming Soon)'}

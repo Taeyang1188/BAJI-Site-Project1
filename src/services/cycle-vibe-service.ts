@@ -939,23 +939,27 @@ ${detailedEffect}`;
       const sEl = baziMappingStems[luck.stem]?.element;
       const bEl = baziMappingBranches[luck.branch]?.element;
 
+      const elementColors: any = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#94a3b8', Water: '#3b82f6' };
+      const formatKo = (el: string, title: string) => `[${elementColors[el]}:${{'Wood':'목(木)', 'Fire':'화(火)', 'Earth':'토(土)', 'Metal':'금(金)', 'Water':'수(水)'}[el] || el} ${title}]`;
+      const formatEn = (el: string, title: string) => `[${elementColors[el]}:${el} (${title})]`;
+
       if (isPowerHeavy && (sEl === reinforcesDm || bEl === reinforcesDm)) {
         score += 150;
         reason = lang === 'KO' ? 
-          `강력한 인성(${lang === 'KO' ? {'Wood':'목','Fire':'화','Earth':'토','Metal':'금','Water':'수'}[reinforcesDm] : reinforcesDm})이 들어와 나를 짓누르던 관성(책임감/압박)을 안정적인 가정이라는 울타리로 비로소 승화시키는 해` :
-          `Strong resource energy enters, transforming crushing pressure into a stable family haven`;
+          `강력한 ${formatKo(reinforcesDm, '인성')}의 기운이 들어와 나를 짓누르던 관성(책임감/압박)을 안정적인 가정이라는 울타리로 비로소 승화시키는 해` :
+          `Strong ${formatEn(reinforcesDm, 'Resource')} energy enters, transforming crushing pressure into a stable family haven`;
       } else if (!isMale && (sEl === controlsDm || bEl === controlsDm)) {
         score += 100;
-        reason = lang === 'KO' ? '관성(남성/안정의 책임)이 내 일간을 감싸 안는 해' : 'Strong connection with a significant other';
+        reason = lang === 'KO' ? `${formatKo(controlsDm, '관성')}(남성/안정의 책임)이 내 일간을 감싸 안는 해` : `Strong ${formatEn(controlsDm, 'Power')} energy connects deeply, bringing a significant other`;
       } else if (isMale && (sEl === wealth || bEl === wealth)) {
         score += 100;
-        reason = lang === 'KO' ? '재성이 직접 도래하여 인연의 결실을 맺는 해' : 'Wealth (Spouse) energy directly arrives for fruitful connection';
+        reason = lang === 'KO' ? `${formatKo(wealth, '재성')}(여성/결실)이 직접 도래하여 인연의 결실을 맺는 해` : `${formatEn(wealth, 'Wealth/Spouse')} energy directly arrives for a fruitful connection`;
       } else if (isMale && (sEl === sikSang || bEl === sikSang)) {
         score += 80;
-        reason = lang === 'KO' ? '식상(표현력)이 생재하여 이성을 향해 마음이 적극적으로 움직이는 해' : 'Your expressive energy actively moves towards romance';
+        reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}(표현력)이 생재하여 이성을 향해 마음이 적극적으로 움직이는 해` : `Your ${formatEn(sikSang, 'Expression')} energy actively moves towards romance`;
       } else if (!isMale && (sEl === sikSang || bEl === sikSang)) {
         score += 80;
-        reason = lang === 'KO' ? '내 가족, 내 식구를 꾸리고자 하는 강한 열망이 생기는 시기' : 'Strong desire to build your own family arises';
+        reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}의 발현으로 내 가족, 내 식구를 꾸리고자 하는 강한 열망이 생기는 시기` : `${formatEn(sikSang, 'Expression')} brings a strong desire to build your own family`;
       } else if (sEl === controlsDm || bEl === reinforcesDm) {
          score += 90;
          reason = lang === 'KO' ? '사회적 책임과 안정적인 가정을 꾸리고자 하는 의지가 강해지는 해' : 'Strong will to take social responsibility and build a stable family';
@@ -999,7 +1003,7 @@ ${detailedEffect}`;
     };
 
     const pastYears = [currentYear - 2, currentYear - 1, currentYear];
-    const futureYears = [currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4, currentYear + 5];
+    const futureYears = Array.from({length: 10}, (_, i) => currentYear + 1 + i);
 
     const pastLucks = pastYears.map(y => evaluateMarriageLuck(getYearlyLuck(y)));
     const futureLucks = futureYears.map(y => evaluateMarriageLuck(getYearlyLuck(y)));
@@ -1018,8 +1022,8 @@ ${detailedEffect}`;
     };
 
     const main = lang === 'KO' ? 
-      `네 인연의 타임라인을 스캔해봤어. [delay:1500]\n\n🕒 [가장 가까웠던/현재의 결혼운]\n${bestPast.year}년(${bestPast.stem}${bestPast.branch}년): ${formatLuck(bestPast)}\n\n🚀 [향후 가장 강력한 결혼운]\n${bestFuture.year}년(${bestFuture.stem}${bestFuture.branch}년): ${formatLuck(bestFuture)}\n\n결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해.` :
-      `I've scanned your relationship timeline. [delay:1500]\n\n🕒 [Most Recent/Current Marriage Luck]\n${bestPast.year} (${bestPast.stem}${bestPast.branch}): ${formatLuck(bestPast)}\n\n🚀 [Strongest Future Marriage Luck]\n${bestFuture.year} (${bestFuture.stem}${bestFuture.branch}): ${formatLuck(bestFuture)}\n\nMarriage is about the choices you make.`;
+      `네 인연의 타임라인을 스캔해봤어. [delay:1500]\n\n🕒 [가장 가까웠던/현재의 결혼운]\n${bestPast.year}년(${bestPast.stem}${bestPast.branch}년): ${formatLuck(bestPast)}\n\n🚀 [향후 가장 강력한 결혼운 (10년 이내)]\n${bestFuture.year}년(${bestFuture.stem}${bestFuture.branch}년): ${formatLuck(bestFuture)}\n\n결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해.` :
+      `I've scanned your relationship timeline. [delay:1500]\n\n🕒 [Most Recent/Current Marriage Luck]\n${bestPast.year} (${bestPast.stem}${bestPast.branch}): ${formatLuck(bestPast)}\n\n🚀 [Strongest Future Marriage Luck (Next 10 Years)]\n${bestFuture.year} (${bestFuture.stem}${bestFuture.branch}): ${formatLuck(bestFuture)}\n\nMarriage is about the choices you make.`;
 
     return { main, glitch: lang === 'KO' ? '운명은 준비된 자에게 찾아온다.' : 'Fate comes to the prepared.' };
   };

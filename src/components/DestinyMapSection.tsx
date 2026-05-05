@@ -395,7 +395,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
   const renderDaewunBriefing = () => (
       <div className="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
         <div className="flex justify-between items-center mb-2">
-            <h4 className="text-sm font-bold text-white/80">{lang === 'KO' ? '대운 해설' : 'Daewun Details'}</h4>
+            <h4 className="text-sm font-bold text-white/80">{lang === 'KO' ? '대운 해설' : 'Life Seasons Details'}</h4>
             <button onClick={() => setShowTimelineDocs(!showTimelineDocs)} className="text-xs text-white/50 hover:text-white">
                 {showTimelineDocs ? (lang === 'KO' ? '닫기' : 'Hide') : (lang === 'KO' ? '펼치기' : 'Show')}
             </button>
@@ -428,7 +428,7 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
       {!scannerOnly && (
       <div className="p-4 bg-black/40 rounded-xl border border-white/5 relative z-20">
         <div className="text-sm font-bold text-white/70 mb-4 flex justify-between items-center">
-          <span>{lang === 'KO' ? '대운 흐름 (Timeline)' : 'Daewun Timeline'}</span>
+          <span>{lang === 'KO' ? '대운 흐름 (Timeline)' : 'Life Seasons Timeline'}</span>
           <span className="text-xs bg-white/10 px-2 py-1 rounded transition-colors duration-1000" style={{ color: daewunThemeColor }}>
             {sliderIndex === currentIndex ? (lang === 'KO' ? '현재' : 'Current') :
              sliderIndex < currentIndex ? (lang === 'KO' ? '과거' : 'Past') : (lang === 'KO' ? '미래' : 'Future')}

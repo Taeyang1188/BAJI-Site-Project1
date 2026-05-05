@@ -370,21 +370,21 @@ export function generateIndividualTimelineBriefing(
         narrative += `[숨겨진 역동성: 합(合)의 함정] 겉보기에는 '${originalTenGod}'의 운으로 다가오지만, 당신의 일지(${dayBranch})와 대운(${daewunBranch})이 강력하게 결합하여(육합), 결과적으로 '${newTenGod}'의 성질로 완전히 변질됩니다. ${(originalTenGod === '재성' && newTenGod === '관성') ? '예컨대 돈과 이익을 쫓았으나, 결국 막중한 책임감이나 압박으로 둔갑하게 되는 특수한 시기입니다.' : '당초 기대했던 사건의 방향성이 전혀 다른 결실로 이어지게 되는 특수한 시기입니다.'}\n\n`;
     }
 
+    let prevDaewunDiff = -1;
+    if (sliderIndex !== undefined && sliderIndex > 0 && !isPast && !isFuture) {
+        const prevDaewun = result.grandCycles[sliderIndex - 1];
+        const prevBranch = prevDaewun.branch;
+        const BRANCH_ELEMENTS: any = { '子':'Water','丑':'Earth','寅':'Wood','卯':'Wood','辰':'Earth','巳':'Fire','午':'Fire','未':'Earth','申':'Metal','酉':'Metal','戌':'Earth','亥':'Water' };
+        const prevEl = BRANCH_ELEMENTS[prevBranch] || 'Wood';
+        const prevIdx = cycle.indexOf(prevEl);
+        prevDaewunDiff = (prevIdx - dmIdx + 5) % 5;
+    }
+
     if (isKO) {
         if (!isPast && !isFuture) {
            // CURRENT DAEWUN LOGIC (Compare with Previous)
            let prevDaewunStr = "";
-           let prevDaewunDiff = -1;
-           if (sliderIndex !== undefined && sliderIndex > 0) {
-               const prevDaewun = result.grandCycles[sliderIndex - 1];
-               const prevBranch = prevDaewun.branch;
-               const BRANCH_ELEMENTS: any = { '子':'Water','丑':'Earth','寅':'Wood','卯':'Wood','辰':'Earth','巳':'Fire','午':'Fire','未':'Earth','申':'Metal','酉':'Metal','戌':'Earth','亥':'Water' };
-               const prevEl = BRANCH_ELEMENTS[prevBranch] || 'Wood';
-               const prevIdx = cycle.indexOf(prevEl);
-               prevDaewunDiff = (prevIdx - dmIdx + 5) % 5;
-           }
-
-                      let pastTenGod = prevDaewunDiff !== -1 ? tenGodsKo[prevDaewunDiff].split('(')[0] : "알 수 없는 기운";
+           let pastTenGod = prevDaewunDiff !== -1 ? tenGodsKo[prevDaewunDiff].split('(')[0] : "알 수 없는 기운";
            let currentTenGod = tenGodRoleKo.split('(')[0];
 
            if (pastTenGod === currentTenGod) {
@@ -499,7 +499,12 @@ export function generateIndividualTimelineBriefing(
     } else {
         narrative += `During this phase, the ${tenGodRoleEn} energy assumes the leading role in your chart.\n\n`;
         if (!isPast && !isFuture) {
-             narrative += `[Phase Shift] Moving from the previous cycle, the shift heavily impacts your structural balance.\n\n`;
+             let pastTenGod = prevDaewunDiff !== -1 ? tenGodsEn[prevDaewunDiff] : "Unknown";
+             if (pastTenGod === tenGodRoleEn) {
+                 narrative += `[Phase Shift] Remaining in the same energy, the ${tenGodRoleEn} theme continues to deepen its impact on your structural balance.\n\n`;
+             } else {
+                 narrative += `[Phase Shift] Moving from the previous ${pastTenGod} cycle, the shift to ${tenGodRoleEn} heavily impacts your structural balance.\n\n`;
+             }
         }
         narrative += `[Phase Flow] The dynamic shift highly influences your path. Evaluate where this energy pushes you, and balance the tension intentionally.\n`;
     }
