@@ -1950,7 +1950,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     </div>
                     <div className="flex-1 flex items-end justify-center">
                       <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
-                        {lang === 'KO' ? lifeStage?.ko : lifeStage?.en}
+                        {lang === 'KO' ? lifeStage?.ko : null}
                       </div>
                     </div>
                   </div>

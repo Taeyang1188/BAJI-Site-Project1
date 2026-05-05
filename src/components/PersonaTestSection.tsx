@@ -40,7 +40,6 @@ interface PersonaTestSectionProps {
 export default function PersonaTestSection({ userName, ilju, baziResult, onComplete, lang = 'KO' }: PersonaTestSectionProps) {
   const [phase, setPhase] = useState<'intro' | 'question' | 'report'>('intro');
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [fatigueScore, setFatigueScore] = useState<number>(0);
   const [questionCount, setQuestionCount] = useState<number>(1);
   
   const targetName = userName && userName.length >= 2 ? (userName.length === 3 ? userName.substring(1) : userName) : (lang === 'KO' ? '너' : 'you');
@@ -66,13 +65,6 @@ export default function PersonaTestSection({ userName, ilju, baziResult, onCompl
 
   const handleReaction = (optionId: string) => {
     if (!currentNode) return;
-    
-    // Calculate fatigue informally
-    let added = 8;
-    if (optionId === 'yes') added = 10 + Math.floor(Math.random() * 3);
-    else if (optionId === 'no') added = 12 + Math.floor(Math.random() * 5);
-    
-    setFatigueScore(prev => Math.min(100, prev + added));
     
     const newAnswers = { ...answers, [currentNode.id]: optionId };
     setAnswers(newAnswers);
@@ -243,23 +235,40 @@ export default function PersonaTestSection({ userName, ilju, baziResult, onCompl
                   <div className="text-sm md:text-base text-neon-purple/90 leading-relaxed break-keep">{currentNode.report.shadow}</div>
                </div>
                
-               {/* 영혼의 피로도 */}
-               <div className="p-5 bg-black/50 border border-neon-pink/20 rounded-2xl relative overflow-hidden mt-8">
-                  <div className="flex justify-between items-center mb-3">
-                     <div className="text-[10px] text-neon-pink/60 font-bold tracking-widest uppercase">
-                       {lang === 'KO' ? '영혼의 피로도 / 방어기제 수준' : 'Soul Fatigue / Defense Mechanism Level'}
+               {/* 운명 동조 스펙트럼 */}
+               <div className="p-6 bg-black/50 border border-white/10 rounded-2xl relative overflow-hidden mt-8">
+                  <div className="flex justify-between items-center mb-4">
+                     <div className="text-[10px] text-white/50 font-bold tracking-widest uppercase">
+                       {lang === 'KO' ? '운명 동기화 스펙트럼' : 'Destiny Synchronization Spectrum'}
                      </div>
-                     <div className="text-sm font-mono text-neon-pink font-bold">
-                        {fatigueScore}%
+                     <div className="text-sm font-mono text-white font-bold">
+                        {currentNode.report.syncScore}%
                      </div>
                   </div>
-                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="relative w-full h-2 bg-gradient-to-r from-blue-900/50 via-purple-700/50 to-neon-pink/80 rounded-full mt-6 mb-8">
+                     <div className="absolute -top-6 left-0 text-[10px] text-blue-400/80">
+                        {lang === 'KO' ? '운명 거부 (저항)' : 'Destiny Rejection'}
+                     </div>
+                     <div className="absolute -top-6 right-0 text-[10px] text-neon-pink/80">
+                        {lang === 'KO' ? '본성 완전 개방' : 'Full Unleash'}
+                     </div>
+                     
                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${fatigueScore}%` }}
+                        initial={{ left: 0 }}
+                        animate={{ left: `${currentNode.report.syncScore}%` }}
                         transition={{ duration: 1.5, ease: 'easeOut' }}
-                        className="h-full bg-gradient-to-r from-red-500 to-neon-pink"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)] border-2 border-black"
                      />
+                  </div>
+                  
+                  <div className="text-sm text-white/80 leading-relaxed font-display break-keep">
+                     {(currentNode.report.syncScore ?? 50) <= 30 ? (
+                        lang === 'KO' ? '운명 저항자 (Destiny Resister) - 선천적 기질을 억누르고 사회가 요구하는 페르소나에 완벽히 동기화된 상태입니다. 엄청난 정신적 에너지를 쏟아붓고 있습니다.' : 'Destiny Resister - Suppressing innate traits, heavily adapting to your social mask.'
+                     ) : (currentNode.report.syncScore ?? 50) < 70 ? (
+                        lang === 'KO' ? '유연한 조율자 (Harmonizer) - 상황에 따라 본성과 가면을 적절히 스위칭하는 실용주의자입니다. 사회적 자아와 내면의 균형을 유지하고 있습니다.' : 'Harmonizer - A pragmatist switching cleanly between nature and mask.'
+                     ) : (
+                        lang === 'KO' ? '기질의 화신 (Incarnation) - 자신의 본성을 가감 없이 드러내며 사주대로 살아가는 날것의 상태입니다. 남들의 시선보다 내 자아가 훨씬 더 중요합니다.' : 'Incarnation - You naturally unleash your innate traits, living intensely with explosive potential.'
+                     )}
                   </div>
                </div>
 

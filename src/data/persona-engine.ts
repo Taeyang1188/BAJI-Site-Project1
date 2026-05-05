@@ -80,11 +80,44 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
   const questionKeys = Object.keys(answers);
   // We want more questions to feel thorough
   const MAX_QUESTIONS = 15;
+
+  if (questionKeys.length === MAX_QUESTIONS - 1 && !answers.q_jung_shadow) {
+    let q = "";
+    if (dom === '관성' || dom === '재성') {
+      q = isKO 
+        ? `마지막 질문이야. 남들이 인정하는 '유능하고 책임감 있는 네 모습(가면)'에 치여서, 정작 혼자 있을 때는 도덕이고 사회적 체면이고 다 벗어던진 채 완전히 게으르거나 충동적인 '괴물'로 변하고 싶은 억압된 욕망을 꾹꾹 누르고 살지 않아?`
+        : `Last question. Crushed by your 'competent and responsible (mask)', when you're alone, don't you suppress a desire to turn into a completely lazy or impulsive 'monster', throwing away all morality and dignity?`;
+    } else {
+      q = isKO 
+        ? `마지막 질문이야. 남들이 보는 '독특하거나 자유로운 네 모습(가면)' 뒤에, 사실은 그 누구보다 남들에게 '정상적'으로 보이고 싶고 주류 사회에 완벽하게 소속되고 싶어 덜덜 떠는 겁쟁이가 숨어 있지 않아?`
+        : `Last question. Behind your 'freethinking or unique (mask)', isn't there a shivering coward hiding who wants more than anything to look 'normal' and belong perfectly to mainstream society?`;
+    }
+    return { id: 'q_jung_shadow', question: q, difficulty: 5, discrimination: 5, options: defaultOptions };
+  }
+
   const isReportPhase = answers.q_final !== undefined || questionKeys.length >= MAX_QUESTIONS;
 
   if (isReportPhase) {
     const dayBranch = bazi.pillars.find(p => p.title === 'Day')?.branch || bazi.pillars[1]?.branch || '寅';
     const ilju = `${dmStem}${dayBranch}`;
+    
+    const computeSyncScore = () => {
+      let score = 50;
+      for (const [key, val] of Object.entries(answers)) {
+        if (['marital', 'children', 'q_final'].includes(key)) continue;
+        const isRefute = key.includes('_refute') || key.includes('_pivot');
+        if (!isRefute) {
+          if (val === 'yes') score += 8;
+          else if (val === 'no') score -= 8;
+        } else {
+          if (val === 'yes') score -= 8;
+          else if (val === 'no') score += 8;
+        }
+      }
+      return Math.max(0, Math.min(100, score));
+    };
+    
+    const finalSyncScore = computeSyncScore();
     
     const getSavageTrueSelf = () => {
       // 60 Ilju characteristics - adding more specific ones and grouping by nature
@@ -111,9 +144,18 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
       const monthStats = bazi.analysis?.tenGodsRatio || {};
       const isMoStrong = (monthStats['인성'] || 0) > 30;
       const isFaStrong = (monthStats['재성'] || 0) > 30;
+      const isBiStrong = (monthStats['비겁'] || 0) > 30;
+      const isGwanStrong = (monthStats['관성'] || 0) > 30;
+      const isSikStrong = (monthStats['식상'] || 0) > 30;
       
       if (isMoStrong) return isKO ? "부모님(특히 어머니)의 영향력이 네 가치관 깊숙이 박혀 있네. 독립한 성인이 되어서도 그들의 기대치라는 보이지 않는 선을 넘지 못해 고뇌하는 모습이 보여." : "The influence of your parents (especially mother) is deeply embedded in your values. Even as an adult, you struggle with the invisible line of their expectations.";
       if (isFaStrong) return isKO ? "가족 관계에서도 '도리'나 '책임'보다는 '실질적인 도움'이나 '결과'를 더 중요하게 생각하는 경향이 있네. 가끔은 너무 건조한 대화만 오가는 건 아닌지 돌아볼 필요가 있어." : "In family relations, you tend to value 'practical help' or 'results' over 'duty' or 'emotion'. You might need to reflect if your conversations are too dry.";
+      if (isBiStrong) return isKO ? "가족이어도 보이지 않는 묘한 경쟁심이 흐르지 않아? 독립심이 강해서 일찍부터 내 영역을 구축했지만, 부모형제와도 선을 명확히 긋는 개인주의적 성향이 강해." : "Even with family, isn't there an invisible, subtle rivalry? Your strong sense of independence made you build your own domain early on, setting clear boundaries even with parents and siblings.";
+      if (isGwanStrong) return isKO ? "K-장녀/K-장남이 아니더라도 집안에서 무거운 책임감을 짊어지고 있네. 가장으로서의 압박감 혹은 '내가 똑바로 해야 가정이 평안하다'는 강박이 스스로를 짓누르고 있어." : "Even if you aren't the eldest, you bear a heavy sense of responsibility in the family. The pressure of being the provider or the obsession that 'I must do right for the family to be at peace' is weighing you down.";
+      if (isSikStrong) return isKO ? "밖에서는 인싸, 집에서는 에너지 방전 모드네. 타인에겐 다 퍼주면서 가장 가깝고 편안한 가족에게는 본의 아니게 뾰족하고 예민한 모습을 보이고 있을 수 있어." : "A social butterfly outside, but your battery is completely drained at home. While you give everything to others, you might unintentionally be sharp and sensitive to your closest family.";
+      
+      const dayBranchElements = bazi.pillars.find(p => p.title === 'Day')?.branch || '寅';
+      if (['辰', '戌', '丑', '未'].includes(dayBranchElements)) return isKO ? "가족 관계에서 속마음을 잘 드러내지 않네. 혼자서 가족의 크고 작은 문제들을 수습하고 고민을 삭히는 '감정적 쓰레기통' 역할을 하고 있진 않아?" : "You don't reveal your true feelings well in family relations. Aren't you playing the role of an 'emotional trash can', cleaning up big and small family problems and swallowing your own worries?";
       
       return isKO ? "가장 가깝고 편안한 이들에게 본의 아니게 가장 날카로운 말을 내뱉곤 하네. 밖에서 쌓인 긴장을 집에서 해소하려는 습관이 가족들에겐 상처가 될 수 있어." : "You unintentionally spit the sharpest words at those closest to you. Releasing outside tension at home can be hurtful to your family.";
     };
@@ -206,7 +248,8 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
         trueSelf: getSavageTrueSelf(),
         shadow: getSavageShadow(),
         advice: getSavageAdvice(),
-        children: getChildrenReport()
+        children: getChildrenReport(),
+        syncScore: finalSyncScore
       }
     };
   }
@@ -226,6 +269,8 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
     return {
       id: 'marital',
       question: questions[questionKeys.length % questions.length],
+      difficulty: 1,
+      discrimination: 1,
       options: isKO ? [
         { id: 'married', label: '결혼했어' },
         { id: 'dating', label: '연애 중' },
@@ -313,6 +358,41 @@ export function getNextNode(bazi: BaZiResult, targetName: string, answers: Recor
 
   // --- NEW COMPLEX QUESTIONS ---
   
+  // IRT High Discrimination: Tri-penal Clash (인사신/축술미)
+  const isSamhyeong = interactions.some((c: any) => c.type?.includes('삼형'));
+  if (isSamhyeong && !answers.q_samhyeong) {
+    let q = isKO 
+      ? `네 사주에는 남의 생살여탈권을 쥘 만큼 날카롭고 위험한 '삼형살'이 있어. 혹시 너, 타인의 약점을 순식간에 캐치해 내고, 마음만 먹으면 그걸로 상대를 완벽하게 짓밟아버릴 수 있다는 걸 본능적으로 알고 있지 않아?` 
+      : `You have the 'Tri-penal clash' meant to hold life-and-death power. Don't you instinctively know you can catch others' weaknesses instantly and emotionally crush them if you wanted to?`;
+    return { id: 'q_samhyeong', question: q, difficulty: 5, discrimination: 5, options: defaultOptions };
+  }
+
+  if (isSamhyeong && answers.q_samhyeong === 'no' && !answers.q_samhyeong_refute) {
+    let q = isKO 
+      ? `그 무서운 칼날을 스스로를 향해 겨누거나 활인(타인을 살리는 직업/조언)으로 승화하고 있나 보네. 남을 해치기보다 오히려 네가 총대를 메고 힘든 걸 감당하려는 피곤한 구원자 역할을 하고 있지?`
+      : `You must be turning that terrifying blade inward or sublimating it into saving others. Instead of harming others, aren't you playing the tiring savior who takes the bullet?`;
+    return { id: 'q_samhyeong_refute', question: q, difficulty: 4, discrimination: 4, options: defaultOptions };
+  }
+
+  // Refined Cold Reading (Barnum combined with ILJU)
+  if (!answers.q_barnum_ilju) {
+    let q = "";
+    if (ilju.includes('寅') || ilju.includes('申') || ilju.includes('巳') || ilju.includes('亥')) {
+      q = isKO 
+        ? `너는 겉보기에 아주 유연하고 남의 말을 잘 듣는 척하지만, 사실 속으로는 이미 너만의 결론을 다 내려놓고 남들이 동의해주기만을 기다리는 '답정너' 기질이 상당히 강하지 않아?`
+        : `You look very flexible and act like a good listener, but inside, haven't you already made your conclusions and are just waiting for others to agree?`;
+    } else if (ilju.includes('子') || ilju.includes('午') || ilju.includes('卯') || ilju.includes('酉')) {
+      q = isKO
+        ? `호불호가 속으로 너무 명확해서, 남들이 볼 땐 무난해 보여도 사실 네 마음속 'VIP 라운지'와 '아웃렛'에 배정된 사람이 영원히 바뀌지 않는 극단적 취향의 소유자지?`
+        : `Your likes/dislikes are so clear inside that while you look easy-going, the people in your mental 'VIP lounge' vs 'trash bin' never change. You have extreme tastes, right?`;
+    } else {
+      q = isKO
+        ? `대인관계에서 다 품어줄 것처럼 좋은 사람 코스프레를 하지만, 사실 누군가 선을 넘거나 예의가 없으면 속으로 조용하고 확실하게 '손절 장부'에 기록부터 하고 있지?`
+        : `You cosplay as a good person who embraces everyone, but softly and surely, if someone crosses a line, you immediately write them down in your 'severance ledger', right?`;
+    }
+    return { id: 'q_barnum_ilju', question: q, difficulty: 3, discrimination: 4, options: defaultOptions };
+  }
+
   if (isGanyeo && !answers.q_ganyeo_stubborn) {
     let q = "";
     if (ilju === '癸亥') {

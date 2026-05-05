@@ -139,12 +139,15 @@ export interface TimelineNarrative {
 export interface PersonaOption {
   id: string;
   label: string;
+  weight?: number; // Added to affect synchronization score
 }
 
 export interface PersonaNode {
   id: string;
   question?: string;
   options?: PersonaOption[];
+  difficulty?: number; // 1 to 5
+  discrimination?: number; // 1 to 5
   isEnd?: boolean;
   report?: {
     family: string;
@@ -156,6 +159,7 @@ export interface PersonaNode {
     trueSelf: string;
     shadow: string;
     advice: string;
+    syncScore?: number;
   };
 }
 
