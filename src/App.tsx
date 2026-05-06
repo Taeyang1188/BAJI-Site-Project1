@@ -399,30 +399,57 @@ export default function App() {
               className="flex flex-col items-center text-center space-y-12 px-6"
             >
               {/* Character Section */}
-              <div className="relative w-64 h-64">
+              <div className="relative w-[332px] h-[332px] mt-8 mb-4">
                 {/* Speech Bubble */}
                 <motion.div 
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="absolute -top-12 -right-12 goth-glass p-4 rounded-2xl rounded-bl-none max-w-[180px] z-20"
+                  className="absolute -top-[70px] -right-4 sm:-right-12 goth-glass p-4 rounded-2xl rounded-bl-none max-w-[220px] z-30"
                 >
-                  <p className="text-[11px] font-medium leading-relaxed italic">
+                  <p className="text-[12px] sm:text-[13px] font-medium leading-relaxed italic text-white/90">
                     "{greeting}"
                   </p>
                 </motion.div>
                 
-                {/* Placeholder for 3D Character (Stylized SVG) */}
-                <div className="w-full h-full rounded-full bg-gradient-to-b from-neon-purple/20 to-transparent flex items-center justify-center border border-white/5 relative">
+                {/* UFO Saucer Rings (Background) */}
+                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[104px] sm:h-[125px] rounded-[50%] bg-gradient-to-t from-neon-purple/30 to-transparent border border-neon-purple/40 blur-[1px] z-0" />
+                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-t border-b border-neon-cyan/20 shadow-[0_0_40px_rgba(0,242,255,0.2)] z-0" />
+
+                {/* Character Circle (UFO Dome) */}
+                <div className="w-full h-full rounded-full bg-gradient-to-b from-neon-purple/20 to-neon-purple/5 border border-white/5 relative overflow-hidden z-10 shadow-[0_-15px_40px_rgba(188,0,255,0.15)]" style={{ isolation: 'isolate' }}>
                   <motion.div
-                    animate={{ y: [0, -10, 0] }}
+                    animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-8xl"
+                    className="absolute inset-[16px] flex items-center justify-center overflow-hidden rounded-full"
                   >
-                    🧛‍♀️
+                    {/* 캐릭터 색상을 자연스럽게 살려주기 위한 백라이트 (너무 밝지 않게 조절) */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-36 h-40 bg-white/30 rounded-full blur-[25px] z-0" />
+                    
+                    <img 
+                      src="https://cdn.jsdelivr.net/gh/Taeyang1188/BAJI-Site-Project1@main/public/door.gif" 
+                      alt="Cosmic Door" 
+                      className="w-[115%] h-[115%] max-w-none object-contain mix-blend-multiply relative z-10 -mt-6"
+                      style={{
+                        // 배경을 투명하게 하되 캐릭터 요소가 너무 쨍해지지 않도록 값 완화
+                        filter: "contrast(1.02) brightness(1.02)"
+                      }}
+                    />
                   </motion.div>
                   {/* Neon Ring */}
-                  <div className="absolute inset-0 border-2 border-neon-pink/30 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 border-[16px] border-neon-purple/40 rounded-full animate-pulse z-20 pointer-events-none" />
+                </div>
+
+                {/* UFO Front Rim (Foreground) */}
+                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-b-[5px] border-neon-cyan shadow-[0_20px_60px_rgba(0,255,170,0.6)] pointer-events-none z-20" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }} />
+                
+                {/* UFO Lights */}
+                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] z-20 pointer-events-none" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }}>
+                  <div className="absolute bottom-[20px] sm:bottom-[23px] left-[15%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" />
+                  <div className="absolute bottom-[5px] sm:bottom-[6px] left-[35%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.3s' }} />
+                  <div className="absolute bottom-[2px] sm:bottom-[3px] left-[50%] -translate-x-1/2 w-3 h-1.5 sm:w-4 sm:h-2 bg-white rounded-full shadow-[0_0_15px_8px_rgba(255,255,255,0.8)] animate-pulse" style={{ animationDelay: '0s' }} />
+                  <div className="absolute bottom-[5px] sm:bottom-[6px] left-[65%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.7s' }} />
+                  <div className="absolute bottom-[20px] sm:bottom-[23px] left-[85%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" style={{ animationDelay: '1.2s' }} />
                 </div>
               </div>
 
