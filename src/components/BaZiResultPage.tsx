@@ -619,6 +619,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showHanja, setShowHanja] = useState(true);
+  const [guideStep, setGuideStep] = useState(0); // 0: None, 1: Year, 2: Month, 3: Day, 4: Hour, 5: Daewun
+  const [showGuideDetailModal, setShowGuideDetailModal] = useState(false);
   const [showStrengthInfo, setShowStrengthInfo] = useState(false);
   const [showGeJuInfo, setShowGeJuInfo] = useState(false);
   const [showMuJaDaJaInfo, setShowMuJaDaJaInfo] = useState<{ title: string, description: string, enDescription?: string } | null>(null);
@@ -1852,17 +1854,136 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       )}
 
       {/* 8 Pillars Grid (4x2) */}
-      <div className="space-y-4">
-        <div className="flex justify-end gap-2">
+      <div className="space-y-4 relative">
+        {/* Guide UI Overlay & Popover */}
+        <AnimatePresence>
+          {guideStep > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-40 flex flex-col pointer-events-none"
+            >
+              {/* Dimmed Overlay Base */}
+              <div className="absolute inset-0 -mx-4 -my-4 lg:-mx-12 lg:-my-8 bg-black/60 backdrop-blur-[2px] rounded-2xl pointer-events-auto" onClick={() => setGuideStep(0)} />
+
+              {/* Guide Content Box */}
+              {guideStep < 5 && (
+                <motion.div 
+                  key={guideStep}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className={`absolute left-0 right-0 z-[60] p-4 sm:p-6 rounded-2xl border border-neon-cyan/40 bg-goth-bg/95 shadow-[0_0_30px_rgba(0,242,255,0.3)] pointer-events-auto top-[100%] mt-4`}
+                >
+                <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                </button>
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="w-12 h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)]">
+                    {guideStep === 1 && <span className="text-2xl" role="img" aria-label="roots">🌱</span>}
+                    {guideStep === 2 && <span className="text-2xl" role="img" aria-label="trunk">🪵</span>}
+                    {guideStep === 3 && <span className="text-2xl" role="img" aria-label="flower">🌸</span>}
+                    {guideStep === 4 && <span className="text-2xl" role="img" aria-label="fruit">🍏</span>}
+                    {guideStep === 5 && <span className="text-2xl" role="img" aria-label="seasons">🌤️</span>}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-base sm:text-lg font-bold text-neon-cyan mb-1 flex items-center gap-2">
+                      {lang === 'KO' ? (
+                        <>
+                          {guideStep === 1 && '연주 (Year Pillar) - 나의 뿌리와 조상'}
+                          {guideStep === 2 && '월주 (Month Pillar) - 환경과 부모님'}
+                          {guideStep === 3 && '일주 (Day Pillar) - 나 자신과 배우자'}
+                          {guideStep === 4 && '시주 (Hour Pillar) - 미래와 숨은 본능'}
+                          {guideStep === 5 && '대운 (Daewun) - 내게 주어진 10년의 테마'}
+                        </>
+                      ) : (
+                        <>
+                          {guideStep === 1 && 'Year Pillar - Roots & Ancestry'}
+                          {guideStep === 2 && 'Month Pillar - Environment & Parents'}
+                          {guideStep === 3 && 'Day Pillar - Self & Spouse'}
+                          {guideStep === 4 && 'Hour Pillar - Future & Hidden Defaults'}
+                          {guideStep === 5 && 'Daewun - The 10-Year Life Theme'}
+                        </>
+                      )}
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-white/70">
+                        Step {guideStep} / 5
+                      </span>
+                    </h4>
+                    <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+                      {lang === 'KO' ? (
+                        <>
+                          {guideStep === 1 && '마치 나무의 뿌리처럼 당신의 태생적 환경, 유전적 특성, 그리고 가문을 넘어선 우주적 조상의 기운을 나타냅니다.'}
+                          {guideStep === 2 && '뿌리에서 자라난 튼튼한 기둥입니다. 당신이 속한 사회적 환경, 가정의 분위기, 그리고 청년기와 성장 과정을 뜻합니다.'}
+                          {guideStep === 3 && '사주에서 가장 핵심이 되는 꽃, 바로 \'나 자신\'입니다. 윗글자(일간)는 당신의 영혼을, 아랫글자(일지)는 배우자를 의미합니다.'}
+                          {guideStep === 4 && '나무가 열매를 맺듯 당신이 이루어낼 무의식적 결과이자 인생의 후반기입니다. 생시를 알아야 완벽한 통변이 가능한 이유입니다.'}
+                          {guideStep === 5 && '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요.'}
+                        </>
+                      ) : (
+                        <>
+                          {guideStep === 1 && 'Like the roots of a tree, this represents your inherited environment, genetics, and the cosmic ancestral energy you were born into.'}
+                          {guideStep === 2 && 'The trunk that grows from the roots. It indicates your social environment, family atmosphere, and your developing youth phase.'}
+                          {guideStep === 3 && 'The blossoming flower, the most crucial part: You. The top stem rules your core identity, while the bottom branch signifies your spouse.'}
+                          {guideStep === 4 && 'The fruits you bear in your twilight years. It symbolizes your offspring, hidden desires, and long-term results.'}
+                          {guideStep === 5 && 'Just like seasons change, this represents the shifting environment and theme you face every 10 years.'}
+                        </>
+                      )}
+                    </p>
+                    <div className="flex gap-2 justify-end w-full">
+                      <button onClick={() => setShowGuideDetailModal(true)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto">
+                        <span className="flex items-center gap-1">
+                          <BookOpen className="w-4 h-4" />
+                          {lang === 'KO' ? '자세히 알아보기' : 'Learn More'}
+                        </span>
+                      </button>
+                      {guideStep > 1 && (
+                        <button onClick={() => setGuideStep(p => p - 1)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                          {lang === 'KO' ? '이전' : 'Prev'}
+                        </button>
+                      )}
+                      {guideStep < 5 ? (
+                        <button onClick={() => setGuideStep(p => p + 1)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 flex items-center justify-center transition-colors">
+                          {lang === 'KO' ? '다음' : 'Next'} <ChevronRight className="w-4 h-4 ml-1" />
+                        </button>
+                      ) : (
+                        <button onClick={() => setGuideStep(0)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors">
+                          {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-4 h-4 ml-1" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex justify-between items-end gap-2 relative z-50">
+          <div className="flex-1">
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: "0 0 10px rgba(0, 242, 255, 0.4)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setGuideStep(1)}
+              className="group flex flex-col sm:flex-row items-center sm:items-start text-left px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-neon-cyan/10 to-transparent border border-neon-cyan/30 rounded-lg sm:rounded-full hover:bg-neon-cyan/20 transition-all text-white relative shadow-lg"
+            >
+              <div className="absolute inset-0 rounded-lg sm:rounded-full border border-neon-cyan/50 animate-pulse mix-blend-overlay"></div>
+              <div className="flex items-center gap-2 w-full">
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-neon-cyan group-hover:text-white transition-colors" />
+                <span className="text-xs sm:text-sm font-bold whitespace-nowrap text-neon-cyan group-hover:text-white transition-colors">
+                  {lang === 'KO' ? "사주가 처음이신가요?" : "New to BaZi?"}
+                </span>
+              </div>
+            </motion.button>
+          </div>
           <motion.button 
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowHanja(!showHanja)} 
-            className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors text-white/70"
+            className="text-xs px-3 py-1.5 sm:px-4 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors text-white/70 whitespace-nowrap whitespace-nowrap flex-shrink-0"
           >
             {showHanja ? (lang === 'KO' ? '한자 숨기기' : 'Hide Hanja') : (lang === 'KO' ? '한자 보기' : 'Show Hanja')}
           </motion.button>
         </div>
-        <div className="grid grid-cols-4 gap-0.5 sm:gap-2 md:gap-4 items-stretch">
+        <div className="grid grid-cols-4 gap-0.5 sm:gap-2 md:gap-4 items-stretch relative">
           {result.pillars.map((pillar, i) => {
             const lifeStage = BAZI_MAPPING.lifeStages[dayMaster as keyof typeof BAZI_MAPPING.lifeStages]?.[pillar.branch as keyof typeof BAZI_MAPPING.lifeStages[keyof typeof BAZI_MAPPING.lifeStages]];
             const branchData = BAZI_MAPPING.branches?.[pillar.branch as keyof typeof BAZI_MAPPING.branches];
@@ -1874,9 +1995,19 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
             const iljuData = isDayPillar ? ILJU_DESCRIPTIONS[pillar.hanja] : null;
 
+            // map guideStep (1:Year, 2:Month, 3:Day, 4:Hour) to index
+            // since index 0 is Hour, 1 is Day, 2 is Month, 3 is Year (assuming standard right-to-left config inside result.pillars array structure for korean bazi usually)
+            // But let's check pillar.title
+            const pillarGuideStep = pillar.title === 'Year' ? 1 : pillar.title === 'Month' ? 2 : pillar.title === 'Day' ? 3 : 4;
+            const isHighlighted = guideStep === pillarGuideStep;
+            const isDimmed = guideStep > 0 && !isHighlighted;
+
             return (
-              <div key={`pillar-${i}`} className="flex flex-col gap-1 sm:gap-2 h-full">
-                <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest ${isDayPillar ? 'text-neon-cyan' : 'text-white/40'}`}>
+              <div 
+                key={`pillar-${i}`} 
+                className={`flex flex-col gap-1 sm:gap-2 h-full transition-all duration-500 ease-in-out ${isHighlighted ? 'scale-105 z-50 shadow-[0_0_30px_rgba(255,255,255,0.2)]' : ''} ${isDimmed ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'}`}
+              >
+                <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest transition-colors ${isDayPillar || isHighlighted ? 'text-neon-cyan' : 'text-white/40'}`}>
                   {pillarName}
                 </div>
                 {/* Stem Card */}
@@ -2021,7 +2152,52 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
 
       {/* Grand Cycle Timeline */}
-      <div className="space-y-6">
+      <div className={`space-y-6 transition-all duration-500 ease-in-out relative ${guideStep === 5 ? 'scale-105 z-50 p-4 bg-black/40 border border-neon-cyan/40 rounded-2xl shadow-[0_0_30px_rgba(0,242,255,0.2)]' : ''} ${guideStep > 0 && guideStep !== 5 ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'}`}>
+        <AnimatePresence>
+          {guideStep === 5 && (
+            <motion.div 
+              key="guideStep5"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={`absolute left-0 right-0 z-[60] p-4 sm:p-6 rounded-2xl border border-neon-cyan/40 bg-goth-bg/95 shadow-[0_0_30px_rgba(0,242,255,0.3)] pointer-events-auto bottom-[100%] mb-4`}
+            >
+              <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </button>
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <div className="w-12 h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)]">
+                  <span className="text-2xl" role="img" aria-label="seasons">🌤️</span>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-base sm:text-lg font-bold text-neon-cyan mb-1 flex items-center gap-2">
+                    {lang === 'KO' ? '대운 (Daewun) - 내게 주어진 10년의 테마' : 'Daewun - The 10-Year Life Theme'}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-white/70">
+                      Step 5 / 5
+                    </span>
+                  </h4>
+                  <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+                    {lang === 'KO' ? '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요.' : 'Just like seasons change, this represents the shifting environment and theme you face every 10 years.'}
+                  </p>
+                  <div className="flex gap-2 justify-end w-full">
+                    <button onClick={() => setShowGuideDetailModal(true)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto">
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="w-4 h-4" />
+                        {lang === 'KO' ? '자세히 알아보기' : 'Learn More'}
+                      </span>
+                    </button>
+                    <button onClick={() => setGuideStep(4)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                      {lang === 'KO' ? '이전' : 'Prev'}
+                    </button>
+                    <button onClick={() => setGuideStep(0)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors">
+                      {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-4 h-4 ml-1" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <h3 className="text-xs font-display font-bold tracking-[0.4em] text-white/60 uppercase text-center flex items-center justify-center gap-2">
           {t.grandCycle}
           <BaziTooltip content={{ ko: "대운(환경): 10년 동안 내가 처한 '무대'야. 기존의 틀을 깨고 새로운 아이디어를 내놓아야 하는 환경 혹은 내 재능을 세상에 드러내야 하는 10년이지.\n세운(사건): 그 10년 중 올해 일어나는 '구체적인 사건'이야. 깊이 있는 공부, 문서 계약, 혹은 예리한 통찰력을 발휘할 일이 생겨.", en: "Life Seasons (Environment): The 'stage' you are in for 10 years. An environment where you need to break existing molds and propose new ideas, or a period to reveal your talents.\nSe-woon (Event): The 'specific event' that happens this year within those 10 years. Deep study, document contracts, or exercising sharp insight." }} lang={lang}>
@@ -2771,7 +2947,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             })}
                           </div>
                         ) : (
-                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 없어.' : 'No major divine stars present.'}</span>
+                          <span className="text-white/40 text-xs italic">{lang === 'KO' ? '해당되는 주요 신살이 있어.' : 'No major divine stars present.'}</span>
                         )}
                         
                         <div className="pt-2 border-t border-white/5">
@@ -2808,88 +2984,386 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       </div>
 
       {/* Tong-Gwan Yongshin Info Modal */}
-      <AnimatePresence>
-        {showTongGwanInfo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              onClick={() => setShowTongGwanInfo(false)}
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
-            >
-              <div className="p-6 space-y-6">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-xl font-bold text-neon-cyan">
-                    {lang === 'KO' ? '통관용신(通關用神)이란?' : 'What is Tong-Gwan (Mediating) Yongshin?'}
-                  </h3>
-                  <motion.button 
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setShowTongGwanInfo(false)} 
-                    className="text-white/50 hover:text-white transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </motion.button>
+      {showTongGwanInfo && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }} // might not work fully without AP, but avoids syntax crash
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowTongGwanInfo(false)}
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+          >
+            <div className="p-6 space-y-6">
+              <div className="flex justify-between items-start">
+                <h3 className="text-xl font-bold text-neon-cyan">
+                  {lang === 'KO' ? '통관용신(通關用神)이란?' : 'What is Tong-Gwan (Mediating) Yongshin?'}
+                </h3>
+                <button 
+                  onClick={() => setShowTongGwanInfo(false)} 
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="text-sm text-white/80 space-y-4 leading-relaxed">
+                <p>
+                  {lang === 'KO' 
+                    ? '대립하는 두 기운 사이를 이어주어 소통시키는 오행이야.' 
+                    : 'An element that bridges two opposing forces, enabling smooth energy flow.'}
+                </p>
+
+                <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
+                  <h4 className="font-bold text-white/90">{lang === 'KO' ? '예시 상황' : 'Example Scenario'}</h4>
+                  <ul className="space-y-2 text-xs">
+                    <li><span className="text-neon-pink font-bold">{lang === 'KO' ? '상황:' : 'Situation:'}</span> {lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</li>
+                    <li><span className="text-neon-cyan font-bold">{lang === 'KO' ? '처방:' : 'Prescription:'}</span> {lang === 'KO' ? '목(木) - 인성 필요' : 'Wood - Resource needed'}</li>
+                    <li><span className="text-green-400 font-bold">{lang === 'KO' ? '결과:' : 'Result:'}</span> {lang === 'KO' ? '수(水) → 목(木) → 화(火)' : 'Water → Wood → Fire'}</li>
+                  </ul>
                 </div>
-                
-                <div className="text-sm text-white/80 space-y-4 leading-relaxed">
-                  <p>
-                    {lang === 'KO' 
-                      ? '대립하는 두 기운 사이를 이어주어 소통시키는 오행이야.' 
-                      : 'An element that bridges two opposing forces, enabling smooth energy flow.'}
-                  </p>
 
-                  <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-3">
-                    <h4 className="font-bold text-white/90">{lang === 'KO' ? '예시 상황' : 'Example Scenario'}</h4>
-                    <ul className="space-y-2 text-xs">
-                      <li><span className="text-neon-pink font-bold">{lang === 'KO' ? '상황:' : 'Situation:'}</span> {lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</li>
-                      <li><span className="text-neon-cyan font-bold">{lang === 'KO' ? '처방:' : 'Prescription:'}</span> {lang === 'KO' ? '목(木) - 인성 필요' : 'Wood - Resource needed'}</li>
-                      <li><span className="text-green-400 font-bold">{lang === 'KO' ? '결과:' : 'Result:'}</span> {lang === 'KO' ? '수(水) → 목(木) → 화(火)' : 'Water → Wood → Fire'}</li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-white/90">{lang === 'KO' ? '대립하는 기운과 통관용신' : 'Clashing Elements & Mediators'}</h4>
-                    <div className="grid grid-cols-1 gap-2 text-xs">
-                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                        <span>{lang === 'KO' ? '목(木) ⚡ 토(土)' : 'Wood ⚡ Earth'}</span>
-                        <span className="text-red-400 font-bold">{lang === 'KO' ? '화(火)가 통관' : 'Fire mediates'}</span>
-                        <span className="text-white/40">{lang === 'KO' ? '(목→화→토)' : '(Wood→Fire→Earth)'}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                        <span>{lang === 'KO' ? '화(火) ⚡ 금(金)' : 'Fire ⚡ Metal'}</span>
-                        <span className="text-yellow-400 font-bold">{lang === 'KO' ? '토(土)가 통관' : 'Earth mediates'}</span>
-                        <span className="text-white/40">{lang === 'KO' ? '(화→토→금)' : '(Fire→Earth→Metal)'}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                        <span>{lang === 'KO' ? '토(土) ⚡ 수(水)' : 'Earth ⚡ Water'}</span>
-                        <span className="text-gray-300 font-bold">{lang === 'KO' ? '금(金)이 통관' : 'Metal mediates'}</span>
-                        <span className="text-white/40">{lang === 'KO' ? '(토→금→수)' : '(Earth→Metal→Water)'}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                        <span>{lang === 'KO' ? '금(金) ⚡ 목(木)' : 'Metal ⚡ Wood'}</span>
-                        <span className="text-blue-400 font-bold">{lang === 'KO' ? '수(水)가 통관' : 'Water mediates'}</span>
-                        <span className="text-white/40">{lang === 'KO' ? '(금→수→목)' : '(Metal→Water→Wood)'}</span>
-                      </div>
-                      <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                        <span>{lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</span>
-                        <span className="text-green-400 font-bold">{lang === 'KO' ? '목(木)이 통관' : 'Wood mediates'}</span>
-                        <span className="text-white/40">{lang === 'KO' ? '(수→목→화)' : '(Water→Wood→Fire)'}</span>
-                      </div>
+                <div className="space-y-2">
+                  <h4 className="font-bold text-white/90">{lang === 'KO' ? '대립하는 기운과 통관용신' : 'Clashing Elements & Mediators'}</h4>
+                  <div className="grid grid-cols-1 gap-2 text-xs">
+                    <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                      <span>{lang === 'KO' ? '목(木) ⚡ 토(土)' : 'Wood ⚡ Earth'}</span>
+                      <span className="text-red-400 font-bold">{lang === 'KO' ? '화(火)가 통관' : 'Fire mediates'}</span>
+                      <span className="text-white/40">{lang === 'KO' ? '(목→화→토)' : '(Wood→Fire→Earth)'}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                      <span>{lang === 'KO' ? '화(火) ⚡ 금(金)' : 'Fire ⚡ Metal'}</span>
+                      <span className="text-yellow-400 font-bold">{lang === 'KO' ? '토(土)가 통관' : 'Earth mediates'}</span>
+                      <span className="text-white/40">{lang === 'KO' ? '(화→토→금)' : '(Fire→Earth→Metal)'}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                      <span>{lang === 'KO' ? '토(土) ⚡ 수(水)' : 'Earth ⚡ Water'}</span>
+                      <span className="text-gray-300 font-bold">{lang === 'KO' ? '금(金)이 통관' : 'Metal mediates'}</span>
+                      <span className="text-white/40">{lang === 'KO' ? '(토→금→수)' : '(Earth→Metal→Water)'}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                      <span>{lang === 'KO' ? '금(金) ⚡ 목(木)' : 'Metal ⚡ Wood'}</span>
+                      <span className="text-blue-400 font-bold">{lang === 'KO' ? '수(水)가 통관' : 'Water mediates'}</span>
+                      <span className="text-white/40">{lang === 'KO' ? '(금→수→목)' : '(Metal→Water→Wood)'}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                      <span>{lang === 'KO' ? '수(水) ⚡ 화(火)' : 'Water ⚡ Fire'}</span>
+                      <span className="text-green-400 font-bold">{lang === 'KO' ? '목(木)이 통관' : 'Wood mediates'}</span>
+                      <span className="text-white/40">{lang === 'KO' ? '(수→목→화)' : '(Water→Wood→Fire)'}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>,
+        document.body
+      )}
+
+      {/* Guide Detail Modal */}
+      {showGuideDetailModal && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            onClick={() => setShowGuideDetailModal(false)}
+          />
+          
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-4xl max-h-[90vh] bg-gray-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-10"
+          >
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20 rounded-t-2xl">
+              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan drop-shadow-[0_0_10px_rgba(188,0,255,0.3)]">
+                {lang === 'KO' ? '사주명리학의 우주적 시선' : 'Cosmic Perspective of BaZi'}
+              </h3>
+              <button 
+                onClick={() => setShowGuideDetailModal(false)}
+                className="text-white/50 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-8 no-scrollbar">
+
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">1</span>
+                  {lang === 'KO' ? '생태계적 관점: 사주나무 (Cosmic Tree)' : 'Ecological View: The Cosmic Tree'}
+                </h4>
+                <div className="relative w-full aspect-square sm:aspect-video rounded-2xl bg-black/50 border border-white/10 flex flex-col items-center justify-end pb-4 sm:pb-8 overflow-hidden group">
+                  {/* Glowing background */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(74,222,128,0.1)_0%,transparent_70%)] opacity-50 group-hover:opacity-100 transition-opacity duration-1000"></div>
+
+                  {/* Canopy/Leaves */}
+                  <div className="relative w-48 h-48 sm:w-64 sm:h-64 mb-[-40px] sm:mb-[-60px] z-10 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-green-500/20 rounded-full blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
+                    <div className="absolute inset-8 bg-emerald-500/30 rounded-full blur-2xl animate-pulse"></div>
+                    
+                    {/* Flower (Day Pillar) */}
+                    <div className="absolute top-4 left-0 sm:top-10 sm:left-4 flex flex-col items-center">
+                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-pink-500/20 border border-pink-400/50 rounded-full flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-transform hover:scale-110 z-20">
+                          <span className="text-2xl sm:text-3xl">🌸</span>
+                       </div>
+                       <div className="mt-2 text-center bg-black/60 px-2 py-1 rounded-lg backdrop-blur-md border border-white/10">
+                         <span className="text-pink-400 font-bold block text-xs sm:text-sm">{lang === 'KO' ? '일주' : 'Day'}</span>
+                         <span className="text-white/60 text-[10px] sm:text-xs">{lang === 'KO' ? '꽃 (나)' : 'Flower (Me)'}</span>
+                       </div>
+                    </div>
+
+                    {/* Fruit (Hour Pillar) */}
+                    <div className="absolute top-4 right-0 sm:top-10 sm:right-4 flex flex-col items-center">
+                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/20 border border-yellow-400/50 rounded-full flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-transform hover:scale-110 z-20">
+                          <span className="text-2xl sm:text-3xl">🍏</span>
+                       </div>
+                       <div className="mt-2 text-center bg-black/60 px-2 py-1 rounded-lg backdrop-blur-md border border-white/10">
+                         <span className="text-yellow-400 font-bold block text-xs sm:text-sm">{lang === 'KO' ? '시주' : 'Hour'}</span>
+                         <span className="text-white/60 text-[10px] sm:text-xs">{lang === 'KO' ? '열매 (결과)' : 'Fruit (Result)'}</span>
+                       </div>
+                    </div>
+                  </div>
+
+                  {/* Trunk (Month Pillar) */}
+                  <div className="relative z-0 flex flex-col items-center">
+                    <div className="w-16 h-24 sm:w-24 sm:h-32 bg-gradient-to-b from-amber-900/80 to-stone-900/90 rounded-t-lg border-x border-t border-amber-700/50 flex flex-col items-center justify-center shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                       <div className="bg-black/60 px-2 py-1 rounded backdrop-blur-md border border-white/10 text-center">
+                         <span className="text-amber-500 font-bold text-xs sm:text-sm block">{lang === 'KO' ? '월주' : 'Month'}</span>
+                         <span className="text-white/60 text-[10px] sm:text-xs block leading-tight">{lang === 'KO' ? '기둥\n(환경)' : 'Trunk\n(Env)'}</span>
+                       </div>
+                    </div>
+                  </div>
+
+                  {/* Roots (Year Pillar) */}
+                  <div className="relative flex justify-center w-full mt-[-10px] sm:mt-[-15px] z-20">
+                     <svg className="absolute w-64 h-24 sm:w-96 sm:h-32 left-1/2 -translate-x-1/2 top-0 -z-10 text-amber-900/40" viewBox="0 0 200 100" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                       <path d="M100 0 C 100 40, 40 60, 20 90 M100 0 C 100 40, 80 70, 70 100 M100 0 C 100 40, 120 70, 130 100 M100 0 C 100 40, 160 60, 180 90" />
+                     </svg>
+                     <div className="mt-4 sm:mt-8 flex flex-col items-center bg-black/60 px-3 py-1 sm:px-4 sm:py-2 rounded-xl backdrop-blur-md border border-white/10">
+                       <span className="text-emerald-400 font-bold text-xs sm:text-sm">{lang === 'KO' ? '년주' : 'Year'}</span>
+                       <span className="text-white/60 text-[10px] sm:text-xs">{lang === 'KO' ? '뿌리 (조상/과거)' : 'Roots (Ancestry)'}</span>
+                     </div>
+                  </div>
+                </div>
+                <p className="text-sm leading-relaxed text-white/70">
+                  {lang === 'KO' ? 
+                    '사주는 단순한 텍스트가 아니라 우주적인 나무와 같습니다. 년주는 당신의 뿌리(유전, 과거)요, 월주는 자라나는 기둥(부모, 환경)입니다. 일주는 코어 아이덴티티이자 파트너를 뜻하는 꽃(Flower)이며, 시주는 노년과 성과를 뜻하는 열매(Fruit)입니다.' : 
+                    'BaZi (Four Pillars) can be compared to a cosmic tree. The Year Pillar is your roots (genetics, past), the Month Pillar is the trunk (parents, growing environment), the Day Pillar is the flower (core identity, spouse), and the Hour Pillar is the fruit (future, offspring).'}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-sm">2</span>
+                  {lang === 'KO' ? '시간의 파도: 대운 (Life Seasons)' : 'Waves of Time: Daewun'}
+                </h4>
+                <div className="relative w-full h-[250px] sm:h-[300px] overflow-hidden flex items-center justify-center bg-black/40 rounded-2xl border border-neon-purple/20">
+                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,rgba(188,0,255,0.2)_0%,transparent_70%)]"></div>
+                  
+                  {/* The Wave SVG */}
+                  <svg className="absolute w-[120%] sm:w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 200">
+                     {/* Horizontal Guide line */}
+                     <line x1="0" y1="100" x2="1000" y2="100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="5,5" />
+                     
+                     {/* Wave Path */}
+                     <path d="M -100 100 C 100 100, 100 30, 300 30 C 500 30, 500 170, 700 170 C 900 170, 900 100, 1100 100" fill="none" stroke="url(#wave-gradient)" strokeWidth="4" className="drop-shadow-[0_0_10px_rgba(188,0,255,0.5)]" />
+                     
+                     <defs>
+                        <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                           <stop offset="0%" stopColor="#4ade80" /> {/* Spring/Wood */}
+                           <stop offset="35%" stopColor="#f87171" /> {/* Summer/Fire */}
+                           <stop offset="75%" stopColor="#60a5fa" /> {/* Winter/Water */}
+                           <stop offset="100%" stopColor="#c084fc" /> 
+                        </linearGradient>
+                     </defs>
+                  </svg>
+
+                  {/* Nodes on the Wave */}
+                  <div className="absolute w-[120%] sm:w-full h-full">
+                     {/* 1. Spring (Growth) */}
+                     <div className="absolute top-[50%] left-[10%] sm:left-[20%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 transition-transform hover:scale-110">
+                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.5)] backdrop-blur-md mb-2">
+                         <span className="text-sm sm:text-lg">🌱</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                         <span className="text-green-400 font-bold block text-xs">{lang === 'KO' ? '성장기(봄)' : 'Growth(Spring)'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '씨앗이 발아하여\n뿌리를 내림' : 'Seeds sprout\nand take root'}</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                         <span className="text-green-400 font-bold block text-[10px]">{lang === 'KO' ? '봄' : 'Spring'}</span>
+                       </div>
+                     </div>
+
+                     {/* 2. Summer (Expansion) */}
+                     <div className="absolute top-[18%] left-[30%] sm:left-[40%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 transition-transform hover:scale-110">
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block mb-2">
+                         <span className="text-red-400 font-bold block text-xs">{lang === 'KO' ? '확장기(여름)' : 'Expansion(Summer)'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '꽃이 만개하고\n세력을 넓힘' : 'Flowers bloom\nand spread'}</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden mb-2">
+                         <span className="text-red-400 font-bold block text-[10px]">{lang === 'KO' ? '여름' : 'Summer'}</span>
+                       </div>
+                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500/20 border-2 border-red-400 flex items-center justify-center shadow-[0_0_15px_rgba(248,113,113,0.5)] backdrop-blur-md">
+                         <span className="text-sm sm:text-lg">🔥</span>
+                       </div>
+                     </div>
+
+                     {/* 3. Autumn (Harvest) */}
+                     <div className="absolute top-[50%] left-[50%] sm:left-[60%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 transition-transform hover:scale-110">
+                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.5)] backdrop-blur-md mb-2">
+                         <span className="text-sm sm:text-lg">🍂</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                         <span className="text-yellow-400 font-bold block text-xs">{lang === 'KO' ? '수확기(가을)' : 'Harvest(Autumn)'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '열매를 맺고\n결실을 거둠' : 'Bear fruit\nand harvest'}</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                         <span className="text-yellow-400 font-bold block text-[10px]">{lang === 'KO' ? '가을' : 'Autumn'}</span>
+                       </div>
+                     </div>
+
+                     {/* 4. Winter (Contraction) */}
+                     <div className="absolute top-[82%] left-[70%] sm:left-[80%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 transition-transform hover:scale-110">
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block mb-2">
+                         <span className="text-blue-400 font-bold block text-xs">{lang === 'KO' ? '수축기(겨울)' : 'Contraction(Winter)'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '생명력을 비축하며\n휴식함' : 'Rest and reserve\nvitality'}</span>
+                       </div>
+                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden mb-2">
+                         <span className="text-blue-400 font-bold block text-[10px]">{lang === 'KO' ? '겨울' : 'Winter'}</span>
+                       </div>
+                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(96,165,250,0.5)] backdrop-blur-md">
+                         <span className="text-sm sm:text-lg">❄️</span>
+                       </div>
+                     </div>
+                  </div>
+                </div>
+                <p className="text-sm leading-relaxed text-white/70">
+                  {lang === 'KO' ? 
+                    '태어날 때 받은 사주가 자동차라면, 대운(大運)은 그 자동차가 달리는 도로와 같습니다. 10년 단위로 바뀌는 이 운의 흐름에 따라 내게 유리한 환경이 오기도 하고, 폭풍우가 치기도 합니다. 사주 자체의 구조만큼이나 지금 내가 어느 계절을 지나는지가 중요합니다.' : 
+                    'If your BaZi chart is the vehicle you were born with, Daewun (10-year cycle) is the road you are driving on. This cycle changes every 10 years, shifting the environment like seasons. Recognizing which "season" you are passing through helps align your life strategy.'}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">3</span>
+                  {lang === 'KO' ? '오행과 글자의 물상 (Metaphors of Elements)' : 'Metaphors of the Five Elements'}
+                </h4>
+                <p className="text-sm leading-relaxed text-white/70 mb-4">
+                  {lang === 'KO' ? 
+                    '사주의 글자들은 단순한 기호가 아니라 자연의 모습(물상)과 직업/환경(업상)을 나타내는 상징입니다. 같은 쇠(金)라도 모양과 쓰임새가 다릅니다.' : 
+                    'The characters in BaZi are not just symbols but represent natural imagery (Metaphors) and occupational traits. Even within the same Metal (金) element, the shape and use differ.'}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-black/30 border border-[#00ea5e]/30 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 text-[#00ea5e] font-bold">
+                      <span className="text-xl">🌱</span> {lang === 'KO' ? '목 (Wood): 생명력, 기획' : 'Wood (木): Vitality, Planning'}
+                    </div>
+                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
+                      {lang === 'KO' ? (
+                        <>
+                          <li><strong className="text-white">갑(甲)/인(寅)</strong>: 하늘을 뚫고 솟는 거목. <span className="opacity-80">기획, 건축, 수직적 리더십</span></li>
+                          <li><strong className="text-white">을(乙)/묘(卯)</strong>: 끈질긴 생명력의 화초. <span className="opacity-80">교육, 기획, 유연한 네트워킹</span></li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong className="text-white">Jia(甲) / Yin(寅)</strong>: Tall tree piercing the sky. <span className="opacity-80">Planning, architecture, vertical leadership</span></li>
+                          <li><strong className="text-white">Yi(乙) / Mao(卯)</strong>: Flower/grass with tenacious vitality. <span className="opacity-80">Education, networking, flexible adaptation</span></li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-black/30 border border-[#ff4747]/30 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 text-[#ff4747] font-bold">
+                      <span className="text-xl">🔥</span> {lang === 'KO' ? '화 (Fire): 확산, 표현' : 'Fire (火): Expansion, Expression'}
+                    </div>
+                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
+                      {lang === 'KO' ? (
+                        <>
+                          <li><strong className="text-white">병(丙)/사(巳)</strong>: 만물을 비추는 태양, 공적인 열기. <span className="opacity-80">방송, 언론, 화려한 리더십</span></li>
+                          <li><strong className="text-white">정(丁)/오(午)</strong>: 세밀하고 집중된 열성, 등대. <span className="opacity-80">연구, IT, 종교, 철학</span></li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong className="text-white">Bing(丙) / Si(巳)</strong>: Sun shining on all things, public heat. <span className="opacity-80">Broadcasting, media, flashy leadership</span></li>
+                          <li><strong className="text-white">Ding(丁) / Wu(午)</strong>: Detailed and focused heat, lighthouse. <span className="opacity-80">Research, IT, religion, philosophy</span></li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-black/30 border border-[#f5b800]/30 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 text-[#f5b800] font-bold">
+                      <span className="text-xl">🪨</span> {lang === 'KO' ? '토 (Earth): 중재, 조절' : 'Earth (土): Mediation, Storage'}
+                    </div>
+                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
+                      {lang === 'KO' ? (
+                        <>
+                          <li><strong className="text-white">무(戊)</strong>: 모든 것을 품는 광활한 산. <span className="opacity-80">부동산, 무역, 포용력</span></li>
+                          <li><strong className="text-white">기(己)</strong>: 실속 있는 경작지, 정원. <span className="opacity-80">세밀한 관리, 농업, 보육</span></li>
+                          <li className="text-[10px] text-white/50">※ 지지(진술축미)는 각 계절의 환절기로 저장과 전환을 담당합니다.</li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong className="text-white">Wu(戊)</strong>: Vast mountain embracing everything. <span className="opacity-80">Real estate, trade, tolerance</span></li>
+                          <li><strong className="text-white">Ji(己)</strong>: Practical farmland, garden. <span className="opacity-80">Detailed management, agriculture, nurturing</span></li>
+                          <li className="text-[10px] text-white/50">※ The Earth branches (Chen, Xu, Chou, Wei) act as seasonal transitions, handling storage and transformation.</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-black/30 border border-[#d8d8d8]/30 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 text-[#d8d8d8] font-bold">
+                      <span className="text-xl">⚔️</span> {lang === 'KO' ? '금 (Metal): 분별, 수확' : 'Metal (金): Decision, Harvest'}
+                    </div>
+                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
+                      {lang === 'KO' ? (
+                        <>
+                          <li><strong className="text-white">경(庚)/신(申)</strong>: 가공되지 않은 바위나 무쇠. <span className="opacity-80">군경, 검찰, 중공업, 큰 결단</span></li>
+                          <li><strong className="text-white">신(辛)/유(酉)</strong>: 예리한 칼날, 정밀하게 세공된 보석. <span className="opacity-80">금융, 의료(수술), 정밀가공, 예민함</span></li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong className="text-white">Geng(庚) / Shen(申)</strong>: Unprocessed rock or raw iron. <span className="opacity-80">Military/police, heavy industry, major decisions</span></li>
+                          <li><strong className="text-white">Xin(辛) / You(酉)</strong>: Sharp blade, finely crafted jewelry. <span className="opacity-80">Finance, medical (surgery), precision processing, sensitivity</span></li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-black/30 border border-[#00bfff]/30 rounded-xl space-y-2 sm:col-span-2">
+                    <div className="flex items-center gap-2 text-[#00bfff] font-bold">
+                      <span className="text-xl">💧</span> {lang === 'KO' ? '수 (Water): 지혜, 흐름' : 'Water (水): Wisdom, Flow'}
+                    </div>
+                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
+                      {lang === 'KO' ? (
+                        <>
+                          <li><strong className="text-white">임(壬)/해(亥)</strong>: 대륙을 가로지르는 큰 강물, 바다. <span className="opacity-80">해운, 유통, 외교, 거대한 구상</span></li>
+                          <li><strong className="text-white">계(癸)/자(子)</strong>: 스며드는 비, 맑은 샘물, 정보. <span className="opacity-80">아이디어 기획, 철학, 내면적 사유</span></li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong className="text-white">Ren(壬) / Hai(亥)</strong>: Large river crossing the continent, ocean. <span className="opacity-80">Shipping, distribution, diplomacy, grand ideas</span></li>
+                          <li><strong className="text-white">Gui(癸) / Zi(子)</strong>: Seeping rain, clear spring water, information. <span className="opacity-80">Idea planning, philosophy, introspective thinking</span></li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </motion.div>
+        </div>,
+        document.body
+      )}
 
       {/* GeJu Help Modal */}
       <GeJuHelpModal

@@ -427,7 +427,7 @@ export default function App() {
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-36 h-40 bg-white/30 rounded-full blur-[25px] z-0" />
                     
                     <img 
-                      src="https://cdn.jsdelivr.net/gh/Taeyang1188/BAJI-Site-Project1@main/public/door.gif" 
+                      src="/door.gif" 
                       alt="Cosmic Door" 
                       className="w-[115%] h-[115%] max-w-none object-contain mix-blend-multiply relative z-10 -mt-6"
                       style={{

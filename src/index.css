@@ -13,23 +13,23 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-gothic: "UnifrakturMaguntia", serif;
   
-  --color-goth-bg: #0B0118;
-  --color-neon-pink: #FF007A;
-  --color-neon-cyan: #00F2FF;
-  --color-neon-purple: #BC00FF;
+  --color-goth-bg: #0B0416;
+  --color-neon-pink: #FA1E8E;
+  --color-neon-cyan: #05E6FF;
+  --color-neon-purple: #A52BFF;
 }
 
 body {
   background-color: var(--color-goth-bg);
-  color: #ffffff;
+  color: #F8FAFC;
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
 .goth-glass {
-  background: rgba(11, 1, 24, 0.6);
+  background: rgba(11, 4, 22, 0.6);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 0, 122, 0.2);
+  border: 1px solid rgba(250, 30, 142, 0.2);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -46,6 +46,11 @@ body {
 .neon-text-cyan {
   color: var(--color-neon-cyan);
   text-shadow: 0 0 5px var(--color-neon-cyan), 0 0 10px var(--color-neon-cyan);
+}
+
+.subtle-text {
+  color: #CBD5E1;
+  text-shadow: none;
 }
 
 .star-field {
