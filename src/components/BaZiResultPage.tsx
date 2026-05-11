@@ -3515,22 +3515,24 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   {/* Using exact viewBox 0 0 1000 200 to map percentages */}
                   <svg className="absolute w-full h-[70%]" preserveAspectRatio="none" viewBox="0 0 1000 200">
                      {/* Exact Symmetric Wave Path */}
-                     <path d="M 50 150 C 200 150, 350 30, 500 30 C 650 30, 800 150, 950 150" fill="none" stroke="url(#wave-gradient)" strokeWidth="4" className="drop-shadow-[0_0_10px_rgba(188,0,255,0.5)]" />
+                     <path d="M -166.7 30 C -55.6 30, 55.6 170, 166.7 170 C 277.8 170, 388.9 30, 500 30 C 611.1 30, 722.2 170, 833.3 170 C 944.4 170, 1055.6 30, 1166.7 30" fill="none" stroke="url(#wave-gradient)" strokeWidth="4" className="drop-shadow-[0_0_10px_rgba(188,0,255,0.5)]" />
                      
                      <defs>
                         <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                           <stop offset="0%" stopColor="#4ade80" /> {/* Spring/Wood */}
-                           <stop offset="40%" stopColor="#f87171" /> {/* Summer/Fire */}
-                           <stop offset="60%" stopColor="#facc15" /> {/* Autumn/Metal/Earth */}
-                           <stop offset="100%" stopColor="#60a5fa" /> {/* Winter/Water */}
+                           <stop offset="0%" stopColor="#4ade80" stopOpacity="0.5" />
+                           <stop offset="33.3%" stopColor="#4ade80" /> {/* Spring/Wood */}
+                           <stop offset="50%" stopColor="#f87171" /> {/* Summer/Fire */}
+                           <stop offset="66.7%" stopColor="#facc15" /> {/* Autumn/Metal/Earth */}
+                           <stop offset="83.3%" stopColor="#60a5fa" /> {/* Winter/Water */}
+                           <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.5" />
                         </linearGradient>
                      </defs>
                   </svg>
 
                   {/* Nodes on the Exact Calculated Positions of the Wave */}
                   <div className="absolute w-full h-[70%]">
-                     {/* 1. Spring (Growth): 27.5% left, 45% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '45%', left: '27.5%', transform: 'translate(-50%, -50%)' }}>
+                     {/* 1. Spring (Growth): 33.3% left, 50% top */}
+                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '33.3%', transform: 'translate(-50%, -50%)' }}>
                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.5)] backdrop-blur-md mb-2">
                          <span className="text-sm sm:text-lg">🌱</span>
                        </div>
@@ -3557,8 +3559,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        </div>
                      </div>
 
-                     {/* 3. Autumn (Harvest): 72.5% left, 45% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '45%', left: '72.5%', transform: 'translate(-50%, -50%)' }}>
+                     {/* 3. Autumn (Harvest): 66.7% left, 50% top */}
+                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '66.7%', transform: 'translate(-50%, -50%)' }}>
                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.5)] backdrop-blur-md mb-2">
                          <span className="text-sm sm:text-lg">🍂</span>
                        </div>
@@ -3571,8 +3573,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        </div>
                      </div>
 
-                     {/* 4. Winter (Contraction): 92% left, 75% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '75%', left: '92%', transform: 'translate(-50%, -50%)' }}>
+                     {/* 4. Winter (Contraction): 83.3% left, 85% top */}
+                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '85%', left: '83.3%', transform: 'translate(-50%, -50%)' }}>
                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(96,165,250,0.5)] backdrop-blur-md mb-2">
                          <span className="text-sm sm:text-lg">❄️</span>
                        </div>

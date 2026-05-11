@@ -101,9 +101,9 @@ const TimeInput = ({
     : inputValue;
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className={`relative flex-1 bg-white/5 border rounded-2xl py-2.5 pl-12 pr-2 text-base transition-all flex items-center ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
-        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+    <div className="flex gap-2 items-center w-full">
+      <div className={`flex-1 flex items-center bg-white/5 border rounded-2xl transition-all h-[44px] ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
+        <Clock className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
         
         <input 
           type="text"
@@ -120,14 +120,14 @@ const TimeInput = ({
             const padded = inputValue.padEnd(4, '0');
             handleInputChange(padded);
           }}
-          className="flex-1 bg-transparent text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
+          className="flex-1 min-w-0 bg-transparent px-3 h-full text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
           placeholder="00 : 00"
         />
 
         {!isUnknown && (
           <button 
             onClick={toggleAMPM}
-            className={`ml-auto px-3 py-1.5 rounded-xl text-[10px] font-black tracking-tighter transition-all shrink-0 ${isPM ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'}`}
+            className={`mr-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-tighter transition-all shrink-0 ${isPM ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'}`}
           >
             {isPM ? 'PM' : 'AM'}
           </button>
@@ -135,7 +135,7 @@ const TimeInput = ({
       </div>
       <button
         onClick={() => onUnknownChange(!isUnknown)}
-        className={`px-3 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap border ${isUnknown ? 'bg-neon-pink text-white border-neon-pink shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/80'}`}
+        className={`shrink-0 px-3 flex items-center justify-center rounded-2xl text-xs font-bold transition-all whitespace-nowrap border h-[44px] ${isUnknown ? 'bg-neon-pink text-white border-neon-pink shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/80'}`}
       >
         {lang === 'KO' ? '모름' : 'Unknown'}
       </button>
@@ -539,14 +539,14 @@ export default function App() {
                     />
 
                     {/* Name */}
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink" />
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all h-[44px]">
+                      <User className="ml-4 w-4 h-4 text-neon-pink shrink-0" />
                       <input 
                         type="text"
                         placeholder={t.input.name}
                         value={userInput.name}
                         onChange={(e) => setUserInput({ ...userInput, name: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="flex-1 bg-transparent px-3 py-1 h-full text-base focus:outline-none placeholder:text-white/20 min-w-0"
                       />
                     </div>
 
@@ -555,26 +555,26 @@ export default function App() {
                       <>
                         {/* Date Row (KO) */}
                         <div className="flex gap-2 items-center">
-                          <div className="relative flex-1">
-                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+                          <div className="flex-1 flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all min-w-0 h-[44px]">
+                            <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                             <input 
                               type="date"
                               required
                               value={userInput.birthDate}
                               onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                              className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                              className="flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert min-w-0 m-0"
                             />
                           </div>
-                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[44px] items-center">
+                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[44px] items-center shrink-0">
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                              className={`px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                              className={`flex-1 h-full px-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.solar}
                             </button>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                              className={`px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                              className={`flex-1 h-full px-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.lunar}
                             </button>
@@ -592,14 +592,14 @@ export default function App() {
                     ) : (
                       /* Date & Time Section (EN) */
                       <>
-                        <div className="relative">
-                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+                        <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all h-[44px]">
+                          <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                           <input 
                             type="date"
                             required
                             value={userInput.birthDate}
                             onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                            className="flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert min-w-0"
                           />
                         </div>
                         <TimeInput 
@@ -647,15 +647,15 @@ export default function App() {
                     </div>
 
                     {/* City */}
-                    <div className="relative">
-                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink" />
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all relative">
+                      <Globe className="ml-4 w-4 h-4 text-neon-pink shrink-0" />
                       <input 
                         ref={inputRef}
                         type="text"
                         placeholder={t.input.city}
                         value={userInput.city}
                         onChange={(e) => setUserInput({ ...userInput, city: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="flex-1 bg-transparent py-2.5 pl-3 pr-4 text-base focus:outline-none placeholder:text-white/20 min-w-0"
                       />
                       <AnimatePresence>
                         {isLocationSynced && (
@@ -663,7 +663,7 @@ export default function App() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0 }}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neon-cyan uppercase"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neon-cyan uppercase pointer-events-none"
                           >
                             {t.nav.synced}
                           </motion.div>
