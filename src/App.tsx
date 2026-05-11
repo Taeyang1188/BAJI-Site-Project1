@@ -13,9 +13,22 @@ import BaZiResultPage from './components/BaZiResultPage';
 
 import { calculateRealBaZi } from './services/bazi-service';
 
+import doorGif from './assets/door.gif';
 import { useMemo, useRef } from 'react';
 
-const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: string) => void, lang: Language }) => {
+const TimeInput = ({ 
+  value, 
+  isUnknown,
+  onChange, 
+  onUnknownChange,
+  lang 
+}: { 
+  value: string, 
+  isUnknown?: boolean,
+  onChange: (v: string) => void, 
+  onUnknownChange: (u: boolean) => void,
+  lang: Language 
+}) => {
   // value is HH:MM (24h)
   const [hour24, minute24] = value.split(':');
   const h24 = parseInt(hour24);
@@ -66,6 +79,7 @@ const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: str
 
       const formatted = `${finalH24.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
       onChange(formatted);
+      if (isUnknown) onUnknownChange(false);
     }
   };
 
@@ -78,6 +92,7 @@ const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: str
     }
     const formatted = `${finalH24.toString().padStart(2, '0')}:${minute24}`;
     onChange(formatted);
+    if (isUnknown) onUnknownChange(false);
   };
 
   // Format display for the input: "HH : MM"
@@ -86,29 +101,43 @@ const TimeInput = ({ value, onChange, lang }: { value: string, onChange: (v: str
     : inputValue;
 
   return (
-    <div className="relative w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-2 text-sm focus-within:border-neon-pink transition-all flex items-center">
-      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
-      
-      <input 
-        type="text"
-        inputMode="numeric"
-        value={displayString}
-        onChange={(e) => handleInputChange(e.target.value)}
-        onFocus={(e) => e.target.select()}
-        onBlur={() => {
-          // Ensure 4 digits on blur
-          const padded = inputValue.padEnd(4, '0');
-          handleInputChange(padded);
-        }}
-        className="flex-1 bg-transparent text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
-        placeholder="00 : 00"
-      />
+    <div className="flex gap-2 items-center">
+      <div className={`relative flex-1 bg-white/5 border rounded-2xl py-2.5 pl-12 pr-2 text-base transition-all flex items-center ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
+        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
+        
+        <input 
+          type="text"
+          inputMode="numeric"
+          value={isUnknown ? (lang === 'KO' ? '모름' : 'Unknown') : displayString}
+          onChange={(e) => {
+            if (isUnknown) onUnknownChange(false);
+            handleInputChange(e.target.value);
+          }}
+          onFocus={(e) => e.target.select()}
+          onBlur={() => {
+            if (isUnknown) return;
+            // Ensure 4 digits on blur
+            const padded = inputValue.padEnd(4, '0');
+            handleInputChange(padded);
+          }}
+          className="flex-1 bg-transparent text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
+          placeholder="00 : 00"
+        />
 
-      <button 
-        onClick={toggleAMPM}
-        className={`ml-auto px-3 py-1.5 rounded-xl text-[10px] font-black tracking-tighter transition-all shrink-0 ${isPM ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'}`}
+        {!isUnknown && (
+          <button 
+            onClick={toggleAMPM}
+            className={`ml-auto px-3 py-1.5 rounded-xl text-[10px] font-black tracking-tighter transition-all shrink-0 ${isPM ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'}`}
+          >
+            {isPM ? 'PM' : 'AM'}
+          </button>
+        )}
+      </div>
+      <button
+        onClick={() => onUnknownChange(!isUnknown)}
+        className={`px-3 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap border ${isUnknown ? 'bg-neon-pink text-white border-neon-pink shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/80'}`}
       >
-        {isPM ? 'PM' : 'AM'}
+        {lang === 'KO' ? '모름' : 'Unknown'}
       </button>
     </div>
   );
@@ -427,7 +456,7 @@ export default function App() {
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-36 h-40 bg-white/30 rounded-full blur-[25px] z-0" />
                     
                     <img 
-                      src={`${import.meta.env.BASE_URL}door.gif`} 
+                      src={doorGif} 
                       alt="Cosmic Door" 
                       className="w-[115%] h-[115%] max-w-none object-contain mix-blend-multiply relative z-10 -mt-6"
                       style={{
@@ -517,7 +546,7 @@ export default function App() {
                         placeholder={t.input.name}
                         value={userInput.name}
                         onChange={(e) => setUserInput({ ...userInput, name: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
                       />
                     </div>
 
@@ -529,49 +558,23 @@ export default function App() {
                           <div className="relative flex-1">
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
                             <input 
-                              type="text"
-                              placeholder="YYYY-MM-DD"
+                              type="date"
+                              required
                               value={userInput.birthDate}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                const prev = userInput.birthDate;
-                                const isDeleting = val.length < prev.length;
-                                let formatted = val;
-
-                                if (isDeleting) {
-                                  if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
-                                    formatted = val.slice(0, -1);
-                                  }
-                                } else {
-                                  const digits = val.replace(/\D/g, '');
-                                  if (digits.length <= 4) {
-                                    formatted = digits;
-                                    if (digits.length === 4) formatted += '-';
-                                  } else if (digits.length <= 6) {
-                                    formatted = digits.slice(0, 4) + '-' + digits.slice(4);
-                                    if (digits.length === 6) formatted += '-';
-                                  } else {
-                                    formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
-                                  }
-                                }
-
-                                if (formatted.length <= 10) {
-                                  setUserInput({ ...userInput, birthDate: formatted });
-                                }
-                              }}
-                              className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                              onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
                             />
                           </div>
-                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[42px] items-center">
+                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[44px] items-center">
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                              className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                              className={`px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.solar}
                             </button>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                              className={`px-2 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                              className={`px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                             >
                               {t.input.lunar}
                             </button>
@@ -580,6 +583,8 @@ export default function App() {
                         {/* Time Row (KO) */}
                         <TimeInput 
                           value={userInput.birthTime}
+                          isUnknown={userInput.isTimeUnknown}
+                          onUnknownChange={(u) => setUserInput({ ...userInput, isTimeUnknown: u })}
                           onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
                           lang={lang}
                         />
@@ -590,41 +595,17 @@ export default function App() {
                         <div className="relative">
                           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neon-pink pointer-events-none" />
                           <input 
-                            type="text"
-                            placeholder="YYYY-MM-DD"
+                            type="date"
+                            required
                             value={userInput.birthDate}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              const prev = userInput.birthDate;
-                              const isDeleting = val.length < prev.length;
-                              let formatted = val;
-
-                              if (isDeleting) {
-                                if (prev.endsWith('-') && (val.length === 4 || val.length === 7)) {
-                                  formatted = val.slice(0, -1);
-                                }
-                              } else {
-                                const digits = val.replace(/\D/g, '');
-                                if (digits.length <= 4) {
-                                  formatted = digits;
-                                  if (digits.length === 4) formatted += '-';
-                                } else if (digits.length <= 6) {
-                                  formatted = digits.slice(0, 4) + '-' + digits.slice(4);
-                                  if (digits.length === 6) formatted += '-';
-                                } else {
-                                  formatted = digits.slice(0, 4) + '-' + digits.slice(4, 6) + '-' + digits.slice(6);
-                                }
-                              }
-
-                              if (formatted.length <= 10) {
-                                setUserInput({ ...userInput, birthDate: formatted });
-                              }
-                            }}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                            onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base font-mono tracking-[0.1em] focus:outline-none focus:border-neon-pink transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
                           />
                         </div>
                         <TimeInput 
                           value={userInput.birthTime}
+                          isUnknown={userInput.isTimeUnknown}
+                          onUnknownChange={(u) => setUserInput({ ...userInput, isTimeUnknown: u })}
                           onChange={(v) => setUserInput({ ...userInput, birthTime: v })}
                           lang={lang}
                         />
@@ -635,30 +616,30 @@ export default function App() {
                     <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl">
                       <div className="flex items-center gap-1.5 pl-2 border-r border-white/10 pr-2">
                         <User className="w-3.5 h-3.5 text-neon-pink" />
-                        <span className="text-[9px] font-bold tracking-widest text-white/40 uppercase whitespace-nowrap">{t.input.gender}</span>
+                        <span className="text-[10px] sm:text-xs font-bold tracking-widest text-white/40 uppercase whitespace-nowrap">{t.input.gender}</span>
                       </div>
                       <div className="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar">
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'male' })}
-                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.male}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'female' })}
-                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'female' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'female' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.female}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'non-binary' })}
-                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.nonBinary}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'prefer-not-to-tell' })}
-                          className={`px-2.5 py-1 rounded-xl text-[9px] font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
                         >
                           {t.input.preferNotToTell}
                         </button>
@@ -674,7 +655,7 @@ export default function App() {
                         placeholder={t.input.city}
                         value={userInput.city}
                         onChange={(e) => setUserInput({ ...userInput, city: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 pl-12 pr-4 text-base focus:outline-none focus:border-neon-pink transition-all placeholder:text-white/20"
                       />
                       <AnimatePresence>
                         {isLocationSynced && (
@@ -690,18 +671,20 @@ export default function App() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Social Context (Optional) */}
                     <div className="relative flex flex-col gap-1.5 mt-2">
-                       <label className="text-[10px] text-white/50 pl-2 uppercase font-mono">{lang === 'KO' ? '사회적 환경 (선택)' : 'Social Context (Optional)'}</label>
+                       <label className="text-xs text-white/50 pl-2 uppercase font-mono">{lang === 'KO' ? '사회적 환경 (선택)' : 'Social Context (Optional)'}</label>
                        <select 
                           value={userInput.socialContext || 'none'}
                           onChange={(e) => setUserInput({ ...userInput, socialContext: e.target.value as any })}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-4 text-sm focus:outline-none focus:border-neon-pink transition-all text-white/80 appearance-none"
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-4 text-base focus:outline-none focus:border-neon-pink transition-all text-white/80 appearance-none"
                        >
                          <option value="none" className="bg-black text-white">{lang === 'KO' ? '선택 안함' : 'None'}</option>
                          <option value="military_public" className="bg-black text-white">{lang === 'KO' ? '군인/경찰/공무원' : 'Military/Public Service'}</option>
                          <option value="corporate" className="bg-black text-white">{lang === 'KO' ? '일반 직장인' : 'Corporate Employee'}</option>
                          <option value="business_freelance" className="bg-black text-white">{lang === 'KO' ? '사업/프리랜서' : 'Business/Freelance'}</option>
+                         <option value="professional_it" className="bg-black text-white">{lang === 'KO' ? '전문직/IT' : 'Professional/IT'}</option>
+                         <option value="education" className="bg-black text-white">{lang === 'KO' ? '교육/교직' : 'Education/Teaching'}</option>
+                         <option value="arts_creative" className="bg-black text-white">{lang === 'KO' ? '예술/창작' : 'Arts/Creative'}</option>
                          <option value="student" className="bg-black text-white">{lang === 'KO' ? '학생/취업준비' : 'Student/Job Seeker'}</option>
                        </select>
                     </div>

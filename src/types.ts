@@ -1,7 +1,7 @@
 
 export type Language = 'KO' | 'EN';
 
-export type SocialContext = 'military_public' | 'corporate' | 'business_freelance' | 'student' | 'none';
+export type SocialContext = 'military_public' | 'corporate' | 'business_freelance' | 'student' | 'education' | 'professional_it' | 'arts_creative' | 'none';
 
 export type JudgmentGrade = 'A' | 'B' | 'C';
 
@@ -49,6 +49,7 @@ export interface UserInput {
   name: string;
   birthDate: string;
   birthTime: string;
+  isTimeUnknown?: boolean;
   city: string;
   gender?: 'male' | 'female' | 'non-binary' | 'prefer-not-to-tell';
   calendarType?: 'solar' | 'lunar';
@@ -57,6 +58,7 @@ export interface UserInput {
 
 export interface BaZiCard {
   title: string;
+  isUnknown?: boolean;
   hanja: string;
   stem: string;
   branch: string;
@@ -164,6 +166,7 @@ export interface PersonaNode {
 }
 
 export interface BaZiResult {
+  isTimeUnknown?: boolean;
   pillars: BaZiCard[];
   grandCycles: GrandCycle[];
   currentCycleIndex: number;
@@ -194,6 +197,7 @@ export interface BaZiResult {
     };
     muJaRon?: { title: string; description: string; enDescription: string }[];
     daJaRon?: { title: string; description: string; enDescription: string }[];
+    specialPatterns?: { code: string; name: string; rarity: string; effect: string; enName: string; enEffect: string }[];
     shinGangShinYak?: { 
       isStrong: boolean;
       title: string; 

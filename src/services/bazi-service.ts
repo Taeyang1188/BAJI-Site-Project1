@@ -2,7 +2,7 @@ import { Solar, Lunar, EightChar } from 'lunar-typescript';
 import { DateTime } from 'luxon';
 import { UserInput, BaZiResult, BaZiCard, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
-import { calculateGeJu, calculateTenGodsRatio, determineStructure } from './bazi-analysis';
+import { calculateGeJu, calculateTenGodsRatio, determineStructure, detectSpecialPatterns } from './bazi-analysis';
 import { calculateInteractions as calculateDetailedInteractions } from './bazi-interactions';
 import { detectShinsal } from './bazi-shinsal';
 import { calcDayMasterStrength, determineYongshin, checkByeongYak, checkTongGwan, analyzeSpecialStructure } from './bazi-yongshin';
@@ -147,7 +147,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const timeZhi = baZi.getTimeZhi();
   
   const pillarsRaw = [
-    { title: 'Hour', stem: timeGan, branch: timeZhi },
+    { title: 'Hour', stem: timeGan, branch: timeZhi, isUnknown: input.isTimeUnknown },
     { title: 'Day', stem: dayGan, branch: dayZhi },
     { title: 'Month', stem: baZi.getMonthGan(), branch: baZi.getMonthZhi() },
     { title: 'Year', stem: baZi.getYearGan(), branch: baZi.getYearZhi() },
@@ -172,6 +172,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     
     return {
       title: p.title,
+      isUnknown: p.isUnknown,
       hanja: `${p.stem}${p.branch}`,
       stem: p.stem,
       branch: p.branch,
@@ -388,6 +389,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   
   // New detailed calculations
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
+  const specialPatterns = detectSpecialPatterns(allStems, allBranches, lang);
   const strength = calcDayMasterStrength(allStems, allBranches);
   const geJuResult = calculateGeJu(dayGan, monthZhi, allStems, allBranches, strength.elementScores, lang);
   const geJu = geJuResult.geJu;
@@ -480,6 +482,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const balanceWarnings = calculateBalanceWarnings(elementRatios, tenGodsRatio, dmElement, lang);
   
   return {
+    isTimeUnknown: input.isTimeUnknown,
     pillars,
     grandCycles,
     currentCycleIndex,
@@ -497,6 +500,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
       dayMasterStrength: strength,
       yongshinDetail,
       structureDetail,
+      specialPatterns,
       elementRatios,
       balanceWarnings,
       ...advancedAnalysis

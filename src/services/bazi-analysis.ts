@@ -401,3 +401,91 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
 
   return ratio;
 };
+
+export const detectSpecialPatterns = (stems: string[], branches: string[], lang: string) => {
+  const patterns: { code: string; name: string; rarity: string; effect: string; enName: string; enEffect: string }[] = [];
+
+  if (stems.length !== 4 || branches.length !== 4) return patterns;
+
+  // 천원일기격 (天元一氣) / 천지동도격
+  if (stems.every(s => s === stems[0])) {
+    const isJiWon = branches.every(b => b === branches[0]);
+    if (isJiWon) {
+      patterns.push({
+        code: "cheon_ji_dong_do",
+        name: "천지동도격(天地同道格)",
+        rarity: "LEGEND",
+        effect: "하늘과 땅의 기운이 완벽히 일치하여 평범함을 거부하는 독보적인 삶의 궤적을 그립니다.",
+        enName: "Heaven-Earth Integration (Cheon-Ji-Dong-Do)",
+        enEffect: "Heaven and earth energies are perfectly aligned, creating an unmatched and absolute life trajectory."
+      });
+    } else {
+      patterns.push({
+        code: "cheon_won_il_gi",
+        name: "천원일기격(天元一氣格)",
+        rarity: "SSR",
+        effect: `천간의 기운이 ${stems[0]}으로 통일되어 타협 없는 고집과 강력한 추진력이 극대화됩니다.`,
+        enName: "Single Heavenly Energy (Cheon-Won-Il-Gi)",
+        enEffect: `The heavenly stems are unified with ${stems[0]}, maximizing uncompromising stubbornness and intense driving force.`
+      });
+    }
+  } else if (branches.every(b => b === branches[0])) {
+    patterns.push({
+      code: "ji_won_il_gi",
+      name: "지원일기격(地元一氣格)",
+      rarity: "SSR",
+      effect: `지지가 모두 ${branches[0]}로 통일되어 환경적 고집과 한 가지 분야의 압도적인 장인 정신이 강화됩니다.`,
+      enName: "Single Earthly Energy (Ji-Won-Il-Gi)",
+      enEffect: `The earthly branches are unified with ${branches[0]}, enhancing environmental persistence and overwhelming craftsmanship in one field.`
+    });
+  }
+
+  // 양간지지격
+  const uniqueStems = [...new Set(stems)];
+  const uniqueBranches = [...new Set(branches)];
+  if (uniqueStems.length === 2 && stems.filter(s => s === uniqueStems[0]).length === 2 &&
+      uniqueBranches.length === 2 && branches.filter(b => b === uniqueBranches[0]).length === 2) {
+    patterns.push({
+      code: "yang_gan_ji_ji",
+      name: "양간지지격(兩干支格)",
+      rarity: "SR",
+      effect: "삶의 이중성을 이해하고, 두 가지의 전문 분야를 동시에 능숙하게 다루는 탁월한 재능이 돋보입니다.",
+      enName: "Dual Pillar Resonance",
+      enEffect: "Provides an exceptional ability to handle two distinct domains simultaneously, balancing the dualities of life."
+    });
+  }
+
+  // 천지덕합
+  const hasStemComb = (s1: string, s2: string) => {
+    const sArray = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const idx1 = sArray.indexOf(s1);
+    const idx2 = sArray.indexOf(s2);
+    return Math.abs(idx1 - idx2) === 5;
+  };
+  
+  const hasBranchComb = (b1: string, b2: string) => {
+    const bArray = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    const idx1 = bArray.indexOf(b1);
+    const idx2 = bArray.indexOf(b2);
+    if (idx1 === -1 || idx2 === -1) return false;
+    const sum = idx1 + idx2;
+    return sum === 1 || sum === 13;
+  };
+
+  const isYearMonthComb = hasStemComb(stems[0], stems[1]) && hasBranchComb(branches[0], branches[1]);
+  const isMonthDayComb = hasStemComb(stems[1], stems[2]) && hasBranchComb(branches[1], branches[2]);
+  const isDayHourComb = hasStemComb(stems[2], stems[3]) && hasBranchComb(branches[2], branches[3]);
+
+  if (isYearMonthComb || isMonthDayComb || isDayHourComb) {
+    patterns.push({
+      code: "cheon_ji_deok_hap",
+      name: "천지덕합격(天地德合格)",
+      rarity: "SR",
+      effect: "천간합과 지지합이 일치하여 대인관계의 완벽한 조화, 강력한 귀인의 조력, 매력과 사교성이 빛납니다.",
+      enName: "Heaven-Earth Virtuous Harmony",
+      enEffect: "Provides perfect harmony in personal relationships, assistance from noble benefactors, and overwhelming charm and sociability."
+    });
+  }
+
+  return patterns;
+};

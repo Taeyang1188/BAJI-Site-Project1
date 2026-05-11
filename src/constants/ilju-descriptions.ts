@@ -367,7 +367,9 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
   "壬寅": { 
     ko: "임인일주는 진취적이고 활동적이야. 밝은 미래를 향해 나아가는 긍정적인 에너지와 리더십이 돋보이지.", 
     en: "Im-in is enterprising and active. Your positive energy and leadership are impressive.",
-    impression: "추진력이 꽤 시원시원하네. 복잡하게 생각 안 하고 일단 저지르고 보는 타입이지?"
+    impression: "추진력이 꽤 시원시원하네. 복잡하게 생각 안 하고 일단 저지르고 보는 타입이지?",
+    cardBg: "https://i.imgur.com/R7fduL6.png",
+    detailImg: "https://i.imgur.com/Lg1hHFR.png"
   },
   "壬子": { 
     ko: "임자일주는 주관이 매우 강하고 총명해. 깊은 바다처럼 속을 알 수 없는 신비로움과 강한 뚝심이 있지.", 

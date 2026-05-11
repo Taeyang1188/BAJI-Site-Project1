@@ -202,6 +202,15 @@ export function generateCycleVibe(
   const iljuInfo = ILJU_DESCRIPTIONS[ilju as keyof typeof ILJU_DESCRIPTIONS] || { ko: '', en: '', impression: '' };
   const iljuImpression = lang === 'KO' ? iljuInfo.impression : '';
 
+  let missingTimeInsight = '';
+  if (result.isTimeUnknown) {
+    if (lang === 'KO') {
+      missingTimeInsight = `잠깐, 네가 태어난 시간을 모른다고 했지? 명리학에서 시주는 미래와 자녀, 그리고 말년의 운을 나타내는 중요한 단서야. 지금 보여주는 건 시주가 제외된 '삼주' 기준의 흐름이라 원래의 네 '완성된 운명'과는 조금 다를 수 있어. 하지만 현재 알 수 있는 기운만으로도 충분히 많은 걸 읽어낼 수 있으니 일단 따라와봐. [delay:2000]\n\n`;
+    } else {
+      missingTimeInsight = `Wait, you didn't provide your exact birth time? In the cosmic blueprint, the 'Time Pillar' rules your future, subordinates, and late-life fortune. What you're seeing is a 'Three-Pillar' estimate. Your true fate might have a different twist once you find your exact time. Still, the foundation we have is enough to pull some serious insights. Let's go. [delay:2000]\n\n`;
+    }
+  }
+
   // 1. Intro: Birthplace Insight
   let cityInsight = '';
   if (lang === 'KO') {
@@ -383,7 +392,7 @@ ${combos[0].desc} ${combos[1].desc}`;
       introPrefix = `흠.. `;
     }
 
-    intro = `${introPrefix}${impression} 
+    intro = `${missingTimeInsight}${introPrefix}${impression} 
 게다가 ${strengthComment} ${geJuComment}
 
 ${elementComment} ${balanceComment} 
@@ -415,7 +424,7 @@ Anyway.. `;
 
     const enIljuDesc = iljuInfo.en.replace(/^([A-Za-z-]+)/, "$1, which is your Day Pillar representing your core self,");
 
-    intro = `${enCityGreeting}${enIljuDesc} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
+    intro = `${missingTimeInsight}${enCityGreeting}${enIljuDesc} ${enSpecialGreeting}Plus, you have ${isSinGang ? 'plenty of' : isNeutral ? 'balanced' : 'delicate'} energy. Your unique color will definitely shine.`;
   }
 
   // 4. Cycle Intro Construction
@@ -1179,11 +1188,19 @@ ${detailedEffect}`;
         ? `${currentYearIntro}인프라의 한계 내에서 무난하게 돌아가는 흐름이야. 이럴 땐 일확천금보다는 시스템에 맞춰 차곡차곡 모아가는 재미를 느껴봐.\n`
         : `${currentYearIntro}flows ordinarily within your given infrastructure. Follow your plans for steady accumulation.\n`;
     } else {
-      report += lang === 'KO'
-        ? `${currentYearIntro}시스템의 과부하로 재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹(트래픽 초과)이 강할 수 있어.\n\n`
-          + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n`
-        : `${currentYearIntro}brings a system overload with a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
-          + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n`;
+      if (daewunScore >= 40) {
+        report += lang === 'KO'
+          ? `다만... ${currentYearIntro}앞서 시스템이 과부하된 탓으로 재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹(트래픽 초과)이 강할 수 있어.\n\n`
+            + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n`
+          : `However... ${currentYearIntro}brings a system overload with a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
+            + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n`;
+      } else {
+        report += lang === 'KO'
+          ? `${currentYearIntro}시스템의 과부하로 재물운이 잠시 쉬어가는 흐름이야. 예상치 못한 지출이나 충동구매의 유혹(트래픽 초과)이 강할 수 있어.\n\n`
+            + `[액땜 꿀팁] 큰 돈이 나갈 뻔한 위기를 '나를 위한 자기계발 투자'나 '오래 쓸 수 있는 좋은 물건 구매'로 스스로 돈의 흐름을 긍정적으로 바꿔보는(액땜) 걸 추천해. 어차피 나갈 돈이라면 가치 있게 쓰는 거지!\n`
+          : `${currentYearIntro}brings a system overload with a pause in wealth luck. Watch out for unexpected expenses.\n\n` 
+            + `[Remedy] Consider "warding off" bad luck by actively spending on self-development. If money must flow out, make it valuable for your future!\n`;
+      }
     }
 
     if (hasSelfPunishment) {
@@ -1257,9 +1274,13 @@ ${detailedEffect}`;
     const movingType = interactionsData?.movingType || 'moving_house';
     const movingContext = interactionsData?.movingContext || socialContext || 'none';
     
-    const isMilitary = movingContext === 'military';
-    const isPublic = movingContext === 'public' || movingContext === 'corporate';
-    const isBusiness = movingContext === 'business' || movingContext === 'freelancer';
+    const isMilitary = movingContext === 'military_public';
+    const isPublic = movingContext === 'corporate' || movingContext === 'public'; // fallback public
+    const isBusiness = movingContext === 'business_freelance';
+    const isStudent = movingContext === 'student';
+    const isArtsCreative = movingContext === 'arts_creative';
+    const isProfessionalIT = movingContext === 'professional_it';
+    const isEducation = movingContext === 'education';
 
     const luckGodsStr = luckGods.join(' ');
     const hasBiGyeopYear = luckGodsStr.includes('비견') || luckGodsStr.includes('겁재');
@@ -1297,9 +1318,17 @@ ${detailedEffect}`;
         finalVerdict = lang === 'KO' ? "탈주(전역/퇴사)보다는 현재 궤도 내의 전술적 이동이 강력히 요구되는 시점이야." : "Tactical movement within orbit is strongly required over escape.";
         altAction = lang === 'KO' ? "군/경/소방 등 거대한 '안전 울타리'를 벗어나는 건 방패의 상실을 의미해. 차라리 장기 교육, 파견, 보직 변경으로 기운을 해소하는 생존 전략을 짜봐." : "Use internal dispatches or position changes instead of quitting.";
       } else if (isPublic) {
-        altAction = lang === 'KO' ? "공공기관/대기업은 한 번 궤도를 이탈하면 재진입이 어려워. 욱하는 ма음에 사표를 던지기보단 휴직이나 연수, 파견 등으로 합법적인 '잠수'를 타는 전략을 써봐." : "Public/Corp systems are hard to re-enter. Use options like long-term training or leave of absence.";
+        altAction = lang === 'KO' ? "공공기관/대기업은 한 번 궤도를 이탈하면 재진입이 어려워. 욱하는 마음에 사표를 던지기보단 휴직이나 연수, 파견 등으로 합법적인 '잠수'를 타는 전략을 써봐." : "Public/Corp systems are hard to re-enter. Use options like long-term training or leave of absence.";
       } else if (isBusiness) {
         altAction = lang === 'KO' ? "이동 자체가 현금 흐름에 타격을 줄 수 있어. 업장을 당장 접기보단 운영 방식을 비대면이나 새로운 플랫폼으로 일부 변경하여 이동의 기운(역마)을 액땜해보는 걸 추천해." : "Instead of closing business, apply movement energy to marketing or platform shifts.";
+      } else if (isStudent) {
+        altAction = lang === 'KO' ? "학생/취준생에게 궤도 이탈은 '진로 변경'이나 '수험 방향의 턴'을 의미해. 섣부른 백지화보다는 기존에 쌓은 베이스를 활용할 수 있는 피보팅(Pivoting) 전략이 필요해." : "For students, derailment means changing majors or career paths. Pivot using your existing baseline rather than starting from absolute scratch.";
+      } else if (isArtsCreative) {
+        altAction = lang === 'KO' ? "창작자에게 이동은 '작업 스타일이나 플랫폼의 전환'이야. 무작정 소속을 끊기보단, 협업 방식을 바꾸거나 개인 프로젝트 비중을 늘려 탈선 욕구를 해소해봐." : "For creatives, changing the style or platform is better than abruptly cutting ties. Increase personal projects to dissolve the desire to derail.";
+      } else if (isProfessionalIT) {
+        altAction = lang === 'KO' ? "전문직/IT 종사자에게 잦은 점프는 익숙하지만, 지금은 단순한 연봉 올리기보다 '독보적인 기술 스택/포트폴리오'를 챙길 수 있는 환경인지가 핵심 필터야." : "For IT/Professionals, analyze if the new place offers a unique tech stack or portfolio, rather than just a salary jump.";
+      } else if (isEducation) {
+        altAction = lang === 'KO' ? "교육/교직은 연간 커리큘럼 사이클이 강하게 묶인 곳이야. 중간의 무리한 이탈은 타격이 커. 답답하다면 '연구 휴직'이나 '새로운 방식의 수업 프로젝트'로 환기해." : "Education has strong annual cycles. Abrupt changes are risky. Dissolve frustration through research leave or new teaching projects.";
       }
 
     } else if (movingType === 'transfer') {
@@ -1314,6 +1343,18 @@ ${detailedEffect}`;
       
       if (isMilitary) {
         altAction = lang === 'KO' ? "군 조직 특성상 이동수(역마/충)가 들어왔을 때 전출이나 상급/타 부대 파견으로 대응하는 것은 최고의 승부수야. 짐을 싸라." : "Answering movement energy with transfers is the best tactic in military.";
+      } else if (isPublic) {
+        altAction = lang === 'KO' ? "공공/대기업에서 파견이나 전출은 사표 대신 선택할 수 있는 최고의 '합법적 도피처'이자 다음을 기약할 베이스캠프야. 전략적으로 활용해." : "In public/corp, dispatches are the best legal escape route and basecamp for the future.";
+      } else if (isBusiness) {
+        altAction = lang === 'KO' ? "사업/프리랜서는 부서 이동이랄 게 없지? 이럴 땐 '새로운 거래처/지사 방문'이나 '영업 지역의 확장'으로 이 공간적 이동의 기운을 해소해봐." : "Since you don't have departments, use this energy to visit new clients or expand your operational area.";
+      } else if (isStudent) {
+        altAction = lang === 'KO' ? "학생에게 부서 이동이란 '동아리/연구 주제의 변경'이나 '교환학생/인턴십' 같은 변화를 뜻해. 과감히 새로운 커뮤니티로 넘어가봐." : "For students, this means changing clubs, research topics, or internships. Jump into a new community.";
+      } else if (isArtsCreative) {
+        altAction = lang === 'KO' ? "창작자에게 전출/파견은 '새로운 장르나 타 매체와의 콜라보레이션'을 의미해. 익숙한 방식을 고집하지 말고 전혀 다른 분야와 팀을 짜는 걸 추천해." : "For creatives, this is a collaboration with a new genre or medium. Partner with completely different fields.";
+      } else if (isProfessionalIT) {
+        altAction = lang === 'KO' ? "전문직/IT 종사자에게 부서 이동이나 파견은 '새로운 도메인/신규 TF' 투입을 의미해. 귀찮다고 피하지 마. 그 경험이 다음 몸값을 결정할 패가 될 테니까." : "For IT/Professionals, this means joining a new domain or TF. Don't avoid it; it will determine your next value.";
+      } else if (isEducation) {
+        altAction = lang === 'KO' ? "학급 교체, 새로운 학년 배정, 혹은 타 부서 보직 등 교육 현장 내의 변화를 뜻해. 기존 방식을 완전히 고집하기보단 새로운 시스템을 수용해봐." : "It means changing classes, grades, or administrative roles. Embrace the new system rather than clinging to the old.";
       }
     } else if (movingType === 'moving_house') {
       psychology = lang === 'KO' ? "주거 환경이나 생활 반경 자체를 완전히 뒤집어엎고 싶은 지살(地殺)이나 역마의 기운이 감돌고 있어." : "Energy of wanting to completely flip the living environment.";
