@@ -102,7 +102,7 @@ const TimeInput = ({
 
   return (
     <div className="flex gap-2 items-center w-full">
-      <div className={`flex-1 flex items-center bg-white/5 border rounded-2xl transition-all h-[44px] ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
+      <div className={`flex-1 min-w-0 flex items-center bg-white/5 border rounded-2xl transition-all h-[44px] ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
         <Clock className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
         
         <input 
