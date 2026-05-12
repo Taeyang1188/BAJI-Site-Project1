@@ -428,7 +428,11 @@ export default function App() {
               className="flex flex-col items-center text-center space-y-12 px-6"
             >
               {/* Character Section */}
-              <div className="relative w-[332px] h-[332px] mt-8 mb-4">
+              <motion.div 
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-[332px] h-[332px] mt-8 mb-4"
+              >
                 {/* Speech Bubble */}
                 <motion.div 
                   initial={{ scale: 0, opacity: 0 }}
@@ -447,24 +451,43 @@ export default function App() {
 
                 {/* Character Circle (UFO Dome) */}
                 <div className="w-full h-full rounded-full bg-gradient-to-b from-neon-purple/20 to-neon-purple/5 border border-white/5 relative overflow-hidden z-10 shadow-[0_-15px_40px_rgba(188,0,255,0.15)]" style={{ isolation: 'isolate' }}>
-                  <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-[16px] flex items-center justify-center overflow-hidden rounded-full"
+                  <div
+                    className="absolute inset-[16px] flex items-center justify-center overflow-hidden rounded-full bg-black/10"
                   >
-                    {/* 캐릭터 색상을 자연스럽게 살려주기 위한 백라이트 (너무 밝지 않게 조절) */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-36 h-40 bg-white/30 rounded-full blur-[25px] z-0" />
-                    
                     <img 
                       src={doorGif} 
                       alt="Cosmic Door" 
-                      className="w-[115%] h-[115%] max-w-none object-contain mix-blend-multiply relative z-10 -mt-6"
-                      style={{
-                        // 배경을 투명하게 하되 캐릭터 요소가 너무 쨍해지지 않도록 값 완화
-                        filter: "contrast(1.02) brightness(1.02)"
-                      }}
+                      className="w-full h-full object-cover relative z-10"
                     />
-                  </motion.div>
+
+                    {/* UFO Dashboard Overlay (Hides the bottom of the character) */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[20%] bg-gradient-to-t from-[#0B0416] via-[#0B0416] to-[#0B0416]/90 border-t border-neon-cyan/30 z-20 flex flex-col items-center pt-2.5 backdrop-blur-sm">
+                      
+                      {/* Left Joystick */}
+                      <div className="absolute left-[20%] bottom-full flex flex-col items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10" />
+                        <div className="w-1 h-5 bg-gradient-to-b from-gray-400 to-gray-600 -mt-1" />
+                        <div className="w-6 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
+                      </div>
+
+                      {/* Right Button */}
+                      <div className="absolute right-[20%] bottom-full flex flex-col items-center justify-end">
+                        <div className="w-4 h-2 rounded-t-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10 relative top-[1px]" />
+                        <div className="w-8 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
+                      </div>
+
+                      {/* Dashboard Indicators */}
+                      <div className="flex gap-4 items-center opacity-80 mt-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-neon-pink shadow-[0_0_8px_rgba(255,0,122,1)] animate-pulse" style={{ animationDuration: '2s' }} />
+                        <div className="flex gap-1.5">
+                          <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
+                          <div className="w-2 h-1 rounded-sm bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)]" />
+                          <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
+                        </div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)] animate-pulse" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }} />
+                      </div>
+                    </div>
+                  </div>
                   {/* Neon Ring */}
                   <div className="absolute inset-0 border-[16px] border-neon-purple/40 rounded-full animate-pulse z-20 pointer-events-none" />
                 </div>
@@ -480,7 +503,7 @@ export default function App() {
                   <div className="absolute bottom-[5px] sm:bottom-[6px] left-[65%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.7s' }} />
                   <div className="absolute bottom-[20px] sm:bottom-[23px] left-[85%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" style={{ animationDelay: '1.2s' }} />
                 </div>
-              </div>
+              </motion.div>
 
               <div className="space-y-4">
                 <h1 className="font-gothic text-7xl md:text-8xl tracking-tighter neon-text-pink">

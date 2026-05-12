@@ -3302,8 +3302,51 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                   {/* Canopy/Leaves */}
                   <div className="relative w-48 h-48 sm:w-64 sm:h-64 mb-[-40px] sm:mb-[-60px] z-10 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-green-500/20 rounded-full blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
-                    <div className="absolute inset-8 bg-emerald-500/30 rounded-full blur-2xl animate-pulse"></div>
+                    
+                    {/* The Leaf Canopy Shape */}
+                    <div className="absolute inset-[-20%] transition-transform duration-1000 group-hover:scale-105 pointer-events-none overflow-visible">
+                      <svg viewBox="0 0 200 200" className="w-full h-full block">
+                        <defs>
+                          <filter id="leafBlur" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="6" result="blur" />
+                            <feComponentTransfer>
+                              <feFuncA type="linear" slope="1.2" />
+                            </feComponentTransfer>
+                          </filter>
+                          <linearGradient id="leafGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="rgba(52,211,153,0.3)" /> {/* emerald-400 */}
+                            <stop offset="100%" stopColor="rgba(4,120,87,0.4)" /> {/* emerald-700 */}
+                          </linearGradient>
+                          <linearGradient id="leafGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="rgba(163,230,53,0.25)" /> {/* lime-400 */}
+                            <stop offset="100%" stopColor="rgba(21,128,61,0.35)" /> {/* green-700 */}
+                          </linearGradient>
+                        </defs>
+                        <g filter="url(#leafBlur)">
+                          {/* Outer Canopy */}
+                          <path fill="url(#leafGrad1)" d="M100 35 
+                            C 130 35 150 50 160 70 
+                            C 185 75 190 95 185 115 
+                            C 180 135 160 145 140 145 
+                            C 130 160 90 165 80 145 
+                            C 55 145 30 135 25 115 
+                            C 20 95 35 75 45 70 
+                            C 50 50 70 35 100 35 Z" />
+                          {/* Inner Canopy Highlights */}
+                          <path fill="url(#leafGrad2)" d="M100 50 
+                            C 120 50 135 60 140 75 
+                            C 155 80 160 95 155 110 
+                            C 150 125 135 130 120 130 
+                            C 110 140 90 140 85 130 
+                            C 65 130 50 125 45 110 
+                            C 40 95 50 80 65 75 
+                            C 70 60 80 50 100 50 Z" />
+                        </g>
+                      </svg>
+                    </div>
+
+                    {/* Ambient background glow */}
+                    <div className="absolute inset-0 bg-green-500/10 rounded-full blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
                     
                     {/* Flower (Day Pillar) */}
                     <div className="absolute top-4 left-0 sm:top-10 sm:left-4 flex flex-col items-center">
