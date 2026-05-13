@@ -18,6 +18,61 @@ function getJosa(name: string, josaType: '은는' | '이가' | '을를'): string
   return name + josa[josaType];
 }
 
+function generateCoreRemedy(analysis: any, lang: Language): string {
+    const yongshin = analysis && analysis.yongshinDetail;
+    if (!yongshin || !yongshin.primary || !yongshin.giShin) return "";
+
+    const heeElement = yongshin.primary.element;
+    const heeGod = yongshin.primary.god ? yongshin.primary.god.split("(")[0].trim().split(",")[0].trim() : "";
+    const giElement = yongshin.giShin.element;
+    const giGod = yongshin.giShin.god ? yongshin.giShin.god.split("(")[0].trim().split(",")[0].trim() : "";
+
+    const elementToKo: Record<string, string> = {
+        "Wood": "목(木)", "Fire": "화(火)", "Earth": "토(土)", "Metal": "금(金)", "Water": "수(水)"
+    };
+
+    const edgyGiDescMap: Record<string, string> = {
+        "비겁": "나의 주장과 자기중심적 에너지가 무척 강열해 마찰이 잦거나 에너지가 한쪽으로 쏠리고",
+        "식상": "행동과 발산하는 에너지가 과열되어 기운이 쉽게 소진되거나 구설에 오르기 쉽고",
+        "재성": "현실적인 결과나 이득에만 집착하여 시야가 좁아지거나 극심한 불안을 느끼기 쉽고",
+        "관성": "규칙, 책임감, 외부의 억압이 너무 팽배해 스스로 짓눌리는 압박감이 강하며",
+        "인성": "생각이 너무 많아져 행동으로 옮기지 못하거나 내면에서 에너지가 과열되고"
+    };
+
+    const edgyHeeActionMap: Record<string, string> = {
+        "비겁": "스스로의 줏대를 단호하게 세우고, 내 능력을 믿거나 든든한 동료와 강력하게 연대하는",
+        "식상": "단순히 주변의 혜택을 수동적으로 기다리기보다 스스로의 전문성과 기발함을 바탕으로 밖으로 터뜨려 결과를 만들어내는",
+        "재성": "추상적인 이념이나 감정에 휘둘리기 보다 눈에 보이는 구체적인 성과물이나 자산을 냉정하게 쟁취하는",
+        "관성": "감정적인 충동을 억누르고 조직의 룰, 시스템, 직함이라는 강한 방패 안으로 깊숙이 들어가 그것을 영리하게 활용하는",
+        "인성": "성급하게 나서서 힘을 빼기보다, 묵묵히 인내하며 지식과 자격을 갖추어 내실의 퀄리티를 독보적으로 높이는"
+    };
+
+    if (!elementToKo[heeElement] || !elementToKo[giElement]) return "";
+
+    const mapGod = (g: string) => {
+      if(!g) return "";
+      if(g.includes("비")) return "비겁";
+      if(g.includes("겁")) return "비겁";
+      if(g.includes("식")) return "식상";
+      if(g.includes("상")) return "식상";
+      if(g.includes("재")) return "재성";
+      if(g.includes("관")) return "관성";
+      if(g.includes("인")) return "인성";
+      return g;
+    };
+    
+    const mappedGi = mapGod(giGod);
+    const mappedHee = mapGod(heeGod);
+
+    if (!edgyGiDescMap[mappedGi] || !edgyHeeActionMap[mappedHee]) return "";
+
+    if (lang === "KO") {
+        return "\n\n📌 **[ 명식의 핵심 과제 및 개운법 ]**\n사주를 분석해보면 제어되지 않는 " + elementToKo[giElement] + " " + mappedGi + " 기운으로 인해 " + edgyGiDescMap[mappedGi] + " 있습니다. 이 과포화 상태를 쿨다운시키려면 " + elementToKo[heeElement] + " " + mappedHee + "의 기운을 의도적으로 끌어올리는 컨트롤이 필수적입니다.\n\n이 시기엔 결코 체념하거나 무작정 흘러가길 기다리지 마십시오. **" + edgyHeeActionMap[mappedHee] + " 쪽**으로 삶의 주파수를 맞추는 것이 당신에게 가장 뼈때리고 현실적으로 통할 개운법(운명 개선법)입니다.";
+    } else {
+        return "\n\n📌 **[ Core Task & Remedy ]**\nYour chart shows intense " + giElement + " (" + mappedGi + ") energy, which can lead to severe imbalance. To harmonize this pressure, you must actively channel your " + heeElement + " (" + mappedHee + ") energy.\nRather than waiting passively, **prioritizing actions related to " + mappedHee + "** is your most practical and powerful strategy to transcend your current limits.";
+    }
+}
+
 export interface ThemeOption {
   id: string;
   title: string;
@@ -529,11 +584,12 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
       }
       if (comboIds.includes('관인상생')) detailedEffect += `그리고.. 조직의 보호 아래서 가치를 증명하기 좋아. `;
       
+      const coreRemedy = generateCoreRemedy(analysis, lang);
       main += `
 
 ${comboInsight}
 
-${detailedEffect}`;
+${detailedEffect}${coreRemedy}`;
     } else {
       // No combo logic
       const dominantLuckElement = daewunElement;
@@ -545,6 +601,7 @@ ${detailedEffect}`;
         'Water': '지혜와 유연함이 필요한 시기네. 내면의 깊이를 더하는 쪽으로 방향을 잡아봐.'
       };
       main += elementAdvice[dominantLuckElement] || `원국의 균형을 크게 흔들지 않으면서도 적절한 자극이 되어주는 운이야. `;
+      main += generateCoreRemedy(analysis, lang);
     }
   } else {
     const daewunStemEN = TEN_GODS_EN[daewunStemGodKo] || daewunStemGodKo;
@@ -577,6 +634,8 @@ ${detailedEffect}`;
     } else if (luckScore < 40) {
       main += `It's a time for reflection rather than aggressive action. `;
     }
+    
+    main += generateCoreRemedy(analysis, lang);
   }
 
   // 6. Luck Score (Already computed above)

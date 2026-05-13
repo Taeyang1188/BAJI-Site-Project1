@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock } from 'lucide-react';
 import { Language, UserInput, BaZiResult } from './types';
@@ -14,7 +14,57 @@ import BaZiResultPage from './components/BaZiResultPage';
 import { calculateRealBaZi } from './services/bazi-service';
 
 import doorGif from './assets/door.gif';
-import { useMemo, useRef } from 'react';
+
+const HorizontalScrollArea = ({ children, className }: { children: React.ReactNode, className?: string }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [dragDistance, setDragDistance] = useState(0);
+
+  const onMouseDown = (e: ReactMouseEvent) => {
+    setIsDragging(true);
+    setDragDistance(0);
+    setStartX(e.pageX - (scrollRef.current?.offsetLeft || 0));
+    setScrollLeft(scrollRef.current?.scrollLeft || 0);
+  };
+
+  const onMouseLeave = () => setIsDragging(false);
+  const onMouseUp = () => setIsDragging(false);
+
+  const onMouseMove = (e: ReactMouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - (scrollRef.current?.offsetLeft || 0);
+    const walk = (x - startX) * 2; // Scroll-fast
+    setDragDistance(Math.abs(walk));
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollLeft - walk;
+    }
+  };
+
+  const onClickCapture = (e: ReactMouseEvent) => {
+    if (dragDistance > 10) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  };
+
+  return (
+    <div 
+      ref={scrollRef}
+      className={`overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing ${className || ''}`}
+      onMouseDown={onMouseDown}
+      onMouseLeave={onMouseLeave}
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
+      onClickCapture={onClickCapture}
+      style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const TimeInput = ({ 
   value, 
@@ -60,16 +110,22 @@ const TimeInput = ({
       
       let newIsPM = isPM;
       // Smart 24h detection
-      if (h >= 13 && h <= 23) {
+      if (h === 24) {
+        h = 12;
+        newIsPM = false; // 12 AM (00:00)
+      } else if (h >= 13 && h <= 23) {
         h -= 12;
         newIsPM = true;
-      } else if (h > 23) {
-        h = 11;
+      } else if (h === 12) {
         newIsPM = true;
+      } else if (h === 0) {
+        h = 12;
+        newIsPM = false;
+      } else if (h > 12) {
+        // Just in case (though logically impossible with the above else-ifs)
+        h = 12;
       }
-      if (h === 0) h = 12;
-      if (h > 12) h = 12;
-
+      
       let finalH24 = h;
       if (newIsPM) {
         finalH24 = (h === 12) ? 12 : h + 12;
@@ -582,6 +638,7 @@ export default function App() {
                             <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                             <input 
                               type="date"
+                              max="9999-12-31"
                               required
                               value={userInput.birthDate}
                               onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
@@ -619,6 +676,7 @@ export default function App() {
                           <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                           <input 
                             type="date"
+                            max="9999-12-31"
                             required
                             value={userInput.birthDate}
                             onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
@@ -641,7 +699,7 @@ export default function App() {
                         <User className="w-3.5 h-3.5 text-neon-pink" />
                         <span className="text-[10px] sm:text-xs font-bold tracking-widest text-white/40 uppercase whitespace-nowrap">{t.input.gender}</span>
                       </div>
-                      <div className="flex flex-1 items-center gap-1 overflow-x-auto no-scrollbar">
+                      <HorizontalScrollArea className="flex flex-1 items-center gap-1">
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'male' })}
                           className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
@@ -666,7 +724,7 @@ export default function App() {
                         >
                           {t.input.preferNotToTell}
                         </button>
-                      </div>
+                      </HorizontalScrollArea>
                     </div>
 
                     {/* City */}

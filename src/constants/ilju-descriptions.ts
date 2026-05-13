@@ -270,8 +270,8 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
     ko: "경진일주는 두뇌가 명석하고 카리스마가 있어. 비범한 재능으로 큰 일을 도모하는 힘이 있지.", 
     en: "Gyeong-jin is bright-witted and charismatic. You have the power to plan big things with talent.",
     impression: "스케일이 꽤 크네. 자잘한 일보다는 굵직한 한 방을 노리는 타입이지?",
-    cardBg: "https://i.imgur.com/gFb1bUJl.jpeg",
-    detailImg: "https://i.imgur.com/LweIWrNl.jpeg"
+    cardBg: "https://i.imgur.com/nGnXHCE.png",
+    detailImg: "https://i.imgur.com/SFyF7zK.png"
   },
   "庚寅": { 
     ko: "경인일주는 활동적이고 진취적이야. 강한 추진력으로 새로운 영역을 개척하는 용기가 돋보이지.", 

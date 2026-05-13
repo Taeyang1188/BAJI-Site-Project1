@@ -2367,13 +2367,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               const isExpanded = expandedCycle === actualIndex;
 
               return (
-                <div key={actualIndex} className="flex flex-col items-center space-y-1" dir="ltr">
-                  <div className="text-xs text-white/40 font-mono">
+                <div key={actualIndex} className="flex flex-col items-center w-[72px] sm:w-[88px]" dir="ltr">
+                  <div className="text-xs text-white/40 font-mono h-[18px] flex items-center justify-center">
                     {cycle.year}
                   </div>
-                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
+                  <div 
+                    className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter flex items-center justify-center gap-1 text-center h-[28px] leading-[1.1] mb-1.5" 
+                    style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}
+                  >
                     <PolarityIcon polarity={cycle.stemPolarity} size={8} />
-                    {lang === 'KO' ? cycle.stemTenGodKo : cycle.stemTenGodEn}
+                    <span>{lang === 'KO' ? cycle.stemTenGodKo : cycle.stemTenGodEn}</span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -2383,16 +2386,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       setExpandedYear(null);
                       setExpandedMonth(null);
                     }}
-                    className={`w-16 h-24 rounded-xl transition-all flex flex-col items-center justify-center p-2 relative ${
+                    className={`w-full min-h-[104px] flex-1 rounded-xl transition-all flex flex-col items-center justify-start p-2 relative ${
                       isCurrent ? 'ring-1 ring-neon-pink bg-neon-pink/10 shadow-[0_0_15px_rgba(255,0,122,0.3)]' : 'bg-white/5 hover:bg-white/10'
                     }`}
                   >
-                    <div className="text-[10px] font-bold text-white/40 mb-1 uppercase leading-tight text-center px-1">
+                    <div className="text-[9px] sm:text-[10px] font-bold text-white/40 mb-1 uppercase leading-[1.1] text-center px-0.5 min-h-[22px] flex items-center justify-center">
                       {getLifeStage(cycle.age)}
                     </div>
-                    <div className="text-sm font-bold text-white mb-1">{cycle.age}</div>
+                    <div className="text-sm font-bold text-white mb-1.5">{cycle.age}</div>
                     <div 
-                      className="text-[10px] md:text-xs font-gothic leading-tight text-center"
+                      className="text-[10px] md:text-xs font-gothic leading-tight text-center mb-0.5"
                       style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
                     >
                       {renderPillarText('stem', cycle.stem)}
@@ -2403,13 +2406,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     >
                       {renderPillarText('branch', cycle.branch)}
                     </div>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#0B0416] rounded-full p-0.5">
                       {isExpanded ? <ChevronUp className="w-3 h-3 text-neon-pink" /> : <ChevronDown className="w-3 h-3 text-white/20" />}
                     </div>
                   </motion.button>
-                  <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-1" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
+                  <div 
+                    className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter flex items-center justify-center gap-1 text-center h-[28px] mt-1.5 leading-[1.1]" 
+                    style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}
+                  >
                     <PolarityIcon polarity={cycle.branchPolarity} size={8} />
-                    {lang === 'KO' ? cycle.branchTenGodKo : cycle.branchTenGodEn}
+                    <span>{lang === 'KO' ? cycle.branchTenGodKo : cycle.branchTenGodEn}</span>
                   </div>
                 </div>
               );

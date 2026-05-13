@@ -1233,6 +1233,10 @@ export function calculateRelationshipDynamics(
     const pDefaultKo = pIljuData?.narrative_blocks?.default?.ko?.replace(/당신의/g, '상대의').replace(/당신은/g, '상대는').replace(/당신에게/g, '상대에게').replace(/당신이/g, '상대가').replace(/당신/g, '상대') || '';
     const pGothEn = pIljuData?.core_identity?.goth_punk_vibe?.en?.replace(/\bYour\b/g, 'Their').replace(/\byour\b/g, 'their').replace(/\bYou are\b/g, 'They are').replace(/\byou are\b/g, 'they are').replace(/\bYou\b/g, 'They').replace(/\byou\b/g, 'they') || '';
 
+    if (isSameIlju) {
+        syncScore += 10;
+    }
+
     if (isKO) {
         // [Section 1: Identity] 두 영혼의 질감
         resultText += `[Identity: 두 영혼의 질감]\n**당신은 "${uIljuData?.metadata?.kr_name}" : ${uIljuData?.core_identity?.persona?.ko}입니다.**\n${uIljuData?.core_identity?.goth_punk_vibe?.ko} 당신은 ${uIljuData?.narrative_blocks?.default?.ko}\n\n`;
@@ -1240,7 +1244,6 @@ export function calculateRelationshipDynamics(
         
         if (isSameIlju) {
              resultText += `🎭 [거울 치료] 두 분은 놀랍게도 나와 똑같은 일주(${uDMStemForEaster}${uDayBranch})를 가진 도플갱어와도 같습니다. 상대의 혐오스러운 단점이 곧 나의 쉐도우(그림자)임을 인정할 때 강렬한 소울메이트가 됩니다.\n\n`;
-             syncScore += 10;
         } else if (isIljiChung) {
              resultText += `🌪️ [긴장감의 미학] 두 사람의 본성(일지)이 끊임없이 부딪히며 스파크를 일으킵니다(${uDayBranch}-${pDayBranch} 충). 이 위태로운 충돌이 역설적으로 눈을 뗄 수 없는 섹슈얼한 혹은 극도의 긴장감 있는 매력으로 작용합니다.\n\n`;
         }
@@ -1273,6 +1276,12 @@ export function calculateRelationshipDynamics(
 
         resultText += `[Identity: Textures of Two Souls]\n**You are "${uRoman}" : ${uIljuData?.core_identity?.persona?.en}.**\n${uIljuData?.core_identity?.goth_punk_vibe?.en}\n\n`;
         resultText += `**Partner is "${pRoman}" : ${pIljuData?.core_identity?.persona?.en}.**\n${pGothEn}\n\n`;
+
+        if (isSameIlju) {
+             resultText += `🎭 [Mirror Healing] You both surprisingly share the exact same Day Pillar. You are like doppelgangers. Only when you admit that the partner's repulsive flaws are actually your own shadows, you become intense soulmates.\n\n`;
+        } else if (isIljiChung) {
+             resultText += `🌪️ [Aesthetics of Tension] Your core natures constantly collide, creating sparks. This precarious clash paradoxically acts as an irresistibly attractive tension.\n\n`;
+        }
 
         if (isSameGender) {
             resultText += `[Social Bond (Bro/Sister Synergy)]\nAnalyzing how your energies align for social, business, and life synergy.\n\n`;
