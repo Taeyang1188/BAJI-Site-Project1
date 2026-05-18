@@ -671,11 +671,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     const counts = result.analysis?.elementRatios || defaultCounts;
     
     return [
-      { name: lang === 'KO' ? '목(Wood)' : 'Wood', value: counts?.Wood || 0, color: '#22c55e' },
-      { name: lang === 'KO' ? '화(Fire)' : 'Fire', value: counts?.Fire || 0, color: '#ef4444' },
-      { name: lang === 'KO' ? '토(Earth)' : 'Earth', value: counts?.Earth || 0, color: '#eab308' },
-      { name: lang === 'KO' ? '금(Metal)' : 'Metal', value: counts?.Metal || 0, color: '#f8fafc' },
-      { name: lang === 'KO' ? '수(Water)' : 'Water', value: counts?.Water || 0, color: '#3b82f6' },
+      { name: lang === 'KO' ? '목(Wood)' : 'Wood', value: counts?.Wood || 0, color: ELEMENT_COLORS.Wood },
+      { name: lang === 'KO' ? '화(Fire)' : 'Fire', value: counts?.Fire || 0, color: ELEMENT_COLORS.Fire },
+      { name: lang === 'KO' ? '토(Earth)' : 'Earth', value: counts?.Earth || 0, color: ELEMENT_COLORS.Earth },
+      { name: lang === 'KO' ? '금(Metal)' : 'Metal', value: counts?.Metal || 0, color: ELEMENT_COLORS.Metal },
+      { name: lang === 'KO' ? '수(Water)' : 'Water', value: counts?.Water || 0, color: ELEMENT_COLORS.Water },
     ].filter(d => d.value > 0);
   }, [result.analysis?.elementRatios, lang]);
 
@@ -938,7 +938,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     };
 
     const getTenGodColor = (name: string) => {
-      return TEN_GOD_COLORS[name as keyof typeof TEN_GOD_COLORS] || '#FFFFFF';
+      return TEN_GOD_COLORS[name as keyof typeof TEN_GOD_COLORS] || 'var(--color-dm-text, #FFFFFF)';
     };
 
     const colorizeAdvancedAnalysis = (text: string) => {
@@ -1344,7 +1344,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        </motion.div>
                     )}
                   </AnimatePresence>
-                  <p className="text-sm sm:text-[15px] font-display italic font-bold text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse leading-relaxed transition-colors">
+                  <p className="text-sm sm:text-[15px] font-display italic font-bold text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse leading-relaxed transition-colors cycle-vibe-preview-text">
                     <TypingText 
                            key={`short-${lang}`} 
                            text={lang === 'KO' 
@@ -1413,7 +1413,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             animate={{ opacity: 1, y: 0 }}
                             className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"
                           >
-                            {(showAllThemes ? cycleVibe.themes : cycleVibe.themes.slice(0, 3)).map((theme) => (
+                            {(showAllThemes ? cycleVibe.themes : cycleVibe.themes.slice(0, 2)).map((theme) => (
                               <motion.button
                                 key={theme.id}
                                 whileHover={{ scale: 1.02 }}
@@ -1442,7 +1442,26 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               </motion.button>
                             ))}
                             
-                            {!showAllThemes && cycleVibe.themes.length > 3 && (
+                            {(!showAllThemes || showAllThemes) && (
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                  setSelectedThemeId('daily_vibe');
+                                  setVibePhase('analysis');
+                                  handleShowDailyVibe();
+                                  setTimeout(() => {
+                                    vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }, 50);
+                                }}
+                                className="p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-left transition-all group"
+                              >
+                                <div className="text-neon-pink text-xs font-bold mb-1 uppercase tracking-widest">{lang === 'KO' ? '[오늘의 운세]' : '[TODAY\'S FORTUNE]'}</div>
+                                <div className="text-white/80 text-sm leading-snug group-hover:text-white">{lang === 'KO' ? '오늘 하루는 내게 어떤 기운일까? 운세를 봐줘!' : 'How is today\'s vibe? Tell me my fortune!'}</div>
+                              </motion.button>
+                            )}
+
+                            {!showAllThemes && cycleVibe.themes.length > 2 && (
                               <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -1465,7 +1484,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                   {vibePhase === 'analysis' && selectedThemeId && (
                     <div className="space-y-4 sm:space-y-6">
-                      {selectedThemeId === 'psych_test' ? (
+                      {selectedThemeId === 'daily_vibe' ? (
+                        <div className="p-4 sm:p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-1 h-full bg-neon-pink" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                            <div className="flex items-center justify-between sm:justify-start sm:gap-4">
+                              <h4 className="text-neon-pink font-display font-bold flex items-center space-x-2">
+                                <Sparkles className="w-5 h-5" />
+                                <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
+                              </h4>
+                            </div>
+                            <div className="flex items-center justify-end gap-4">
+                              <WeatherWidget city={city} lang={lang} />
+                            </div>
+                          </div>
+                          <p className="text-sm sm:text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
+                            <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} lang={lang} />
+                          </p>
+                        </div>
+                      ) : selectedThemeId === 'psych_test' ? (
                         <div className="w-full">
                            <PersonaTestSection 
                              userName={userName}
@@ -1613,7 +1650,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         </div>
                       ) : (
                         <div 
-                          className="p-4 sm:p-6 border rounded-xl relative overflow-hidden"
+                          className="p-4 sm:p-6 border rounded-xl relative overflow-hidden ilju-theme-block"
                           style={{
                             backgroundColor: 'rgba(255, 42, 133, 0.1)',
                             borderColor: 'rgba(255, 42, 133, 0.3)',
@@ -1775,7 +1812,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               }
                           })()}
                           <div className="mt-4 pt-4 border-t border-neon-pink/20">
-                            <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-[#facc15] bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
+                            <p className={`text-xs sm:text-sm font-display italic ${cycleVibe.themeAnalyses[selectedThemeId].isCorruption ? 'text-cycle-corruption bg-black/80 px-2 py-1 inline-block rounded' : 'text-neon-pink/80'}`}>
                               <ParsedText lang={lang} text={cycleVibe.themeAnalyses[selectedThemeId].glitch} />
                             </p>
                           </div>
@@ -1822,42 +1859,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         >
                           {lang === 'KO' ? '다른 질문 하기' : 'ASK ANOTHER QUESTION'}
                         </button>
-                        {!showDailyVibe && (
-                          <button 
-                            onClick={handleShowDailyVibe}
-                            className="w-fit px-5 py-2.5 bg-neon-pink/10 hover:bg-neon-pink/20 border border-neon-pink/30 rounded-full text-xs text-neon-pink transition-all flex items-center gap-2 font-medium"
-                          >
-                            <span>{lang === 'KO' ? '오늘 하루는 어떨까?' : 'How about today?'}</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        )}
                       </div>
-                    </div>
-                  )}
-                  
-                  {showDailyVibe && (
-                    <div className="mt-6 p-4 sm:p-6 bg-black/40 rounded-2xl border border-neon-pink/30 relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-neon-pink" />
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                        <div className="flex items-center justify-between sm:justify-start sm:gap-4">
-                          <h4 className="text-neon-pink font-display font-bold flex items-center space-x-2">
-                            <Sparkles className="w-5 h-5" />
-                            <span>{lang === 'KO' ? 'TODAY\'S VIBE' : 'TODAY\'S VIBE'}</span>
-                          </h4>
-                          <button onClick={() => setShowDailyVibe(false)} className="sm:hidden text-white/50 hover:text-white transition-colors">
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-end gap-4">
-                          <WeatherWidget city={city} lang={lang} />
-                          <button onClick={() => setShowDailyVibe(false)} className="hidden sm:block text-white/50 hover:text-white transition-colors">
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-sm sm:text-base font-display italic text-white/90 leading-relaxed whitespace-pre-wrap">
-                        <TypingText key={lang + dailyVibe} text={dailyVibe} speed={20} lang={lang} />
-                      </p>
                     </div>
                   )}
                 </div>
@@ -2669,8 +2671,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           ))}
                         </Pie>
                         <Tooltip 
-                          contentStyle={{ backgroundColor: '#050505', border: '1px solid #333', borderRadius: '8px' }}
-                          itemStyle={{ color: '#fff' }}
+                          contentStyle={{ backgroundColor: 'var(--color-chart-tooltip-bg)', border: '1px solid var(--color-chart-grid)', borderRadius: '8px' }}
+                          itemStyle={{ color: 'var(--color-chart-text)' }}
                           formatter={(value: number) => [`${value.toFixed(1)}%`, '']}
                         />
                       </PieChart>
@@ -3198,7 +3200,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
           >
             <div className="p-6 space-y-6">
               <div className="flex justify-between items-start">
@@ -3281,7 +3283,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-4xl max-h-[90vh] bg-gray-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-10"
+            className="relative w-full max-w-4xl max-h-[90vh] bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl flex flex-col z-10"
           >
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20 rounded-t-2xl">
               <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan drop-shadow-[0_0_10px_rgba(188,0,255,0.3)]">
@@ -4176,7 +4178,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+              className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
             >
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-start">
@@ -4220,7 +4222,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+              className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
             >
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-start">
@@ -4276,7 +4278,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+              className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
             >
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-start">
@@ -4380,7 +4382,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
       viewport={{ once: true }}
       className="mt-12 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
     >
-      <div className="bg-[#050505] rounded-[1.9rem] p-6 sm:p-10 border border-white/10 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
+      <div className="bg-black/95 rounded-[1.9rem] p-6 sm:p-10 border border-white/10 relative overflow-hidden min-h-[600px] flex flex-col justify-center transition-colors duration-700">
         {iljuData?.detailImg && (
           <button 
             onClick={() => setIsImageViewMode(!isImageViewMode)}
@@ -4391,13 +4393,22 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
         )}
 
         {iljuData?.detailImg && (
-          <img 
-            src={isImageViewMode ? iljuData.detailImg : (iljuData.cardBg || iljuData.detailImg)}
-            alt={`${dayPillar?.hanja} Background`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            className={`absolute inset-0 w-full h-full z-0 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain' : 'opacity-40 object-cover'}`}
-          />
+          <>
+            <img 
+              src={isImageViewMode ? iljuData.detailImg : (iljuData.cardBg || iljuData.detailImg)}
+              alt="Blurred Background"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className={`absolute inset-0 w-full h-full z-0 object-cover blur-[40px] scale-125 brightness-50 saturate-150 transition-opacity duration-700 ${isImageViewMode ? 'opacity-100' : 'opacity-0'}`}
+            />
+            <img 
+              src={isImageViewMode ? iljuData.detailImg : (iljuData.cardBg || iljuData.detailImg)}
+              alt={`${dayPillar?.hanja} Background`}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className={`absolute inset-0 w-full h-full z-10 transition-all duration-700 ease-in-out ${isImageViewMode ? 'opacity-100 object-contain drop-shadow-2xl' : 'opacity-40 object-cover'}`}
+            />
+          </>
         )}
         {/* Decorative elements */}
         <div className={`absolute top-0 right-0 w-64 h-64 bg-neon-pink/5 blur-[100px] -z-10 transition-opacity duration-700 ${isImageViewMode ? 'opacity-0' : 'opacity-100'}`} />

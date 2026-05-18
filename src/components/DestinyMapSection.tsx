@@ -257,54 +257,9 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         else if (finalDyn.syncScore <= 40) titleSync = lang === 'KO' ? '🌪️ 거센 마찰과 뼈를 깎는 인내' : '🌪️ Severe Friction & Unrelenting Patience';
     }
 
-    // Fix output text mismatch by dynamically finding and replacing the sync description paragraph
-    const textParts = finalDyn.text.split('\n\n');
-    let newSyncDescKo = "";
-    let newSyncDescEn = "";
-    
     if (isExtremeMode) {
-        newSyncDescKo = "현재의 높은 싱크로율 수치는 평온한 조화로움보다는, 서로를 강렬하게 끌어당기는 거부할 수 없는 업보적 결속력과 인연의 질량을 의미합니다.";
-        newSyncDescEn = "The current high sync score indicates an irresistible karmic attraction and fateful binding, rather than peaceful harmony.";
-    } else {
-        if (weightedScore >= 95) newSyncDescKo = "현재 두 분의 싱크로율 수치는 서로의 에너지 방향성이 완벽하게 일치하여, 억지로 맞추려 하지 않아도 서로의 존재만으로 빛이 나는 천생연분임을 의미합니다.";
-        else if (weightedScore >= 85) newSyncDescKo = "현재 싱크로율 수치는 두 분의 에너지가 깊이 통하고 있음을 보여줍니다. 약간의 조율만으로도 서로에게 최고의 시너지를 끌어다 주는 찰떡궁합의 인연입니다.";
-        else if (weightedScore >= 70) newSyncDescKo = "현재 싱크로율 수치는 서로의 에너지가 부드럽게 조화를 이루며, 조금의 맞춰가는 노력으로도 긍정적인 관계를 만들어낼 수 있는 상호보완적이고 훌륭한 조력자 인연임을 의미합니다.";
-        else if (weightedScore >= 50) newSyncDescKo = "현재 싱크로율 수치는 두 분의 기운이 때로는 부딪히고 때로는 융화되는 현실적인 동행 구간임을 의미합니다. 다름을 인정하고 서로 양보를 통해 타협점을 찾아가는 지혜가 필요합니다.";
-        else if (weightedScore >= 40) newSyncDescKo = "현재 싱크로율 수치는 두 분의 기운 방향성이 달라서 맞추어 가는 데 꽤 많은 인내와 타협이 필요한 관계임을 의미합니다. 서로의 거리를 적절히 유지하는 것이 필수적입니다.";
-        else if (weightedScore > 15) newSyncDescKo = "현재 싱크로율 수치는 두 분의 에너지 방향성이 크게 달라, 억지로 맞추려 하면 깊은 감정적, 기운적 소진이 발생할 수 있는 벅차고 버거운 인연임을 의미합니다.";
-        else newSyncDescKo = "현재 두 사람의 싱크로율은 상극의 극한에 닿아 있습니다. 에너지가 맹렬히 충돌하며, 함께 맞추려 발버둥칠수록 피할 수 없는 파국과 서로의 존재를 갉아먹는 처절한 소진만이 증폭될 뿐입니다.";
-
-        if (weightedScore >= 95) newSyncDescEn = "The current sync score indicates that your energy directions are perfectly aligned, a soulmate bond that shines just by existing together without forced effort.";
-        else if (weightedScore >= 85) newSyncDescEn = "The current sync score shows deep energetic connection. With minor tweaks, you provide top-tier synergy to each other.";
-        else if (weightedScore >= 70) newSyncDescEn = "The current sync score shows your energies harmonize smoothly, meaning that with a little effort to adapt, you can act as great supporters and create wonderful synergy.";
-        else if (weightedScore >= 50) newSyncDescEn = "The current sync score means this is a practical phase where your energies sometimes clash and sometimes blend. It requires the wisdom to accept differences and compromise.";
-        else if (weightedScore >= 40) newSyncDescEn = "The current sync score shows differing energy directions that demand significant patience and compromise. Maintaining proper boundaries is essential.";
-        else if (weightedScore > 15) newSyncDescEn = "The current sync score shows significantly different energy directions. Forcing an alignment may lead to deep emotional and energetic exhaustion.";
-        else newSyncDescEn = "The current sync score is at the extreme of polarity. Energies fiercely collide, and struggling to fit together will only amplify inevitable mutual drain.";
+        // newSyncDesc overrides are now handled directly inside relationship-dynamics-service.ts
     }
-    
-    const targetDesc = lang === 'KO' ? newSyncDescKo : newSyncDescEn;
-    let replaced = false;
-
-    for (let i = 0; i < textParts.length; i++) {
-        const p = textParts[i];
-        if (p.includes("현재 두 분의") || p.includes("현재 싱크로율") || p.includes("현재 두 사람의") || 
-            p.includes("Your energies fit") || p.includes("Your energies harmonize") || p.includes("This is a practical") || p.includes("Your energy directions") || p.includes("Your energetic synchronicity")) {
-            textParts[i] = targetDesc;
-            replaced = true;
-            break;
-        }
-    }
-
-    if (!replaced) {
-        if (textParts.length > 1) {
-            textParts.splice(1, 0, targetDesc);
-        } else {
-            textParts.push(targetDesc);
-        }
-    }
-
-    finalDyn.text = textParts.join('\n\n');
 
     let syncTierText = lang === 'KO' ? '적합' : 'Good';
     let syncColor = 'bg-fuchsia-400';
@@ -529,8 +484,8 @@ export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, la
         <div className="w-full h-64 sm:h-80 relative z-10 pointer-events-none">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart key={sliderIndex} cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-              <PolarGrid stroke="#ffffff20" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: '#ffffff80', fontSize: 12 }} />
+              <PolarGrid stroke="var(--color-chart-grid)" />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--color-chart-text)', fontSize: 12 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
               
               {questCompleted && (

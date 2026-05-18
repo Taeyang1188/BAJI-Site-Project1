@@ -396,8 +396,8 @@ export const ILJU_DESCRIPTIONS: Record<string, IljuDescription> = {
     ko: "계미일주는 온화해 보이지만 생활력이 강해. 현실적인 어려움을 지혜롭게 극복해 나가는 인내심이 있지.", 
     en: "Gye-mi looks gentle but has strong vitality. You have the patience to overcome difficulties wisely.",
     impression: "인내심이 꽤 지독하네. 겉으론 져주는 척해도 결국 네가 원하는 대로 상황을 끌고 가잖아.",
-    cardBg: "https://i.imgur.com/zb1kkNol.jpeg",
-    detailImg: "https://i.imgur.com/PyXWWeOl.jpeg"
+    cardBg: "https://i.imgur.com/a9TUKLG.png",
+    detailImg: "https://i.imgur.com/Q3slwZO.png"
   },
   "癸巳": { 
     ko: "계사일주는 재치 있고 사교적이야. 현실적인 이익을 포착하는 감각과 타인과 소통하는 능력이 뛰어나지.", 

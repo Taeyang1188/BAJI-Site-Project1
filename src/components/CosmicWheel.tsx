@@ -1,10 +1,26 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ZODIAC_ANIMALS } from '../constants';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface CosmicWheelProps {
   birthDate: string;
 }
+
+const lightModeZodiacImages: Record<string, string> = {
+  'za': 'https://i.imgur.com/fewPGoU.png',
+  'chuck': 'https://i.imgur.com/WkHjxWz.png',
+  'in': 'https://i.imgur.com/J338Daq.png',
+  'myo': 'https://i.imgur.com/JQlp1wo.png',
+  'zin': 'https://i.imgur.com/3A3pE9f.png',
+  'sa': 'https://i.imgur.com/kL0dmGI.png',
+  'oh': 'https://i.imgur.com/SMNqqrj.png',
+  'me': 'https://i.imgur.com/lEa2Dvw.png',
+  'sin': 'https://i.imgur.com/5mjY91o.png',
+  'yu': 'https://i.imgur.com/Ek7aKRg.png',
+  'sul': 'https://i.imgur.com/GsEA6cP.png',
+  'hae': 'https://i.imgur.com/bhhCUj0.png'
+};
 
 const ASTRO_SYMBOLS = ['♈\uFE0E', '♉\uFE0E', '♊\uFE0E', '♋\uFE0E', '♌\uFE0E', '♍\uFE0E', '♎\uFE0E', '♏\uFE0E', '♐\uFE0E', '♑\uFE0E', '♒\uFE0E', '♓\uFE0E'];
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -26,10 +42,14 @@ const HorizontalDial = ({
   isSymbol?: boolean,
   visibleCount?: number
 }) => {
+  const { theme } = useTheme();
   const [prevIndex, setPrevIndex] = useState(selectedIndex);
   const [direction, setDirection] = useState(1);
 
   const getImagePath = (item: any) => {
+    if (theme === 'light' && item.slug && lightModeZodiacImages[item.slug]) {
+      return lightModeZodiacImages[item.slug];
+    }
     return item.imgUrl;
   };
 
@@ -116,20 +136,23 @@ const HorizontalDial = ({
                       className="w-full h-full object-contain" 
                       loading="lazy"
                       style={{ 
-                        mixBlendMode: 'screen',
-                        filter: isCenter 
-                          ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
-                          : 'sepia(0.8) saturate(1.5) brightness(0.8) drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))' 
+                        mixBlendMode: theme === 'light' ? 'normal' : 'screen',
+                        filter: theme === 'light' 
+                          ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
+                          : isCenter 
+                            ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
+                            : 'brightness(0) drop-shadow(0 0 4px rgba(0, 0, 0, 0.8))',
+                        opacity: isCenter ? 1 : 0.3
                       }}
                       referrerPolicy="no-referrer" 
                     />
                   </div>
                 ) : isSymbol ? (
-                  <span className={`font-bold text-[#FFD700] transition-all duration-500 ${isCenter ? 'text-4xl sm:text-5xl [text-shadow:0_0_25px_rgba(255,215,0,1),0_0_10px_rgba(255,215,0,0.8)]' : 'text-3xl sm:text-4xl [text-shadow:0_0_10px_rgba(255,215,0,0.4)]'}`} style={{ fontFamily: 'sans-serif' }}>
+                  <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl [text-shadow:0_0_25px_rgba(255,215,0,1),0_0_10px_rgba(255,215,0,0.8)]') : (theme === 'light' ? 'text-3xl sm:text-4xl opacity-30' : 'text-3xl sm:text-4xl opacity-30 [text-shadow:0_0_10px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
                     {item}
                   </span>
                 ) : (
-                  <span className={`font-bold text-[#FFD700] transition-all duration-500 ${isCenter ? 'text-lg sm:text-xl [text-shadow:0_0_15px_rgba(255,215,0,1)]' : 'text-sm sm:text-base [text-shadow:0_0_8px_rgba(255,215,0,0.4)]'}`} style={{ fontFamily: 'sans-serif' }}>
+                  <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-lg sm:text-xl' : 'text-lg sm:text-xl [text-shadow:0_0_15px_rgba(255,215,0,1)]') : (theme === 'light' ? 'text-sm sm:text-base opacity-30' : 'text-sm sm:text-base opacity-30 [text-shadow:0_0_8px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
                     {item}
                   </span>
                 )}
@@ -143,6 +166,7 @@ const HorizontalDial = ({
 };
 
 export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
+  const { theme } = useTheme();
   const date = useMemo(() => {
     const d = birthDate ? new Date(birthDate) : new Date();
     return isNaN(d.getTime()) ? new Date() : d;
@@ -190,8 +214,8 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[260px]"
                 style={{ clipPath: 'polygon(35% 0, 65% 0, 50% 100%)' }}
               >
-                <div className="absolute inset-0 bg-gradient-to-b from-[#FFD700]/15 via-[#FFD700]/5 to-transparent backdrop-blur-[1px]" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.3)_0%,transparent_80%)]" />
+                <div className={`absolute inset-0 bg-gradient-to-b from-[#FFD700]/15 via-[#FFD700]/5 to-transparent backdrop-blur-[1px] ${theme === 'light' ? 'hidden' : ''}`} />
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.3)_0%,transparent_80%)] ${theme === 'light' ? 'hidden' : ''}`} />
               </div>
             </div>
           </div>

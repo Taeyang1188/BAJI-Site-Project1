@@ -1422,13 +1422,40 @@ export function calculateRelationshipDynamics(
                 }
             });
 
+            const stemToEl: Record<string, string> = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water' };
+            const brToEl: Record<string, string> = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
+            const isSaeng = (sender: string, receiver: string) => {
+                if (sender === 'Wood' && receiver === 'Fire') return true;
+                if (sender === 'Fire' && receiver === 'Earth') return true;
+                if (sender === 'Earth' && receiver === 'Metal') return true;
+                if (sender === 'Metal' && receiver === 'Water') return true;
+                if (sender === 'Water' && receiver === 'Wood') return true;
+                return false;
+            };
+
+            const uStemEl = stemToEl[uDayStem];
+            const pStemEl = stemToEl[pDayStem];
+
+            const isExtremeBond = (syncScore >= 90 && (hasInSaSin || hasChukSulMi)) || 
+                                  (uStemEl && pStemEl && isSaeng(uStemEl, pStemEl) && (partnerAdjustedElements[pStemEl] || 0) >= 35 && uWeak) || 
+                                  (temp >= 75 && uGiGu.includes(brToEl[pDayBranch]) && ['Fire', 'Wood'].includes(brToEl[pDayBranch])) ||
+                                  (temp <= 10 && uGiGu.includes(brToEl[pDayBranch]) && ['Water', 'Metal'].includes(brToEl[pDayBranch]));
+
             if (isKO) {
                 // 1. Sync level
-                if (syncScore >= 90) resultText += "현재 두 분의 싱크로율 수치는 서로의 에너지 방향성이 완벽하게 일치하여, 억지로 맞추려 하지 않아도 서로의 존재만으로 빛이 나는 천생연분임을 의미합니다. ";
-                else if (syncScore >= 70) resultText += "현재 싱크로율 수치는 서로의 에너지가 부드럽게 조화를 이루며, 조금의 맞춰가는 노력만으로도 긍정적인 시너지를 만들어낼 수 있는 훌륭한 인연임을 의미합니다. ";
-                else if (syncScore >= 50) resultText += "현재 싱크로율 수치는 두 분의 기운이 때로는 부딪히고 때로는 융화되는 현실적 구간임을 의미합니다. 다름을 인정하고 양보를 통해 타협점을 찾아가는 지혜가 필요합니다. ";
-                else if (syncScore > 15) resultText += "현재 싱크로율 수치는 두 분의 에너지 방향성이 크게 달라, 억지로 맞추려 하면 깊은 감정적, 기운적 소진이 발생할 수 있는 벅차고 버거운 인연임을 의미합니다. ";
-                else resultText += "현재 두 사람의 싱크로율은 상극의 극한에 닿아 있습니다. 에너지가 맹렬히 충돌하며, 함께 맞추려 발버둥칠수록 피할 수 없는 파국과 서로의 존재를 갉아먹는 처절한 소진만이 증폭될 뿐입니다. ";
+                if (isExtremeBond) {
+                    resultText += "현재 드러나는 수치는 평화롭고 이상적인 관계를 의미하는 것이 아닙니다. 상대방과 당신의 관계는 강압적인 자석처럼 맞물려 있으며, 질긴 인연의 끈으로 연결된 상태입니다. 이것은 축복인 동시에 서로를 갉아먹을 수 있는 시련을 의미합니다. ";
+                } else if (syncScore >= 90) {
+                    resultText += "현재 두 분의 싱크로율 수치는 서로의 에너지 방향성이 완벽하게 일치하여, 억지로 맞추려 하지 않아도 서로의 존재만으로 빛이 나는 천생연분임을 의미합니다. ";
+                } else if (syncScore >= 70) {
+                    resultText += "현재 싱크로율 수치는 서로의 에너지가 부드럽게 조화를 이루며, 조금의 맞춰가는 노력만으로도 긍정적인 시너지를 만들어낼 수 있는 훌륭한 인연임을 의미합니다. ";
+                } else if (syncScore >= 50) {
+                    resultText += "현재 싱크로율 수치는 두 분의 기운이 때로는 부딪히고 때로는 융화되는 현실적 구간임을 의미합니다. 다름을 인정하고 양보를 통해 타협점을 찾아가는 지혜가 필요합니다. ";
+                } else if (syncScore > 15) {
+                    resultText += "현재 싱크로율 수치는 두 분의 에너지 방향성이 크게 달라, 억지로 맞추려 하면 깊은 감정적, 기운적 소진이 발생할 수 있는 벅차고 버거운 인연임을 의미합니다. ";
+                } else {
+                    resultText += "현재 두 사람의 싱크로율은 상극의 극한에 닿아 있습니다. 에너지가 맹렬히 충돌하며, 함께 맞추려 발버둥칠수록 피할 수 없는 파국과 서로의 존재를 갉아먹는 처절한 소진만이 증폭될 뿐입니다. ";
+                }
 
                 // 2. Benefit (용희신 보완) & Hyung (형살) Overwrite
                 if (hyungCheck) {
@@ -1487,11 +1514,19 @@ export function calculateRelationshipDynamics(
                  resultText += tempText + clashText;
 
             } else {
-                 if (syncScore >= 90) resultText += "Your energies fit together perfectly, meaning you naturally shine together without forcing it. ";
-                 else if (syncScore >= 70) resultText += "Your energies harmonize smoothly. You create great synergy with just a little effort to understand each other. ";
-                 else if (syncScore >= 50) resultText += "This is a practical phase where your energies sometimes clash and sometimes blend. It requires wisdom to compromise and respect your differences. ";
-                 else if (syncScore > 15) resultText += "Your energy directions are quite different, making it an exhausting relationship where forcing alignment could burn one out. ";
-                 else resultText += "Your energetic synchronicity is at the absolute extreme of incompatibility. The energies violently clash, and the harder you try to make it work, the more you face an unavoidable catastrophe that ruthlessly drains both your souls. ";
+                 if (isExtremeBond) {
+                     resultText += "The current score does not denote a peaceful and ideal relationship. Your connection is like a coercive magnet, tightly bound by the persistent threads of destiny. This state is a blessing but also an ordeal that can relentlessly gnaw at each other. ";
+                 } else if (syncScore >= 90) {
+                     resultText += "Your energies fit together perfectly, meaning you naturally shine together without forcing it. ";
+                 } else if (syncScore >= 70) {
+                     resultText += "Your energies harmonize smoothly. You create great synergy with just a little effort to understand each other. ";
+                 } else if (syncScore >= 50) {
+                     resultText += "This is a practical phase where your energies sometimes clash and sometimes blend. It requires wisdom to compromise and respect your differences. ";
+                 } else if (syncScore > 15) {
+                     resultText += "Your energy directions are quite different, making it an exhausting relationship where forcing alignment could burn one out. ";
+                 } else {
+                     resultText += "Your energetic synchronicity is at the absolute extreme of incompatibility. The energies violently clash, and the harder you try to make it work, the more you face an unavoidable catastrophe that ruthlessly drains both your souls. ";
+                 }
 
                  if (hyungCheck) {
                      resultText += `\n\n[Surgical Table of Correction] Rather than affectionately embracing each other's flaws, this relationship brings a fierce scalpel of 'correction.' Painful friction and a chilling tension dominate as you both try to carve the other into a specific mold instead of accepting differences.`;
@@ -1591,20 +1626,6 @@ export function calculateRelationshipDynamics(
             const elementalGates = uniqueGates.filter(g => isElementalBadge(g));
             
             const finalGates = [...structuralGates, ...elementalGates];
-
-            const stemToEl: Record<string, string> = { '甲':'Wood', '乙':'Wood', '丙':'Fire', '丁':'Fire', '戊':'Earth', '己':'Earth', '庚':'Metal', '辛':'Metal', '壬':'Water', '癸':'Water' };
-            const brToEl: Record<string, string> = { '子':'Water', '丑':'Earth', '寅':'Wood', '卯':'Wood', '辰':'Earth', '巳':'Fire', '午':'Fire', '未':'Earth', '申':'Metal', '酉':'Metal', '戌':'Earth', '亥':'Water' };
-            const isSaeng = (sender: string, receiver: string) => {
-                if (sender === 'Wood' && receiver === 'Fire') return true;
-                if (sender === 'Fire' && receiver === 'Earth') return true;
-                if (sender === 'Earth' && receiver === 'Metal') return true;
-                if (sender === 'Metal' && receiver === 'Water') return true;
-                if (sender === 'Water' && receiver === 'Wood') return true;
-                return false;
-            };
-
-            const uStemEl = stemToEl[uDayStem];
-            const pStemEl = stemToEl[pDayStem];
 
             let relation = isKO ? "평범한 동행" : "Ordinary Companion";
             if (syncScore > 80) relation = isKO ? "천생연분" : "Soulmate";

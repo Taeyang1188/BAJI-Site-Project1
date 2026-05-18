@@ -32,19 +32,19 @@ function generateCoreRemedy(analysis: any, lang: Language): string {
     };
 
     const edgyGiDescMap: Record<string, string> = {
-        "비겁": "나의 주장과 자기중심적 에너지가 무척 강열해 마찰이 잦거나 에너지가 한쪽으로 쏠리고",
-        "식상": "행동과 발산하는 에너지가 과열되어 기운이 쉽게 소진되거나 구설에 오르기 쉽고",
-        "재성": "현실적인 결과나 이득에만 집착하여 시야가 좁아지거나 극심한 불안을 느끼기 쉽고",
-        "관성": "규칙, 책임감, 외부의 억압이 너무 팽배해 스스로 짓눌리는 압박감이 강하며",
-        "인성": "생각이 너무 많아져 행동으로 옮기지 못하거나 내면에서 에너지가 과열되고"
+        "비겁": "마치 브레이크 고장난 8톤 트럭처럼 나만 옳다며 직진하다 여기저기 부딪쳐 에너지만 방전되고",
+        "식상": "머리를 거치기도 전에 입부터 열려서 쓸데없는 오지랖으로 구설수 마일리지나 적립하기 십상인 상태에 놓여",
+        "재성": "눈앞의 떡고물에만 꽂혀 달리는 경주마처럼 굴며 시야는 좁아지고 피로감만 잔뜩 짊어지고",
+        "관성": "마치 꽉 끼는 코르셋을 스스로 조여 맨 듯, 타인의 시선이나 룰에 갇혀 혼자 숨 막혀하고",
+        "인성": "머릿속은 이미 우주 정복을 끝냈는데 정작 현실의 몸은 방구석을 못 벗어나서 망상만 찌는 중이거나 꽤 답답해"
     };
 
     const edgyHeeActionMap: Record<string, string> = {
-        "비겁": "스스로의 줏대를 단호하게 세우고, 내 능력을 믿거나 든든한 동료와 강력하게 연대하는",
-        "식상": "단순히 주변의 혜택을 수동적으로 기다리기보다 스스로의 전문성과 기발함을 바탕으로 밖으로 터뜨려 결과를 만들어내는",
-        "재성": "추상적인 이념이나 감정에 휘둘리기 보다 눈에 보이는 구체적인 성과물이나 자산을 냉정하게 쟁취하는",
-        "관성": "감정적인 충동을 억누르고 조직의 룰, 시스템, 직함이라는 강한 방패 안으로 깊숙이 들어가 그것을 영리하게 활용하는",
-        "인성": "성급하게 나서서 힘을 빼기보다, 묵묵히 인내하며 지식과 자격을 갖추어 내실의 퀄리티를 독보적으로 높이는"
+        "비겁": "어설픈 눈칫밥은 그만 먹고 독고다이 마이웨이를 걷거나, 기댈 수 있는 확실한 동아줄 하나를 단단히 쥐는",
+        "식상": "마음속에 구겨둔 끼와 재능을 어떻게든 밖으로 터뜨려서 이 지루한 판 자체를 흔들어버리는",
+        "재성": "뜬구름 잡는 감성팔이는 접어두고, 당장 내 주머니를 불려줄 눈에 보이는 실속에 올인하는",
+        "관성": "괜히 앞장서다 피 보지 말고, 차라리 조직이나 시스템이라는 크고 튼튼한 우산 아래 요령껏 숨어서 비를 피하는",
+        "인성": "설익은 상태로 무대에 서지 말고, 차라리 동굴에 박혀서 아무도 반박 못 할 진짜 내공이나 스펙을 조용히 갈고닦는"
     };
 
     if (!elementToKo[heeElement] || !elementToKo[giElement]) return "";
@@ -67,7 +67,7 @@ function generateCoreRemedy(analysis: any, lang: Language): string {
     if (!edgyGiDescMap[mappedGi] || !edgyHeeActionMap[mappedHee]) return "";
 
     if (lang === "KO") {
-        return "\n\n📌 **[ 명식의 핵심 과제 및 개운법 ]**\n사주를 분석해보면 제어되지 않는 " + elementToKo[giElement] + " " + mappedGi + " 기운으로 인해 " + edgyGiDescMap[mappedGi] + " 있습니다. 이 과포화 상태를 쿨다운시키려면 " + elementToKo[heeElement] + " " + mappedHee + "의 기운을 의도적으로 끌어올리는 컨트롤이 필수적입니다.\n\n이 시기엔 결코 체념하거나 무작정 흘러가길 기다리지 마십시오. **" + edgyHeeActionMap[mappedHee] + " 쪽**으로 삶의 주파수를 맞추는 것이 당신에게 가장 뼈때리고 현실적으로 통할 개운법(운명 개선법)입니다.";
+        return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 제어되지 않는 ${elementToKo[giElement]} ${mappedGi} 기운 때문에 ${edgyGiDescMap[mappedGi]} 있어. 이 답답한 과포화 상태에 시원하게 찬물이라도 부으려면 어떻게든 ${elementToKo[heeElement]} ${mappedHee}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
     } else {
         return "\n\n📌 **[ Core Task & Remedy ]**\nYour chart shows intense " + giElement + " (" + mappedGi + ") energy, which can lead to severe imbalance. To harmonize this pressure, you must actively channel your " + heeElement + " (" + mappedHee + ") energy.\nRather than waiting passively, **prioritizing actions related to " + mappedHee + "** is your most practical and powerful strategy to transcend your current limits.";
     }
@@ -904,15 +904,15 @@ ${detailedEffect}${coreRemedy}`;
             bestMonthStrKO = `내년 ${bestM.month}월`;
             bestMonthStrEN = `${bestMonthStrEN} next year`;
         }
-        textKO += `**향후 6개월 내 가장 좋은 타점은 ${bestMonthStrKO}이야.** 이때 ${bestM.reasonKO || bestM.reason || '긍정적인 기운이 들어와'} 연애세포를 깨울 테니, 미리 매력을 어필할 준비를 해둬.\n\n`;
+        textKO += `향후 6개월 내 가장 좋은 타점은 ${bestMonthStrKO}이야. 이때 ${bestM.reasonKO || bestM.reason || '긍정적인 기운이 들어와'} 연애세포를 깨울 테니, 미리 매력을 어필할 준비를 해둬.\n\n`;
         textEN += `**The best timing in the next 6 months is ${bestMonthStrEN}.** ${bestM.reasonEN || bestM.reason || 'Positive aura is strong.'} Prepare your charm and profile for this period.\n\n`;
     }
     
     if (score < 50) {
-        textKO += `[ 💔 액땜 및 개운법 ]\n인연이 잘 안 풀린다면 **${remedyDir} 방향**으로 짧은 산책이나 드라이브를 다녀와봐. 옷이나 악세서리에 [${remedyHex}:**${remedyColor}**] 포인트를 주면 나를 표현하는 매력 에너지를 보완해줄 수 있어. 무리한 소개팅보다는 내 일이나 취미에 에너지를 발산할 때 오히려 귀인이 나타날 확률이 높아!\n\n`;
+        textKO += `[ 💔 액땜 및 개운법 ]\n인연이 잘 안 풀린다면 ${remedyDir} 방향으로 짧은 산책이나 드라이브를 다녀와봐. 옷이나 악세서리에 [${remedyHex}:${remedyColor}] 포인트를 주면 나를 표현하는 매력 에너지를 보완해줄 수 있어. 무리한 소개팅보다는 내 일이나 취미에 에너지를 발산할 때 오히려 귀인이 나타날 확률이 높아!\n\n`;
         textEN += `[ 💔 Remedy ]\nWhen luck is blocked, change your environment! Try going towards the **${remedyDir}**. Wearing [${remedyHex}:**${remedyColor}**] accessories will supplement your expressive romantic energy. Focus on hobbies or work first, and the right person will appear naturally.\n\n`;
     } else {
-        textKO += `[ 💖 매력 부스팅 팁 ]\n운이 들어왔을 땐 노를 저어야지! 중요한 만남이 있다면 [${remedyHex}:**${remedyColor}**] 계열의 옷을 입거나 소품을 활용해봐. ${(isOverDrained && yongShinEl !== sikSang) ? '과도한 열기를 식히고 나를 아름답게 다듬어주는 기운' : '나를 더 돋보이게 하는 인연 기운'}을 증폭시켜 줄 거야. 약속 장소는 내 기준 **${remedyDir} 방향**이 운을 끌어올리기 좋으니 참고해!\n\n`;
+        textKO += `[ 💖 매력 부스팅 팁 ]\n운이 들어왔을 땐 노를 저어야지! 중요한 만남이 있다면 [${remedyHex}:${remedyColor}] 계열의 옷을 입거나 소품을 활용해봐. ${(isOverDrained && yongShinEl !== sikSang) ? '과도한 열기를 식히고 나를 아름답게 다듬어주는 기운' : '나를 더 돋보이게 하는 인연 기운'}을 증폭시켜 줄 거야. 약속 장소는 내 기준 ${remedyDir} 방향이 운을 끌어올리기 좋으니 참고해!\n\n`;
         textEN += `[ 💖 Boost Tip ]\nWear [${remedyHex}:**${remedyColor}**] items for important meetups to amplify your charm. A location towards the **${remedyDir}** from your place would be lucky!\n\n`;
     }
 
@@ -1085,7 +1085,7 @@ ${detailedEffect}${coreRemedy}`;
     const formatLuck = (l) => {
       const monthStr = l.targetMonths.join(', ');
       return lang === 'KO' 
-        ? `${l.reason}야. **(성취 확률이 높은 달: ${monthStr}월)**`
+        ? `${l.reason}야. (성취 확률이 높은 달: ${monthStr}월)`
         : `${l.reason}. **(High success months: ${monthStr})**`;
     };
 
@@ -1208,15 +1208,15 @@ ${detailedEffect}${coreRemedy}`;
 
     if (daewunScore >= 70) {
       report += lang === 'KO' 
-        ? `이번 대운(${daewunLabelKO})의 본질은 **'압도적 자산 증식의 인프라'**에 있어. 물이 쏟아져 들어오며 성과가 기하급수적으로 팽창하는 시기지.\n\n`
+        ? `이번 대운(${daewunLabelKO})의 본질은 '압도적 자산 증식의 인프라'에 있어. 물이 쏟아져 들어오며 성과가 기하급수적으로 팽창하는 시기지.\n\n`
         : `The current ${daewunLabelEN} cycle is a massive infrastructure for wealth multiplication. A golden period where results expand exponentially.\n\n`;
     } else if (daewunScore >= 40) {
       report += lang === 'KO' 
-        ? `이번 대운(${daewunLabelKO})의 본질은 **'안정적 수익 구조의 완성'**에 있어. 무리한 도박보다는 리스크를 제어하며 자산을 불리기에 최적화된 하드웨어를 갖춘 시기지.\n\n`
+        ? `이번 대운(${daewunLabelKO})의 본질은 '안정적 수익 구조의 완성'에 있어. 무리한 도박보다는 리스크를 제어하며 자산을 불리기에 최적화된 하드웨어를 갖춘 시기지.\n\n`
         : `The current ${daewunLabelEN} cycle provides an infrastructure of stable wealth accumulation. Focus on controlling risks and steady growth.\n\n`;
     } else {
       report += lang === 'KO'
-        ? `이번 대운(${daewunLabelKO})의 본질은 **'자산 방어와 리스크 관리 시스템'**에 있어. 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 하드웨어 환경이야.\n\n`
+        ? `이번 대운(${daewunLabelKO})의 본질은 '자산 방어와 리스크 관리 시스템'에 있어. 큰 배팅보다는 내실을 다지고 현금 유동성을 확보하는 게 유리한 방어적 하드웨어 환경이야.\n\n`
         : `The current ${daewunLabelEN} cycle is a defensive infrastructure. Focus on securing cash flow and minimizing risks rather than big bets.\n\n`;
     }
 
@@ -1319,7 +1319,7 @@ ${detailedEffect}${coreRemedy}`;
     const hasMaoYouClash = branches.includes('卯') && branches.includes('酉');
     if (dmElement === 'Metal' && hasMaoYouClash) {
       report += lang === 'KO' 
-        ? `\n\n[ ⚠️ 특별 자산 방어 경고 ]\n명식에 재물(卯)과 주변의 강력한 금(酉)들이 수시로 충돌하는 군비쟁재(군중이 내 재물을 노림)와 묘유충의 기운이 강해. 이 타점에 돈이 들어오더라도 주변에 **절대 소문내지 말고 비밀리에 자산을 확보해!** 쉽게 들어온 돈은 주변 사람들에 의해 순식간에 흩어질 수 있으니 투자나 동업은 피하고 단단히 묶어둬야 해.`
+        ? `\n\n[ ⚠️ 특별 자산 방어 경고 ]\n명식에 재물(卯)과 주변의 강력한 금(酉)들이 수시로 충돌하는 군비쟁재(군중이 내 재물을 노림)와 묘유충의 기운이 강해. 이 타점에 돈이 들어오더라도 주변에 입단속을 철저히 하고 조용히 자산을 확보해. 쉽게 들어온 돈은 주변 사람들에 의해 순식간에 흩어질 수 있으니 투자나 동업은 피하고 단단히 묶어둬야 해.`
         : `\n\n[ ⚠️ Asset Defense Warning ]\nYour chart has a strong internal clash regarding wealth. When money comes in, **do not spread rumors and secure your assets secretly!** Wealth can easily scatter among peers or competitors, so avoid joint investments and hold onto your money carefully.`;
     }
 

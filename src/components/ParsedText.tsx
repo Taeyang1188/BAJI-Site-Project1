@@ -406,8 +406,18 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
 
           // Recursively parse content in case of nested tags
           elements.push(
-            <span key={`${idId}-${keyCount++}`} style={{ color }}>
-              <ParsedText text={processedContent} lang={lang} />
+            <span 
+              key={`${idId}-${keyCount++}`} 
+              className="inline-flex items-center align-middle void-element-wrapper" 
+              style={{ '--elem-color': color, color: 'var(--text-elem-color, ' + color + ')' } as React.CSSProperties}
+            >
+              <span 
+                className="void-element-badge w-2 h-2 rounded-full hidden shrink-0 mr-1" 
+                style={{ backgroundColor: color }}
+              />
+              <span className="inline">
+                <ParsedText text={processedContent} lang={lang} />
+              </span>
             </span>
           );
           

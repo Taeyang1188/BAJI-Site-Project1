@@ -5,7 +5,8 @@
 
 import React, { useState, useEffect, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock } from 'lucide-react';
+import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock, Sun, Moon } from 'lucide-react';
+import { useTheme } from './contexts/ThemeContext';
 import { Language, UserInput, BaZiResult } from './types';
 import { TRANSLATIONS } from './constants';
 import CosmicWheel from './components/CosmicWheel';
@@ -207,6 +208,8 @@ declare global {
 
 // Main Application Component
 export default function App() {
+  const { theme, toggleTheme } = useTheme();
+  
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [lang, setLang] = useState<Language>('KO');
   const [userInput, setUserInput] = useState<UserInput>({
@@ -464,13 +467,27 @@ export default function App() {
           </AnimatePresence>
         </div>
 
-        <button 
-          onClick={() => setLang(lang === 'KO' ? 'EN' : 'KO')}
-          className="flex items-center gap-2 px-4 py-2 goth-glass rounded-full text-[10px] font-bold tracking-widest hover:border-neon-cyan transition-all"
-        >
-          <Languages className="w-3 h-3 text-neon-cyan" />
-          {lang}
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={toggleTheme}
+            className="flex items-center justify-center p-2 goth-glass rounded-full hover:border-theme-primary transition-all group"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-neon-pink group-hover:text-white transition-colors" />
+            ) : (
+              <Moon className="w-4 h-4 text-neon-pink group-hover:text-black transition-colors" />
+            )}
+          </button>
+          
+          <button 
+            onClick={() => setLang(lang === 'KO' ? 'EN' : 'KO')}
+            className="flex items-center gap-2 px-4 py-2 goth-glass rounded-full text-[10px] font-bold tracking-widest hover:border-neon-cyan transition-all"
+          >
+            <Languages className="w-3 h-3 text-neon-cyan" />
+            {lang}
+          </button>
+        </div>
       </nav>
 
       <main className="relative pt-24 pb-12 min-h-screen flex flex-col items-center justify-center">
@@ -487,78 +504,99 @@ export default function App() {
               <motion.div 
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-[332px] h-[332px] mt-8 mb-4"
+                className={`relative mt-8 ${theme === 'dark' ? 'mb-4 w-[332px] h-[332px]' : '-mb-16 sm:-mb-24 w-full max-w-[500px] z-20'}`}
               >
                 {/* Speech Bubble */}
                 <motion.div 
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="absolute -top-[70px] -right-4 sm:-right-12 goth-glass p-4 rounded-2xl rounded-bl-none max-w-[220px] z-30"
+                  className={`absolute ${theme === 'dark' ? '-top-[70px] -right-4 sm:-right-12' : '-top-[10px] sm:-top-[30px] right-0 translate-x-1/4 sm:translate-x-1/3 shadow-xl border border-black/5'} goth-glass p-4 rounded-2xl rounded-bl-none max-w-[220px] w-max z-30`}
                 >
                   <p className="text-[12px] sm:text-[13px] font-medium leading-relaxed italic text-white/90">
                     "{greeting}"
                   </p>
                 </motion.div>
                 
-                {/* UFO Saucer Rings (Background) */}
-                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[104px] sm:h-[125px] rounded-[50%] bg-gradient-to-t from-neon-purple/30 to-transparent border border-neon-purple/40 blur-[1px] z-0" />
-                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-t border-b border-neon-cyan/20 shadow-[0_0_40px_rgba(0,242,255,0.2)] z-0" />
+                {theme === 'dark' ? (
 
-                {/* Character Circle (UFO Dome) */}
-                <div className="w-full h-full rounded-full bg-gradient-to-b from-neon-purple/20 to-neon-purple/5 border border-white/5 relative overflow-hidden z-10 shadow-[0_-15px_40px_rgba(188,0,255,0.15)]" style={{ isolation: 'isolate' }}>
-                  <div
-                    className="absolute inset-[16px] flex items-center justify-center overflow-hidden rounded-full bg-black/10"
-                  >
+                  <>
+                    {/* UFO Saucer Rings (Background) */}
+                    <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[104px] sm:h-[125px] rounded-[50%] bg-gradient-to-t from-neon-purple/30 to-transparent border border-neon-purple/40 blur-[1px] z-0" />
+                    <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-t border-b border-neon-cyan/20 shadow-[0_0_40px_rgba(0,242,255,0.2)] z-0" />
+
+                    {/* Character Circle (UFO Dome) */}
+                    <div className="w-full h-full rounded-full bg-gradient-to-b from-neon-purple/20 to-neon-purple/5 border border-white/5 relative overflow-hidden z-10 shadow-[0_-15px_40px_rgba(188,0,255,0.15)]" style={{ isolation: 'isolate' }}>
+                      <div
+                        className="absolute inset-[16px] flex items-center justify-center overflow-hidden rounded-full bg-black/10"
+                      >
+                        <img 
+                          src={doorGif} 
+                          alt="Cosmic Door" 
+                          className="w-full h-full object-cover relative z-10"
+                        />
+
+                        {/* UFO Dashboard Overlay (Hides the bottom of the character) */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[20%] bg-gradient-to-t from-[#0B0416] via-[#0B0416] to-[#0B0416]/90 border-t border-neon-cyan/30 z-20 flex flex-col items-center pt-2.5 backdrop-blur-sm">
+                          
+                          {/* Left Joystick */}
+                          <div className="absolute left-[20%] bottom-full flex flex-col items-center">
+                            <div className="w-3 h-3 rounded-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10" />
+                            <div className="w-1 h-5 bg-gradient-to-b from-gray-400 to-gray-600 -mt-1" />
+                            <div className="w-6 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
+                          </div>
+
+                          {/* Right Button */}
+                          <div className="absolute right-[20%] bottom-full flex flex-col items-center justify-end">
+                            <div className="w-4 h-2 rounded-t-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10 relative top-[1px]" />
+                            <div className="w-8 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
+                          </div>
+
+                          {/* Dashboard Indicators */}
+                          <div className="flex gap-4 items-center opacity-80 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-neon-pink shadow-[0_0_8px_rgba(255,0,122,1)] animate-pulse" style={{ animationDuration: '2s' }} />
+                            <div className="flex gap-1.5">
+                              <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
+                              <div className="w-2 h-1 rounded-sm bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)]" />
+                              <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
+                            </div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)] animate-pulse" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }} />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Neon Ring */}
+                      <div className="absolute inset-0 border-[16px] border-neon-purple/40 rounded-full animate-pulse z-20 pointer-events-none" />
+                    </div>
+
+                    {/* UFO Front Rim (Foreground) */}
+                    <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-b-[5px] border-neon-cyan shadow-[0_20px_60px_rgba(0,255,170,0.6)] pointer-events-none z-20" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }} />
+                    
+                    {/* UFO Lights */}
+                    <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] z-20 pointer-events-none" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }}>
+                      <div className="absolute bottom-[20px] sm:bottom-[23px] left-[15%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" />
+                      <div className="absolute bottom-[5px] sm:bottom-[6px] left-[35%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.3s' }} />
+                      <div className="absolute bottom-[2px] sm:bottom-[3px] left-[50%] -translate-x-1/2 w-3 h-1.5 sm:w-4 sm:h-2 bg-white rounded-full shadow-[0_0_15px_8px_rgba(255,255,255,0.8)] animate-pulse" style={{ animationDelay: '0s' }} />
+                      <div className="absolute bottom-[5px] sm:bottom-[6px] left-[65%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.7s' }} />
+                      <div className="absolute bottom-[20px] sm:bottom-[23px] left-[85%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" style={{ animationDelay: '1.2s' }} />
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full relative flex flex-col items-center justify-center z-10 pointer-events-none">
+                    {/* Character placement to look like they are riding the UFO */}
                     <img 
                       src={doorGif} 
-                      alt="Cosmic Door" 
-                      className="w-full h-full object-cover relative z-10"
+                      alt="Character" 
+                      className="w-[190px] h-[190px] sm:w-[230px] sm:h-[230px] object-cover relative z-10"
+                      style={{ objectPosition: 'center top' }}
                     />
-
-                    {/* UFO Dashboard Overlay (Hides the bottom of the character) */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[20%] bg-gradient-to-t from-[#0B0416] via-[#0B0416] to-[#0B0416]/90 border-t border-neon-cyan/30 z-20 flex flex-col items-center pt-2.5 backdrop-blur-sm">
-                      
-                      {/* Left Joystick */}
-                      <div className="absolute left-[20%] bottom-full flex flex-col items-center">
-                        <div className="w-3 h-3 rounded-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10" />
-                        <div className="w-1 h-5 bg-gradient-to-b from-gray-400 to-gray-600 -mt-1" />
-                        <div className="w-6 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
-                      </div>
-
-                      {/* Right Button */}
-                      <div className="absolute right-[20%] bottom-full flex flex-col items-center justify-end">
-                        <div className="w-4 h-2 rounded-t-full bg-[#ff0033] shadow-[0_0_10px_rgba(255,0,51,0.8)] z-10 relative top-[1px]" />
-                        <div className="w-8 h-2 bg-[#1a1a1a] rounded-t-full border-t border-gray-600" />
-                      </div>
-
-                      {/* Dashboard Indicators */}
-                      <div className="flex gap-4 items-center opacity-80 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-neon-pink shadow-[0_0_8px_rgba(255,0,122,1)] animate-pulse" style={{ animationDuration: '2s' }} />
-                        <div className="flex gap-1.5">
-                          <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
-                          <div className="w-2 h-1 rounded-sm bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)]" />
-                          <div className="w-3 h-1 rounded-sm bg-neon-cyan/40" />
-                        </div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,1)] animate-pulse" style={{ animationDuration: '1.5s', animationDelay: '0.5s' }} />
-                      </div>
-                    </div>
+                    {/* UFO */}
+                    <img 
+                      src="https://i.imgur.com/AptrSjO.png" 
+                      alt="UFO" 
+                      className="w-[440px] sm:w-[500px] max-w-none h-auto relative z-20 pointer-events-none shrink-0 -mt-[105px] sm:-mt-[135px]"
+                    />
                   </div>
-                  {/* Neon Ring */}
-                  <div className="absolute inset-0 border-[16px] border-neon-purple/40 rounded-full animate-pulse z-20 pointer-events-none" />
-                </div>
-
-                {/* UFO Front Rim (Foreground) */}
-                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] border-b-[5px] border-neon-cyan shadow-[0_20px_60px_rgba(0,255,170,0.6)] pointer-events-none z-20" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }} />
-                
-                {/* UFO Lights */}
-                <div className="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[190%] h-[125px] sm:h-[145px] rounded-[50%] z-20 pointer-events-none" style={{ clipPath: 'polygon(-20% 50%, 120% 50%, 120% 200%, -20% 200%)' }}>
-                  <div className="absolute bottom-[20px] sm:bottom-[23px] left-[15%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" />
-                  <div className="absolute bottom-[5px] sm:bottom-[6px] left-[35%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.3s' }} />
-                  <div className="absolute bottom-[2px] sm:bottom-[3px] left-[50%] -translate-x-1/2 w-3 h-1.5 sm:w-4 sm:h-2 bg-white rounded-full shadow-[0_0_15px_8px_rgba(255,255,255,0.8)] animate-pulse" style={{ animationDelay: '0s' }} />
-                  <div className="absolute bottom-[5px] sm:bottom-[6px] left-[65%] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-neon-cyan rounded-full shadow-[0_0_12px_6px_rgba(0,242,255,0.8)] animate-pulse" style={{ animationDelay: '0.7s' }} />
-                  <div className="absolute bottom-[20px] sm:bottom-[23px] left-[85%] w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neon-pink rounded-full shadow-[0_0_10px_5px_rgba(255,0,122,0.8)] animate-pulse" style={{ animationDelay: '1.2s' }} />
-                </div>
+                )}
               </motion.div>
 
               <div className="space-y-4">

@@ -19,12 +19,446 @@
   --color-neon-purple: #A52BFF;
 }
 
+:root {
+  --color-wood: #4ADE80;
+  --color-fire: #F87171;
+  --color-earth: #FACC15;
+  --color-metal: #E2E8F0;
+  --color-water: #60A5FA;
+  
+  --color-chart-grid: rgba(255, 255, 255, 0.2);
+  --color-chart-text: rgba(255, 255, 255, 0.5);
+  --color-chart-tooltip-bg: #050505;
+}
+
 body {
   background-color: var(--color-goth-bg);
   color: #F8FAFC;
   font-family: var(--font-sans);
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ---------------- LIGHT MODE OVERRIDES ---------------- */
+body.light-mode {
+  --color-goth-bg: #FFFFFF;
+  --color-neon-pink: #CC5858;
+  --color-neon-cyan: #809BED;
+  --color-neon-purple: #809BED;
+  
+/* Light mode explicit mapping - overriding default for contrast/visibility */
+  --color-wood: #059669; /* Emerald 600 - High contrast green */
+  --color-fire: #E11D48; /* Rose 600 - Deep, energetic red */
+  --color-earth: #B45309; /* Amber 700 - Solid, readable brown/gold */
+  --color-metal: #475569; /* Slate 600 - Replacing white with slate for visibility against light backgrounds */
+  --color-water: #2563EB; /* Blue 600 - Deep satisfying blue */
+
+  --color-chart-grid: rgba(0, 0, 0, 0.2);
+  --color-chart-text: rgba(0, 0, 0, 0.6);
+  --color-chart-tooltip-bg: #FFFFFF;
+
+  background-color: #FAFAFA; /* Soft off-white for main background to reduce eye strain */
+  color: #171717; /* Neutral 900 for optimal text contrast */
+}
+
+body.light-mode {
+  --color-dm-text: #171717;
+}
+
+body.light-mode .text-white { color: #171717 !important; }
+body.light-mode .text-white\/90 { color: #262626 !important; }
+body.light-mode .text-white\/80 { color: #404040 !important; }
+body.light-mode .text-white\/70 { color: #525252 !important; }
+body.light-mode .text-white\/60 { color: #737373 !important; }
+body.light-mode .text-white\/50 { color: #737373 !important; }
+body.light-mode .text-white\/40 { color: #A3A3A3 !important; }
+body.light-mode .text-white\/30 { color: #A3A3A3 !important; }
+body.light-mode .text-white\/20 { color: #D4D4D4 !important; }
+body.light-mode .text-white\/10 { color: #E5E5E5 !important; }
+
+/* Override surface backgrounds */
+body.light-mode .bg-white\/5 { background-color: #FFFFFF !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important; }
+body.light-mode .bg-white\/10 { background-color: rgba(0,0,0,0.03) !important; }
+body.light-mode .bg-white\/20 { background-color: rgba(0,0,0,0.06) !important; }
+body.light-mode .bg-white\/30 { background-color: rgba(0,0,0,0.09) !important; }
+body.light-mode .bg-white\/40 { background-color: rgba(0,0,0,0.12) !important; }
+body.light-mode .bg-\[\#1a0510\] { background-color: #FFFFFF !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; }
+body.light-mode .bg-\[\#0a0a0a\],
+body.light-mode .bg-\[\#0a0a1a\],
+body.light-mode .bg-\[\#0B0416\] { background-color: #FFFFFF !important; }
+
+/* Tooltips & Dark Overlays. Make them white in light mode for a different, distinct feel */
+/* Theme Blocks */
+body.light-mode .ilju-theme-block {
+    background-image: none !important;
+}
+
+body.light-mode .bg-black\/95 { 
+  background-color: #FFFFFF !important; 
+  color: #171717 !important; 
+  border-color: rgba(0,0,0,0.1) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+body.light-mode .bg-black\/95 .text-white { color: #171717 !important; }
+body.light-mode .bg-black\/95 .text-white\/90 { color: #262626 !important; }
+body.light-mode .bg-black\/95 .text-white\/60 { color: #525252 !important; }
+body.light-mode .bg-black\/95 .text-white\/40 { color: #737373 !important; }
+body.light-mode .bg-black\/95 .text-neon-cyan\/60 { color: #2563EB !important; }
+
+/* Modals & Other Overlays */
+body.light-mode .bg-black\/70 { background-color: rgba(255, 255, 255, 0.9) !important; color: #171717 !important; }
+body.light-mode .bg-black\/60 { background-color: rgba(255, 255, 255, 0.8) !important; color: #171717 !important; }
+body.light-mode .bg-black\/50 { background-color: rgba(255, 255, 255, 0.7) !important; }
+body.light-mode .bg-black\/80 { background-color: rgba(255, 255, 255, 0.95) !important; }
+body.light-mode .bg-black\/40 { background-color: rgba(255, 255, 255, 0.6) !important; backdrop-filter: blur(12px) !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; border-color: rgba(0,0,0,0.08) !important; }
+body.light-mode .bg-black\/30 { background-color: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(12px) !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; border-color: rgba(0,0,0,0.08) !important; }
+body.light-mode .bg-black\/20 { background-color: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(12px) !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; border-color: rgba(0,0,0,0.08) !important; }
+body.light-mode .bg-black { background-color: #FFFFFF !important; }
+
+/* Color overlays for advanced analysis blocks */
+body.light-mode .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.1) !important; }
+body.light-mode .border-red-500\/20 { border-color: rgba(185, 28, 28, 0.3) !important; }
+body.light-mode .bg-amber-900\/20 { background-color: rgba(161, 98, 7, 0.1) !important; }
+
+/* Yellow / Gold Shinsal Styles */
+body.light-mode .bg-yellow-400\/20 { background-color: rgba(146, 64, 14, 0.15) !important; }
+body.light-mode .bg-yellow-400\/5 { background-color: rgba(146, 64, 14, 0.05) !important; }
+body.light-mode .border-yellow-400, body.light-mode .border-yellow-400\/30 { border-color: rgba(146, 64, 14, 0.4) !important; }
+body.light-mode .text-yellow-400\/70 { color: rgba(146, 64, 14, 0.9) !important; }
+
+/* Amber overrides (Tree Trunk & Seeds) */
+body.light-mode .text-amber-300,
+body.light-mode .text-amber-400,
+body.light-mode .text-amber-500 {
+  color: #a16207 !important; /* Dark Gold */
+}
+body.light-mode .text-amber-900\/40 {
+  color: rgba(161, 98, 7, 0.4) !important;
+}
+body.light-mode .from-amber-900\/80 {
+  --tw-gradient-from: rgba(161, 98, 7, 0.2) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+body.light-mode .to-stone-900\/90 {
+  --tw-gradient-to: rgba(0,0,0,0.05) !important;
+}
+body.light-mode .border-amber-700\/50,
+body.light-mode .border-amber-500\/20,
+body.light-mode .border-amber-500\/30,
+body.light-mode .border-amber-500\/40 {
+  border-color: rgba(161, 98, 7, 0.3) !important;
+}
+body.light-mode .bg-amber-500\/10,
+body.light-mode .bg-amber-500\/20 {
+  background-color: rgba(161, 98, 7, 0.1) !important;
+}
+body.light-mode .shadow-\[inset_0_0_20px_rgba\(0\,0\,0\,0\.5\)\],
+body.light-mode .shadow-\[inset_0_0_20px_rgba\(0\,0\,0\,0\.8\)\] {
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05) !important;
+}
+body.light-mode .shadow-\[inset_0_0_15px_rgba\(245\,158\,11\,0\.05\)\] {
+  box-shadow: inset 0 0 15px rgba(161, 98, 7, 0.1) !important;
+}
+body.light-mode .drop-shadow-\[0_0_8px_rgba\(251\,191\,36\,0\.6\)\] {
+  filter: drop-shadow(0 0 8px rgba(161, 98, 7, 0.4)) !important;
+}
+
+/* Drop shadow overrides for text clearly unreadable or weird in light mode */
+body.light-mode .drop-shadow-\[0_0_5px_rgba\(255\,42\,133\,0\.5\)\] { /* Neon pink shadow */
+  filter: none !important;
+}
+body.light-mode .drop-shadow-\[0_0_5px_rgba\(0\,255\,255\,0\.5\)\] { /* Neon cyan shadow */
+  filter: none !important; 
+}
+body.light-mode .drop-shadow-\[0_0_8px_rgba\(255\,0\,128\,0\.5\)\] {
+  filter: none !important;
+}
+body.light-mode .drop-shadow-\[0_0_10px_rgba\(188\,0\,255\,0\.3\)\] {
+  filter: none !important;
+}
+body.light-mode .drop-shadow-\[0_0_10px_rgba\(188\,0\,255\,0\.5\)\] {
+  filter: none !important;
+}
+body.light-mode .mix-blend-overlay {
+  mix-blend-mode: normal !important;
+}
+
+/* Input Background */
+body.light-mode input.bg-white\/5,
+body.light-mode select.bg-white\/5 { background-color: #FFFFFF !important; color: #171717 !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+body.light-mode input.bg-transparent,
+body.light-mode select.bg-transparent { color: #171717 !important; }
+body.light-mode .placeholder\:text-white\/20::placeholder { color: #aaaaaa !important; }
+body.light-mode .placeholder\:text-white\/40::placeholder { color: #888888 !important; }
+
+/* Borders */
+body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.05) !important; }
+body.light-mode .border-white\/10 { border-color: rgba(0,0,0,0.1) !important; }
+body.light-mode .border-white\/20 { border-color: rgba(0,0,0,0.2) !important; }
+body.light-mode .border-white\/30 { border-color: rgba(0,0,0,0.25) !important; }
+body.light-mode .border-white\/40 { border-color: rgba(0,0,0,0.3) !important; }
+body.light-mode .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(0,0,0,0.1) !important; }
+body.light-mode .border-neon-pink { border-color: #E11D48 !important; }
+body.light-mode .border-neon-cyan { border-color: #2563EB !important; }
+body.light-mode .focus-within\:border-neon-pink:focus-within { border-color: #E11D48 !important; }
+body.light-mode .focus-within\:border-neon-cyan:focus-within { border-color: #2563EB !important; }
+
+/* Remove glow (box-shadow) for neon borders */
+body.light-mode .neon-border-pink {
+  border: 1px solid #E11D48 !important;
+  box-shadow: none !important;
+}
+
+body.light-mode .border-neon-pink {
+  border-color: #E11D48 !important; /* Secondary accent for unselected/borders as requested */
+}
+
+/* 텍스트 네온 이펙트 제거 및 색상 적용 */
+body.light-mode .neon-text-pink,
+body.light-mode .text-neon-pink {
+  color: #E11D48 !important; /* This is Primary accent */
+  text-shadow: none !important;
+}
+body.light-mode .neon-text-cyan,
+body.light-mode .text-neon-cyan {
+  color: #0284C7 !important; /* Deep Cyan/Blue for better contrast on light mode */
+  text-shadow: none !important;
+}
+
+/* Specific glowing shadows overridden for Light Mode */
+body.light-mode .shadow-\[0_0_15px_rgba\(255\,42\,133\,0\.4\)\] { box-shadow: 0 4px 12px rgba(204, 88, 88, 0.15) !important; }
+body.light-mode .shadow-\[0_0_15px_rgba\(0\,255\,255\,0\.4\)\] { box-shadow: 0 4px 12px rgba(128, 155, 237, 0.15) !important; }
+body.light-mode .shadow-\[0_0_30px_rgba\(0\,255\,255\,0\.15\)\] { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important; }
+
+/* Eliminate bottom dark gradients and any other #0B0118/#0B0416 gradients */
+body.light-mode .from-\[\#0B0118\],
+body.light-mode .from-\[\#0B0416\],
+body.light-mode .from-black\/60 {
+  --tw-gradient-from: transparent !important;
+  --tw-gradient-to: transparent !important;
+  --tw-gradient-stops: transparent !important;
+}
+body.light-mode .via-\[\#0B0118\]\/90,
+body.light-mode .via-\[\#0B0416\] {
+  --tw-gradient-stops: transparent !important;
+}
+body.light-mode .to-\[\#0B0416\]\/90,
+body.light-mode .to-stone-900\/90 {
+  --tw-gradient-to: transparent !important;
+}
+
+/* Bright text color overrides for readability on light backgrounds */
+.text-cycle-corruption {
+  color: #facc15;
+}
+body.light-mode .text-cycle-corruption {
+  color: #CC5858 !important; /* using direct hex for primary accent since vars might not work on early init */
+  background-color: transparent !important;
+  border: 1px solid #CC5858;
+}
+
+body.light-mode .cycle-vibe-preview-text {
+  color: #CC5858 !important; /* Red color as requested */
+  filter: drop-shadow(0 2px 4px rgba(204,88,88,0.2)) !important;
+}
+
+body.light-mode .text-\[\#facc15\] {
+  color: #CC5858 !important;
+}
+
+body.light-mode .text-\[\#FFD700\],
+body.light-mode .text-\[\#f5b800\],
+body.light-mode .text-yellow-400 { color: #92400e !important; } /* Amber 800 */
+
+body.light-mode .text-\[\#00ea5e\],
+body.light-mode .text-green-400,
+body.light-mode .text-green-300 { color: #059669 !important; } /* Emerald 600 */
+
+body.light-mode .text-\[\#00bfff\],
+body.light-mode .text-cyan-400,
+body.light-mode .text-cyan-300 { color: #0284c7 !important; } /* Sky 600 */
+
+body.light-mode .text-\[\#d8d8d8\] { color: #475569 !important; } /* Slate 600 */
+
+body.light-mode .text-\[\#ff4747\],
+body.light-mode .text-red-400,
+body.light-mode .text-red-500 { color: #e11d48 !important; } /* Rose 600 */
+
+body.light-mode .text-pink-400,
+body.light-mode .text-pink-500,
+body.light-mode .text-fuchsia-400,
+body.light-mode .text-purple-400 { color: #7e22ce !important; } /* Purple 700 */
+
+
+
+/* Ring overrides */
+body.light-mode .ring-neon-pink { --tw-ring-color: #CC5858 !important; }
+body.light-mode .ring-neon-cyan { --tw-ring-color: #809BED !important; }
+
+/* 요약 리포트 해시태그 등 */
+body.light-mode .bg-neon-cyan\/10,
+body.light-mode .bg-neon-cyan\/20,
+body.light-mode .bg-neon-pink\/20 {
+  background-color: #809BED !important; /* Secondary accent */
+  color: #FFFFFF !important;
+}
+body.light-mode .bg-neon-pink\/10 {
+  background-color: rgba(204, 88, 88, 0.1) !important; /* 연한 핑크 틴트 배경 */
+}
+body.light-mode .bg-neon-cyan\/20 .text-neon-cyan,
+body.light-mode .bg-neon-cyan\/10 .text-neon-cyan,
+body.light-mode .bg-neon-pink\/20 .text-neon-pink {
+  color: #FFFFFF !important; 
+}
+body.light-mode .bg-neon-pink\/10 .text-neon-pink {
+  color: #CC5858 !important;
+}
+
+/* Hashtag override for Soul Blueprint hashtags (usually green) */
+body.light-mode .text-\[\#39FF14\] {
+  background-color: #809BED !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+}
+
+/* "운명 소환" 등 Primary 강조 버튼류 */
+body.light-mode .hover\:bg-neon-pink:hover {
+  background-color: #CC5858 !important;
+  color: #FFFFFF !important;
+}
+body.light-mode .bg-neon-pink { background-color: #CC5858 !important; color: #FFFFFF !important; }
+body.light-mode .hover\:bg-neon-cyan:hover { background-color: #809BED !important; color: #FFFFFF !important; }
+body.light-mode .bg-neon-cyan { background-color: #809BED !important; color: #FFFFFF !important; }
+
+body.light-mode .from-neon-pink, body.light-mode .to-neon-purple {
+  --tw-gradient-from: #CC5858 !important;
+  --tw-gradient-to: #CC5858 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+
+/* Goth glass effect overhaul for light mode */
+body.light-mode .void-element-wrapper {
+  --text-elem-color: #222222;
+  font-weight: bold;
+}
+body.light-mode .void-element-badge {
+  display: inline-block !important;
+}
+
+body.light-mode .goth-glass {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+}
+
+/* 메인 화면 아바타 스탠드 등 기타 요소 처리 */
+body.light-mode .from-neon-purple\/30 { --tw-gradient-from: rgba(255, 255, 255, 1) var(--tw-gradient-from-position) !important; }
+body.light-mode .from-neon-purple\/20 { --tw-gradient-from: #FFFFFF var(--tw-gradient-from-position) !important; }
+body.light-mode .to-neon-purple\/5 { --tw-gradient-to: rgba(255, 255, 255, 0.05) var(--tw-gradient-to-position) !important; }
+body.light-mode .border-neon-purple\/40 { border-color: transparent !important; }
+
+/* Lights & effects removal for light mode */
+body.light-mode .bg-\[\#ff0033\] {
+  background: transparent !important;
+}
+
+body.light-mode .subtle-text {
+  color: #555555;
+  text-shadow: none;
+}
+
+body.light-mode .bg-neon-pink { background: #CC5858 !important; }
+body.light-mode .bg-neon-cyan { background: #809BED !important; }
+
+/* Recharts overrides for Destiny Map in light mode */
+body.light-mode .recharts-polar-angle-axis-tick-value {
+  fill: #666666 !important;
+}
+body.light-mode .recharts-polar-grid line,
+body.light-mode .recharts-polar-grid path,
+body.light-mode .recharts-polar-grid polygon {
+  stroke: rgba(0,0,0,0.1) !important;
+}
+
+/* Compatibility Scanner Light mode overrides */
+body.light-mode .text-rose-50,
+body.light-mode .text-rose-100,
+body.light-mode .text-rose-400 {
+  color: #e11d48 !important; /* Rose 600 */
+}
+body.light-mode .text-fuchsia-100,
+body.light-mode .text-fuchsia-200,
+body.light-mode .text-fuchsia-300,
+body.light-mode .text-fuchsia-400,
+body.light-mode .text-fuchsia-500 {
+  color: #CC5858 !important;
+}
+
+body.light-mode .text-fuchsia-50\/90,
+body.light-mode .text-fuchsia-100\/90,
+body.light-mode .text-fuchsia-300\/80,
+body.light-mode .text-fuchsia-200\/90 {
+  color: rgba(204, 88, 88, 0.9) !important;
+}
+
+body.light-mode .text-zinc-50,
+body.light-mode .text-zinc-100,
+body.light-mode .text-zinc-200,
+body.light-mode .text-zinc-300,
+body.light-mode .text-zinc-400 {
+  color: #404040 !important;
+}
+
+body.light-mode .bg-fuchsia-500,
+body.light-mode .bg-fuchsia-400 {
+  background-color: #CC5858 !important;
+  color: #FFFFFF !important;
+}
+
+body.light-mode .bg-fuchsia-500\/5 {
+  background-color: #FFFFFF !important;
+}
+
+body.light-mode .bg-fuchsia-500\/10,
+body.light-mode .bg-fuchsia-500\/20,
+body.light-mode .bg-fuchsia-900\/30,
+body.light-mode .bg-fuchsia-950\/50,
+body.light-mode .hover\:bg-fuchsia-500\/10:hover,
+body.light-mode .hover\:bg-fuchsia-500\/20:hover {
+  background-color: rgba(204, 88, 88, 0.1) !important;
+}
+
+body.light-mode .border-fuchsia-500\/20,
+body.light-mode .border-fuchsia-500\/30,
+body.light-mode .border-fuchsia-500\/40,
+body.light-mode .border-fuchsia-500\/50,
+body.light-mode .border-fuchsia-400\/50,
+body.light-mode .border-fuchsia-400\/30 {
+  border-color: rgba(204, 88, 88, 0.3) !important;
+}
+
+/* CosmicWheel Light Mode Fixes */
+body.light-mode .bg-\[\#050505\] {
+  background-color: transparent !important;
+}
+body.light-mode .border-purple-900\/40,
+body.light-mode .border-\[\#FF1493\]\/90,
+body.light-mode .border-\[\#FF1493\]\/70,
+body.light-mode .border-\[\#FF1493\]\/50,
+body.light-mode .border-\[\#FF1493\]\/30 {
+  border-color: #809BED !important;
+}
+body.light-mode .from-purple-950\/30,
+body.light-mode .via-black,
+body.light-mode .to-pink-950\/20 {
+  --tw-gradient-from: transparent !important;
+  --tw-gradient-to: transparent !important;
+  --tw-gradient-stops: transparent !important;
+}
+body.light-mode .border-neon-pink { border-color: #809BED !important; } /* Unselected border -> 809BED */
+/* ---------------------------------------------------- */
 
 .goth-glass {
   background: rgba(11, 4, 22, 0.6);

@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { Language, BaZiResult } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
+import { ELEMENT_COLORS } from '../constants';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 
 interface GeJuHelpModalProps {
@@ -147,15 +148,6 @@ export const GeJuHelpModal: React.FC<GeJuHelpModalProps> = ({ isOpen, onClose, r
   // We'll create a simple temperature difference graph based on season and day master element
   const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element;
   const monthElement = BAZI_MAPPING.branches[monthBranch as keyof typeof BAZI_MAPPING.branches]?.element;
-  
-  // Element Colors mapping
-  const ELEMENT_COLORS: Record<string, string> = {
-    Wood: '#4ADE80',
-    Fire: '#F87171',
-    Earth: '#FACC15',
-    Metal: '#E2E8F0',
-    Water: '#60A5FA'
-  };
 
   let socialTemp = 50; // 0 is cold, 100 is hot
   if (season === 'summer') socialTemp = 90;

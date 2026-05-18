@@ -329,11 +329,11 @@ export const ZODIAC_ANIMALS = [
 ];
 
 export const ELEMENT_COLORS = {
-  Wood: '#4ADE80',
-  Fire: '#F87171',
-  Earth: '#FACC15',
-  Metal: '#E2E8F0',
-  Water: '#60A5FA',
+  Wood: 'var(--color-wood)',
+  Fire: 'var(--color-fire)',
+  Earth: 'var(--color-earth)',
+  Metal: 'var(--color-metal)',
+  Water: 'var(--color-water)',
 };
 
 export const TEN_GOD_COLORS = {
@@ -347,8 +347,8 @@ export const TEN_GOD_COLORS = {
   "정관": ELEMENT_COLORS.Metal,
   "편인": ELEMENT_COLORS.Water,
   "정인": ELEMENT_COLORS.Water,
-  "일간(나)": '#FFFFFF',
-  "The Ego": '#FFFFFF',
+  "일간(나)": 'var(--color-dm-text, #FFFFFF)',
+  "The Ego": 'var(--color-dm-text, #FFFFFF)',
   "The Mirror": ELEMENT_COLORS.Wood,
   "The Rival": ELEMENT_COLORS.Wood,
   "The Artist": ELEMENT_COLORS.Fire,
