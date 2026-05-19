@@ -2175,7 +2175,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           (pillar.title === 'Hour' ? 'Time Stem' : `${pillar.title} Stem`)}
                       </div>
                     </div>
-                    <div className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : 'text-white'}`}>
+                    <div 
+                      className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : ''}`}
+                      style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
+                    >
                       {isUnknownPillar ? (
                         <span>?</span>
                       ) : (
@@ -2232,7 +2235,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           (pillar.title === 'Hour' ? 'Time Branch' : `${pillar.title} Branch`)}
                       </div>
                     </div>
-                    <div className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : 'text-white/60'}`}>
+                    <div 
+                      className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : ''}`}
+                      style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
+                    >
                       {isUnknownPillar ? (
                         <span>?</span>
                       ) : (

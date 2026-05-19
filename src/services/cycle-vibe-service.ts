@@ -742,7 +742,7 @@ ${detailedEffect}${coreRemedy}`;
     const remedyColor = lang === 'KO' ? (elementColorsKO[boostElement] || '흰색') : (elementColorsEN[boostElement] || 'White');
     const remedyDir = lang === 'KO' ? (elementDirectionsKO[boostElement] || '남쪽') : (elementDirectionsEN[boostElement] || 'South');
 
-    const elementHex: Record<string, string> = { 'Wood': '#4ade80', 'Fire': '#f87171', 'Earth': '#fde047', 'Metal': '#e2e8f0', 'Water': '#60a5fa' };
+    const elementHex: Record<string, string> = { 'Wood': 'var(--color-wood)', 'Fire': 'var(--color-fire)', 'Earth': 'var(--color-earth)', 'Metal': 'var(--color-metal)', 'Water': 'var(--color-water)' };
     const remedyHex = elementHex[boostElement] || '#ffffff';
     
     const d = new Date();
@@ -1007,7 +1007,7 @@ ${detailedEffect}${coreRemedy}`;
       const sEl = baziMappingStems[luck.stem]?.element;
       const bEl = baziMappingBranches[luck.branch]?.element;
 
-      const elementColors: any = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#94a3b8', Water: '#3b82f6' };
+      const elementColors: any = { Wood: 'var(--color-wood)', Fire: 'var(--color-fire)', Earth: 'var(--color-earth)', Metal: 'var(--color-metal)', Water: 'var(--color-water)' };
       const formatKo = (el: string, title: string) => `[${elementColors[el]}:${{'Wood':'목(木)', 'Fire':'화(火)', 'Earth':'토(土)', 'Metal':'금(金)', 'Water':'수(水)'}[el] || el} ${title}]`;
       const formatEn = (el: string, title: string) => `[${elementColors[el]}:${el} (${title})]`;
 
@@ -1196,7 +1196,7 @@ ${detailedEffect}${coreRemedy}`;
     
     // We get hex colors based on Bazi elements
     const getElementColorHex = (element: string) => {
-      const colors: Record<string, string> = { 'Wood': '#22c55e', 'Fire': '#ef4444', 'Earth': '#eab308', 'Metal': '#94a3b8', 'Water': '#3b82f6' };
+      const colors: Record<string, string> = { 'Wood': 'var(--color-wood)', 'Fire': 'var(--color-fire)', 'Earth': 'var(--color-earth)', 'Metal': 'var(--color-metal)', 'Water': 'var(--color-water)' };
       return colors[element] || '#ffffff';
     };
     

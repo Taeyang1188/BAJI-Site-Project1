@@ -591,7 +591,7 @@ export default function App() {
                     />
                     {/* UFO */}
                     <img 
-                      src="https://i.imgur.com/AptrSjO.png" 
+                      src={theme === 'dark' ? "https://i.imgur.com/AptrSjO.png" : "https://i.imgur.com/71XeUqK.png"}
                       alt="UFO" 
                       className="w-[440px] sm:w-[500px] max-w-none h-auto relative z-20 pointer-events-none shrink-0 -mt-[105px] sm:-mt-[135px]"
                     />

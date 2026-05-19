@@ -19,11 +19,11 @@ export const calculateAdvancedAnalysis = (
 
   const getColor = (el: string) => {
     const colors: Record<string, string> = {
-      'Wood': '#22c55e',
-      'Fire': '#ef4444',
-      'Earth': '#eab308',
-      'Metal': '#94a3b8',
-      'Water': '#3b82f6'
+      'Wood': 'var(--color-wood)',
+      'Fire': 'var(--color-fire)',
+      'Earth': 'var(--color-earth)',
+      'Metal': 'var(--color-metal)',
+      'Water': 'var(--color-water)'
     };
     return colors[el] || '#ffffff';
   };

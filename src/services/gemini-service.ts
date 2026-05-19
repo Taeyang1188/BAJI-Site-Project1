@@ -15,12 +15,12 @@ Tone and Manner: Goth-Punk, Cyberpunk, Noir.
   - 편관/정관 (GwanSeong): Warrior/Judge
   - 편인/정인 (InSeong): Mystic/Sage
 - When mentioning Ten Gods or Elements, apply color mapping using the syntax [color:text].
-  - Wood: [#22c55e:text]
-  - Fire: [#ef4444:text]
-  - Earth: [#eab308:text]
-  - Metal: [#e2e8f0:text]
-  - Water: [#3b82f6:text]
-  Example: "[#22c55e:비견]" or "[#ef4444:Artist]"
+  - Wood: [var(--color-wood):text]
+  - Fire: [var(--color-fire):text]
+  - Earth: [var(--color-earth):text]
+  - Metal: [var(--color-metal):text]
+  - Water: [var(--color-water):text]
+  Example: "[var(--color-wood):비견]" or "[var(--color-fire):Artist]"
 `;
 
 export const generateCycleVibeWithGemini = async (

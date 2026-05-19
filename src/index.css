@@ -50,7 +50,7 @@ body.light-mode {
   --color-wood: #059669; /* Emerald 600 - High contrast green */
   --color-fire: #E11D48; /* Rose 600 - Deep, energetic red */
   --color-earth: #B45309; /* Amber 700 - Solid, readable brown/gold */
-  --color-metal: #475569; /* Slate 600 - Replacing white with slate for visibility against light backgrounds */
+  --color-metal: #52525B; /* Zinc 600 - Neutral metallic grey for contrast on light mode */
   --color-water: #2563EB; /* Blue 600 - Deep satisfying blue */
 
   --color-chart-grid: rgba(0, 0, 0, 0.2);
@@ -121,10 +121,12 @@ body.light-mode .border-red-500\/20 { border-color: rgba(185, 28, 28, 0.3) !impo
 body.light-mode .bg-amber-900\/20 { background-color: rgba(161, 98, 7, 0.1) !important; }
 
 /* Yellow / Gold Shinsal Styles */
+body.light-mode .bg-yellow-400\/50 { background-color: rgba(146, 64, 14, 0.3) !important; }
 body.light-mode .bg-yellow-400\/20 { background-color: rgba(146, 64, 14, 0.15) !important; }
 body.light-mode .bg-yellow-400\/5 { background-color: rgba(146, 64, 14, 0.05) !important; }
-body.light-mode .border-yellow-400, body.light-mode .border-yellow-400\/30 { border-color: rgba(146, 64, 14, 0.4) !important; }
-body.light-mode .text-yellow-400\/70 { color: rgba(146, 64, 14, 0.9) !important; }
+body.light-mode .bg-yellow-500\/20 { background-color: rgba(146, 64, 14, 0.15) !important; }
+body.light-mode .border-yellow-400, body.light-mode .border-yellow-400\/30, body.light-mode .border-yellow-400\/50 { border-color: rgba(146, 64, 14, 0.4) !important; }
+body.light-mode .text-yellow-400\/80, body.light-mode .text-yellow-400\/70, body.light-mode .text-yellow-400\/50 { color: rgba(146, 64, 14, 0.95) !important; }
 
 /* Amber overrides (Tree Trunk & Seeds) */
 body.light-mode .text-amber-300,
@@ -348,8 +350,8 @@ body.light-mode .void-element-badge {
 
 body.light-mode .goth-glass {
   background: #FFFFFF !important;
-  border: 1px solid rgba(0,0,0,0.05) !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(0,0,0,0.08); /* Allow inline border colors */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
   backdrop-filter: none !important;
 }
 
