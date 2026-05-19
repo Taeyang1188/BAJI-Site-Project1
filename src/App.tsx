@@ -522,7 +522,7 @@ export default function App() {
               <motion.div 
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className={`relative mt-8 z-10 ${theme === 'dark' ? 'mb-4 w-[332px] h-[332px]' : '-mb-16 sm:-mb-24 w-full max-w-[500px]'}`}
+                className="relative mt-8 z-10 -mb-16 sm:-mb-24 w-full max-w-[500px]"
               >
                 
                 {/* Speech Bubble */}
@@ -530,7 +530,7 @@ export default function App() {
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className={`absolute ${theme === 'dark' ? '-top-[70px] -right-4 sm:-right-12' : '-top-[10px] sm:-top-[30px] right-0 translate-x-1/4 sm:translate-x-1/3 shadow-xl border border-black/5'} goth-glass p-4 rounded-[20px] max-w-[220px] w-max z-30`}
+                  className="absolute -top-[10px] sm:-top-[30px] right-0 translate-x-1/4 sm:translate-x-1/3 shadow-xl border border-black/5 dark:border-white/10 goth-glass p-4 rounded-[20px] max-w-[220px] w-max z-30"
                 >
                   {/* Tail (Curved SVG) */}
                   <svg 
