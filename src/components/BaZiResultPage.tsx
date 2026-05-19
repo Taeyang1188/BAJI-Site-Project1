@@ -1920,29 +1920,29 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     <div className="w-full mb-2">
                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                          {[
-                           { groupKo: '나침반', groupEn: 'Identity', color: '#3b82f6', items: [
+                           { groupKo: '나침반', groupEn: 'Identity', color: 'var(--tengod-identity)', items: [
                              { nameKo: '비견', nameEn: 'Mirror', descKo: '주체성/독립심', descEn: 'Independence' },
                              { nameKo: '겁재', nameEn: 'Rival', descKo: '승부욕/경쟁', descEn: 'Competitiveness' }
                            ]},
-                           { groupKo: '엔진', groupEn: 'Expression', color: '#ec4899', items: [
+                           { groupKo: '엔진', groupEn: 'Expression', color: 'var(--tengod-expression)', items: [
                              { nameKo: '식신', nameEn: 'Artist', descKo: '창작/몰입', descEn: 'Creation/Focus' },
                              { nameKo: '상관', nameEn: 'Rebel', descKo: '언변/파격', descEn: 'Eloquence/Rebel' }
                            ]},
-                           { groupKo: '안테나', groupEn: 'Wealth', color: '#eab308', items: [
+                           { groupKo: '안테나', groupEn: 'Wealth', color: 'var(--tengod-wealth)', items: [
                              { nameKo: '정재', nameEn: 'Architect', descKo: '안정/꼼꼼함', descEn: 'Stability/Meticulous' },
                              { nameKo: '편재', nameEn: 'Maverick', descKo: '스케일/네트워크', descEn: 'Scale/Network' }
                            ]},
-                           { groupKo: '브레이크', groupEn: 'Power', color: '#f97316', items: [
+                           { groupKo: '브레이크', groupEn: 'Power', color: 'var(--tengod-power)', items: [
                              { nameKo: '정관', nameEn: 'Judge', descKo: '원칙/체면', descEn: 'Principles/Honor' },
                              { nameKo: '편관', nameEn: 'Warrior', descKo: '극기/카리스마', descEn: 'Endurance/Power' }
                            ]},
-                           { groupKo: '충전소', groupEn: 'Resource', color: '#a855f7', items: [
+                           { groupKo: '충전소', groupEn: 'Resource', color: 'var(--tengod-resource)', items: [
                              { nameKo: '정인', nameEn: 'Sage', descKo: '수용/학문', descEn: 'Acceptance/Study' },
                              { nameKo: '편인', nameEn: 'Mystic', descKo: '직관/비판', descEn: 'Intuition/Critical' }
                            ]}
                          ].map((g, i) => (
                            <div key={i} className="bg-white/5 border border-white/10 rounded-xl flex flex-col overflow-hidden">
-                             <div className="w-full text-center py-1 border-b border-white/10" style={{ backgroundColor: `${g.color}15` }}>
+                             <div className="w-full text-center py-1 border-b border-white/10" style={{ backgroundColor: `color-mix(in srgb, ${g.color} 15%, transparent)` }}>
                                <span className="font-bold text-[10px] sm:text-xs tracking-widest" style={{ color: g.color }}>
                                  {lang === 'KO' ? g.groupKo : g.groupEn}
                                </span>
@@ -3576,70 +3576,70 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                      
                      <defs>
                         <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                           <stop offset="0%" stopColor="#4ade80" stopOpacity="0.5" />
-                           <stop offset="33.3%" stopColor="#4ade80" /> {/* Spring/Wood */}
-                           <stop offset="50%" stopColor="#f87171" /> {/* Summer/Fire */}
-                           <stop offset="66.7%" stopColor="#facc15" /> {/* Autumn/Metal/Earth */}
-                           <stop offset="83.3%" stopColor="#60a5fa" /> {/* Winter/Water */}
-                           <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.5" />
+                           <stop offset="0%" stopColor="#4ade80" stopOpacity="0.3" />
+                           <stop offset="20%" stopColor="#4ade80" /> {/* Spring/Wood */}
+                           <stop offset="40%" stopColor="#f87171" /> {/* Summer/Fire */}
+                           <stop offset="60%" stopColor="#facc15" /> {/* Autumn/Metal/Earth */}
+                           <stop offset="80%" stopColor="#60a5fa" /> {/* Winter/Water */}
+                           <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.3" />
                         </linearGradient>
                      </defs>
                   </svg>
 
                   {/* Nodes on the Exact Calculated Positions of the Wave */}
                   <div className="absolute w-full h-[70%]">
-                     {/* 1. Spring (Growth): 33.3% left, 50% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '33.3%', transform: 'translate(-50%, -50%)' }}>
-                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.5)] backdrop-blur-md mb-2">
+                     {/* 1. Spring (Growth): Valley 1 - 16.7% left, 85% top */}
+                     <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '85%', left: '16.7%' }}>
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.5)] backdrop-blur-md">
                          <span className="text-sm sm:text-lg">🌱</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                       <div className="absolute bottom-[24px] sm:bottom-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
                          <span className="text-green-400 font-bold block text-xs">{lang === 'KO' ? '성장기(봄)' : 'Growth(Spring)'}</span>
                          <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '씨앗이 발아하여\n뿌리를 내림' : 'Seeds sprout\nand take root'}</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                       <div className="absolute bottom-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-green-400 font-bold block text-[10px]">{lang === 'KO' ? '봄' : 'Spring'}</span>
                        </div>
                      </div>
 
-                     {/* 2. Summer (Expansion): 50% left, 15% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '15%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500/20 border-2 border-red-400 flex items-center justify-center shadow-[0_0_15px_rgba(248,113,113,0.5)] backdrop-blur-md mb-2">
+                     {/* 2. Summer (Expansion): Ascending slope - 33.3% left, 50% top */}
+                     <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '33.3%' }}>
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500/20 border-2 border-red-400 flex items-center justify-center shadow-[0_0_15px_rgba(248,113,113,0.5)] backdrop-blur-md">
                          <span className="text-sm sm:text-lg">🔥</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                       <div className="absolute top-[24px] sm:top-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
                          <span className="text-red-400 font-bold block text-xs">{lang === 'KO' ? '확장기(여름)' : 'Expansion(Summer)'}</span>
                          <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '꽃이 만개하고\n세력을 넓힘' : 'Flowers bloom\nand spread'}</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                       <div className="absolute top-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-red-400 font-bold block text-[10px]">{lang === 'KO' ? '여름' : 'Summer'}</span>
                        </div>
                      </div>
 
-                     {/* 3. Autumn (Harvest): 66.7% left, 50% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '66.7%', transform: 'translate(-50%, -50%)' }}>
-                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.5)] backdrop-blur-md mb-2">
+                     {/* 3. Autumn (Harvest): Descending slope - 66.7% left, 50% top */}
+                     <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '66.7%' }}>
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.5)] backdrop-blur-md">
                          <span className="text-sm sm:text-lg">🍂</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                       <div className="absolute top-[24px] sm:top-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
                          <span className="text-yellow-400 font-bold block text-xs">{lang === 'KO' ? '수확기(가을)' : 'Harvest(Autumn)'}</span>
                          <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '열매를 맺고\n결실을 거둠' : 'Bear fruit\nand harvest'}</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                       <div className="absolute top-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-yellow-400 font-bold block text-[10px]">{lang === 'KO' ? '가을' : 'Autumn'}</span>
                        </div>
                      </div>
 
-                     {/* 4. Winter (Contraction): 83.3% left, 85% top */}
-                     <div className="absolute flex flex-col items-center z-10 transition-transform hover:scale-110" style={{ top: '85%', left: '83.3%', transform: 'translate(-50%, -50%)' }}>
-                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(96,165,250,0.5)] backdrop-blur-md mb-2">
+                     {/* 4. Winter (Contraction): Valley 2 - 83.3% left, 85% top */}
+                     <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '85%', left: '83.3%' }}>
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(96,165,250,0.5)] backdrop-blur-md">
                          <span className="text-sm sm:text-lg">❄️</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block">
+                       <div className="absolute bottom-[24px] sm:bottom-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
                          <span className="text-blue-400 font-bold block text-xs">{lang === 'KO' ? '수축기(겨울)' : 'Contraction(Winter)'}</span>
                          <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '생명력을 비축하며\n휴식함' : 'Rest and reserve\nvitality'}</span>
                        </div>
-                       <div className="text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden">
+                       <div className="absolute bottom-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-blue-400 font-bold block text-[10px]">{lang === 'KO' ? '겨울' : 'Winter'}</span>
                        </div>
                      </div>
@@ -3771,29 +3771,29 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                 
                 <div className="grid grid-cols-1 gap-3">
                   {[
-                    { groupKo: '나침반', groupEn: 'Identity', color: '#3b82f6', items: [
+                    { groupKo: '나침반', groupEn: 'Identity', color: 'var(--tengod-identity)', items: [
                       { nameKo: '비견', nameEn: 'Mirror', descKo: '주체성, 독립심, 평등, 마이웨이', descEn: 'Independence, self-esteem, equality' },
                       { nameKo: '겁재', nameEn: 'Rival', descKo: '경쟁심, 승부욕, 쟁취, 강력한 에너지', descEn: 'Competitiveness, ambition, fierce energy' }
                     ]},
-                    { groupKo: '엔진', groupEn: 'Expression', color: '#ec4899', items: [
+                    { groupKo: '엔진', groupEn: 'Expression', color: 'var(--tengod-expression)', items: [
                       { nameKo: '식신', nameEn: 'Artist', descKo: '몰입, 창작, 연구, 취향, 호기심, 식도락', descEn: 'Immersion, creation, hobbies, deep focus' },
                       { nameKo: '상관', nameEn: 'Rebel', descKo: '표현력, 파격, 언변, 호기심, 순발력', descEn: 'Expression, breaking rules, eloquence, wit' }
                     ]},
-                    { groupKo: '안테나', groupEn: 'Wealth', color: '#eab308', items: [
+                    { groupKo: '안테나', groupEn: 'Wealth', color: 'var(--tengod-wealth)', items: [
                       { nameKo: '정재', nameEn: 'Architect', descKo: '안정, 소유욕, 계산, 꼼꼼함, 현실감각', descEn: 'Stability, ownership, meticulous calculating' },
                       { nameKo: '편재', nameEn: 'Maverick', descKo: '통 큰 스케일, 모험심, 유흥, 네트워크', descEn: 'Big scale, adventure, thrill, networking' }
                     ]},
-                    { groupKo: '브레이크', groupEn: 'Power', color: '#f97316', items: [
+                    { groupKo: '브레이크', groupEn: 'Power', color: 'var(--tengod-power)', items: [
                       { nameKo: '정관', nameEn: 'Judge', descKo: '원칙, 도덕심, 체면, 질서, 인정욕구', descEn: 'Principles, morals, honor, order, reputation' },
                       { nameKo: '편관', nameEn: 'Warrior', descKo: '카리스마, 극기, 인내, 강박, 권력', descEn: 'Charisma, endurance, overcoming crisis, power' }
                     ]},
-                    { groupKo: '충전소', groupEn: 'Resource', color: '#a855f7', items: [
+                    { groupKo: '충전소', groupEn: 'Resource', color: 'var(--tengod-resource)', items: [
                       { nameKo: '정인', nameEn: 'Sage', descKo: '안정, 수용성, 학문, 인내, 어머니의 마음', descEn: 'Stability, acceptance, academics, motherly love' },
                       { nameKo: '편인', nameEn: 'Mystic', descKo: '직관력, 눈치, 심리/철학, 비판적 사고', descEn: 'Intuition, insight, philosophy, critical thinking' }
                     ]}
                   ].map((g, i) => (
                     <div key={i} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden flex flex-col sm:flex-row">
-                      <div className="w-full sm:w-32 flex-shrink-0 flex items-center justify-center p-3 sm:p-0 border-b sm:border-b-0 sm:border-r border-white/10" style={{ backgroundColor: `${g.color}15` }}>
+                      <div className="w-full sm:w-32 flex-shrink-0 flex items-center justify-center p-3 sm:p-0 border-b sm:border-b-0 sm:border-r border-white/10" style={{ backgroundColor: `color-mix(in srgb, ${g.color} 15%, transparent)` }}>
                         <span className="font-bold text-sm" style={{ color: g.color }}>
                           {lang === 'KO' ? g.groupKo : g.groupEn}
                         </span>

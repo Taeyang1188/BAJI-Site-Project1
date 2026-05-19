@@ -141,8 +141,8 @@ const HorizontalDial = ({
                           ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
                           : isCenter 
                             ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
-                            : 'brightness(0) drop-shadow(0 0 4px rgba(0, 0, 0, 0.8))',
-                        opacity: isCenter ? 1 : 0.3
+                            : 'sepia(1) saturate(2) hue-rotate(-10deg) brightness(0.8) contrast(1.1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.2))',
+                        opacity: isCenter ? 1 : 0.8
                       }}
                       referrerPolicy="no-referrer" 
                     />
