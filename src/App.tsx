@@ -15,7 +15,10 @@ import AuroraBackground from './components/AuroraBackground';
 
 import { calculateRealBaZi } from './services/bazi-service';
 
-import doorVideo from './assets/door.webm';
+import characterWebm from './assets/door.webm';
+import characterApng from './assets/door.png';
+
+export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 const HorizontalScrollArea = ({ children, className }: { children: React.ReactNode, className?: string }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -222,8 +225,18 @@ const buttonStyles = {
   }
 } as const;
 
+const titleFontVariant = 'C'; // 'A', 'B', 'C', 'D' 중 하나로 전환
+
+const titleFonts = {
+  A: { fontFamily: "'Black Han Sans', sans-serif", letterSpacing: '-0.02em' },
+  B: { fontFamily: "'Jua', sans-serif", letterSpacing: '0em' },
+  C: { fontFamily: "'Gaegu', cursive", letterSpacing: '0.02em' },
+  D: { fontFamily: "'Noto Sans KR', sans-serif", fontWeight: 900, letterSpacing: '-0.03em' },
+};
+
 // Main Application Component
 export default function App() {
+  const currentTitleFont = titleFonts[titleFontVariant];
   const currentButton = buttonStyles[buttonVariant];
   const { theme, toggleTheme } = useTheme();
   
@@ -559,12 +572,25 @@ export default function App() {
                         opacity: theme === 'dark' ? 0.92 : 1 
                       }}
                     >
-                      <video 
-                        src={doorVideo} 
-                        autoPlay loop muted playsInline
-                        className="w-full h-full object-cover"
-                        style={{ objectPosition: 'center top' }}
-                      />
+                      {isSafari ? (
+                        <img
+                          src={characterApng}
+                          alt="Character"
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: 'center top' }}
+                        />
+                      ) : (
+                        <video
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: 'center top' }}
+                        >
+                          <source src={characterWebm} type="video/webm" />
+                        </video>
+                      )}
                     </div>
                     {/* UFO */}
                     <img 
@@ -577,7 +603,14 @@ export default function App() {
               </motion.div>
 
               <div className="space-y-4 relative z-20">
-                <h1 className="font-gothic text-7xl md:text-8xl tracking-tighter text-[#4C0519] dark:text-[#FF2A6D] transition-colors">
+                <h1 
+                  className="text-7xl md:text-8xl tracking-tighter text-[#4C0519] dark:text-[#FF2A6D] transition-colors"
+                  style={{
+                    fontFamily: currentTitleFont.fontFamily,
+                    fontWeight: currentTitleFont.fontWeight ?? 400,
+                    letterSpacing: currentTitleFont.letterSpacing,
+                  }}
+                >
                   {t.intro.title}
                 </h1>
                 <p 
