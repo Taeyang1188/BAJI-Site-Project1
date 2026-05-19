@@ -604,11 +604,12 @@ export default function App() {
 
               <div className="space-y-4 relative z-20">
                 <h1 
-                  className="text-7xl md:text-8xl tracking-tighter text-[#4C0519] dark:text-[#FF2A6D] transition-colors"
+                  className="text-7xl md:text-8xl tracking-tighter transition-colors"
                   style={{
                     fontFamily: currentTitleFont.fontFamily,
                     fontWeight: currentTitleFont.fontWeight ?? 400,
                     letterSpacing: currentTitleFont.letterSpacing,
+                    color: theme === 'dark' ? '#FF2A6D' : '#4C0519',
                     textShadow: theme === 'dark'
                       ? '3px 3px 0px #1a0030, 5px 5px 0px rgba(155, 48, 255, 0.5)'
                       : '2px 2px 0px rgba(200, 0, 100, 0.25), 4px 4px 0px rgba(200, 0, 100, 0.12)',
