@@ -609,7 +609,7 @@ export default function App() {
                     fontFamily: currentTitleFont.fontFamily,
                     fontWeight: currentTitleFont.fontWeight ?? 400,
                     letterSpacing: currentTitleFont.letterSpacing,
-                    color: theme === 'dark' ? '#FF2A6D' : '#4C0519',
+                    color: theme === 'dark' ? '#FF2A6D' : '#E8185A',
                     textShadow: theme === 'dark'
                       ? '3px 3px 0px #1a0030, 5px 5px 0px rgba(155, 48, 255, 0.5)'
                       : '2px 2px 0px rgba(200, 0, 100, 0.25), 4px 4px 0px rgba(200, 0, 100, 0.12)',
