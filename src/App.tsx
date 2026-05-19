@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock, Sun, Moon } from 'lucide-react';
+import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock, Sun, Moon, Keyboard, Zap } from 'lucide-react';
 import { useTheme } from './contexts/ThemeContext';
 import { Language, UserInput, BaZiResult } from './types';
 import { TRANSLATIONS } from './constants';
@@ -242,6 +242,12 @@ export default function App() {
   
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [lang, setLang] = useState<Language>('KO');
+  const [skipTyping, setSkipTyping] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('void_skip_typing') === 'true';
+    }
+    return false;
+  });
   const [userInput, setUserInput] = useState<UserInput>({
     name: '',
     birthDate: '1993-01-01',
@@ -520,7 +526,7 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="relative pt-24 pb-12 min-h-screen flex flex-col items-center justify-center">
+      <main className="relative pt-16 sm:pt-20 pb-12 min-h-screen flex flex-col items-center justify-center">
         {page <= 2 && <AuroraBackground />}
         <AnimatePresence mode="wait">
           {page === 1 && (
@@ -529,13 +535,13 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="flex flex-col items-center text-center space-y-12 px-6 relative w-full isolate z-[1]"
+              className="flex flex-col items-center text-center space-y-6 sm:space-y-8 px-6 relative w-full isolate z-[1]"
             >
               {/* Character Section */}
               <motion.div 
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative mt-8 z-10 -mb-16 sm:-mb-24 w-full max-w-[500px]"
+                className="relative mt-4 sm:mt-8 z-10 -mb-20 sm:-mb-32 w-full max-w-[500px]"
               >
                 
                 {/* Speech Bubble */}
@@ -602,12 +608,12 @@ export default function App() {
                   </div>
               </motion.div>
 
-              <div className="space-y-4 relative z-20">
+              <div className="space-y-0 sm:space-y-1 relative z-20">
                 <h1 
                   className="text-7xl md:text-8xl tracking-tighter transition-colors"
                   style={{
                     fontFamily: currentTitleFont.fontFamily,
-                    fontWeight: currentTitleFont.fontWeight ?? 400,
+                    fontWeight: (currentTitleFont as any).fontWeight ?? 400,
                     letterSpacing: currentTitleFont.letterSpacing,
                     color: theme === 'dark' ? '#FF2A6D' : '#E8185A',
                     textShadow: theme === 'dark'
@@ -903,6 +909,7 @@ export default function App() {
                 city={userInput.city}
                 socialContext={userInput.socialContext}
                 onBack={() => setPage(2)} 
+                skipTyping={skipTyping}
               />
             </motion.div>
           )}

@@ -29,17 +29,56 @@ export const generateCycleVibeWithGemini = async (
   currentAnnualPillar: any,
   lang: Language
 ): Promise<string> => {
+  const getTenGodEn = (ko: string) => {
+    if (!ko) return "";
+    if (ko.includes("비견") || ko.includes("겁재")) return "Mirror/Rival";
+    if (ko.includes("식신") || ko.includes("상관")) return "Artist/Rebel";
+    if (ko.includes("편재") || ko.includes("정재")) return "Maverick/Architect";
+    if (ko.includes("편관") || ko.includes("정관")) return "Warrior/Judge";
+    if (ko.includes("편인") || ko.includes("정인")) return "Mystic/Sage";
+    return ko;
+  };
+
+  const getCleanList = (isMissing: boolean) => {
+    return Object.entries(result.analysis?.tenGodsRatio || {})
+      .filter(([_, r]) => isMissing ? r === 0 : r > 30)
+      .map(([k]) => {
+        if (lang === 'EN') {
+          const m = k.match(/\(([^)]+)\)/);
+          return m ? m[1] : k;
+        }
+        return k;
+      })
+      .join(', ');
+  };
+
+  const missingList = getCleanList(true);
+  const overflowingList = getCleanList(false);
+
+  const dmName = lang === 'EN' ? result.pillars[1].element : `${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})`;
+  const dmStrength = result.analysis?.dayMasterStrength?.score > 50 
+    ? (lang === 'EN' ? 'Strong' : 'Strong (신강)') 
+    : (lang === 'EN' ? 'Weak' : 'Weak (신약)');
+
+  const majorCycleInfo = lang === 'EN'
+    ? `${currentCycle.stem}${currentCycle.branch} (${getTenGodEn(currentCycle.stemTenGodKo)}/${getTenGodEn(currentCycle.branchTenGodKo)})`
+    : `${currentCycle.stem}${currentCycle.branch} (${currentCycle.stemTenGodKo}/${currentCycle.branchTenGodKo})`;
+
+  const annualCycleInfo = lang === 'EN'
+    ? `${currentAnnualPillar.stem}${currentAnnualPillar.branch} (${getTenGodEn(currentAnnualPillar.stemTenGodKo)}/${getTenGodEn(currentAnnualPillar.branchTenGodKo)})`
+    : `${currentAnnualPillar.stem}${currentAnnualPillar.branch} (${currentAnnualPillar.stemTenGodKo}/${currentAnnualPillar.branchTenGodKo})`;
+
   const prompt = `
 You are a 'V.O.I.D Destiny Consultant' who analyzes the light and shadow of fate coldly.
 Analyze the user's Bazi blueprint and the current cycle (DaYun and LiuNian) to generate a highly detailed, realistic, and stylish reading.
 
 User's Bazi Data:
-- Day Master (일간): ${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})
-- Day Master Strength (신강/신약): ${result.analysis?.dayMasterStrength?.score > 50 ? 'Strong (신강)' : 'Weak (신약)'}
-- Missing Elements (무자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r === 0).map(([k]) => k).join(', ')}
-- Overflowing Elements (다자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r > 30).map(([k]) => k).join(', ')}
-- Current Major Cycle (대운): ${currentCycle.stem}${currentCycle.branch} (${currentCycle.stemTenGodKo}/${currentCycle.branchTenGodKo})
-- Current Annual Cycle (세운): ${currentAnnualPillar.stem}${currentAnnualPillar.branch} (${currentAnnualPillar.stemTenGodKo}/${currentAnnualPillar.branchTenGodKo})
+- Day Master (일간): ${dmName}
+- Day Master Strength (신강/신약): ${dmStrength}
+- Missing Elements (무자): ${missingList}
+- Overflowing Elements (다자): ${overflowingList}
+- Current Major Cycle (대운): ${majorCycleInfo}
+- Current Annual Cycle (세운): ${annualCycleInfo}
 
 Logic to apply:
 1. Double-edged Sword (양면성 분석):
@@ -51,10 +90,10 @@ Logic to apply:
    - If Overflowing Wisdom (인성다자) + Expression Luck (식상운): "Trying to act, but clashing with laziness. Beware of health issues and trial-and-error."
 3. Day Master Strength Logic:
    - Strong DM + Wealth Luck: "I cut the tree and take it." (Positive achievement, but must handle rivals).
-    - Weak DM + Wealth Luck: "Crushed by the weight of the tree." (Health issues, debt).
+   - Weak DM + Wealth Luck: "Crushed by the weight of the tree." (Health issues, debt).
 
 CRITICAL INSTRUCTION FOR ENGLISH READINGS:
-When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion'. Instead, you MUST strictly use the V.O.I.D. system terms provided below:
+When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion' or any Korean characters (including '(재성)', '(식상)', etc.). Instead, you MUST strictly use the V.O.I.D. system terms provided below:
 - Wealth -> Maverick/Architect
 - Power -> Warrior/Judge
 - Resource -> Mystic/Sage
@@ -94,18 +133,52 @@ export const generateDailyVibeWithGemini = async (
   todayPillar: any,
   lang: Language
 ): Promise<string> => {
+  const getTenGodEn = (ko: string) => {
+    if (!ko) return "";
+    if (ko.includes("비견") || ko.includes("겁재")) return "Mirror/Rival";
+    if (ko.includes("식신") || ko.includes("상관")) return "Artist/Rebel";
+    if (ko.includes("편재") || ko.includes("정재")) return "Maverick/Architect";
+    if (ko.includes("편관") || ko.includes("정관")) return "Warrior/Judge";
+    if (ko.includes("편인") || ko.includes("정인")) return "Mystic/Sage";
+    return ko;
+  };
+
+  const getCleanList = (isMissing: boolean) => {
+    return Object.entries(result.analysis?.tenGodsRatio || {})
+      .filter(([_, r]) => isMissing ? r === 0 : r > 30)
+      .map(([k]) => {
+        if (lang === 'EN') {
+          const m = k.match(/\(([^)]+)\)/);
+          return m ? m[1] : k;
+        }
+        return k;
+      })
+      .join(', ');
+  };
+
+  const missingList = getCleanList(true);
+  const overflowingList = getCleanList(false);
+
+  const dmName = lang === 'EN' ? result.pillars[1].element : `${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})`;
+  const dbName = lang === 'EN' ? result.pillars[1].branch : `${result.pillars[1].branchKoreanName} (${result.pillars[1].branch})`;
+  const mbName = lang === 'EN' ? result.pillars[2].branch : `${result.pillars[2].branchKoreanName} (${result.pillars[2].branch})`;
+
+  const todayPillarInfo = lang === 'EN'
+    ? `${todayPillar.stem}${todayPillar.branch} (${getTenGodEn(todayPillar.stemTenGodKo)}/${getTenGodEn(todayPillar.branchTenGodKo)})`
+    : `${todayPillar.stem}${todayPillar.branch} (${todayPillar.stemTenGodKo}/${todayPillar.branchTenGodKo})`;
+
   const prompt = `
 You are a 'V.O.I.D Destiny Consultant'. Generate a daily fortune (일진) reading based on the user's Bazi and today's energy.
 
 User's Bazi Data:
-- Day Master (일간): ${result.pillars[1].stemKoreanName} (${result.pillars[1].stem})
-- Day Branch (일지): ${result.pillars[1].branchKoreanName} (${result.pillars[1].branch})
-- Month Branch (월지): ${result.pillars[2].branchKoreanName} (${result.pillars[2].branch})
-- Missing Elements (무자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r === 0).map(([k]) => k).join(', ')}
-- Overflowing Elements (다자): ${Object.entries(result.analysis?.tenGodsRatio || {}).filter(([_, r]) => r > 30).map(([k]) => k).join(', ')}
+- Day Master (일간): ${dmName}
+- Day Branch (일지): ${dbName}
+- Month Branch (월지): ${mbName}
+- Missing Elements (무자): ${missingList}
+- Overflowing Elements (다자): ${overflowingList}
 
 Today's Energy:
-- Today's Pillar (일진): ${todayPillar.stem}${todayPillar.branch} (${todayPillar.stemTenGodKo}/${todayPillar.branchTenGodKo})
+- Today's Pillar (일진): ${todayPillarInfo}
 
 Logic to apply (3-Step Scan):
 1. Day Master vs Today's Stem (Ten Gods):
@@ -124,7 +197,7 @@ Logic to apply (3-Step Scan):
    - If Today's element adds to an Overflowing element: "Overload warning! Blades are clashing. Take a breath so you don't get looted."
 
 CRITICAL INSTRUCTION FOR ENGLISH READINGS:
-When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion'. Instead, you MUST strictly use the V.O.I.D. system terms provided below:
+When writing in English, you MUST NOT use traditional Bazi terminology such as 'Wealth', 'Power', 'Resource', 'Expression', or 'Companion' or any Korean characters (such as '(재성)', '(식상)', etc.). Instead, you MUST strictly use the V.O.I.D. system terms provided below:
 - Wealth -> Maverick/Architect
 - Power -> Warrior/Judge
 - Resource -> Mystic/Sage

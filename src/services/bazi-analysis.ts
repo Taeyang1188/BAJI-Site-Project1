@@ -402,8 +402,27 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
   return ratio;
 };
 
-export const detectSpecialPatterns = (stems: string[], branches: string[], lang: string) => {
-  const patterns: { code: string; name: string; rarity: string; effect: string; enName: string; enEffect: string }[] = [];
+export const detectSpecialPatterns = (
+  stems: string[],
+  branches: string[],
+  lang: string,
+  elementRatios: Record<string, number> = {},
+  strength: any = {}
+) => {
+  const patterns: { 
+    code: string; 
+    name: string; 
+    rarity: string; 
+    effect: string; 
+    enName: string; 
+    enEffect: string;
+    isNoble?: boolean;
+    efficiency?: number;
+    logicDetails?: string[];
+    logicDetailsEn?: string[];
+    tooltipText?: string;
+    tooltipTextEn?: string;
+  }[] = [];
 
   if (stems.length !== 4 || branches.length !== 4) return patterns;
 
@@ -460,6 +479,7 @@ export const detectSpecialPatterns = (stems: string[], branches: string[], lang:
     const sArray = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
     const idx1 = sArray.indexOf(s1);
     const idx2 = sArray.indexOf(s2);
+    if (idx1 === -1 || idx2 === -1) return false;
     return Math.abs(idx1 - idx2) === 5;
   };
   
@@ -484,6 +504,241 @@ export const detectSpecialPatterns = (stems: string[], branches: string[], lang:
       effect: "천간합과 지지합이 일치하여 대인관계의 완벽한 조화, 강력한 귀인의 조력, 매력과 사교성이 빛납니다.",
       enName: "Heaven-Earth Virtuous Harmony",
       enEffect: "Provides perfect harmony in personal relationships, assistance from noble benefactors, and overwhelming charm and sociability."
+    });
+  }
+
+  // --- 귀격 및 특수 케이스 고도화 추가 (수보양광, 목화통명, 벽갑인화, 등라계갑) ---
+  const dayMaster = stems[1]; // 일간
+  const monthZhi = branches[2]; // 월지
+  
+  const fireRatio = elementRatios['Fire'] || 0;
+  const earthRatio = elementRatios['Earth'] || 0;
+  const waterRatio = elementRatios['Water'] || 0;
+  const metalRatio = elementRatios['Metal'] || 0;
+  const woodRatio = elementRatios['Wood'] || 0;
+  const strengthScore = strength?.score || 50;
+
+  // 1. 수보양광 (水輔陽光)
+  // 일간이 병화(丙)이거나 임수(壬)여야 하고, 상대 글자가 바로 옆(시간 stems[0] 또는 월간 stems[2])에 인접해야 함
+  const isSuboYanggwangAdjacent = (stems[1] === '丙' && (stems[0] === '壬' || stems[2] === '壬')) ||
+                                  (stems[1] === '壬' && (stems[0] === '丙' || stems[2] === '丙'));
+
+  if (isSuboYanggwangAdjacent) {
+    let efficiency = 100;
+    const logicDetails: string[] = [];
+    const logicDetailsEn: string[] = [];
+
+    // 조후 과열 검증 (Fire+Earth 비율이 지나치게 강해 물이 증발할 우려)
+    const fireEarthSum = fireRatio + earthRatio;
+    if (fireEarthSum >= 55) {
+      efficiency -= 25;
+      logicDetails.push("조후 과열 요인(-25%): 원국에 화토(火土) 기운이 과도하여 강물(壬)이 건조해질 우려가 있어 명예의 지속성이 다소 약화됩니다.");
+      logicDetailsEn.push("Overheated Climate (-25%): Strong Fire/Earth energy dries up the river water (Im), slightly weakening the stability of prestige.");
+    }
+
+    // 조후 한랭 검증 (Water+Metal이 지나치게 한랭하고 겨울 월인 경우)
+    const waterMetalSum = waterRatio + metalRatio;
+    const isColdMonth = ['亥', '子', '丑'].includes(monthZhi);
+    if (waterMetalSum >= 55 && isColdMonth) {
+      efficiency -= 25;
+      logicDetails.push("조후 동결 요인(-25%): 겨울철 냉랭한 물과 금의 기운으로 동결되어, 병화(太陽)의 따뜻함이 만물에 전달되는 효율이 다소 막힙니다.");
+      logicDetailsEn.push("Frozen Slate (-25%): Extremely cold winter water/metal chills the sun (Byeong), limiting its ability to nurture the surroundings.");
+    }
+
+    // 천간 병임충(丙壬沖) 검증 (둘이 인접해 있는 상태이므로 항상 참)
+    efficiency -= 20;
+    logicDetails.push("천간 병임충(丙壬沖) 영향(-20%): 병화와 임수가 주체인 일간 옆에서 격렬히 충돌하여 삶의 다이내믹한 굴곡과 예기치 못한 도발적 기회가 상존합니다.");
+    logicDetailsEn.push("Stem Clash Interference (-20%): Directly adjacent Byeong-Im clash brings dramatic life changes and sudden breakthrough points.");
+
+    // 지지 충극 검증 (사해충, 자오충)
+    if (branches.includes('巳') && branches.includes('亥')) {
+      efficiency -= 15;
+      logicDetails.push("사해충(巳亥沖) 영향(-15%): 지지에서 병화와 임수의 주 뿌리가 정면 충돌하여 기반이 다소 불안정해집니다.");
+      logicDetailsEn.push("Sa-Hae Branch Clash (-15%): Major roots of Fire and Water directly collide, destabilizing the architectural foundation.");
+    }
+    if (branches.includes('子') && branches.includes('午')) {
+      efficiency -= 15;
+      logicDetails.push("자오충(子午沖) 영향(-15%): 지지의 강력한 물과 불의 충돌로 조화가 일부 훼손됩니다.");
+      logicDetailsEn.push("Ja-Oh Branch Clash (-15%): Severe sub-surface Fire-Water crash partially diminishes internal harmony.");
+    }
+
+    efficiency = Math.max(30, efficiency); // 최소 30% 보장
+
+    patterns.push({
+      code: "subo_yanggwang",
+      name: "수보양광(水輔陽光)",
+      rarity: "SSR",
+      effect: "태양이 맑은 강물을 비춰 함께 눈부시게 빛납니다. 명예와 지위, 사회적 권위가 빛나고 타인에게 찬사를 한몸에 얻는 명예의 귀격입니다.",
+      enName: "Solar-River Radiance (Subo-Yanggwang)",
+      enEffect: "The sun radiates over crisp, clean river waters. Endows great social prestige, high office, and brilliant popular appeal.",
+      isNoble: true,
+      efficiency,
+      logicDetails,
+      logicDetailsEn,
+      tooltipText: "태양(丙)과 강물(壬)이 조화를 이루어 서로의 존재감을 무한히 밝혀주는 명품 격국입니다. 대중적 명성과 사회적 권위를 상징합니다.",
+      tooltipTextEn: "The union of Sun (Byeong) and Infinite Water (Im), magnifying each other's beauty. Denotes eminent renown and noble social status."
+    });
+  }
+
+  // 2. 목화통명 (木火通明)
+  // 일간이 목(甲, 乙)이면서 인접한 천간(시간 stems[0] 또는 월간 stems[2])에 화(丙, 丁)가 뜨거나 주위 지지(시간, 일지, 월지)에 강력한 화(巳, 午)가 박혀야 함 (또는 반대)
+  let isMokhwaAdjacent = false;
+  if (['甲', '乙'].includes(dayMaster)) {
+    const hasAdjacentFireStem = ['丙', '丁'].includes(stems[0]) || ['丙', '丁'].includes(stems[2]);
+    const hasNearbyFireBranch = ['巳', '午'].includes(branches[0]) || ['巳', '午'].includes(branches[1]) || ['巳', '午'].includes(branches[2]);
+    if (hasAdjacentFireStem || hasNearbyFireBranch) {
+      isMokhwaAdjacent = true;
+    }
+  } else if (['丙', '丁'].includes(dayMaster)) {
+    const hasAdjacentWoodStem = ['甲', '乙'].includes(stems[0]) || ['甲', '乙'].includes(stems[2]);
+    const hasNearbyWoodBranch = ['寅', '卯'].includes(branches[0]) || ['寅', '卯'].includes(branches[1]) || ['寅', '卯'].includes(branches[2]);
+    if (hasAdjacentWoodStem || hasNearbyWoodBranch) {
+      isMokhwaAdjacent = true;
+    }
+  }
+
+  const woodFireSum = woodRatio + fireRatio;
+
+  if (isMokhwaAdjacent && woodFireSum >= 45) {
+    let efficiency = 100;
+    const logicDetails: string[] = [];
+    const logicDetailsEn: string[] = [];
+
+    // 동결 상태 검증 (겨울철 지독히 차가운 경우 나무가 얼어 불을 지피기 힘듬)
+    const isWinter = ['亥', '子', '丑'].includes(monthZhi);
+    if (isWinter && waterRatio >= 30 && fireRatio < 15) {
+      efficiency -= 30;
+      logicDetails.push("동결된 땔감인자(-30%): 겨울철 얼어붙은 수기운(水)이 화기를 억누르고 나무를 젖게 만들어, 불길이 활발히 타오르기 어렵습니다.");
+      logicDetailsEn.push("Frozen Wood (-30%): Cold winter water dampens the wood and suppresses heat, preventing the flame from shining widely.");
+    }
+
+    // 강력한 금극목 충돌로 나무 밑둉이 망가짐 (인신충, 묘유충)
+    const hasInShinClash = branches.includes('寅') && branches.includes('申');
+    const hasMyoYuClash = branches.includes('卯') && branches.includes('酉');
+    if ((hasInShinClash || hasMyoYuClash) && metalRatio >= 25) {
+      efficiency -= 20;
+      logicDetails.push("금극목 충돌 위협(-20%): 지지 금기운의 도끼질로 인해 나무 뿌리가 훼손되어 지식의 안정적인 유통과 계승에 차질이 생깁니다.");
+      logicDetailsEn.push("Metal-Wood Fracture (-20%): Earthly metal clashes shear the wood's vital core, disrupting consistent intellectual focus.");
+    }
+
+    efficiency = Math.max(30, efficiency);
+
+    patterns.push({
+      code: "mokhwa_tongmyeong",
+      name: "목화통명(木火通明)",
+      rarity: "SSR",
+      effect: "나무가 아낌없이 타올라 어둠을 깊은 슬기로 밝힙니다. 깊은 학문 연구, 언론, 지식전달 등 지혜와 명성을 지배하는 총명한 두뇌의 귀격입니다.",
+      enName: "Wood-Fire Brilliancy (Mokhwa-Tongmyeong)",
+      enEffect: "Wood transforms into pure, illuminating Fire. Represents high intellect, brilliant wisdom, and sublime academic or artistic success.",
+      isNoble: true,
+      efficiency,
+      logicDetails,
+      logicDetailsEn,
+      tooltipText: "초목이 따사로운 불길을 만나 자신의 지혜와 재능을 세상만방에 널리 퍼트리는 귀격입니다. 지적 탁월함, 언론, 강단에서의 명망을 상징합니다.",
+      tooltipTextEn: "Benevolent wood fueling an eternal light. Symbolizes academic genius, clarity of speech, and high reputation through intellectual work."
+    });
+  }
+
+  // 3. 벽갑인화 (劈甲引火)
+  // 일간이 甲, 丁, 庚 중 하나여야 하고, 나머지 두 핵심 성분이 원국에 있어야 하며 최소한 하나 이상이 일간 옆 천간에 인접해야 함
+  let isByeokGapFormed = false;
+  if (dayMaster === '甲') {
+    const isAdjacentToGyeongOrJeong = ['庚', '丁'].includes(stems[0]) || ['庚', '丁'].includes(stems[2]);
+    const hasGyeong = stems.includes('庚') || branches.includes('申');
+    const hasJeong = stems.includes('丁') || branches.includes('午') || branches.includes('巳');
+    if (isAdjacentToGyeongOrJeong && hasGyeong && hasJeong) {
+      isByeokGapFormed = true;
+    }
+  } else if (dayMaster === '丁') {
+    const isAdjacentToGyeongOrGap = ['庚', '甲'].includes(stems[0]) || ['庚', '甲'].includes(stems[2]);
+    const hasGyeong = stems.includes('庚') || branches.includes('申');
+    const hasGap = stems.includes('甲') || branches.includes('寅');
+    if (isAdjacentToGyeongOrGap && hasGyeong && hasGap) {
+      isByeokGapFormed = true;
+    }
+  } else if (dayMaster === '庚') {
+    const isAdjacentToGapOrJeong = ['甲', '丁'].includes(stems[0]) || ['甲', '丁'].includes(stems[2]);
+    const hasGap = stems.includes('甲') || branches.includes('寅');
+    const hasJeong = stems.includes('丁') || branches.includes('午') || branches.includes('巳');
+    if (isAdjacentToGapOrJeong && hasGap && hasJeong) {
+      isByeokGapFormed = true;
+    }
+  }
+
+  if (isByeokGapFormed && metalRatio >= 10 && woodRatio >= 10) {
+    let efficiency = 100;
+    const logicDetails: string[] = [];
+    const logicDetailsEn: string[] = [];
+
+    // 수다멸화 (물이 너무 많아 정화 모닥불이 위태로운 경우)
+    if (waterRatio >= 30) {
+      efficiency -= 30;
+      logicDetails.push("수다멸화(水多滅火) 압박(-30%): 홍수와 같은 지독한 물기운으로 인해 경금 도끼가 무뎌지고 정화 불씨가 꺼질 위협이 도사립니다.");
+      logicDetailsEn.push("Excessive Water Threat (-30%): Flooding water rusts the ax (Gyeong) and puts out the vital hearth fire (Jeong).");
+    }
+
+    // 지지 인신충(寅申沖)으로 도끼와 통나무가 거칠게 박살남
+    if (branches.includes('寅') && branches.includes('申')) {
+      efficiency -= 20;
+      logicDetails.push("인신충(寅申沖) 장애(-20%): 지지에서 도끼(申)와 고목(寅)이 너무 난폭하게 부딪혀, 땔감을 부드럽게 가공해 내는 안정성이 손상됩니다.");
+      logicDetailsEn.push("In-Shin Clash Disturbance (-20%): Severe physical friction between metal and wood limits precise, constructive splitting.");
+    }
+
+    efficiency = Math.max(30, efficiency);
+
+    patterns.push({
+      code: "byeokgap_inhwa",
+      name: "벽갑인화(劈甲引火)",
+      rarity: "LEGEND",
+      effect: "무쇠 도끼(庚)로 큰 통나무(甲)를 솜씨 좋게 쪼개어 영롱한 횃불(丁)을 밝힙니다. 위대한 전문적 권위와 난관을 보석 같은 기회로 뒤집어 극복하는 귀격입니다.",
+      enName: "Ax-Split Hearth Fire (Byeokgap-Inhwa)",
+      enEffect: "Heaving the ax (Gyeong) to split mature timber (Gap) and fuel the blazing hearth (Jeong). Bestows immense technical mastery and crisis navigation power.",
+      isNoble: true,
+      efficiency,
+      logicDetails,
+      logicDetailsEn,
+      tooltipText: "경력과 역량(庚)을 다해 미지의 원석(甲)을 조각내어 찬란한 지혜와 전문성(丁)을 피워 올리는 극귀한 전문가 귀격입니다.",
+      tooltipTextEn: "Splitting raw wood with sharp metal to generate enduring fire. Denotes extraordinary professional resilience and master problem-solving skills."
+    });
+  }
+
+  // 4. 등라계갑 (藤羅繫甲)
+  const hasBackingOak = stems.includes('甲') || branches.includes('寅') || branches.includes('亥');
+  if (dayMaster === '乙' && hasBackingOak) {
+    let efficiency = 100;
+    const logicDetails: string[] = [];
+    const logicDetailsEn: string[] = [];
+
+    // 일간의 신강 조건 검증 (이미 을목이 든든하게 강하면 굳이 갑목을 귀히 붙잡지 않고 경쟁함)
+    if (strengthScore > 52) {
+      efficiency -= 30;
+      logicDetails.push("일간 기운 과잉(-30%): 을목 스스로 이미 힘이 넘쳐, 참나무(甲)의 소중한 그늘과 조력에 대한 이점 활용도가 절반으로 저하됩니다.");
+      logicDetailsEn.push("Self-Sufficient Overload (-30%): Strong Eul-Wood requires less support, turning potential cooperation with Gap-Wood into competition.");
+    }
+
+    // 갑목이 무쇠(庚金) 등 극심한 금기운에게 정면 강해 목숨을 다치는 경우 (갑경충)
+    const hasGyeongStem = stems.includes('庚');
+    if (hasGyeongStem && metalRatio >= 25) {
+      efficiency -= 20;
+      logicDetails.push("갑목 지지목 손상 요인(-20%): 타고 올라갈 든든한 참나무(甲)가 가혹한 금기운(庚)의 도끼날에 상처 입어 지지 기둥이 흔들립니다.");
+      logicDetailsEn.push("Damaged Support Stem (-20%): The sturdy tree (Gap) faces severe ax strokes from Gyeong-Metal, destabilizing your safe climbing support.");
+    }
+
+    efficiency = Math.max(30, efficiency);
+
+    patterns.push({
+      code: "deungra_gyegap",
+      name: "등라계갑(藤羅繫甲)",
+      rarity: "SR",
+      effect: "여린 덩굴(乙)이 거목(甲)을 휘감아 하늘 높이 비상합니다. 나 혼자 독고다이로 돌파하려 들면 곧 꺾이지만, 거대한 인프라나 타인의 힘을 주저 없이 '빌려 쓰고 얹혀가는' 의존을 택할 때 마침내 운명이 개척됩니다. 철저히 남의 덕을 보고 빌려 쓰며 생존해 나가는 강력한 상호협력과 귀인의 격국입니다.",
+      enName: "Ivy Climbing the Oak (Deungra-Gyegap)",
+      enEffect: "The slender Ivy (Eul) ascends to the heavens by scaling the giant Oak (Gap). You cannot survive on solo struggle; true glory unfolds only when you gracefully rely on someone else's backing or platforms. Winning through collaborative dependence is your ultimate key.",
+      isNoble: true,
+      efficiency,
+      logicDetails,
+      logicDetailsEn,
+      tooltipText: "가녀린 을목이 자존심을 내려놓고 든든한 수호자(甲)를 획득해 온갖 비바람을 함께 극복하는 수호격입니다. ‘현명한 의존’이 최대의 무기입니다.",
+      tooltipTextEn: "Surviving and scaling the heights by gracefully relying on a sturdy pillar (Gap). Embracing smart dependence is your biggest asset, not a weakness."
     });
   }
 

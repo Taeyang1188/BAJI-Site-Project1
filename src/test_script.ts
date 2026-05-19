@@ -1,22 +1,30 @@
-import { calculateRelationshipDynamics } from './services/relationship-dynamics-service';
+import { calculateRealBaZi } from './services/bazi-service';
 
-function runTest(uStem: string, uBranch: string, pStem: string, pBranch: string) {
-  const userResult: any = {
-    pillars: [{title: 'Year'}, { title: 'Day', stem: uStem, branch: uBranch }, {title: 'Month'}, {title: 'Time'}],
-    analysis: { gender: 'female', elementRatios: {}, yongshinDetail: {}, tenGodsRatio: {} }
-  };
-  const partnerResult: any = {
-    pillars: [{title: 'Year'}, { title: 'Day', stem: pStem, branch: pBranch }, {title: 'Month'}, {title: 'Time'}],
-    analysis: { gender: 'male', elementRatios: {}, yongshinDetail: {}, tenGodsRatio: {} }
-  };
-  
-  const res = calculateRelationshipDynamics(userResult, partnerResult, {}, {}, 'KO');
-  console.log(`\n=== Test: ${uStem}${uBranch} vs ${pStem}${pBranch} ===`);
-  console.log("Score:", res.syncScore);
-  console.log("Temperature:", res.temperature);
-  console.log("Gates:", res.gates);
-  console.log("Text:\n", res.text);
-}
+const input = {
+  calendarType: 'solar' as const,
+  birthDate: '1990-11-16',
+  birthTime: '14:00',
+  isTimeUnknown: false,
+  gender: 'female' as const,
+  name: '사용자',
+  city: 'Seoul'
+};
 
-runTest('丙', '午', '壬', '子');
-runTest('丙', '子', '辛', '卯');
+const result = calculateRealBaZi(input, 37.5665, 126.9780, 'KO'); // Seoul Latitude & Longitude
+import { generateCycleVibe } from './services/cycle-vibe-service';
+
+console.log("=== PILLARS ===");
+result.pillars.forEach(p => {
+  console.log(`${p.title}: ${p.hanja} (${p.stemKoreanName} / ${p.branchKoreanName}) [${p.element}]`);
+});
+
+console.log("\n=== Day Master ===");
+console.log(result.pillars[1].stem);
+
+import { generateCoreRemedy } from './services/cycle-vibe-service';
+console.log("\n=== CORE REMEDY KO ===");
+console.log(generateCoreRemedy(result.analysis, 'KO'));
+
+console.log("\n=== Special Patterns (귀격 및 특수 패턴) ===");
+console.log(result.analysis.specialPatterns);
+

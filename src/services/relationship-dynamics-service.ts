@@ -308,7 +308,7 @@ export function calculateRelationshipDynamics(
 
          const isShenZi = (uDayBranch === '申' && pDayBranch === '子') || (uDayBranch === '子' && pDayBranch === '申');
          if (isShenZi) {
-              gates.push({ name: isKO ? "🌊 [영혼의 주파수: 신자합(申子)]" : "🌊 [Soul Resonator: Shen-Zi Combination]", desc: isKO ? "상대방과 깊은 영혼의 결속력을 가집니다. 서로가 함께할 때 큰 시너지(수국)를 만들어냅니다." : "Deep spiritual connection forming powerful synergy." });
+              gates.push({ name: isKO ? "🌊 [영혼의 주파수: 신자합(申子)]" : "🌊 [Soul Resonator: Shin-Ja Combination]", desc: isKO ? "상대방과 깊은 영혼의 결속력을 가집니다. 서로가 함께할 때 큰 시너지(수국)를 만들어냅니다." : "Deep spiritual connection forming powerful synergy." });
          } else {
               gates.push({ name: isKO ? `🔗 [강력한 결속: ${uDayBranch}${pDayBranch} 반합]` : `🔗 [Strong Bond: Half-Combination]`, desc: isKO ? `두 사람의 내면이 같은 방향(${samhapMatch.element})성을 향해 매끄럽게 융합됩니다.` : "Your inner energies blend seamlessly in the same direction." });
          }
@@ -903,7 +903,7 @@ export function calculateRelationshipDynamics(
         if (uWeak || uMetalVal > 30) {
             gates.push({ 
                 name: isKO ? "🌿 [등라계갑(藤羅繫甲)] 거목을 만난 넝쿨" : "🌿 [Deng-Ra-Gye-Gap]", 
-                desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 타고 하늘로 뻗어 나갑니다. 당신에게 상대는 성장의 발판이자 가장 강력한 보호막입니다. 주도권은 매달리는 자(당신)에게 있습니다." : "As Eul-Wood, you climb the partner's giant Gap-Wood tree. They are your ladder to the sky and strongest shield. The initiative lies with you." 
+                desc: isKO ? "을목인 당신은 상대라는 거대한 갑목을 디디고 고양이처럼 유연하게 타고 올라 마침내 생존합니다. 고집 세게 혼자 버티기보다 상대를 기꺼이 믿고 밀착해 '현명하게 의존'할 때 비로소 성장의 로켓이 점화됩니다." : "As Eul-Wood, you gracefully scale the partner's oak tree. Instead of stubborn isolation, fully embracing smart reliance and trust in them unlocks your ultimate growth and success." 
             });
             gateBonus += 20;
         }
@@ -911,7 +911,7 @@ export function calculateRelationshipDynamics(
     if (pDayStem === '乙' && (userResult.pillars.some(p => p.stem === '甲' || p.branch === '寅'))) {
         gates.push({ 
             name: isKO ? "🛡️ [자비로운 짐] 등라계갑(藤羅繫甲)의 버팀목" : "🛡️ [Benevolent Burden]", 
-            desc: isKO ? "상대(을목)는 당신이라는 거목을 타고 하늘로 뻗어 나갑니다. 당신은 상대의 성장을 위해 자신의 에너지를 기꺼이 내어주는 헌신적인 보호막 역할을 하고 있습니다." : "The partner (Eul-Wood) climbs you, the Gap-Wood tree. You are a devoted shield, giving your energy for their growth." 
+            desc: isKO ? "상대(을목)는 당신이라는 거대한 고목 기둥에 안겨 함께 폭풍우를 견디며 살아남습니다. 당신의 든든한 울타리와 조력 속에서만 상대의 가능성이 활짝 피어나므로 기꺼이 그늘을 허락하는 대인배의 결합입니다." : "The partner (Eul-Wood) climbs you, the giant Gap-Wood tree. They depend entirely on your strong shield to blossom, requiring you to generously provide shelter and structure." 
         });
         // Bonus is smaller or neutral for the supporter as it's a "burden"
         gateBonus += 5;

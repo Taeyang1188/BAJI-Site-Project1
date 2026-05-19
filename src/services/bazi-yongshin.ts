@@ -76,12 +76,67 @@ const STEM_CLASHES: Record<string, string> = {
   '丁': '癸', '癸': '丁'
 };
 
+const CLASH_PAIRS: Record<string, string> = { 
+  '子': '午', '午': '子', '丑': '未', '未': '丑', '寅': '申', '申': '寅', 
+  '卯': '酉', '酉': '卯', '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳' 
+};
+
+const PUNISHMENT_PAIRS: Record<string, string[]> = {
+  '寅': ['巳'],
+  '巳': ['寅', '申'],
+  '申': ['巳'],
+  '丑': ['戌'],
+  '戌': ['丑', '未'],
+  '未': ['戌'],
+  '子': ['卯'],
+  '卯': ['子'],
+  '辰': ['辰'],
+  '午': ['午'],
+  '酉': ['酉'],
+  '亥': ['亥']
+};
+
+const HARM_PAIRS: Record<string, string> = { '子': '未', '未': '子', '丑': '午', '午': '丑', '寅': '巳', '巳': '寅', '卯': '辰', '辰': '卯', '申': '亥', '亥': '申', '酉': '戌', '戌': '酉' };
+const PA_PAIRS: Record<string, string> = { '子': '酉', '酉': '子', '寅': '亥', '亥': '寅', '卯': '午', '午': '卯', '辰': '丑', '丑': '辰', '巳': '申', '申': '巳', '未': '戌', '戌': '未' };
+
+function isAdjacentPunished(b: string, bIdx: number, branches: string[]): boolean {
+  const adjIdxs = [bIdx - 1, bIdx + 1].filter(idx => idx >= 0 && idx < branches.length);
+  for (const adjIdx of adjIdxs) {
+    const other = branches[adjIdx];
+    if (PUNISHMENT_PAIRS[b] && PUNISHMENT_PAIRS[b].includes(other)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function calcDayMasterStrength(stems: string[], branches: string[]) {
   const dayMaster = stems[1]; // 일간
   const dmElement = STEM_ELEMENTS[dayMaster];
   const monthZhi = branches[2]; // 월지
   const monthElement = BRANCH_ELEMENTS[monthZhi];
   
+  // Compute adjacent clashes
+  const adjacentClashedIndices = new Set<number>();
+  for (let j = 0; j < branches.length - 1; j++) {
+    const b1 = branches[j];
+    const b2 = branches[j + 1];
+    if (CLASH_PAIRS[b1] === b2) {
+      adjacentClashedIndices.add(j);
+      adjacentClashedIndices.add(j + 1);
+    }
+  }
+
+  // Check if any branch of the combination is adjacent-clashed
+  const isGroupComboBroken = (groupBranches: string[]) => {
+    for (let idx = 0; idx < branches.length; idx++) {
+      if (groupBranches.includes(branches[idx]) && adjacentClashedIndices.has(idx)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   // 1. Base Element Scores
   const elementScores: Record<string, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
   const floatingStems: string[] = [];
@@ -92,8 +147,9 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
     
     // Check for Floating Stems (Heo-bu)
     const rooting = ROOTING_DATA[s];
-    const hasRoot = rooting && branches.some(b => 
-      rooting.strong.includes(b) || rooting.mid.includes(b) || rooting.weak.includes(b)
+    const hasRoot = rooting && branches.some((b, bIdx) => 
+      !adjacentClashedIndices.has(bIdx) &&
+      (rooting.strong.includes(b) || rooting.mid.includes(b) || rooting.weak.includes(b))
     );
     
     if (!hasRoot) {
@@ -124,6 +180,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   
   // Check Bang-hap
   COMBINATIONS.BANG_HAP.forEach(group => {
+    if (isGroupComboBroken(group.branches)) return;
     const present = group.branches.filter(b => branches.includes(b));
     if (present.length === 3 || (present.length === 2 && present.includes(monthZhi))) {
       const bonus = present.length === 3 ? 40 : 20;
@@ -134,6 +191,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
 
   // Check Sam-hap
   COMBINATIONS.SAM_HAP.forEach(group => {
+    if (isGroupComboBroken(group.branches)) return;
     const present = group.branches.filter(b => branches.includes(b));
     const center = group.branches[1];
     if (present.length === 3 || (present.length === 2 && branches.includes(center))) {
@@ -180,6 +238,9 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
 
     let maxMult = 0.5;
     branches.forEach((b, bIdx) => {
+      // If of adjacent-clashed index, rooting is completely wiped out!
+      if (adjacentClashedIndices.has(bIdx)) return;
+
       let m = 0.5;
       if (rooting.strong.includes(b)) m = 1.5;
       else if (rooting.mid.includes(b)) m = 1.2;
@@ -193,7 +254,8 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
     
     if (i === 1) {
       let strongRootCount = 0;
-      branches.forEach(b => {
+      branches.forEach((b, bIdx) => {
+        if (adjacentClashedIndices.has(bIdx)) return;
         if (rooting.strong.includes(b)) strongRootCount++;
       });
       if (strongRootCount >= 2) elementScores[dmElement] += 30;
@@ -250,6 +312,250 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   else if (score <= 65) level = "신강";
   else level = "극신강";
 
+  // 3.8 Compute detailed rooting/tonggeon and generative support information for all 4 pillars with advanced damage and combination-boosted rules
+  const rootingDetails: any[] = [];
+  const titles = ['Hour', 'Day', 'Month', 'Year'];
+
+  stems.forEach((s, sIdx) => {
+    const pTitle = titles[sIdx];
+    const itemRoots: any[] = [];
+    const elStem = STEM_ELEMENTS[s];
+
+    // Check of board-wide Combinations (Hap-hwa) producing/strengthening s's element
+    const combSupportList: any[] = [];
+    if (elStem === 'Wood') {
+      if (['亥', '卯', '未'].every(x => branches.includes(x)) && !isGroupComboBroken(['亥', '卯', '未'])) {
+        combSupportList.push({
+          type: "samhap",
+          element: "Wood",
+          ko: "해묘미 삼합 목국(木局) 완비! 목(木)의 강력한 연합으로 뭉쳐 하늘의 천간을 수호하므로, 뿌리가 대폭 강화되었습니다.",
+          en: "Full Hae-Myo-Mi Wood Triple Combination completes! The strong alignment of Wood branches offers supercharged organic stability to this stem."
+        });
+      } else if (((branches.includes('亥') && branches.includes('卯')) && !isGroupComboBroken(['亥', '卯'])) || ((branches.includes('卯') && branches.includes('未')) && !isGroupComboBroken(['卯', '未']))) {
+        combSupportList.push({
+          type: "samhap_half",
+          element: "Wood",
+          ko: "해묘/묘미 반합 목국(木局) 형성! 중심 기운인 묘목(卯)을 필두로 결속되어 뿌리의 지지력이 격상되었습니다.",
+          en: "Hae-Myo/Myo-Mi Half-Wood Combination. Centered around Myo-Wood, it elevates the grounding and rooting strength significantly."
+        });
+      }
+      if (['寅', '卯', '辰'].every(x => branches.includes(x)) && !isGroupComboBroken(['寅', '卯', '辰'])) {
+        combSupportList.push({
+          type: "banghap",
+          element: "Wood",
+          ko: "인묘진 방합 동방목국(木局) 결집! 강력한 계절의 동류 세력들이 밀착 협력하여 하늘의 천간을 요새처럼 옹호합니다.",
+          en: "In-Myo-Jin Directional Wood Cluster. Strong seasonal alliance creates a fortress-like sanctuary, anchoring your intent."
+        });
+      }
+      if (branches.includes('寅') && branches.includes('亥') && !isGroupComboBroken(['寅', '亥'])) {
+        combSupportList.push({
+          type: "yukhap",
+          element: "Wood",
+          ko: "인해 육합(木) 형성! 상생(수생목) 촉발과 특별한 소속감으로 천간의 힘을 부드럽게 강화시킵니다.",
+          en: "In-Hae Six Combination (Wood). Organic fusion provides highly unified background nourishment and defense."
+        });
+      }
+    }
+
+    if (elStem === 'Fire') {
+      if (['寅', '午', '戌'].every(x => branches.includes(x)) && !isGroupComboBroken(['寅', '午', '戌'])) {
+        combSupportList.push({
+          type: "samhap",
+          element: "Fire",
+          ko: "인오술 삼합 화국(火局) 완비! 거대한 불길의 연합 대세가 조율되어 천간의 불길을 마르지 않게 호위합니다.",
+          en: "Full In-Oh-Sul Fire Triple Combination completes! Creates an ocean of passionate flame energy, granting deep stable roots."
+        });
+      } else if (((branches.includes('寅') && branches.includes('午')) && !isGroupComboBroken(['寅', '午'])) || ((branches.includes('午') && branches.includes('戌')) && !isGroupComboBroken(['午', '戌']))) {
+        combSupportList.push({
+          type: "samhap_half",
+          element: "Fire",
+          ko: "인오/오술 반합 화국(火局) 형성! 오화(午)를 주축으로 결성된 열정이 천간의 화 기운에 막강한 화력을 유입합니다.",
+          en: "In-Oh/Oh-Sul Half-Fire Combination. Armed with Oh-Fire's core pivot, it infuses active backing energy to the stem."
+        });
+      }
+      if (['巳', '午', '未'].every(x => branches.includes(x)) && !isGroupComboBroken(['巳', '午', '未'])) {
+        combSupportList.push({
+          type: "banghap",
+          element: "Fire",
+          ko: "사오미 방합 남방화국(火局) 결집! 강력한 뜨거운 남부의 화염 연합군이 지상에 깔려 천간의 에너지를 전폭 옹립합니다.",
+          en: "Sa-Oh-Mi Directional Fire Cluster. Emits overwhelming solar radiation, securing absolute sovereignty for Fire stems."
+        });
+      }
+      if (branches.includes('卯') && branches.includes('戌') && !isGroupComboBroken(['卯', '戌'])) {
+        combSupportList.push({
+          type: "yukhap",
+          element: "Fire",
+          ko: "묘술 육합(화) 형성! 나무와 흙이 긴밀히 녹아들어 따뜻한 열기로 결합해 천간을 수호합니다.",
+          en: "Myo-Sul Six Combination (Fire). Gently fuels the Fire stem with stable, persistent heat."
+        });
+      }
+    }
+
+    if (elStem === 'Metal') {
+      if (['巳', '酉', '丑'].every(x => branches.includes(x)) && !isGroupComboBroken(['巳', '酉', '丑'])) {
+        combSupportList.push({
+          type: "samhap",
+          element: "Metal",
+          ko: "사유축 삼합 금국(金局) 완비! 냉철한 가을의 금속 연합이 대성하여 천간의 금기를 흔들림 없는 단단한 바위로 다져줍니다.",
+          en: "Full Sa-Yu-Chuk Metal Triple Combination completes! Hardens the structural integrity, sealing a rigid diamond footing for your stem."
+        });
+      } else if (((branches.includes('巳') && branches.includes('酉')) && !isGroupComboBroken(['巳', '酉'])) || ((branches.includes('酉') && branches.includes('丑')) && !isGroupComboBroken(['酉', '丑']))) {
+        combSupportList.push({
+          type: "samhap_half",
+          element: "Metal",
+          ko: "사유/유축 반합 금국(金局) 형성! 유금(酉)을 둘러싼 합화 에너지가 천간 신/경금의 통근을 기적적으로 강화합니다.",
+          en: "Sa-Yu/Yu-Chuk Half-Metal Combination. Centered on Yu-Metal, it creates active metallurgical reinforcement."
+        });
+      }
+      if (['申', '酉', '戌'].every(x => branches.includes(x)) && !isGroupComboBroken(['申', '酉', '戌'])) {
+        combSupportList.push({
+          type: "banghap",
+          element: "Metal",
+          ko: "신유술 방합 서방금국(金局) 결집! 백색 호랑이의 가을 숙살 세력이 지상을 가득 채워, 바위와 칼날이 기세등등하게 우뚝 섭니다.",
+          en: "Shin-Yu-Sul Directional Metal Cluster. Floods the terrain with mineral density, fortifying the stem like armor plating."
+        });
+      }
+      if (branches.includes('辰') && branches.includes('酉') && !isGroupComboBroken(['辰', '酉'])) {
+        combSupportList.push({
+          type: "yukhap",
+          element: "Metal",
+          ko: "진유 육합(금) 형성! 습토의 완벽한 상생 지원(토생금)이 밀착되어 하늘에서 번뜩이는 철제 도구를 명품으로 승격시킵니다.",
+          en: "Jin-Yu Six Combination (Metal). Earth to Metal consolidation acts as a secure buffer, solidifying output stamina."
+        });
+      }
+    }
+
+    if (elStem === 'Water') {
+      if (['申', '子', '辰'].every(x => branches.includes(x)) && !isGroupComboBroken(['申', '子', '辰'])) {
+        combSupportList.push({
+          type: "samhap",
+          element: "Water",
+          ko: "신자진 삼합 수국(水局) 완비! 거대한 대해의 조류 소통을 통해 최고의 연대 뿌리를 형성합니다.",
+          en: "Full Shin-Ja-Jin Water Triple Combination completes! Forms a giant subterranean reservoir, empowering this Water stem deeply."
+        });
+      } else if (((branches.includes('申') && branches.includes('子')) && !isGroupComboBroken(['申', '子'])) || ((branches.includes('子') && branches.includes('辰')) && !isGroupComboBroken(['子', '辰']))) {
+        combSupportList.push({
+          type: "samhap_half",
+          element: "Water",
+          ko: "신자/자진 반합 수국(水局) 형성! 자수(子)를 매개로 한 마르지 않는 강줄기가 연결되어 천간의 갈증을 완전히 씻어 내립니다.",
+          en: "Shin-Ja/Ja-Jin Half-Water Combination. Connects a persistent hydraulic artery directly, enhancing water vitality."
+        });
+      }
+      if (['亥', '子', '丑'].every(x => branches.includes(x)) && !isGroupComboBroken(['亥', '子', '丑'])) {
+        combSupportList.push({
+          type: "banghap",
+          element: "Water",
+          ko: "해자축 방합 북방수국(水局) 결집! 북방의 차갑고 심오한 수기가 대대적으로 모여 뿌리를 공고히 합니다.",
+          en: "Hae-Ja-Chuk Directional Water Cluster. Cold winter freezing water flow gathers together, creating absolute fluid superiority."
+        });
+      }
+      if (branches.includes('巳') && branches.includes('申') && !isGroupComboBroken(['巳', '申'])) {
+        combSupportList.push({
+          type: "yukhap",
+          element: "Water",
+          ko: "사신 육합(수) 형성! 수기를 함유한 긴밀한 이중 결합으로 천간 자원을 뒷받침합니다.",
+          en: "Sa-Shin Six Combination (Water). Complex metamorphic alchemy triggers a silent water flow undercurrent."
+        });
+      }
+    }
+
+    if (elStem === 'Earth') {
+      if (branches.includes('午') && branches.includes('未') && !isGroupComboBroken(['午', '未'])) {
+        combSupportList.push({
+          type: "yukhap",
+          element: "Earth",
+          ko: "오미 육합(토) 형성! 뜨거운 화기와 메마른 흙의 밀접한 결합으로 토(土) 기질을 강화하고 하늘의 가치를 공고히 지탱합니다.",
+          en: "Oh-Mi Six Combination (Earth). Consolidates dry-clay properties, strengthening the stem structural foundations."
+        });
+      }
+    }
+
+    branches.forEach((b, bIdx) => {
+      const bTitle = titles[bIdx];
+      const jijangan = JIJANGAN[b];
+      
+      const damages: string[] = [];
+      const damagesEn: string[] = [];
+      
+      const isAdjacentClashed = adjacentClashedIndices.has(bIdx);
+      const hasAdjacentPunishment = !isAdjacentClashed && isAdjacentPunished(b, bIdx, branches);
+
+      if (isAdjacentClashed) {
+        damages.push(`직접적인 인접 지지충(地支衝)인 [ ${b}-${CLASH_PAIRS[b]} ] 이(가) 가까이서 발생하여 지장간 뿌리(통근)가 완전히 깨지고 소멸되었습니다.`);
+        damagesEn.push(`Direct adjacent Earthly Branch Clash [ ${b}-${CLASH_PAIRS[b]} ] is active, completely shattering physical rooting stability.`);
+      } else if (hasAdjacentPunishment) {
+        damages.push(`⚡ 인접 형살(刑殺) 작용: 뿌리가 파괴되지는 않았으나 에너지가 매우 거칠고 예민하게 비틀어 집니다. (예: 살벌하고 압박적인 상황 속에서 능력을 발휘하는 강박적인 조율 원리)`);
+        damagesEn.push(`⚡ Adjacent Punishment active: Root remains intact, but energy is squeezed and twisted roughly under intense pressure.`);
+      }
+
+      if (jijangan) {
+        jijangan.stems.forEach((hs, hsIdx) => {
+          const isExactMatch = (hs === s);
+          const isMain = (hsIdx === jijangan.stems.length - 1) || isExactMatch;
+          const hasRootSameElement = (STEM_ELEMENTS[hs] === STEM_ELEMENTS[s]);
+          const isGeneration = (hs === '癸' && s === '甲') || (hs === '壬' && s === '甲') ||
+                                (hs === '癸' && s === '乙') || (hs === '壬' && s === '乙') ||
+                                (STEM_ELEMENTS[hs] === 'Water' && STEM_ELEMENTS[s] === 'Wood') ||
+                                (STEM_ELEMENTS[hs] === 'Wood' && STEM_ELEMENTS[s] === 'Fire') ||
+                                (STEM_ELEMENTS[hs] === 'Fire' && STEM_ELEMENTS[s] === 'Earth') ||
+                                (STEM_ELEMENTS[hs] === 'Earth' && STEM_ELEMENTS[s] === 'Metal') ||
+                                (STEM_ELEMENTS[hs] === 'Metal' && STEM_ELEMENTS[s] === 'Water');
+          
+          if (hasRootSameElement) {
+            const type = isMain ? 'main' : 'sub_residual';
+            const typeKo = isMain ? '본기통근' : '중/여기통근';
+            const typeEn = isMain ? 'Main-Qi Root' : 'Sub-Qi Root';
+            const descKo = isMain ? `본기 통근 (가장 강력한 뿌리)` : `중기/여기 통근 (안정적인 지지대)`;
+            const descEn = isMain ? `Main-Qi Rooting (Most Powerful)` : `Sub-Qi Rooting (Moderate)`;
+            itemRoots.push({
+              branchTitle: bTitle,
+              branch: b,
+              type,
+              typeKo,
+              typeEn,
+              descKo,
+              descEn,
+              hiddenStem: hs,
+              isDestroyed: isAdjacentClashed,
+              isTwisted: hasAdjacentPunishment,
+              damages,
+              damagesEn
+            });
+          } else if (isGeneration) {
+            const type = 'generation';
+            const typeKo = '생기생조(득생)';
+            const typeEn = 'Generative Support';
+            const descKo = '생기 생조 (득생 - 인성의 든든한 상생 보조)';
+            const descEn = 'Generative Support (Receiving strength from Resource qi)';
+            itemRoots.push({
+              branchTitle: bTitle,
+              branch: b,
+              type,
+              typeKo,
+              typeEn,
+              descKo,
+              descEn,
+              hiddenStem: hs,
+              isDestroyed: isAdjacentClashed,
+              isTwisted: hasAdjacentPunishment,
+              damages,
+              damagesEn
+            });
+          }
+        });
+      }
+    });
+
+    const isFloat = !itemRoots.some(r => r.type === 'main' || r.type === 'sub_residual');
+    rootingDetails.push({
+      stem: s,
+      pillarTitle: pTitle,
+      isFloat,
+      roots: itemRoots,
+      combinations: combSupportList
+    });
+  });
+
   return { 
     score, 
     level, 
@@ -262,6 +568,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
     },
     activeCombinations,
     floatingStems,
+    rootingDetails, // Detailed rooting information for the entire chart
     elementScores // Return raw scores for advanced analysis
   };
 }
@@ -288,11 +595,31 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
   };
 
   if (isGwanDa) {
-    const primary = { god: "식상", element: getElementByRel('Output'), reason: "관다신약 → 식상용신 (식신제살)", reasonEn: "GwanDa -> Artist/Rebel Useful God" };
-    const heeShin = { god: "비겁", element: getElementByRel('Self') };
-    const giShin = { god: "재성", element: getElementByRel('Wealth') };
-    const guShin = { god: "인성", element: getElementByRel('Wisdom') };
-    return { primary, heeShin, giShin, guShin, method: "관다용신", byeongYak: null, tongGwan: null, eokbu: null };
+    if (!isStrong) {
+      // 관다신약 -> 인성용신 (살인상생/관인상생)
+      const primary = { 
+        god: "인성", 
+        element: getElementByRel('Wisdom'), 
+        reason: "관다신약 → 인성용신 (살인상생)", 
+        reasonEn: "Bazi overloaded with Gwan & Weak DayMaster -> Wisdom/Sage Useful God (살인상생)" 
+      };
+      const heeShin = { god: "비겁", element: getElementByRel('Self') };
+      const giShin = { god: "관성", element: getElementByRel('Power') };
+      const guShin = { god: "재성", element: getElementByRel('Wealth') };
+      return { primary, heeShin, giShin, guShin, method: "관다용신", byeongYak: null, tongGwan: null, eokbu: null };
+    } else {
+      // 관다신강 -> 식상용신 (식신제살)
+      const primary = { 
+        god: "식상", 
+        element: getElementByRel('Output'), 
+        reason: "관다신강 → 식상용신 (식신제살)", 
+        reasonEn: "GwanDa & Strong DayMaster -> Artist/Rebel Useful God (식신제살)" 
+      };
+      const heeShin = { god: "재성", element: getElementByRel('Wealth') };
+      const giShin = { god: "인성", element: getElementByRel('Wisdom') };
+      const guShin = { god: "비겁", element: getElementByRel('Self') };
+      return { primary, heeShin, giShin, guShin, method: "관다용신", byeongYak: null, tongGwan: null, eokbu: null };
+    }
   }
 
   const getGod = (el: string) => {

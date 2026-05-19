@@ -9,6 +9,7 @@ export interface SoulSummary {
   traits: string[];
   coreEnergy: {
     element: string;
+    baseElement: string;
     description: string;
     practicalAdvice: string;
     luckyHabit: string;
@@ -103,6 +104,16 @@ const STEM_NAMES: Record<string, string> = {
 const BRANCH_NAMES: Record<string, string> = {
   '子': '자', '丑': '축', '寅': '인', '卯': '묘', '辰': '진', '巳': '사',
   '午': '오', '未': '미', '申': '신', '酉': '유', '戌': '술', '亥': '해'
+};
+
+const STEM_TRANSLITERATION: Record<string, string> = {
+  '甲': 'GAP', '乙': 'EUL', '丙': 'BYEONG', '丁': 'JEONG', '戊': 'MU',
+  '己': 'GI', '庚': 'GYEONG', '辛': 'SIN', '壬': 'IM', '癸': 'GYE'
+};
+
+const BRANCH_TRANSLITERATION: Record<string, string> = {
+  '子': 'JA', '丑': 'CHUK', '寅': 'IN', '卯': 'MYO', 'JIN': 'JIN', '辰': 'JIN', '巳': 'SA',
+  '午': 'O', '未': 'MI', '申': 'SHIN', '酉': 'YU', '戌': 'SUL', '亥': 'HAE'
 };
 
 const STEM_METAPHORS: Record<string, { ko: string, en: string }> = {
@@ -245,7 +256,13 @@ const getIljuCharacter = (key: string, lang: Language): { core: string, traits: 
 export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSummary {
   const dayPillar = result.pillars.find(p => p.title === 'Day');
   const iljuKey = dayPillar ? `${STEM_NAMES[dayPillar.stem] || ''}${BRANCH_NAMES[dayPillar.branch] || ''}` : "무인";
-  const iljuName = dayPillar ? (lang === 'KO' ? `${STEM_NAMES[dayPillar.stem] || dayPillar.stem}${BRANCH_NAMES[dayPillar.branch] || dayPillar.branch}일주 (${dayPillar.hanja})` : `${dayPillar.stemEnglishName.toUpperCase()}-${dayPillar.branchEnglishName.toUpperCase()} (${dayPillar.hanja})`) : "MU-IN (戊寅)";
+  const iljuName = dayPillar ? (
+    lang === 'KO' ? 
+      `${STEM_NAMES[dayPillar.stem] || dayPillar.stem}${BRANCH_NAMES[dayPillar.branch] || dayPillar.branch}일주 (${dayPillar.hanja})` : 
+      `${STEM_TRANSLITERATION[dayPillar.stem] || dayPillar.stem}-${BRANCH_TRANSLITERATION[dayPillar.branch] || dayPillar.branch} (${dayPillar.hanja}) Day Pillar`
+  ) : (
+    lang === 'KO' ? "무인일주 (戊寅)" : "MU-IN (戊寅) Day Pillar"
+  );
 
   const charData = getIljuCharacter(iljuKey, lang);
   const strength = result.analysis?.strength?.score ?? 50;
@@ -440,6 +457,9 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   const dmIdx = elementsOrder.indexOf(dmElement);
 
   let yongShen = result.analysis?.yongShen || 'Wood';
+  const primaryElementField = result.analysis?.yongshinDetail?.primary?.element || "";
+  const hasMultipleElements = primaryElementField.includes('/');
+  const yongShenElements = hasMultipleElements ? primaryElementField.split('/') : [primaryElementField];
   
   // Extract base element if it contains English terminology (e.g., "Water (Maverick/Architect)")
   let baseElement = yongShen;
@@ -456,10 +476,21 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   else if (baseElement.includes('인성')) baseElement = elementsOrder[(dmIdx + 4) % 5];
 
   // Core Energy (Use Yong-shin as the key energy to utilize)
-  const rawElemKo = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.ko || baseElement;
-  const coreElemKo = rawElemKo.split(' ')[0]; // Strip terminology
-  const hanja = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
-  const displayElem = lang === 'KO' ? `${coreElemKo}(${hanja})` : yongShen;
+  let displayElem = baseElement;
+  if (hasMultipleElements && yongShenElements.length > 1) {
+    displayElem = lang === 'KO' 
+      ? yongShenElements.map(el => {
+          const ko = BAZI_MAPPING.elements[el as keyof typeof BAZI_MAPPING.elements]?.ko?.split(' ')[0] || el;
+          const hanja = BAZI_MAPPING.elements[el as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
+          return `${ko}(${hanja})`;
+        }).join(' · ')
+      : yongShenElements.join(' / ');
+  } else {
+    const rawElemKo = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.ko || baseElement;
+    const coreElemKo = rawElemKo.split(' ')[0]; // Strip terminology
+    const hanja = BAZI_MAPPING.elements[baseElement as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
+    displayElem = lang === 'KO' ? `${coreElemKo}(${hanja})` : baseElement;
+  }
 
   // Core Energy logic based on Yong-shin's role (Ten Gods)
   const yongShenRoleIdx = (elementsOrder.indexOf(baseElement) - dmIdx + 5) % 5;
@@ -586,6 +617,7 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     traits: charData.traits,
     coreEnergy: {
       element: displayElem,
+      baseElement,
       ...coreInfo
     },
     actionPrescription,

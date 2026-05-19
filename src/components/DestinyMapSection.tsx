@@ -43,11 +43,11 @@ const ELEMENT_KOR: Record<string, string> = { "Wood": "목(木)", "Fire": "화(�
 
 export const DestinyMapSection: React.FC<DestinyMapSectionProps> = ({ result, lang, parsedJson, scannerOnly = false }) => {
 
-  const pinyinStem: Record<string, string> = { '甲':'Jia', '乙':'Yi', '丙':'Bing', '丁':'Ding', '戊':'Wu', '己':'Ji', '庚':'Geng', '辛':'Xin', '壬':'Ren', '癸':'Gui' };
-  const pinyinBranch: Record<string, string> = { '子':'Zi', '丑':'Chou', '寅':'Yin', '卯':'Mao', '辰':'Chen', '巳':'Si', '午':'Wu', '未':'Wei', '申':'Shen', '酉':'You', '戌':'Xu', '亥':'Hai' };
+  const romanStem: Record<string, string> = { '甲':'Gap', '乙':'Eul', '丙':'Byeong', '丁':'Jeong', '戊':'Mu', '己':'Gi', '庚':'Gyeong', '辛':'Shin', '壬':'Im', '癸':'Gye' };
+  const romanBranch: Record<string, string> = { '子':'Ja', '丑':'Chuk', '寅':'In', '卯':'Myo', '辰':'Jin', '巳':'Sa', '午':'O', '未':'Mi', '申':'Shin', '酉':'Yu', '戌':'Sul', '亥':'Hae' };
 
   const getPinyin = (s: string, b: string) => {
-      return (pinyinStem[s] || s) + '-' + (pinyinBranch[b] || b);
+      return (romanStem[s] || s) + '-' + (romanBranch[b] || b);
   };
   const currentIndex = result.currentCycleIndex;
   const minSlider = Math.max(0, currentIndex - 1);

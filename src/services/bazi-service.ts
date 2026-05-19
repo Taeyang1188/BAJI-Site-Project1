@@ -389,8 +389,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   
   // New detailed calculations
   const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
-  const specialPatterns = detectSpecialPatterns(allStems, allBranches, lang);
   const strength = calcDayMasterStrength(allStems, allBranches);
+  const specialPatterns = detectSpecialPatterns(allStems, allBranches, lang, elementRatios, strength);
   const geJuResult = calculateGeJu(dayGan, monthZhi, allStems, allBranches, strength.elementScores, lang);
   const geJu = geJuResult.geJu;
   let structureDetail: any = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
@@ -437,7 +437,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
     };
     
     if (translatedGod.includes('/')) {
-      translatedGod = translatedGod.split('/').map(g => enMap[g] || g).join(', ');
+      translatedGod = ""; // Omit Ten God names to reduce clutter, just show elements
+      translatedElement = translatedElement.split('/').join(', '); 
     } else {
       translatedGod = enMap[translatedGod] || translatedGod;
     }

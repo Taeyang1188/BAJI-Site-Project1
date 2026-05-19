@@ -18,7 +18,7 @@ function getJosa(name: string, josaType: '은는' | '이가' | '을를'): string
   return name + josa[josaType];
 }
 
-function generateCoreRemedy(analysis: any, lang: Language): string {
+export function generateCoreRemedy(analysis: any, lang: Language): string {
     const yongshin = analysis && analysis.yongshinDetail;
     if (!yongshin || !yongshin.primary || !yongshin.giShin) return "";
 
@@ -27,8 +27,26 @@ function generateCoreRemedy(analysis: any, lang: Language): string {
     const giElement = yongshin.giShin.element;
     const giGod = yongshin.giShin.god ? yongshin.giShin.god.split("(")[0].trim().split(",")[0].trim() : "";
 
-    const elementToKo: Record<string, string> = {
+    const elementToKoRaw: Record<string, string> = {
         "Wood": "목(木)", "Fire": "화(火)", "Earth": "토(土)", "Metal": "금(金)", "Water": "수(水)"
+    };
+
+    const getElementColorVar = (el: string) => {
+        if (el === "Wood") return "var(--color-wood)";
+        if (el === "Fire") return "var(--color-fire)";
+        if (el === "Earth") return "var(--color-earth)";
+        if (el === "Metal") return "var(--color-metal)";
+        if (el === "Water") return "var(--color-water)";
+        return "#FFFFFF";
+    };
+
+    const getGodWithHanja = (god: string) => {
+        if (god === "비겁") return "비겁(比劫)";
+        if (god === "식상") return "식상(食傷)";
+        if (god === "재성") return "재성(財星)";
+        if (god === "관성") return "관성(官星)";
+        if (god === "인성") return "인성(印星)";
+        return god;
     };
 
     const edgyGiDescMap: Record<string, string> = {
@@ -47,7 +65,31 @@ function generateCoreRemedy(analysis: any, lang: Language): string {
         "인성": "설익은 상태로 무대에 서지 말고, 차라리 동굴에 박혀서 아무도 반박 못 할 진짜 내공이나 스펙을 조용히 갈고닦는"
     };
 
-    if (!elementToKo[heeElement] || !elementToKo[giElement]) return "";
+    const edgyGiDescMapEn: Record<string, string> = {
+        "비겁": "running blindly like a runaway truck, exhausting yourself by stubbornness",
+        "식상": "speaking before thinking, piling up regrets with unnecessary interference",
+        "재성": "chasing short-term gains like a racehorse with blinders, piling up narrow-minded fatigue",
+        "관성": "suffocating yourself within rigid social rules or expectations of others",
+        "인성": "getting stuck in endless overthinking and daydreams while staying in your room"
+    };
+
+    const edgyHeeActionMapEn: Record<string, string> = {
+        "비겁": "stopping people-pleasing and confidently blazing your own trail",
+        "식상": "releasing your hidden talents and taking bold actions to shake things up",
+        "재성": "dropping vague dreams and focusing strictly on real, tangible rewards",
+        "관성": "avoiding unnecessary conflicts and taking cover under established systems or safety nets",
+        "인성": "stepping back to quietly build genuine expertise and inner strength in the shadows"
+    };
+
+    const godGroupToEn: Record<string, string> = {
+        "비겁": "Mirror/Rival",
+        "식상": "Artist/Rebel",
+        "재성": "Maverick/Architect",
+        "관성": "Warrior/Judge",
+        "인성": "Mystic/Sage"
+    };
+
+    if (!elementToKoRaw[heeElement] || !elementToKoRaw[giElement]) return "";
 
     const mapGod = (g: string) => {
       if(!g) return "";
@@ -66,10 +108,30 @@ function generateCoreRemedy(analysis: any, lang: Language): string {
 
     if (!edgyGiDescMap[mappedGi] || !edgyHeeActionMap[mappedHee]) return "";
 
+    const giRatio = analysis?.elementRatios?.[giElement] || 0;
+    const mappedGiEn = godGroupToEn[mappedGi] || mappedGi;
+    const mappedHeeEn = godGroupToEn[mappedHee] || mappedHee;
+
     if (lang === "KO") {
-        return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 제어되지 않는 ${elementToKo[giElement]} ${mappedGi} 기운 때문에 ${edgyGiDescMap[mappedGi]} 있어. 이 답답한 과포화 상태에 시원하게 찬물이라도 부으려면 어떻게든 ${elementToKo[heeElement]} ${mappedHee}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+        const colorVarGi = getElementColorVar(giElement);
+        const colorVarHee = getElementColorVar(heeElement);
+        const giCombo = `[${colorVarGi}:${elementToKoRaw[giElement]} ${getGodWithHanja(mappedGi)}]`;
+        const heeCombo = `[${colorVarHee}:${elementToKoRaw[heeElement]} ${getGodWithHanja(mappedHee)}]`;
+
+        if (giRatio >= 25) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 너무 과열되어 제어되지 않는 ${giCombo} 기운 때문에 ${edgyGiDescMap[mappedGi]} 있어. 이 답답한 과포화 상태에 시원하게 찬물이라도 부으려면 어떻게든 ${heeCombo}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+        } else {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 다소 약하고 부실하게 자리 잡은 ${giCombo} 기운 때문에 오히려 이 기운이 약한 것에 대해 조급해지고 집착하게 되어 ${edgyGiDescMap[mappedGi]} 있어. 부족하고 불안정한 기운에 휘둘리는 상태인 거지. 이 부실한 중심을 다잡고 건강하게 보완하려면 어떻게든 ${heeCombo}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+        }
     } else {
-        return "\n\n📌 **[ Core Task & Remedy ]**\nYour chart shows intense " + giElement + " (" + mappedGi + ") energy, which can lead to severe imbalance. To harmonize this pressure, you must actively channel your " + heeElement + " (" + mappedHee + ") energy.\nRather than waiting passively, **prioritizing actions related to " + mappedHee + "** is your most practical and powerful strategy to transcend your current limits.";
+        const giComboEn = `[${getElementColorVar(giElement)}:${giElement} (${mappedGiEn})]`;
+        const heeComboEn = `[${getElementColorVar(heeElement)}:${heeElement} (${mappedHeeEn})]`;
+
+        if (giRatio >= 25) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart currently shows over-saturated and uncontrolled ${giComboEn} energy, leading you to experience a state of ${edgyGiDescMapEn[mappedGi]}. To harmonize this overwhelming pressure, you must actively channel your ${heeComboEn} essence.\n\nRather than waiting passively, **${edgyHeeActionMapEn[mappedHee]}** is your most practical and powerful strategy to transcend your current limits.`;
+        } else {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart shows fragile or unstable ${giComboEn} energy. Because the energy is weak, you tend to get impatient and excessively cling to ${edgyGiDescMapEn[mappedGi]}. To stabilize and ground this vulnerable state, you must actively channel your ${heeComboEn} essence.\n\nRather than waiting passively, **${edgyHeeActionMapEn[mappedHee]}** is your most practical and powerful strategy to transcend your current limits.`;
+        }
     }
 }
 
@@ -280,80 +342,186 @@ export function generateCycleVibe(
 
   // 2. Bazi Combinations (Combos)
   const combos: { id: string; priority: number; name: string; desc: string }[] = [];
-  if (lang === 'KO') {
-    const hasSikSangLuck = luckGods.some(g => g === '식신' || g === '상관');
-    const hasJaeSeongLuck = luckGods.some(g => g === '편재' || g === '정재');
-    const hasGwanSeongLuck = luckGods.some(g => g === '편관' || g === '정관');
-    const hasInSeongLuck = luckGods.some(g => g === '편인' || g === '정인');
+  
+  const hasSikSangLuck = luckGods.some(g => g === '식신' || g === '상관');
+  const hasJaeSeongLuck = luckGods.some(g => g === '편재' || g === '정재');
+  const hasGwanSeongLuck = luckGods.some(g => g === '편관' || g === '정관');
+  const hasInSeongLuck = luckGods.some(g => g === '편인' || g === '정인');
 
-    const hasSikSangBase = overflow.some(o => o.includes('식상')) || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 15 || (tenGodsRatio['Artist/Rebel'] as number) > 15;
-    const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || (tenGodsRatio['재성(Maverick/Architect)'] as number) > 15 || (tenGodsRatio['Maverick/Architect'] as number) > 15;
-    const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || (tenGodsRatio['관성(Warrior/Judge)'] as number) > 15 || (tenGodsRatio['Warrior/Judge'] as number) > 15;
-    const hasInSeongBase = overflow.some(o => o.includes('인성')) || (tenGodsRatio['인성(Mystic/Sage)'] as number) > 15 || (tenGodsRatio['Mystic/Sage'] as number) > 15;
+  const hasSikSangBase = overflow.some(o => o.includes('식상')) || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 15 || (tenGodsRatio['Artist/Rebel'] as number) > 15;
+  const hasJaeSeongBase = overflow.some(o => o.includes('재성')) || (tenGodsRatio['재성(Maverick/Architect)'] as number) > 15 || (tenGodsRatio['Maverick/Architect'] as number) > 15;
+  const hasGwanSeongBase = overflow.some(o => o.includes('관성')) || (tenGodsRatio['관성(Warrior/Judge)'] as number) > 15 || (tenGodsRatio['Warrior/Judge'] as number) > 15;
+  const hasInSeongBase = overflow.some(o => o.includes('인성')) || (tenGodsRatio['인성(Mystic/Sage)'] as number) > 15 || (tenGodsRatio['Mystic/Sage'] as number) > 15;
 
-    const specialCombinations = analysis.specialCombinations || {};
+  const specialCombinations = analysis.specialCombinations || {};
 
-    // --- Special Combinations (물상론) ---
-    if (specialCombinations.isByeokGapInHwa && seunStem === '庚') {
-      combos.push({ id: '벽갑인화', priority: 200, name: '벽갑인화(劈甲引火)', desc: `투박한 거목이 도끼를 만나 쓰임새 있는 도구로 변하는 해이야. 막연했던 계획이 실질적인 결과물로 '떡상'하는 시기지.` });
-    }
-    if (specialCombinations.isDengLaJieJia && seunStem === '甲') {
-      combos.push({ id: '등라계갑', priority: 190, name: '등라계갑(藤羅繫甲)', desc: `담쟁이덩굴이 거목을 만났어. 강력한 조력자나 배우자의 든든한 등 뒤에서 네 능력을 마음껏 펼칠 타이밍이야.` });
-    }
-    if (specialCombinations.isDoSeJuOk && seunStem === '壬') {
-      combos.push({ id: '도세주옥', priority: 180, name: '도세주옥(陶洗珠玉)', desc: `흙먼지 묻은 보석이 맑은 물에 씻겨 광채를 내는 격이야. 네 진가가 세상의 주목을 받으며 반짝이기 시작할 거야.` });
-    }
-    if (specialCombinations.isGangHwiSangYeong && seunStem === '丙') {
-      combos.push({ id: '강휘상영', priority: 185, name: '강휘상영(江輝相映)', desc: `넓은 강물 위로 태양이 비치며 찬란한 빛을 만드는 형국이야. 귀인을 만나거나 사회적 지위가 수직 상승하는 기분 좋은 흐름이지.` });
-    }
-    if (specialCombinations.isHwaChiSeungRyong && seunBranch === '辰') {
-      combos.push({ id: '화치승룡', priority: 170, name: '화치승룡(火熾乘龍)', desc: `타오르는 불길이 용(진토)을 만나 안정을 찾는 해이야. 과부하된 에너지가 조절되어 심리적 평온과 실속을 동시에 챙기게 될 거야.` });
-    }
-    if (specialCombinations.isGiToTakIm && seunStem === '己') {
-      combos.push({ id: '기토탁임', priority: 160, name: '기토탁임(己土濁壬)', desc: `맑은 강물에 흙탕물이 섞이는 형국이야. 감정적인 판단이나 구설수로 명예에 스크래치 나지 않게 멘탈 관리 잘해야 해.` });
-    }
-
-    if (luckGods.includes('상관') && (hasInSeongBase || hasInSeongLuck)) {
-      combos.push({ id: '상관패인', priority: 100, name: '상관패인(傷官佩印)', desc: `기발하고 날카로운 아이디어(상관)가 인성이라는 품격 있는 고삐를 만났어. 거친 재능이 다듬어져 세상의 인정을 받기 좋은 시기야.` });
-    }
-    if (luckGods.includes('식신') && (hasGwanSeongBase || hasGwanSeongLuck)) {
-      combos.push({ id: '식신제살', priority: 95, name: '식신제살(食神制殺)', desc: `너를 괴롭히던 난관을 너만의 실력으로 시원하게 해결해버리는 시기야. 위기 돌파 능력이 빛을 발할 거야.` });
-    }
-    if (luckGods.includes('편관') && (hasInSeongBase || hasInSeongLuck)) {
-      combos.push({ id: '살인상생', priority: 90, name: '살인상생(殺印相生)', desc: `강력한 난관(편관)을 지혜와 학문(인성)으로 녹여내어 오히려 큰 기회로 바꾸는 시기야. 위기를 기회로 만드는 반전의 드라마가 펼쳐질 거야.` });
-    }
-    if (hasSikSangLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
-      combos.push({ id: '식상생재', priority: 85, name: '식상생재(食傷生財)', desc: `재능이 곧바로 결과물로 이어지는 흐름이야. 머릿속 계획들이 실질적인 성과로 변하는 생산적인 시기지.` });
-    }
-    if (hasGwanSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
-      combos.push({ id: '관인상생', priority: 80, name: '관인상생(官印상생)', desc: `조직의 혜택이나 윗사람의 끌어줌이 있는 시기야. 노력이 공식적으로 인정받고 명예가 올라가는 흐름이지.` });
-    }
-    if (hasJaeSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
-      combos.push({ id: '재극인', priority: 70, name: '재극인(財剋印)', desc: `현실적인 이익과 신념이 충돌하고 있어. 당장의 이익 때문에 소중한 가치를 버리지 않게 조심해.` });
-    }
-    if (hasGwanSeongLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
-      combos.push({ id: '재생관', priority: 60, name: '재생관(財生官)', desc: `쌓아온 자산이나 노력이 사회적 지위로 연결되는 흐름이야. 내실을 다져 더 높은 곳으로 올라갈 발판을 마련하게 될 거야.` });
-    }
-
-    // 観多専用のロジック
-    if (isGwanDa) {
-      if (hasSikSangLuck) {
-        combos.push({ id: '식신제살', priority: 1000, name: '식신제살(食神制殺)', desc: "비로소 당신의 검을 휘둘러 낡은 굴레를 끊어내고 주도권을 잡는 '돌파의 해'입니다." });
-      }
-      if (hasJaeSeongLuck) {
-        combos.push({ id: '재생살', priority: -1000, name: '재생살(財生殺)', desc: "겉으로는 실속과 기회처럼 보이나, 실제로는 당신의 책임과 부담을 가중시켜 숨 막히게 할 수 있는 시기입니다." });
-      }
-    }
-
-    combos.sort((a, b) => b.priority - a.priority);
-    if (combos.length > 2) combos.splice(2);
+  // --- Special Combinations (물상론) ---
+  if (specialCombinations.isByeokGapInHwa && seunStem === '庚') {
+    combos.push({ 
+      id: '벽갑인화', 
+      priority: 200, 
+      name: lang === 'KO' ? '벽갑인화(劈甲引火)' : 'Chopping Wood to Spark Fire', 
+      desc: lang === 'KO' 
+        ? `투박한 거목이 도끼를 만나 쓰임새 있는 도구로 변하는 해이야. 막연했던 계획이 실질적인 결과물로 '떡상'하는 시기지.`
+        : `A rough log meets a sharp axe, turning into valuable firewood. Your abstract concepts ignite into highly tangible, practical success.`
+    });
   }
+  if (specialCombinations.isDengLaJieJia && seunStem === '甲') {
+    combos.push({ 
+      id: '등라계갑', 
+      priority: 190, 
+      name: lang === 'KO' ? '등라계갑(藤羅繫甲)' : 'Ivy Clinging to a Giant Oak', 
+      desc: lang === 'KO' 
+        ? `담쟁이덩굴이 거목을 만났어. 강력한 조력자나 배우자의 든든한 등 뒤에서 네 능력을 마음껏 펼칠 타이밍이야.`
+        : `Vines encountering a sturdy, grand tree. It is the perfect timing to fully unleash your abilities, leveraging a powerful partner or system.`
+    });
+  }
+  if (specialCombinations.isDoSeJuOk && seunStem === '壬') {
+    combos.push({ 
+      id: '도세주옥', 
+      priority: 180, 
+      name: lang === 'KO' ? '도세주옥(陶洗珠玉)' : 'Washing the Dusty Gem', 
+      desc: lang === 'KO' 
+        ? `흙먼지 묻은 보석이 맑은 물에 씻겨 광채를 내는 격이야. 네 진가가 세상의 주목을 받으며 반짝이기 시작할 거야.`
+        : `A dusty gem washed clean by pure water, restoring its pristine brilliance. Your genuine worth will finally captures the world's eye and shine.`
+    });
+  }
+  if (specialCombinations.isGangHwiSangYeong && seunStem === '丙') {
+    combos.push({ 
+      id: '강휘상영', 
+      priority: 185, 
+      name: lang === 'KO' ? '강휘상영(江輝相映)' : 'Sunlight Reflecting on a Broad River', 
+      desc: lang === 'KO' 
+        ? `넓은 강물 위로 태양이 비치며 찬란한 빛을 만드는 형국이야. 귀인을 만나거나 사회적 지위가 수직 상승하는 기분 좋은 흐름이지.`
+        : `The blazing sun reflecting off a vast river, creating a dazzling spectacle. A stellar wave where you ascend socially and meet key allies.`
+    });
+  }
+  if (specialCombinations.isHwaChiSeungRyong && seunBranch === '辰') {
+    combos.push({ 
+      id: '화치승룡', 
+      priority: 170, 
+      name: lang === 'KO' ? '화치승룡(火熾乘龍)' : 'Raging Fire Riding a Dragon', 
+      desc: lang === 'KO' 
+        ? `타오르는 불길이 용(진토)을 만나 안정을 찾는 해이야. 과부하된 에너지가 조절되어 심리적 평온과 실속을 동시에 챙기게 될 거야.`
+        : `Intense flames tempered and stabilized by a dragon. Your overloaded energy cools down to bring emotional zen and concrete utility.`
+    });
+  }
+  if (specialCombinations.isGiToTakIm && seunStem === '己') {
+    combos.push({ 
+      id: '기토탁임', 
+      priority: 160, 
+      name: lang === 'KO' ? '기토탁임(己土濁壬)' : 'Muddying the Pure River', 
+      desc: lang === 'KO' 
+        ? `맑은 강물에 흙탕물이 섞이는 형국이야. 감정적인 판단이나 구설수로 명예에 스크래치 나지 않게 멘탈 관리 잘해야 해.`
+        : `Pure river water muddied by clay. Watch out for emotional mishaps and sudden drama that can scratch your reputation.`
+    });
+  }
+
+  if (luckGods.includes('상관') && (hasInSeongBase || hasInSeongLuck)) {
+    combos.push({ 
+      id: '상관패인', 
+      priority: 100, 
+      name: lang === 'KO' ? '상관패인(傷官佩印)' : 'Artist/Rebel Restrained by Mystic/Sage', 
+      desc: lang === 'KO' 
+        ? `기발하고 날카로운 아이디어(상관)가 인성이라는 품격 있는 고삐를 만났어. 거친 재능이 다듬어져 세상의 인정을 받기 좋은 시기야.`
+        : `Sharp, wild ideas meet the elegant restraint of wisdom. Your unbridled talents are refined to earn profound social recognition.`
+    });
+  }
+  if (luckGods.includes('식신') && (hasGwanSeongBase || hasGwanSeongLuck)) {
+    combos.push({ 
+      id: '식신제살', 
+      priority: 95, 
+      name: lang === 'KO' ? '식신제살(食神制殺)' : 'Artist/Rebel Controlling the Warrior/Judge', 
+      desc: lang === 'KO' 
+        ? `너를 괴롭히던 난관을 너만의 실력으로 시원하게 해결해버리는 시기야. 위기 돌파 능력이 빛을 발할 거야.`
+        : `Tackling major stress and obstacles with your distinct expertise. Your pathfinder skills shine as you slice through annoying challenges.`
+    });
+  }
+  if (luckGods.includes('편관') && (hasInSeongBase || hasInSeongLuck)) {
+    combos.push({ 
+      id: '살인상생', 
+      priority: 90, 
+      name: lang === 'KO' ? '살인상생(殺印相生)' : 'Warrior/Judge Channeling to Mystic/Sage', 
+      desc: lang === 'KO' 
+        ? `강력한 난관(편관)을 지혜와 학문(인성)으로 녹여내어 오히려 큰 기회로 바꾸는 시기야. 위기를 기회로 만드는 반전의 드라마가 펼쳐질 거야.`
+        : `Transforming harsh pressure and crises into opportunities using deep wisdom and strategy. A dramatic breakthrough era.`
+    });
+  }
+  if (hasSikSangLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
+    combos.push({ 
+      id: '식상생재', 
+      priority: 85, 
+      name: lang === 'KO' ? '식상생재(食傷生財)' : 'Artist/Rebel fueling Maverick/Architect', 
+      desc: lang === 'KO' 
+        ? `재능이 곧바로 결과물로 이어지는 흐름이야. 머릿속 계획들이 실질적인 성과로 변하는 생산적인 시기지.`
+        : `Your talents flow directly into concrete results. It's a highly productive cycle where mental designs turn into real assets.`
+    });
+  }
+  if (hasGwanSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
+    combos.push({ 
+      id: '관인상생', 
+      priority: 80, 
+      name: lang === 'KO' ? '관인상생(官印상생)' : 'Warrior/Judge supporting Mystic/Sage', 
+      desc: lang === 'KO' 
+        ? `조직의 혜택이나 윗사람의 끌어줌이 있는 시기야. 노력이 공식적으로 인정받고 명예가 올라가는 흐름이지.`
+        : `Receiving backing, systematic safety, and recognition from authoritative institutions. Your standing rises securely under structured shields.`
+    });
+  }
+  if (hasJaeSeongLuck && (hasInSeongBase || hasInSeongLuck)) {
+    combos.push({ 
+      id: '재극인', 
+      priority: 70, 
+      name: lang === 'KO' ? '재극인(財剋印)' : 'Maverick/Architect clashing Mystic/Sage', 
+      desc: lang === 'KO' 
+        ? `현실적인 이익과 신념이 충돌하고 있어. 당장의 이익 때문에 소중한 가치를 버리지 않게 조심해.`
+        : `Tangible profit colliding with deep personal beliefs. Avoid sacrificing your long-term integrity for a quick cashgrab.`
+    });
+  }
+  if (hasGwanSeongLuck && (hasJaeSeongBase || hasJaeSeongLuck)) {
+    combos.push({ 
+      id: '재생관', 
+      priority: 60, 
+      name: lang === 'KO' ? '재생관(財生官)' : 'Maverick/Architect building Warrior/Judge', 
+      desc: lang === 'KO' 
+        ? `쌓아온 자산이나 노력이 사회적 지위로 연결되는 흐름이야. 내실을 다져 더 높은 곳으로 올라갈 발판을 마련하게 될 거야.`
+        : `Your accumulated assets and labor solidifying into social status and authority. Use this structure to establish lasting safety.`
+    });
+  }
+
+  // 観多専用のロジック
+  if (isGwanDa) {
+    if (hasSikSangLuck) {
+      combos.push({ 
+        id: '식신제살', 
+        priority: 1000, 
+        name: lang === 'KO' ? '식신제살(食神制殺)' : 'Artist/Rebel Controlling the Warrior/Judge', 
+        desc: lang === 'KO' 
+          ? "비로소 당신의 검을 휘둘러 낡은 굴레를 끊어내고 주도권을 잡는 '돌파의 해'입니다."
+          : "An era of breakthrough, where you wield your blade to cut through old shackles and seize control."
+      });
+    }
+    if (hasJaeSeongLuck) {
+      combos.push({ 
+        id: '재생살', 
+        priority: -1000, 
+        name: lang === 'KO' ? '재생살(財生殺)' : 'Maverick/Architect fueling Extreme Pressure', 
+        desc: lang === 'KO' 
+          ? "겉으로는 실속과 기회처럼 보이나, 실제로는 당신의 책임과 부담을 가중시켜 숨 막히게 할 수 있는 시기입니다."
+          : "What looks like a golden opportunity actually compounds your heavy responsibilities, posing risk of feeling suffocated."
+      });
+    }
+  }
+
+  combos.sort((a, b) => b.priority - a.priority);
+  if (combos.length > 2) combos.splice(2);
 
   let comboInsight = '';
   const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
 
   if (isFrozen && isFireLuck) {
-    comboInsight = `이번 시기는 '해동(解凍)'의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`;
+    comboInsight = lang === 'KO'
+      ? `이번 시기는 '해동(解凍)'의 기적 같은 흐름이야. 차갑게 얼어붙어 있던 네 원국이 따뜻한 불을 만나 비로소 녹기 시작하고 있어. "냉동실에서 나온 보석이 태양을 만나 빛나는 형국"이라는 점에 집중해.`
+      : `This period is a miraculous 'Thawing' wave. Your frozen chart is finally meeting the warm fire and beginning to melt. Focus on the fact that "a gem from the freezer meets the sun and shines."`;
   }
 
   if (combos.length > 0 && !comboInsight) {
@@ -361,16 +529,25 @@ export function generateCycleVibe(
     const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
     const is2026 = currentAnnualPillar?.year === 2026;
 
-    if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
-      comboInsight = `이번 시기는 '화다금용(火多金鎔)'의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
-    } else if (combos.length === 1) {
-      comboInsight = `이번 시기는 '${combos[0].name}'의 격을 갖췄어. ${combos[0].desc}`;
+    if (lang === 'KO') {
+      if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
+        comboInsight = `이번 시기는 '화다금용(火多金鎔)'의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
+      } else if (combos.length === 1) {
+        comboInsight = `이번 시기는 '${combos[0].name}'의 격을 갖췄어. ${combos[0].desc}`;
+      } else {
+        comboInsight = `'${combos[0].name}'의 흐름이 주도적이지만, 동시에 '${combos[1].name}'의 영향도 무시할 수 없어. \n\n${combos[0].desc} ${combos[1].desc}`;
+      }
     } else {
-      comboInsight = `'${combos[0].name}'의 흐름이 주도적이지만, 동시에 '${combos[1].name}'의 영향도 무시할 수 없어. 
-
-${combos[0].desc} ${combos[1].desc}`;
+      if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
+        comboInsight = `This cycle presents the perilous state of 'Fire melting Metal'. Your intense ideas are dissolving your actual practical skills. Stop passive contemplating; take direct action to solidify your results.`;
+      } else if (combos.length === 1) {
+        comboInsight = `This cycle manifests the alignment of '${combos[0].name}'. ${combos[0].desc}`;
+      } else {
+        comboInsight = `The wave of '${combos[0].name}' is dominating, but the impact of '${combos[1].name}' is also highly active. \n\n${combos[0].desc} ${combos[1].desc}`;
+      }
     }
   }
+
 
   // 3. Intro Construction
   let intro = '';
@@ -494,7 +671,7 @@ Anyway.. `;
   } else {
     cycleIntro = `
 
-This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
+This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
 
 `;
   }
@@ -508,23 +685,32 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
   };
 
   if (lang === 'KO') {
-    main = `음, ${userRef}한테는 대운에서 ${formatGod(daewunStemGodKo, daewunStem, lang)}·${formatGod(daewunBranchGodKo, daewunBranch, lang)}, 그리고 세운에서 ${formatGod(seunStemGodKo, seunStem, lang)}·${formatGod(seunBranchGodKo, seunBranch, lang)}의 기운이 스며들고 있네. [delay:4000]
+    main = `음, ${userRef}한테는 대운에서 ${formatGod(daewunStemGodKo, daewunStem, lang)}·${formatGod(daewunBranchGodKo, daewunBranch, lang)}, 그리고 세운에서 ${formatGod(seunStemGodKo, seunStem, lang)}·${formatGod(seunBranchGodKo, seunBranch, lang)}의 기운이 스며들고 있네. [delay:1200]
+\n`;
+  } else {
+    const daewunStemEN = TEN_GODS_EN[daewunStemGodKo] || daewunStemGodKo;
+    const daewunBranchEN = TEN_GODS_EN[daewunBranchGodKo] || daewunBranchGodKo;
+    const seunStemEN = TEN_GODS_EN[seunStemGodKo] || seunStemGodKo;
+    const seunBranchEN = TEN_GODS_EN[seunBranchGodKo] || seunBranchGodKo;
 
-`;
+    main = `For you, it brings a combination of ${daewunStemEN}/${daewunBranchEN} and ${seunStemEN}/${seunBranchEN} energy. [delay:1200]
+\n`;
+  }
+
+  if (comboInsight) {
+    let detailedEffect = '';
+    const yongshinDetail = analysis.yongshinDetail || { primary: { element: '' }, heeShin: { element: '' }, giShin: { element: '' } };
+    const primaryElement = yongshinDetail.primary?.element || '';
+    const heeShinElement = yongshinDetail.heeShin?.element || '';
     
-    if (comboInsight) {
-      let detailedEffect = '';
-      const yongshinDetail = analysis.yongshinDetail || { primary: { element: '' }, heeShin: { element: '' }, giShin: { element: '' } };
-      const primaryElement = yongshinDetail.primary?.element || '';
-      const heeShinElement = yongshinDetail.heeShin?.element || '';
-      
-      const isYongShinYear = (primaryElement && primaryElement.includes(seunElement)) || 
-                             (heeShinElement && heeShinElement.includes(seunElement));
-      
-      const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
-      const is2026 = currentAnnualPillar?.year === 2026;
-      const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
+    const isYongShinYear = (primaryElement && primaryElement.includes(seunElement)) || 
+                           (heeShinElement && heeShinElement.includes(seunElement));
+    
+    const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
+    const is2026 = currentAnnualPillar?.year === 2026;
+    const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
 
+    if (lang === 'KO') {
       if (isFrozen && isFireLuck) {
         detailedEffect += `그동안 굳어있던 네 문서(인성)와 결과물(재성)이 드디어 가치를 발휘하기 시작할 거야. 지금은 돈이 되는 문서를 잡고, 차가운 뚝심이 세상의 빛을 보아 에너지가 폭발하는 시기니까. `;
       } else if (isSinGang && !isFireExtreme) {
@@ -541,9 +727,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
 
       // Special 2026 Fire Year Logic
       if (seunElement === 'Fire' && currentAnnualPillar?.year === 2026) {
-        const isFireExtreme = (analysis.elementRatios?.Fire || 0) >= 60;
         const hasOhBranch = result.pillars.some(p => p.branch === '午');
-        const hasByeongStem = result.pillars.some(p => p.stem === '丙');
         const isBokEum = result.pillars.some(p => p.stem === '丙' && p.branch === '午');
         const isJaHyeong = hasOhBranch;
 
@@ -567,11 +751,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. 
-
-2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. 
-
-그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
+          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
         } else if (!isFireExtreme) {
           detailedEffect += `그리고.. 상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
         }
@@ -583,15 +763,66 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:4000]
         }
       }
       if (comboIds.includes('관인상생')) detailedEffect += `그리고.. 조직의 보호 아래서 가치를 증명하기 좋아. `;
-      
-      const coreRemedy = generateCoreRemedy(analysis, lang);
-      main += `
-
-${comboInsight}
-
-${detailedEffect}${coreRemedy}`;
     } else {
-      // No combo logic
+      if (isFrozen && isFireLuck) {
+        detailedEffect += `Your frozen documentation (Resource) and output (Wealth) are finally unlocking their values. It is a moment of raw power where cold persistence meets the sun to trigger an energy explosion. `;
+      } else if (isSinGang && !isFireExtreme) {
+        detailedEffect += `Your abundant raw energy demands a powerful outlet or structure to manifest. `;
+      } else if (isNeutral) {
+        detailedEffect += `With your energy highly balanced, you can efficiently convert all incoming waves. `;
+      } else {
+        if (isYongShinYear) {
+          detailedEffect += `Although your energy is delicate, the incoming forces serve as your sturdy fortress. `;
+        } else {
+          detailedEffect += `Your energy is delicate, so handling the incoming rushing waves can feel overwhelming. Focus strictly on practical defense. `;
+        }
+      }
+
+      // Special 2026 Fire Year Logic
+      if (seunElement === 'Fire' && is2026) {
+        const hasOhBranch = result.pillars.some(p => p.branch === '午');
+        const isBokEum = result.pillars.some(p => p.stem === '丙' && p.branch === '午');
+        const isJaHyeong = hasOhBranch;
+
+        if (isFireExtreme) {
+          detailedEffect += `In 2026, the giant pillar of Fire brings intense heat instead of gentle warmth. `;
+          if (isBokEum) {
+            detailedEffect += `Specifically, as a 'Fu-yin' year matching your day pillar, stubborn self-conviction can be your own poison. `;
+          } else if (isJaHyeong) {
+            detailedEffect += `With Self-Punishment active, beware of your own stubbornness acting as a blade against yourself. `;
+          }
+        } else if (isYongShinYear) {
+          detailedEffect += `Specifically, the blazing sun of 2026 clears up stagnant issues. Your ideas solidify into recognized credentials, so ride this fiery wave confidently. `;
+        } else if (isSinGang) {
+          detailedEffect += `The strong Fire in 2026 fuels your passion but risks creating friction due to overheating; step on the brakes occasionally. `;
+        }
+      }
+
+      const comboIds = combos.map(c => c.id);
+      if (comboIds.includes('상관패인')) {
+        const fireRatio = analysis.elementRatios?.Fire || 0;
+        const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
+        
+        if (fireRatio > 60 && hasMetalSangGwan) {
+          detailedEffect += `Others might call this 'Artist/Rebel meeting restraint' and celebrate your brilliance. But look closer: your talents are like a fragile blade thrown into a furnace. Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core against overheating. `;
+        } else if (!isFireExtreme) {
+          detailedEffect += `Also, your creative output is being elegant structured by deep wisdom. `;
+        }
+      }
+      if (comboIds.includes('식상생재')) detailedEffect += `Additionally, with Artist/Rebel feeding Maverick/Architect, your efforts directly translate to highly practical financial gains. `;
+      if (comboIds.includes('재극인')) {
+        if (!isFrozen) {
+          detailedEffect += `However, being blinded by sudden profit can shake your long-term career safety; balance real utility with integrity. `;
+        }
+      }
+      if (comboIds.includes('관인상생')) detailedEffect += `Additionally, you will thrive easily when working under the security or sponsorship of structured systems. `;
+    }
+    
+    const coreRemedy = generateCoreRemedy(analysis, lang);
+    main += `${comboInsight}\n\n${detailedEffect}${coreRemedy}`;
+  } else {
+    // No combo logic
+    if (lang === 'KO') {
       const dominantLuckElement = daewunElement;
       const elementAdvice: Record<string, string> = {
         'Wood': '성장과 확장의 기운이 강해지는 시기야. 새로운 프로젝트를 시작하기 좋겠어.',
@@ -601,40 +832,17 @@ ${detailedEffect}${coreRemedy}`;
         'Water': '지혜와 유연함이 필요한 시기네. 내면의 깊이를 더하는 쪽으로 방향을 잡아봐.'
       };
       main += elementAdvice[dominantLuckElement] || `원국의 균형을 크게 흔들지 않으면서도 적절한 자극이 되어주는 운이야. `;
-      main += generateCoreRemedy(analysis, lang);
-    }
-  } else {
-    const daewunStemEN = TEN_GODS_EN[daewunStemGodKo] || daewunStemGodKo;
-    const daewunBranchEN = TEN_GODS_EN[daewunBranchGodKo] || daewunBranchGodKo;
-    const seunStemEN = TEN_GODS_EN[seunStemGodKo] || seunStemGodKo;
-    const seunBranchEN = TEN_GODS_EN[seunBranchGodKo] || seunBranchGodKo;
-
-    main = `For you, it brings a combination of ${daewunStemEN}/${daewunBranchEN} and ${seunStemEN}/${seunBranchEN} energy. [delay:4000]
-
-`;
-    
-    const isFireLuck = seunElement === 'Fire' || daewunElement === 'Fire';
-    const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title === "화토중탁";
-    const is2026 = currentAnnualPillar?.year === 2026;
-
-    if (isFrozen && isFireLuck) {
-      main += `This is a miracle of 'Thawing'. Your frozen chart is finally meeting the warm Fire and beginning to melt. Focus on the fact that "a gem from the freezer meets the sun and shines." Forget about standard theories; your cold persistence is finally seeing the light of day. `;
-    } else if (isFireEarthTurbid) {
-      main += `Since your chart is already heavy with Fire and Earth, this cycle's energy might feel a bit dry. Stay hydrated and focus on keeping your cool. `;
-      if (is2026 && seunElement === 'Fire') {
-        main += `Especially in 2026, the intense Fire might lead to overheating. Prioritize cooling down and protecting your core. `;
-      }
     } else {
-      const conjunction = luckScore >= 60 ? "And" : "But..";
-      main += `${conjunction} the flow is ${luckScore >= 70 ? 'strong' : 'moderate'}. Stay focused on your inner voice. `;
+      const dominantLuckElement = daewunElement;
+      const elementAdviceEn: Record<string, string> = {
+        'Wood': 'A cycle of active growth and expansion. Excellent timing to launch fresh projects.',
+        'Fire': 'Passion and high energy are surging. Opportunities to display your presence are opening up.',
+        'Earth': 'A tide focusing on stability and grounding. Building solid foundations is highly profitable.',
+        'Metal': 'Harvesting and refinement are key. Consolidate your results and discard distractions.',
+        'Water': 'Flexibility and wisdom are demanded. Turn your main focus inward to deeply enrich your soul.'
+      };
+      main += elementAdviceEn[dominantLuckElement] || `A subtle cycle providing smooth stimulation without rocking Bazi's core equilibrium. `;
     }
-    
-    if (luckScore >= 70) {
-      main += `You're in a great position to push forward with your plans. `;
-    } else if (luckScore < 40) {
-      main += `It's a time for reflection rather than aggressive action. `;
-    }
-    
     main += generateCoreRemedy(analysis, lang);
   }
 

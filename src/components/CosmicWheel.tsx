@@ -178,10 +178,18 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
   const dayIndex = date.getDate() - 1; 
 
   return (
-    <div className="relative w-full max-w-3xl h-[130px] sm:h-[240px] mx-auto flex items-center justify-center bg-[#050505] rounded-2xl border border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
+    <div className={`relative w-full max-w-3xl h-[130px] sm:h-[240px] mx-auto flex items-center justify-center rounded-2xl border transition-all duration-500 overflow-hidden ${
+      theme === 'light' 
+        ? 'bg-[#FCFDFF] border-sky-100 shadow-[0_8px_30px_rgba(56,189,248,0.12)]' 
+        : 'bg-[#050505] border-purple-900/40 shadow-[0_0_50px_rgba(168,85,247,0.15)]'
+    }`}>
       
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/30 via-black to-pink-950/20" />
+      <div className={`absolute inset-0 transition-all duration-500 ${
+        theme === 'light' 
+          ? 'bg-gradient-to-b from-sky-50/40 via-white/80 to-rose-50/30' 
+          : 'bg-gradient-to-b from-purple-950/30 via-black to-pink-950/20'
+      }`} />
 
       {/* CSS Mask for fading out left and right edges */}
       <div 
@@ -195,18 +203,34 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
           {/* Base Pivot Container for Rings (The Misty Energy Field) */}
           <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-0 pointer-events-none">
             {/* Line 4 (Outer boundary of Zodiac) - Strongest */}
-            <div className="absolute w-[520px] h-[520px] rounded-full border-[3px] border-[#FF1493]/90 shadow-[0_0_20px_rgba(255,20,147,0.8),inset_0_0_10px_rgba(255,20,147,0.4)]" />
+            <div className={`absolute w-[520px] h-[520px] rounded-full border-[3px] transition-all duration-500 ${
+              theme === 'light' 
+                ? 'border-sky-300/90 shadow-[0_0_12px_rgba(244,63,94,0.35),inset_0_0_8px_rgba(244,63,94,0.15)]' 
+                : 'border-[#FF1493]/90 shadow-[0_0_20px_rgba(255,20,147,0.8),inset_0_0_10px_rgba(255,20,147,0.4)]'
+            }`} />
             
             {/* Line 3 (Between Zodiac and Symbols) */}
-            <div className="absolute w-[370px] h-[370px] rounded-full border-[2px] border-[#FF1493]/70 shadow-[0_0_15px_rgba(255,20,147,0.6)]" />
+            <div className={`absolute w-[370px] h-[370px] rounded-full border-[2px] transition-all duration-500 ${
+              theme === 'light' 
+                ? 'border-sky-300/80 shadow-[0_0_10px_rgba(244,63,94,0.32),inset_0_0_6px_rgba(244,63,94,0.12)]' 
+                : 'border-[#FF1493]/70 shadow-[0_0_15px_rgba(255,20,147,0.6)]'
+            }`} />
             
             {/* Line 2 (Between Symbols and Numbers) */}
-            <div className="absolute w-[230px] h-[230px] rounded-full border-[2px] border-[#FF1493]/50 shadow-[0_0_10px_rgba(255,20,147,0.4)]" />
+            <div className={`absolute w-[230px] h-[230px] rounded-full border-[2px] transition-all duration-500 ${
+              theme === 'light' 
+                ? 'border-sky-300/70 shadow-[0_0_8px_rgba(244,63,94,0.28),inset_0_0_5px_rgba(244,63,94,0.1)]' 
+                : 'border-[#FF1493]/50 shadow-[0_0_10px_rgba(255,20,147,0.4)]'
+            }`} />
             
             {/* Line 1 (Inner boundary of Numbers) - Weakest */}
-            <div className="absolute w-[90px] h-[90px] rounded-full border-[1px] border-[#FF1493]/30 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(255,20,147,0.05)_100%)] backdrop-blur-[1px] shadow-[0_0_8px_rgba(255,20,147,0.2)]" />
+            <div className={`absolute w-[90px] h-[90px] rounded-full border-[1px] transition-all duration-500 ${
+              theme === 'light' 
+                ? 'border-sky-300/60 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(244,63,94,0.02)_100%)] backdrop-blur-[1px] shadow-[0_0_6px_rgba(244,63,94,0.22)]' 
+                : 'border-[#FF1493]/30 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(255,20,147,0.05)_100%)] backdrop-blur-[1px] shadow-[0_0_8px_rgba(255,20,147,0.2)]'
+            }`} />
           </div>
-
+ 
           {/* The Active Wedge (Central Highlight / Crosshair) */}
           <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center z-20 pointer-events-none">
             <div className="absolute w-[520px] h-[520px] rounded-full overflow-hidden">
@@ -214,8 +238,13 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[260px]"
                 style={{ clipPath: 'polygon(35% 0, 65% 0, 50% 100%)' }}
               >
-                <div className={`absolute inset-0 bg-gradient-to-b from-[#FFD700]/15 via-[#FFD700]/5 to-transparent backdrop-blur-[1px] ${theme === 'light' ? 'hidden' : ''}`} />
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.3)_0%,transparent_80%)] ${theme === 'light' ? 'hidden' : ''}`} />
+                {/* Dark Mode Spotlight - Soft Golden Glow */}
+                <div className={`absolute inset-0 bg-gradient-to-b from-[#FFD700]/15 via-[#FFD700]/5 to-transparent backdrop-blur-[1px] transition-opacity duration-500 ${theme === 'light' ? 'opacity-0' : 'opacity-100'}`} />
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(255,215,0,0.3)_0%,transparent_80%)] transition-opacity duration-500 ${theme === 'light' ? 'opacity-0' : 'opacity-100'}`} />
+ 
+                {/* Light Mode Spotlight - Soft Blue/Red mixed Spotlight */}
+                <div className={`absolute inset-0 bg-gradient-to-b from-sky-200/18 via-rose-100/5 to-transparent backdrop-blur-[1px] transition-opacity duration-500 ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} />
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[100%] bg-[radial-gradient(ellipse_at_top,rgba(244,63,94,0.16)_0%,rgba(14,165,233,0.12)_50%,transparent_100%)] transition-opacity duration-500 ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`} />
               </div>
             </div>
           </div>
