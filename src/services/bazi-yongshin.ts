@@ -490,8 +490,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
 
       if (jijangan) {
         jijangan.stems.forEach((hs, hsIdx) => {
-          const isExactMatch = (hs === s);
-          const isMain = (hsIdx === jijangan.stems.length - 1) || isExactMatch;
+          const isMain = (hsIdx === jijangan.stems.length - 1);
           const hasRootSameElement = (STEM_ELEMENTS[hs] === STEM_ELEMENTS[s]);
           const isGeneration = (hs === '癸' && s === '甲') || (hs === '壬' && s === '甲') ||
                                 (hs === '癸' && s === '乙') || (hs === '壬' && s === '乙') ||

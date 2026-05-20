@@ -9,8 +9,8 @@ const AuroraBackground: React.FC = () => {
     <div 
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       style={{
-        maskImage: 'radial-gradient(ellipse at center, black 0%, black 30%, transparent 70%)',
-        WebkitMaskImage: 'radial-gradient(ellipse at center, black 0%, black 30%, transparent 70%)',
+        maskImage: 'radial-gradient(ellipse at 50% 30%, black 0%, black 25%, transparent 60%)',
+        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, black 0%, black 25%, transparent 60%)',
       }}
     >
       <style>
@@ -22,22 +22,22 @@ const AuroraBackground: React.FC = () => {
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: ${isDark ? '0.55' : '0.45'};
+            opacity: ${isDark ? '0.45' : '0.35'};
             mix-blend-mode: ${isDark ? 'screen' : 'multiply'};
           }
           
           .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(140px);
-            opacity: 0.8;
+            filter: blur(120px);
+            opacity: 0.7;
             will-change: transform, background-color;
-            width: 800px;
-            height: 800px;
-            top: 50%;
+            width: 700px;
+            height: 700px;
+            top: 30%;
             left: 50%;
-            margin-top: -400px;
-            margin-left: -400px;
+            margin-top: -350px;
+            margin-left: -350px;
           }
 
           @keyframes fluid-wrap-1 {

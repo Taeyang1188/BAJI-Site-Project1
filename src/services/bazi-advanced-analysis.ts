@@ -1005,6 +1005,10 @@ export const calculateAdvancedAnalysis = (
     let socialKo = '';
     let socialEn = '';
 
+    const dayMasterDetails = strength.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
+    const hasStrongRoots = dayMasterDetails?.roots?.some((r: any) => (r.type === 'main' || r.type === 'sub_residual') && !r.isDestroyed);
+    const isWeakButRooted = (level === '신약' || level === '극신약' || level === '중화신약') && hasStrongRoots;
+
     if (level === '극신강') {
       summaryKo = '자아의 기운이 폭발적으로 강해, 주변 환경을 압도하는 제왕의 기운이야.';
       summaryEn = 'Explosive self-energy, a monarch-like vibe that overwhelms the surroundings.';
@@ -1026,6 +1030,13 @@ export const calculateAdvancedAnalysis = (
       descEn = 'Clear subjective views but flexible enough to accept others\' opinions. Stable energy leads to consistent achievements with few ups and downs.';
       socialKo = '어느 조직에서나 환영받는 리더이자 조율자야. 안정적인 사회생활과 성공을 동시에 거머쥘 수 있는 좋은 구조야.';
       socialEn = 'A leader and mediator welcomed in any organization. A good structure to achieve both stable social life and success.';
+    } else if (isWeakButRooted) {
+      summaryKo = '독립성과 주관은 매우 확고하나, 자신의 에너지를 외부로 폭넓게 분산시키며 다루는 능동적이고 활동적인 사주 구조야.';
+      summaryEn = 'Very firm independence and conviction, an active chart structure that widely disperses and manages its energy outward.';
+      descKo = '지지에 튼튼한 뿌리(통근)를 내리고 있어 절대 남에게 쉽게 의존하거나 휘둘리는 뚝심 부족의 "신약"이 아니야. 자체적인 고집과 결단력은 충분하지만, 그것을 능가할 만큼 많은 에너지(재성이나 식상 등)를 현실에서 운용하려다 보니 전체적인 힘의 잔고가 소진되어 "신약"으로 판별되는 특수한 구조지. 혼자 힘이 부족한 게 아니라 너무 많은 걸 이끌고 가는 상태에 가까워.';
+      descEn = 'With strong roots in the branches, this is NOT a "weak" chart that easily relies on or is swayed by others. You have enough stubbornness and determination. However, because you are actively managing massive external energies (like wealth or output/creativity), your overall energy balance is drained, categorizing you technically as "weak". It\'s not a lack of independent strength, but rather a state of carrying heavy responsibilities.';
+      socialKo = '독자적인 추진력이 대단하지만 혼자 모든 것을 통제하려고 하면 필연적으로 에너지가 고갈돼. 당신의 확실한 주관을 중심에 두되, 실무를 덜어줄 시스템이나 동료를 곁에 둔다면 훨씬 막강한 성과를 창출할 수 있어.';
+      socialEn = 'Your independent drive is tremendous, but trying to control everything alone inevitably depletes you. Keep your firm conviction at the core, but if you build systems or keep colleagues who can share the practical burden, you will achieve far greater success.';
     } else if (level === '중화신약') {
       summaryKo = '부드러운 카리스마를 지녔으며, 주변 환경을 자신에게 유리하게 활용할 줄 아는 지혜가 있어.';
       summaryEn = 'Possesses soft charisma and the wisdom to utilize the surroundings to your advantage.';

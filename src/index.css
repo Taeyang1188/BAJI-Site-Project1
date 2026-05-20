@@ -20,6 +20,7 @@
 }
 
 :root {
+
   --color-wood: #4ADE80;
   --color-fire: #F87171;
   --color-earth: #FACC15;
@@ -45,7 +46,53 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ---------------- LIGHT MODE OVERRIDES ---------------- */
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes borderGlow {
+  0%, 100% { 
+    box-shadow: 0 0 25px rgba(234, 88, 12, 0.75), 0 0 10px rgba(234, 88, 12, 0.45), inset 0 0 12px rgba(234, 88, 12, 0.25); 
+    border-color: rgba(234, 88, 12, 0.95); 
+    background-color: rgba(234, 88, 12, 0.06);
+    transform: scale(1.05);
+  }
+  50% { 
+    box-shadow: 0 0 55px rgba(234, 88, 12, 1), 0 0 25px rgba(234, 88, 12, 0.8), inset 0 0 25px rgba(234, 88, 12, 0.5); 
+    border-color: rgba(234, 88, 12, 1); 
+    background-color: rgba(234, 88, 12, 0.24);
+    transform: scale(1.09);
+  }
+}
+.animate-border-glow {
+  animation: borderGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes borderGlowDark {
+  0%, 100% { 
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.65), inset 0 0 20px rgba(0, 242, 255, 0.3); 
+    border-color: rgba(0, 242, 255, 0.7); 
+    background-color: rgba(0, 242, 255, 0.07);
+  }
+  50% { 
+    box-shadow: 0 0 65px rgba(0, 242, 255, 1), inset 0 0 45px rgba(0, 242, 255, 0.55); 
+    border-color: rgba(0, 242, 255, 1); 
+    background-color: rgba(0, 242, 255, 0.28);
+  }
+}
+.animate-border-glow-dark {
+  animation: borderGlowDark 1.2s ease-in-out infinite;
+}
+
+body.light-mode .animate-border-glow-dynamic {
+  animation: borderGlow 1.2s ease-in-out infinite !important;
+  border-width: 4px !important;
+  border-style: solid !important;
+  z-index: 100 !important;
+}
+body:not(.light-mode) .animate-border-glow-dynamic {
+  animation: borderGlowDark 1.2s ease-in-out infinite !important;
+  border-width: 4px !important;
+  border-style: solid !important;
+  z-index: 100 !important;
+}
 body.light-mode {
   --color-goth-bg: #FAF9F6;
   --color-neon-pink: #CC5858;
@@ -372,10 +419,10 @@ body.light-mode .void-element-badge {
 }
 
 body.light-mode .goth-glass {
-  background: #FAF9F6 !important;
-  border: 1px solid rgba(0,0,0,0.08); /* Allow inline border colors */
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
-  backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Allow inline border colors */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
 /* 메인 화면 아바타 스탠드 등 기타 요소 처리 */
@@ -572,3 +619,14 @@ body.light-mode .border-neon-pink { border-color: #809BED !important; } /* Unsel
   background: var(--color-neon-purple);
   box-shadow: 0 0 10px var(--color-neon-purple);
 }
+
+/* ==========================================================================
+   LIGHT MODE HOVER STYLES FOR CONNECTED STEMS
+   ========================================================================== */
+body.light-mode .goth-glass-hover-active {
+  background: var(--light-hover-bg) !important;
+  border-color: var(--light-hover-border) !important;
+  border-width: 2px !important;
+  box-shadow: none !important;
+}
+

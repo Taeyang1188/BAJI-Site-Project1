@@ -527,7 +527,7 @@ export default function App() {
       </nav>
 
       <main className="relative pt-16 sm:pt-20 pb-12 min-h-screen flex flex-col items-center justify-center">
-        {page <= 2 && <AuroraBackground />}
+        {<AuroraBackground />}
         <AnimatePresence mode="wait">
           {page === 1 && (
             <motion.div 
@@ -535,7 +535,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="flex flex-col items-center text-center space-y-6 sm:space-y-8 px-6 relative w-full isolate z-[1]"
+              className="flex flex-col items-center text-center space-y-6 sm:space-y-8 px-6 relative w-full isolate z-10"
             >
               {/* Character Section */}
               <motion.div 
@@ -668,7 +668,7 @@ export default function App() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 1.1 }}
-              className="w-full max-w-md px-6"
+              className="relative w-full max-w-md px-6 z-10"
             >
               <div className="goth-glass rounded-[40px] p-4 sm:p-6 space-y-3 sm:space-y-4 relative overflow-hidden">
                 {/* Subtle Ambient Top reflection */}
@@ -899,7 +899,7 @@ export default function App() {
               key="result"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="w-full"
+              className="relative w-full z-10"
             >
               <BaZiResultPage 
                 result={result} 
