@@ -624,12 +624,12 @@ export function generateCycleVibe(
       introPrefix = `흠.. `;
     }
 
-    intro = `${missingTimeInsight}${introPrefix}${impression} 
-게다가 ${strengthComment} ${geJuComment}
+    intro = `${missingTimeInsight}${introPrefix}${impression} [delay:1000]
+게다가 ${strengthComment} ${geJuComment} [delay:1000]
 
-${elementComment} ${balanceComment} 
+${elementComment} ${balanceComment} [delay:1500]
 
-이런 다양한 매력이 더해지면 ${nameRef}너만의 색깔이 뚜렷할 거야 분명히.`;
+이런 다양한 매력이 더해지면 ${nameRef}너만의 색깔이 뚜렷할 거야 다분히. [delay:1000]`;
   } else {
     // English Intro (Simplified)
     const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title === "화토중탁";
@@ -1872,14 +1872,14 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
   ];
 
   const displayThemes = [
-    allThemes.find(t => t.id === 'psych_test')!,
     allThemes.find(t => t.id === 'destiny_map')!,
     allThemes.find(t => t.id === 'general')!,
     allThemes.find(t => t.id === 'romance')!,
     allThemes.find(t => t.id === 'wealth')!,
     allThemes.find(t => t.id === 'soul_intersection')!,
     allThemes.find(t => t.id === 'moving')!,
-    allThemes.find(t => t.id === 'secrets')!
+    allThemes.find(t => t.id === 'secrets')!,
+    allThemes.find(t => t.id === 'psych_test')!
   ].filter(Boolean);
 
   // Remove duplicates and ensure general is always there

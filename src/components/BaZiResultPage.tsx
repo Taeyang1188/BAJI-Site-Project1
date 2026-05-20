@@ -294,16 +294,12 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
     return infos;
   }, [text, speed]);
 
-  // Set completion flag
-  React.useEffect(() => {
-    if (currentIndex === charInfos.length && charInfos.length > 0) {
-      wasCompletedRef.current = true;
-    }
-  }, [currentIndex, charInfos]);
+  // Remove separate completion flag effect, handle in one place
 
-  // Reset or instantly fill elements when text changes (or skip becomes true, or previously completed)
+  // Reset or instantly fill elements when text changes (or skip becomes true)
   React.useEffect(() => {
-    if (skip || wasCompletedRef.current) {
+    // text changed or skip changed
+    if (skip) {
       const elements = charInfos.map((info, idx) => {
         if (info.isTooltip && info.tooltipProps) {
           return (
@@ -333,12 +329,13 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
     } else {
       setDisplayedElements([]);
       setCurrentIndex(0);
+      wasCompletedRef.current = false;
     }
   }, [charInfos, lang, skip]);
 
   React.useEffect(() => {
-    if (skip || wasCompletedRef.current) {
-      return;
+    if (skip) {
+      return; 
     }
 
     if (currentIndex < charInfos.length) {
@@ -372,9 +369,12 @@ const TypingText: React.FC<{ text: string, speed?: number, onComplete?: () => vo
       }, currentDelay);
       return () => clearTimeout(timeout);
     } else if (currentIndex === charInfos.length && charInfos.length > 0) {
-      onComplete?.();
+      if (!wasCompletedRef.current) {
+        wasCompletedRef.current = true;
+        onComplete?.();
+      }
     }
-  }, [currentIndex, charInfos, onComplete, lang, skip]);
+  }, [currentIndex, charInfos]);
 
 
   return (
@@ -660,6 +660,7 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
 export default function BaZiResultPage({ result, lang, userName, gender, city, socialContext, onBack, skipTyping = false }: BaZiResultPageProps) {
   const { theme } = useTheme();
   const t = TRANSLATIONS[lang].result as any;
+  const [guideSelectedPillar, setGuideSelectedPillar] = React.useState<'Year' | 'Month' | 'Day' | 'Hour'>('Day');
 
   const renderTenGodLabel = (ko: string, en: string, polarity: number) => {
     if (lang === 'KO') {
@@ -747,6 +748,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [skipCycleVibeTyping, setSkipCycleVibeTyping] = useState(false);
   const [isQuestionPromptComplete, setIsQuestionPromptComplete] = useState(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
+  const [hasAskedAnotherQuestion, setHasAskedAnotherQuestion] = useState(false);
 
   // Local state for skipping text typing effects
   const [internalSkipTyping, setInternalSkipTyping] = useState<boolean>(() => {
@@ -1426,7 +1428,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         ref={vibeContainerRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="goth-glass p-6 rounded-2xl border-l-4 border-neon-pink flex flex-col gap-5"
+        className={`goth-glass p-6 rounded-2xl border-l-4 border-neon-pink flex flex-col ${hasAskedAnotherQuestion ? 'gap-1 sm:gap-2' : 'gap-5'}`}
       >
         {/* Header Row - Optimized for single-line horizontal layout to save vertical space */}
         <div className="flex flex-row items-center justify-between gap-1 sm:gap-3 pb-3 border-b border-white/5">
@@ -1505,8 +1507,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   </p>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {vibePhase === 'intro' && (
+                <div className={!hasAskedAnotherQuestion ? "flex flex-col gap-6" : "flex flex-col mt-[-10px] sm:mt-[-15px]"}>
+                  {vibePhase === 'intro' && !hasAskedAnotherQuestion && (
                     <div className="relative">
                       <p className="text-sm sm:text-base font-display italic text-white leading-relaxed whitespace-pre-wrap">
                         <TypingText 
@@ -1528,8 +1530,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     </div>
                   )}
 
-                  {vibePhase === 'question' && (
-                    <p className="text-sm sm:text-base font-display italic text-white leading-relaxed whitespace-pre-wrap">
+                  {vibePhase === 'question' && !hasAskedAnotherQuestion && (
+                    <p className="text-sm sm:text-base font-display italic text-white leading-relaxed whitespace-pre-wrap mt-0">
                       <ParsedText lang={lang} text={cycleVibe.intro} />
                     </p>
                   )}
@@ -1539,7 +1541,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       <p className="text-sm sm:text-base font-display italic text-neon-pink leading-relaxed whitespace-pre-wrap">
                         <TypingText 
                           key="vibe-questionPrompt" 
-                          text={cycleVibe.questionPrompt} 
+                          text={hasAskedAnotherQuestion ? cycleVibe.questionPrompt.replace(/\[delay:\d+\]/, '').replace(/^\s+/, '').trimStart() : cycleVibe.questionPrompt} 
                           speed={20} 
                           lang={lang}
                           skip={skipCycleVibeTyping || internalSkipTyping}
@@ -1561,7 +1563,24 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             animate={{ opacity: 1, y: 0 }}
                             className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"
                           >
-                            {(showAllThemes ? cycleVibe.themes : cycleVibe.themes.slice(0, 2)).map((theme) => (
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => {
+                                setSelectedThemeId('daily_vibe');
+                                setVibePhase('analysis');
+                                handleShowDailyVibe();
+                                setTimeout(() => {
+                                  vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 50);
+                              }}
+                              className="p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-left transition-all group"
+                            >
+                              <div className="text-neon-pink text-xs font-bold mb-1 uppercase tracking-widest">{lang === 'KO' ? '[오늘의 운세]' : '[TODAY\'S FORTUNE]'}</div>
+                              <div className="text-white/80 text-sm leading-snug group-hover:text-white">{lang === 'KO' ? '오늘 하루는 내게 어떤 기운일까? 운세를 봐줘!' : 'How is today\'s vibe? Tell me my fortune!'}</div>
+                            </motion.button>
+
+                            {(showAllThemes ? cycleVibe.themes : cycleVibe.themes.slice(0, 1)).map((theme) => (
                               <motion.button
                                 key={theme.id}
                                 whileHover={{ scale: 1.02 }}
@@ -1590,26 +1609,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               </motion.button>
                             ))}
                             
-                            {(!showAllThemes || showAllThemes) && (
-                              <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => {
-                                  setSelectedThemeId('daily_vibe');
-                                  setVibePhase('analysis');
-                                  handleShowDailyVibe();
-                                  setTimeout(() => {
-                                    vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                  }, 50);
-                                }}
-                                className="p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-left transition-all group"
-                              >
-                                <div className="text-neon-pink text-xs font-bold mb-1 uppercase tracking-widest">{lang === 'KO' ? '[오늘의 운세]' : '[TODAY\'S FORTUNE]'}</div>
-                                <div className="text-white/80 text-sm leading-snug group-hover:text-white">{lang === 'KO' ? '오늘 하루는 내게 어떤 기운일까? 운세를 봐줘!' : 'How is today\'s vibe? Tell me my fortune!'}</div>
-                              </motion.button>
-                            )}
-
-                            {!showAllThemes && cycleVibe.themes.length > 2 && (
+                            {!showAllThemes && cycleVibe.themes.length > 1 && (
                               <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -2000,6 +2000,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           onClick={() => {
                             setVibePhase('question');
                             setSelectedThemeId(null);
+                            setHasAskedAnotherQuestion(true);
+                            setSkipCycleVibeTyping(true);
+                            setIsQuestionPromptComplete(true);
                             setTimeout(() => {
                               vibeContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }, 50);
@@ -4042,91 +4045,367 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                   {/* JiJangGan Example */}
                   {(() => {
-                    const localDayPillar = result.pillars.find(p => p.title === 'Day');
-                    if (!localDayPillar || !localDayPillar.hanja) return null;
-                    const localDayMaster = localDayPillar.hanja.charAt(0);
-                    const localDayBranch = localDayPillar.hanja.charAt(1);
-                    const localHiddenStems = BAZI_MAPPING.branches?.[localDayBranch as keyof typeof BAZI_MAPPING.branches]?.hiddenStems || [];
+                    const dayMaster = result.pillars.find((p) => p.title === 'Day')?.hanja.charAt(0) || '甲';
+                    const selectedPillar = result.pillars.find((p) => p.title === guideSelectedPillar);
+                    if (!selectedPillar || !selectedPillar.hanja) return null;
+                    
+                    const stem = selectedPillar.hanja.charAt(0);
+                    const branch = selectedPillar.hanja.charAt(1);
+                    const localHiddenStems = BAZI_MAPPING.branches?.[branch as keyof typeof BAZI_MAPPING.branches]?.hiddenStems || [];
                     if (!localHiddenStems.length) return null;
                     
-                    const getTenGodBehavior = (tenGodKo: string, lang: 'KO'|'EN') => {
-                      const behaviors: Record<string, {ko:string, en:string}> = {
-                        '비견': { ko: '독립심, 주체성, 남에게 지지 않으려는 고집', en: 'Independence, autonomy, stubbornness' },
-                        '겁재': { ko: '강력한 경쟁심, 승부욕, 쟁취하려는 본능', en: 'Fierce competitiveness, desire to win' },
-                        '식신': { ko: '나만의 취향, 미식, 한 분야에 몰입하는 즐거움', en: 'Deep immersion in hobbies, taste, and arts' },
-                        '상관': { ko: '틀을 깨는 자유로움, 반항심, 솔직한 자기 표현', en: 'Desire for freedom, breaking rules, self-expression' },
-                        '편재': { ko: '통 큰 스케일, 모험심, 짜릿한 유흥과 쟁취욕', en: 'Big scale, adventurousness, thrill-seeking' },
-                        '정재': { ko: '안정적인 소유, 계산적이고 꼼꼼한 현실 감각', en: 'Stable ownership, calculated and meticulous reality sense' },
-                        '편관': { ko: '강한 카리스마, 책임감, 통제력과 강박감', en: 'Strong charisma, responsibility, controlling power' },
-                        '정관': { ko: '원칙, 질서, 타인에게 인정받고 싶은 체면 중시', en: 'Principles, order, desire for social recognition' },
-                        '편인': { ko: '비판적 사고, 직관, 남들이 모르는 것에 대한 호기심', en: 'Critical thinking, intuition, attraction to mysteries' },
-                        '정인': { ko: '안정 지향, 무조건적 수용과 정신적 사랑 추구', en: 'Desire for stability, unconditional acceptance, spiritual love' },
+                    const getTenGodBehavior = (tenGodKo: string, lang: 'KO'|'EN', pillar: string, damageInfo: any, isMain: boolean, stemChar: string, userName?: string) => {
+                      const nameStr = userName ? `${userName}님` : '당신';
+                      const namePossessive = userName ? `${userName}님의` : '당신의';
+
+                      const baseBehaviors: Record<string, {ko:any, en:any}> = {
+                        '비견': {
+                          ko: { action: "마이웨이 리더십", strategy: "주변 핑계 안 대고 내 방식대로 쿨하게 끌고 가고 싶은 욕구가 은근 강해요. 나만의 영역을 구축하되, 무조건 독식하려 하지 말고 사람들과 공평하게 나눠 먹는 룰만 잘 짜둬도 훨씬 매력적인 리더가 될 수 있습니다.", caution: "내 고집이 선을 넘으면 주변에 진짜 내 편이 다 떨어져 나갈 수 있어요. 혼자만의 동굴에 갇히지 않게 조심!" },
+                          en: { action: "Proactive Independence", strategy: "Lead your way but create a fair sharing system", caution: "Avoid being too stubborn to prevent isolation" }
+                        },
+                        '겁재': {
+                          ko: { action: "짜릿한 승부수", strategy: "은근히 이기고 싶은 승부욕 장난 아니죠? 다들 머뭇거릴 때 과감하게 베팅해서 혼자 판을 독식하는 짜릿한 반전을 만들어낼 힘이 있어요. 이 치열함을 나의 무기로 삼아보세요.", caution: "승패에 너무 꽂히면 이도 저도 아닌 소모전이 돼요. '적당히 이득 봤으면 쿨하게 빠진다'는 마인드컨트롤 필수!" },
+                          en: { action: "High-risk Breakthrough", strategy: "Use rivalry to create unexpected, bold outcomes", caution: "Don't get too obsessed with winning; know when to exit" }
+                        },
+                        '식신': {
+                          ko: { action: "덕업일치의 장인", strategy: "내가 진짜 꽂힌 거엔 밥 먹는 것도 잊고 파고드는 집요함이 있죠? 남들이 흉내 못 낼 압도적인 퀄리티로 '이 분야는 내가 덕후 1인자'라는 타이틀을 꿰찰 수 있어요.", caution: "내 세상에 너무 깊이 빠지면 트렌드 변화나 시장 반응에 무뎌질 수 있어요. 가끔은 '요즘 사람들은 뭐 좋아하나' 살펴볼 것!" },
+                          en: { action: "Mastering Craftsmanship", strategy: "Deeply immerse in what you love and raise the quality endlessly", caution: "Don't lose touch with ongoing trends and reality" }
+                        },
+                        '상관': {
+                          ko: { action: "속 시원한 사이다 혁신", strategy: "말 안 통하고 융통성 없는 룰을 보면 '이걸 왜 이따위로 해?' 하고 엎어버리고 싶은 충동, 느껴본 적 있죠? 남들과는 차원이 다른 감각적이고 빠른 솔루션을 던지는 게 진짜 매력이에요.", caution: "말이 너무 앞서면 혁신이 아니라 그냥 시비 거는 걸로 보여요. 비판할 땐 꼭 '현실적 대안'을 같이 던져서 입을 싹 닫게 만드세요!" },
+                          en: { action: "Breaking Existing Frames", strategy: "Critique outdated rules and propose your own better solutions", caution: "Words can hurt easily; always present alternatives when criticizing" }
+                        },
+                        '편재': {
+                          ko: { action: "스케일이 다른 판 짜기", strategy: "돈냄새, 사람 냄새 기가 막히게 맡는 편이네요. 이것저것 요리조리 연결해서 완전히 판을 크게 키우고 기회를 뻥튀기하는 특출난 감각을 마음껏 써먹으세요.", caution: "판은 기가 막히게 벌리는데 수습과 디테일에 약한 게 흠이죠. 뒤치다꺼리 확실하게 해주는 꼼꼼한 파트너 한 명 무조건 곁에 두세요." },
+                          en: { action: "Designing the Big Picture", strategy: "Connect different resources to create new broad opportunities", caution: "You might miss details; keep a meticulous partner close" }
+                        },
+                        '정재': {
+                          ko: { action: "계산기 두드리는 치밀함", strategy: "허황된 꿈꾸는 거 딱 질색이죠? 뜬구름 잡지 않고 현실적으로 계산기 딱딱 두드려서 한 푼 두 푼 낭비 없이 촘촘하게 내 자산을 쌓아가는 게 최고의 전략이에요.", caution: "눈앞에 떨어진 동전 줍다가 저 멀리서 오는 금덩이를 놓칠 수 있어요. 조금 손해 보더라도 장기적으로 크게 베팅해야 할 타이밍을 볼 줄 알아야 해요." },
+                          en: { action: "Securing Solid Results", strategy: "Calculate exactly and stack results without waste", caution: "Don't miss the big forest while chasing immediate gains" }
+                        },
+                        '편관': {
+                          ko: { action: "위기를 명성으로", strategy: "남들이 다들 겁먹고 도망가는 헬파티나 개노답 프로젝트, 은근히 '내가 영웅처럼 해결해서 폼나게 인정받고 싶다'는 생각 들 때 있지 않나요? 그 미친 돌파력이 바로 나의 강력한 브랜드가 됩니다.", caution: "과도한 책임감 때문에 나를 갉아먹기 딱 좋은 스타일. '내가 안 하면 안 돼'라는 병을 버리고 위임하는 법을 꼭 병행하세요." },
+                          en: { action: "Solving the Impossible", strategy: "Turn around crises everyone avoids to build your strong reputation", caution: "Perfectionism can cause burnout; enforce strict rest" }
+                        },
+                        '정관': {
+                          ko: { action: "안정적인 시스템의 수호자", strategy: "아슬아슬한 모험보단, 탄탄하게 검증된 룰이나 폼 나는 타이틀 딱 등에 업고 흔들림 없이 쭉쭉 치고 나갈 때 가장 편하고 든든할 거예요. 그 안정감이 내 최고의 무기입니다.", caution: "가끔은 매뉴얼에 없는 미친 짓(?)이 필요할 때도 있어요. 너무 FM대로만 살면 꼰대 소리 들으니 융통성 한 스푼 필히 장착!" },
+                          en: { action: "Stabilizing via Rules", strategy: "Move forward steadily relying on established rules and your position", caution: "Too much strictness ruins flexibility; always have a Plan B" }
+                        },
+                        '편인': {
+                          ko: { action: "촌철살인 매력", strategy: "남들 다 '네~' 할 때 혼자 '진짜 그런가?' 하고 삐딱선 한 번 타서 이면을 쫙 파헤쳐내 본 적, 많으실 거예요. 그 누구도 흉내 못 낼 그 오묘한 통찰력과 촉이 진짜 치명적인 무기가 됩니다.", caution: "머릿속으로 '이렇게 하면 쩔겠지?' 생각만 오만 번 하다가 타이밍 다 놓치는 게 문제예요. 고민 좀 적당히 하고 일단 세상에 지르고 보세요." },
+                          en: { action: "Discovering Hidden Edges", strategy: "Observe differently and build your unique irreplaceable know-how", caution: "Don't get trapped in your head; show your ideas to the world early" }
+                        },
+                        '정인': {
+                          ko: { action: "무한 프리패스 자격증", strategy: "남들이 피땀 흘릴 때, 기가 막히게 라이선스 하나 딱 따서 그걸로 두고두고 편안하게 대접받고 사랑받고 싶지 않나요? 신뢰감 있는 자격이나 학위가 나를 평생 우아하게 지켜줄 거예요.", caution: "준비만 완벽하게 하려다가 나이만 먹을 수 있어요. 제발 생각 좀 멈추고 당장 뭐라도 허접하게 들이밀면서 시작해 보세요." },
+                          en: { action: "Building Trusted Authority", strategy: "Gain a loved position using verified skills or credentials", caution: "Perfectionist planning delays execution; start small and adapt" }
+                        }
                       };
-                      return behaviors[tenGodKo] || { ko: '숨은 본성', en: 'Hidden nature' };
+                      
+                      const base = baseBehaviors[tenGodKo] || { 
+                        ko: {action: "본질 파악", strategy: "재능 구체화", caution: "밸런스 유지"}, 
+                        en: {action: "Identify core", strategy: "Manifest talents", caution: "Maintain balance"} 
+                      };
+
+                      if (lang === 'EN') return base;
+
+                      const STEM_TRAITS: Record<string, string> = {
+                          '甲': '기획하고 거침없이 밀고 나가는',
+                          '乙': '어떤 환경에서도 유연하게 살아남는 잡초 같은',
+                          '丙': '화려하게 나를 드러내고 사방으로 뻗어가는',
+                          '丁': '하나를 파고들면 무섭게 집중하는 예리한',
+                          '戊': '모두를 아우르고 묵직하게 버텨내는 산 같은',
+                          '己': '디테일 하나 놓치지 않고 실속을 챙기는 깐깐한',
+                          '庚': '아니다 싶으면 과감하게 끊어내고 밀어붙이는 돌파력 있는',
+                          '辛': '불필요한 건 단호하게 잘라버리고 극한의 완성도를 추구하는',
+                          '壬': '변수를 넉넉히 품어 안으면서도 큰 그림을 꿰뚫어 보는',
+                          '癸': '어느새 스며들어 분위기를 맞추고 사람 마음을 읽어내는'
+                      };
+
+                      const YEAR_TAILS: Record<string, string> = {
+                          '비견': '주변 핑계 안 대고 내 방식대로 쿨하게 내 영역을 지켜내는 뚝심이 진짜 매력이네요.',
+                          '겁재': '다들 머뭇거릴 때 과감하게 베팅해서 짜릿한 반전을 만들어낼 수 있는 대담함이 진짜 매력이네요.',
+                          '식신': '내가 꽂힌 것에 집요하게 파고들어 압도적인 퀄리티를 뽑아내는 장인 정신이 진짜 매력이네요.',
+                          '상관': '당신의 진짜 매력은 남들과는 차원이 다른 감각적이고 빠른 솔루션을 만드는 능력이네요.',
+                          '편재': '돈과 사람을 요리조리 엮어내 특출난 기회를 뻥튀기하는 남다른 스케일이 진짜 매력이네요.',
+                          '정재': '허황된 꿈 대신 계산기 딱딱 두드려가며 낭비 없이 현실을 탄탄히 다지는 꼼꼼함이 진짜 매력이네요.',
+                          '편관': '남들이 피하는 힘든 일이나 위기를 특유의 맷집으로 뚫어내고 내 브랜드로 만드는 돌파력이 진짜 매력입니다.',
+                          '정관': '탄탄히 검증된 룰과 명분 속에서 흔들리지 않고 안정감 있게 주도권을 쥐는 카리스마가 진짜 매력입니다.',
+                          '편인': '남들 다 "네~" 할 때 이면을 쫙 파헤쳐내 아무도 흉내 못 낼 통찰력을 뿜어내는 게 진짜 매력이네요.',
+                          '정인': '단단한 신뢰와 확실한 자격을 바탕으로 어디서든 편안하게 대접받고 사랑받을 수 있는 힘이 진짜 매력입니다.'
+                      };
+
+                      const JOB_ROLES: Record<string, string> = {
+                          '비견': '눈치 안 보는 독립적 프리랜서나 자수성가형 리더',
+                          '겁재': '일단 지르고 보는 혁신가나 파격적인 승부사',
+                          '식신': '내 취향을 집요하게 파고드는 장인이나 크리에이터',
+                          '상관': '기존 룰을 아작내는 트렌드 세터나 감각적인 기획자',
+                          '편재': '스케일 크게 돈과 사람을 엮어내는 비즈니스 네트워커',
+                          '정재': '리스크를 철저히 관리하고 계산기 확실히 두드리는 재무 통제관',
+                          '편관': '다들 도망가는 난제를 보란 듯이 해결해서 영웅이 되는 사령관',
+                          '정관': '체계적이고 흔들림 없는 원칙주의자, 믿음직한 관리자',
+                          '편인': '이면을 날카롭게 캐치하는 심리분석가나 아이디어 뱅크',
+                          '정인': '누구나 무조건 고개 끄덕이게 만드는 검증된 최고 전문가'
+                      };
+
+                      const YEAR_FAMILIES: Record<string, string> = {
+                          '비견': '일찍부터 자립심과 주체성을 터득해야 했던 백그라운드',
+                          '겁재': '은근히 생존 본능과 치열한 생리를 몸으로 체득한 집안 분위기',
+                          '식신': '내 취향과 활동성을 솔찬히 챙겨주고 지원받았을 법한 가풍',
+                          '상관': '얽매임 없이 좀 자유롭게 속마음 털어놓도록 자라왔을 환경',
+                          '편재': '이리저리 바쁘고 스케일이 컸던, 역마살 느낌 낭낭한 환경',
+                          '정재': '아낄 거 철저히 아끼며 안정감 최고로 쳤던 깐깐한 집안 분위기',
+                          '편관': '엄격한 룰 안에서 책임감의 무게를 은근히 느끼며 자랐을 가풍',
+                          '정관': '교과서처럼 반듯하게 선 긋고 도리에 어긋남 없도록 배운 환경',
+                          '편인': '어딘가 유별나고 독특한 세계관, 외롭지만 속 깊은 정서를 키운 곳',
+                          '정인': '사랑채 마냥 따뜻하고 전폭적인 지지를 받아 정서적으로 든든했던 환경'
+                      };
+
+                      let ctxStrategy = '';
+                      let ctxCaution = base.ko.caution;
+
+                      const stemTraitText = STEM_TRAITS[stemChar] || '';
+                      const tailSentence = YEAR_TAILS[tenGodKo] || '';
+
+                      if (pillar === 'Year') {
+                          if (isMain) {
+                              ctxStrategy = `어릴 적 가풍이나 부모님으로부터 [${YEAR_FAMILIES[tenGodKo]}] 속에서 자라오셨네요. 이런 바탕 덕분에 [${stemTraitText}] 기질을 본능적으로 흡수하셨을 겁니다. ${tailSentence}`;
+                          } else {
+                              ctxStrategy = `마치 공기처럼 익숙하게 물려받은 배경으로서 은연중에 [${stemTraitText}] 기질이 배어 있습니다. 이게 알게 모르게 나의 든든한 밑거름이자 은밀한 잠재력이 되곤 하죠.`;
+                          }
+                      } else if (pillar === 'Month') {
+                          if (isMain) {
+                              ctxStrategy = `사회생활이나 직장 같은 빡센 무대에서 ${nameStr}은(는) [${JOB_ROLES[tenGodKo]}] 역할을 맡을 때 포텐이 제대로 터집니다. [${stemTraitText}] 기질을 실무에 거침없이 녹여내서, ${base.ko.strategy}`;
+                          } else {
+                              ctxStrategy = `사회생활에서 겉으로 확 드러나진 않지만, 은근히 속으로는 [${stemTraitText}] 기질을 무기 삼아 상황을 내 쪽으로 유리하게 끌고 가려는 업무 습관이 발동하곤 하네요.`;
+                          }
+                      } else if (pillar === 'Day') {
+                          if (isMain) {
+                              ctxStrategy = `[${stemTraitText}] 것이 바로 ${namePossessive} 일상적 성격입니다. 남 눈치 안 볼 때 제일 편안하게 나오는 모습이기도 하죠. 이 강력하고 솔직한 동력을 바탕으로, ${base.ko.strategy}`;
+                          } else {
+                              ctxStrategy = `나 혼자만의 시간이나 가장 은밀한 사생활 속에서는, [${stemTraitText}] 기질을 조용히 뿜어내며 평온을 느낍니다. 혼자 있을 땐 종종 나만의 방식으로 에너지를 충전하곤 해요.`;
+                          }
+                      } else if (pillar === 'Hour') {
+                          if (isMain) {
+                              ctxStrategy = `장기적인 노후의 지향점이자, 길게 봤을 때 내가 이기적으로라도 꼭 쥐고 싶은 인생의 결과물은 놀랍게도 [${stemTraitText}] 성향과 꼭 맞닿아 있습니다. 먼 미래의 진짜 내 모습을 위해, ${base.ko.strategy}`;
+                          } else {
+                              ctxStrategy = `겉으로는 당장 안 보여도 내 마음 깊숙한 곳에서는 언젠간 반드시 세상에 터뜨리리라 칼을 갈고 있는 [${stemTraitText}] 기질이 숨어 있습니다. 이 은밀한 야망이 나를 계속 나아가게 만드네요.`;
+                          }
+                      }
+
+                      if (damageInfo) {
+                          if (damageInfo.type.includes('충')) {
+                              ctxCaution += ` 💥 (아! 뼈 때리는 조언 하나: 도중에 '${damageInfo.target}' 글자랑 세게 부딪혀서 갑자기 판이 엎어지거나 궤도 수정할 일이 자주 생길 수 있어요. 위기 탈출 능력은 필수입니다.)`;
+                          } else if (damageInfo.type.includes('형')) {
+                              ctxCaution += ` ✂️ (아! 뼈 때리는 조언 하나: '${damageInfo.target}' 글자 때문에 내 맘대로 시원하게 안 풀리고 억지로 고치거나 조율하느라 피곤할 수 있어요. 너무 과한 고집은 내려놓는 게 상책!)`;
+                          }
+                      }
+
+                      return { ko: { ...base.ko, strategy: ctxStrategy, caution: ctxCaution }, en: base.en };
+                    };
+
+                    const stemTenGodInfo = getDetailedTenGod(dayMaster, stem);
+                    const stemBehavior = getTenGodBehavior(stemTenGodInfo.ko, lang, guideSelectedPillar, null, true, stem, userName);
+                    const stemData = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems];
+                    const stemColor = ELEMENT_COLORS[stemData?.element as keyof typeof ELEMENT_COLORS] || '#ffffff';
+
+                    let bestRootType: 'main' | 'sub' | 'gen' | 'none' = 'none';
+                    if (localHiddenStems.length > 0) {
+                      localHiddenStems.forEach((hs, i) => {
+                        const isMain = i === localHiddenStems.length - 1;
+                        const rootInfo = getRootingInfoText(stem, hs, isMain, lang);
+                        if (rootInfo) {
+                          if (rootInfo.type === 'main') bestRootType = 'main';
+                          else if (rootInfo.type === 'sub_residual' && bestRootType !== 'main') bestRootType = 'sub';
+                          else if (rootInfo.type === 'generation' && bestRootType === 'none') bestRootType = 'gen';
+                        }
+                      });
+                    }
+
+                    const getDamageInfo = () => {
+                      const allBranches = result.pillars.map(p => p.hanja.charAt(1));
+                      const branchIndex = result.pillars.findIndex(p => p.title === guideSelectedPillar);
+                      let damageType = null;
+                      let target = null;
+                      
+                      const clashPairs: Record<string, string> = {
+                        '子': '午', '午': '子', '丑': '未', '未': '丑',
+                        '寅': '申', '申': '寅', '卯': '酉', '酉': '卯',
+                        '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳'
+                      };
+                      
+                      for (let i = 0; i < allBranches.length; i++) {
+                        if (i === branchIndex) continue;
+                        if (clashPairs[branch] === allBranches[i]) {
+                          return { type: '충(충돌/조정)', target: allBranches[i] };
+                        }
+                      }
+                      
+                      const penaltyGroups = [
+                        ['寅','巳','申'], ['丑','戌','未'], ['子','卯'],
+                        ['辰','辰'], ['午','午'], ['酉','酉'], ['亥','亥']
+                      ];
+                      for (const group of penaltyGroups) {
+                        if (group.includes(branch)) {
+                          for (let i = 0; i < allBranches.length; i++) {
+                            if (i === branchIndex) continue;
+                            if (group.includes(allBranches[i])) {
+                               return { type: '형(조율/수술)', target: allBranches[i] };
+                            }
+                          }
+                        }
+                      }
+                      return null;
+                    };
+
+                    const damageInfo = getDamageInfo();
+
+                    const getRootingInterpretation = () => {
+                      if (bestRootType === 'main') {
+                        if (damageInfo) return {
+                          title: lang === 'KO' ? `강한 통근이나 ${damageInfo.type} 발생` : `Strong Root but with ${damageInfo.type}`,
+                          color: 'text-amber-400',
+                          desc: lang === 'KO' 
+                            ? `실행력은 매우 강하나, '${damageInfo.target}' 글자와 부딪히며 목표 달성 과정에서 예상치 못한 변동이나 조정 과정이 발생합니다. 위기를 기회로 삼는 구조조정 역량이 가장 중요합니다.`
+                            : `Strong execution, but unexpected changes/adjustments occur due to conflict with '${damageInfo.target}'. Crisis management is key.`
+                        };
+                        return {
+                          title: lang === 'KO' ? '안정적이고 강한 통근 (현실화 능력 90% 이상)' : 'Stable & Strong Root',
+                          color: 'text-neon-cyan',
+                          desc: lang === 'KO' ? '생각한 바가 즉각적으로 행동과 결과로 이어집니다. 별다른 마찰 없이 주도적으로 프로젝트를 이끌 수 있는 최적의 환경입니다.' : 'Ideas translate instantly into action.'
+                        };
+                      }
+                      if (bestRootType === 'sub' || bestRootType === 'gen') {
+                        if (damageInfo) return {
+                          title: lang === 'KO' ? `약한 통근 및 ${damageInfo.type} 발생` : `Weak Root with ${damageInfo.type}`,
+                          color: 'text-rose-400',
+                          desc: lang === 'KO' 
+                            ? `기반이 다소 약한데 '${damageInfo.target}'와 마찰을 빚어 불필요한 체력 소모나 외부 방해가 있을 수 있습니다. 무리한 진행보다는 실무적 플랜 B를 마련해 두세요.`
+                            : `Weak baseline with friction from '${damageInfo.target}'. Prepare a Plan B.`
+                        };
+                        return {
+                          title: lang === 'KO' ? '약한 통근 (현실적 지원 및 연대 필요)' : 'Weak Root (Needs Support)',
+                          color: 'text-amber-400/90',
+                          desc: lang === 'KO' ? '싹은 틔웠으나 뿌리가 얕습니다. 시작은 좋으나 지구력이 부족할 수 있으므로, 나의 약점을 보완해줄 도구나 실무 파트너가 필수적입니다.' : 'Good start but needs environmental help or support.'
+                        };
+                      }
+                      return {
+                        title: lang === 'KO' ? '무근 (이상은 높으나 현실적 수단 부재)' : 'No Root (Lacks Resources)',
+                        color: 'text-white/50',
+                        desc: lang === 'KO' ? '현실적인 제약, 자금 부족 혹은 실행팀 부재로 아이디어가 기획 단계에 머물기 쉽습니다. 실무 감각이 뛰어난 핵심 파트너를 무조건 영입해야 기회가 열립니다.' : 'Good ideas but lacks tools. You need practical partners.'
+                      };
+                    };
+
+                    const rootInterp = getRootingInterpretation();
+
+                    const PILLARS_ORDER: ('Year'|'Month'|'Day'|'Hour')[] = ['Year', 'Month', 'Day', 'Hour'];
+                    const PILLAR_LABELS = {
+                      Year: lang === 'KO' ? '년주(조상/초년)' : 'Year (Ancestors)',
+                      Month: lang === 'KO' ? '월주(사회/직업)' : 'Month (Society/Career)',
+                      Day: lang === 'KO' ? '일주(나/배우자)' : 'Day (Self/Spouse)',
+                      Hour: lang === 'KO' ? '시주(미래/자식)' : 'Hour (Future/Children)'
                     };
 
                     return (
-                      <div className="mt-2 p-5 bg-[#0a0a1a] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] border border-neon-cyan/20 rounded-xl relative overflow-hidden">
+                      <div className="mt-2 p-5 bg-[#0a0a1a] shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] border border-neon-cyan/20 rounded-xl relative overflow-hidden flex flex-col gap-4">
                         <div className="absolute top-0 right-0 p-4 opacity-5 blur-[2px] pointer-events-none">
-                          <span className="text-8xl font-gothic">{localDayBranch}</span>
+                          <span className="text-8xl font-gothic">{branch}</span>
                         </div>
-                        <h5 className="text-neon-cyan font-bold mb-4 flex items-center gap-2 text-sm relative z-10">
-                          <span className="w-1.5 h-4 bg-neon-cyan sm:w-1 sm:h-5 sm:rounded-sm"></span>
-                          {lang === 'KO' ? 
-                            `종합 이해) 남들은 모르는 ${userName}님의 진짜 속마음 (일지 ${localDayBranch})` : 
-                            `Example) ${userName}'s True Secret Mind (Day Branch ${localDayBranch})`
-                          }
-                        </h5>
-                        <p className="text-xs sm:text-sm text-white/70 mb-4 relative z-10">
-                          {lang === 'KO' ? 
-                           `겉으로는 다르게 보일 수 있어도, 당신의 무의식 속 깊은 곳(일지)에는 다음과 같은 ${localHiddenStems.length === 2 ? '두 가지 성향이' : '세 가지 성향이 섞여'} 작동하고 있습니다.` :
-                           `Though you may seem different on the outside, deep in your unconscious mind (Day Branch) lie these ${localHiddenStems.length === 2 ? 'two' : 'three'} traits acting together:`}
-                        </p>
                         
-                        <div className="flex flex-col gap-3 w-full relative z-10">
-                          {localHiddenStems.map((hs, i) => {
-                            const hsData = BAZI_MAPPING.stems?.[hs as keyof typeof BAZI_MAPPING.stems];
-                            if (!hsData) return null;
-                            
-                            const typeInfo = i === 0 ? (lang === 'KO' ? '초기 (약한 본능)' : 'Initial (Weak Instinct)') :
-                                           i === localHiddenStems.length - 1 ? (lang === 'KO' ? '정기 (가장 강한 핵심 자아)' : 'Main (Core True Self)') : 
-                                           (lang === 'KO' ? '중기 (특정 상황의 재능)' : 'Middle (Contextual Talent)');
-                                           
-                            const typeColor = i === 0 ? 'text-white/50' :
-                                            i === localHiddenStems.length - 1 ? 'text-amber-400 font-bold' : 
-                                            'text-white/70';
-                                            
-                            const tenGodInfo = getDetailedTenGod(localDayMaster, hs);
-                            const behavior = getTenGodBehavior(tenGodInfo.ko, lang);
-                            const elementColor = ELEMENT_COLORS[hsData.element as keyof typeof ELEMENT_COLORS] || '#4ade80';
-                            
-                            return (
-                              <div key={i} className={`flex flex-col sm:flex-row border rounded-lg p-3 sm:p-4 gap-3 sm:gap-4 sm:items-center ${i === localHiddenStems.length - 1 ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}>
-                                <div className="flex flex-col min-w-[140px] shrink-0">
-                                  <div className={`text-[10px] mb-1 ${typeColor}`}>{typeInfo}</div>
-                                  <div className="flex items-end gap-2">
-                                    <span className="text-2xl sm:text-3xl font-gothic leading-none" style={{ color: elementColor }}>{hs}</span>
-                                    <div className="flex flex-col gap-1">
-                                      <span className="text-xs text-white/50 leading-none">({lang === 'KO' ? hsData.ko : hsData.en})</span>
-                                      <span className="bg-white/10 rounded px-1.5 py-0.5 inline-block text-[10px] font-bold text-white/90 border border-white/20 w-fit">
+                        <div className="flex flex-col gap-2 relative z-10 border-b border-white/10 pb-4">
+                          <h5 className="text-neon-cyan font-bold text-sm mb-2 flex items-center gap-2">
+                            <span className="w-1.5 h-4 bg-neon-cyan sm:w-1 sm:h-5 sm:rounded-sm"></span>
+                            {lang === 'KO' ? `기둥별 심층 분석 가이드` : `Detailed Pillar Analysis Guide`}
+                          </h5>
+                          <div className="flex flex-wrap gap-2">
+                            {PILLARS_ORDER.map(p => (
+                              <button
+                                key={p}
+                                onClick={() => setGuideSelectedPillar(p)}
+                                className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition-colors ${guideSelectedPillar === p ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50 shadow-[0_0_10px_rgba(0,229,255,0.2)]' : 'bg-white/5 text-white/50 border border-transparent hover:bg-white/10'}`}
+                              >
+                                {PILLAR_LABELS[p]}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 w-full">
+                          {/* 1. 천간 (지향점) */}
+                          <div className="flex flex-col gap-2 p-4 border border-white/10 bg-white/5 rounded-lg h-full">
+                            <div className="text-xs text-white/50 font-bold mb-1">1. {lang === 'KO' ? '천간 (의도와 지향점)' : 'Heavenly Stem (Intention)'}</div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-3xl sm:text-4xl font-gothic leading-none" style={{ color: stemColor }}>{stem}</span>
+                              <div className="flex flex-col flex-1">
+                                <span className="bg-white/10 rounded px-1.5 py-0.5 inline-block text-[10px] font-bold text-white/90 border border-white/20 w-fit mb-1.5">
+                                  {lang === 'KO' ? stemTenGodInfo.ko : stemTenGodInfo.en}
+                                </span>
+                                <span className="text-[11px] sm:text-xs text-white/80 leading-snug break-keep flex flex-col gap-0.5 mt-0.5">
+                                  <span><span className="text-neon-cyan font-bold">목표:</span> {lang === 'KO' ? stemBehavior.ko.action : stemBehavior.en.action}</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. 통근 (결과 예측) */}
+                          <div className="flex flex-col gap-2 p-4 border border-white/10 bg-white/5 rounded-lg h-full">
+                            <div className="text-xs text-white/50 font-bold mb-1">2. {lang === 'KO' ? '통근 여부 (현실 구현력)' : 'Rooting (Actualization)'}</div>
+                            <div className={`text-sm font-bold ${rootInterp.color}`}>{rootInterp.title}</div>
+                            <div className="text-[11px] sm:text-xs text-white/70 leading-relaxed mt-1 break-keep">
+                              {rootInterp.desc}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-2 relative z-10">
+                          <div className="text-xs text-white/50 font-bold mb-3">3. {lang === 'KO' ? '지장간 실무 행동 가이드 (구체적 자원)' : 'Hidden Stems Action Guide'}</div>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+                            {localHiddenStems.map((hs, i) => {
+                              const hsData = BAZI_MAPPING.stems?.[hs as keyof typeof BAZI_MAPPING.stems];
+                              if (!hsData) return null;
+                              
+                              const typeInfo = i === 0 ? (lang === 'KO' ? '초기 (아이디어/기획)' : 'Initial Phase') :
+                                             i === localHiddenStems.length - 1 ? (lang === 'KO' ? '정기 (가장 강력한 수단)' : 'Core Weapon') : 
+                                             (lang === 'KO' ? '중기 (상황별 비장의 무기)' : 'Contextual Tool');
+                                             
+                              const typeColor = i === 0 ? 'text-white/50' :
+                                              i === localHiddenStems.length - 1 ? 'text-amber-400 font-bold' : 
+                                              'text-white/70';
+                                              
+                              const tenGodInfo = getDetailedTenGod(dayMaster, hs);
+                              const isHiddenStemMain = i === localHiddenStems.length - 1;
+                              const behavior = getTenGodBehavior(tenGodInfo.ko, lang, guideSelectedPillar, isHiddenStemMain ? damageInfo : null, isHiddenStemMain, hs, userName);
+                              const elementColor = ELEMENT_COLORS[hsData.element as keyof typeof ELEMENT_COLORS] || '#4ade80';
+                              
+                              return (
+                                <div key={i} className={`flex flex-col border rounded-xl p-3 sm:p-4 gap-3 ${i === localHiddenStems.length - 1 ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-white/5'}`}>
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-2xl font-gothic leading-none drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]" style={{ color: elementColor }}>{hs}</span>
+                                      <span className="bg-white/10 rounded px-1.5 py-0.5 inline-block text-[10px] text-white/90 border border-white/20 select-none">
                                         {lang === 'KO' ? tenGodInfo.ko : tenGodInfo.en}
                                       </span>
                                     </div>
+                                    <div className={`text-[10px] font-bold tracking-tight bg-black/40 px-1.5 py-0.5 rounded ${typeColor}`}>{typeInfo}</div>
+                                  </div>
+                                  
+                                  <div className="flex flex-col gap-1.5 sm:gap-2">
+                                    <div className="text-[11px] sm:text-xs text-white/90 break-keep leading-snug">
+                                      <span className="inline-block px-1 rounded bg-neon-cyan/20 text-neon-cyan font-bold mr-1.5 text-[9px] sm:text-[10px] tracking-widest">{lang === 'KO' ? '행동' : 'ACT'}</span> 
+                                      {lang === 'KO' ? behavior.ko.action : behavior.en.action}
+                                    </div>
+                                    <div className="text-[11px] sm:text-xs text-white/90 break-keep leading-snug">
+                                      <span className="inline-block px-1 rounded bg-amber-400/20 text-amber-400 font-bold mr-1.5 text-[9px] sm:text-[10px] tracking-widest">{lang === 'KO' ? '전략' : 'PLAN'}</span> 
+                                      {lang === 'KO' ? behavior.ko.strategy : behavior.en.strategy}
+                                    </div>
+                                    <div className="text-[10px] sm:text-[11px] text-rose-300 break-keep leading-snug bg-rose-500/10 p-2 rounded border border-rose-500/20 mt-1">
+                                      <span className="font-bold sm:mr-1 block sm:inline">{lang === 'KO' ? '⚠️ 주의:' : '⚠️ Caveat:'}</span> 
+                                      {lang === 'KO' ? behavior.ko.caution : behavior.en.caution}
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="flex-1 border-t sm:border-t-0 sm:border-l border-white/10 pt-3 sm:pt-0 sm:pl-4">
-                                  <div className="text-sm text-white/90 leading-relaxed font-medium">
-                                    {lang === 'KO' ? `👉 "${behavior.ko}"` : `👉 "${behavior.en}"`}
-                                  </div>
-                                  <div className="text-[10.5px] sm:text-xs text-white/50 mt-1.5 leading-relaxed">
-                                    {i === 0 && (lang === 'KO' ? '무의식 중에 옅게 깔려있는 베이스 성향입니다. 가끔씩 불쑥 스쳐가는 생각정도로 작용합니다.' : 'A baseline trait faintly present in your unconscious. It acts gently.')}
-                                    {i > 0 && i < localHiddenStems.length - 1 && (lang === 'KO' ? '내면에 비장의 카드처럼 숨겨둔 무기입니다. 특정한 상황이나 계기가 다가왔을 때 적극적으로 발휘됩니다.' : 'A hidden weapon triggered by specific events or circumstances.')}
-                                    {i === localHiddenStems.length - 1 && (lang === 'KO' ? '결국 현실에서 나의 행동을 결정짓는 가장 핵심적이고 지배적인 본능입니다. 가장 뚜렷하게 발현됩니다.' : 'The most core, dominant instinct that ultimately controls your decisions and most apparent actions.')}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     );
