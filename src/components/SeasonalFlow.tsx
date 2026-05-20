@@ -6,9 +6,9 @@ const SEASONS = {
     ko: '봄 (Spring)',
     en: 'Spring',
     items: [
-      { char: '寅', nameKo: '인목', nameEn: 'Yin Wood', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '새로운 생명과 진취적 시작', typeDescEn: 'New life and progressive start', colorClass: 'bg-[#2ECC71] dark:bg-[#27AE60]' },
-      { char: '卯', nameKo: '묘목', nameEn: 'Mao Wood', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '폭발적이고 뚜렷한 봄의 기운', typeDescEn: 'Explosive and distinct spring energy', colorClass: 'bg-[#2ECC71] dark:bg-[#27AE60]' },
-      { char: '辰', nameKo: '진토', nameEn: 'Chen Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '봄 기운을 갈무리·여름 준비', typeDescEn: 'Gathering spring energy and preparing for summer', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
+      { char: '寅', nameKo: '인목', nameEn: 'In Wood', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '새로운 생명과 진취적 시작', typeDescEn: 'New life and progressive start', colorClass: 'bg-[#2ECC71] dark:bg-[#27AE60]' },
+      { char: '卯', nameKo: '묘목', nameEn: 'Myo Wood', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '폭발적이고 뚜렷한 봄의 기운', typeDescEn: 'Explosive and distinct spring energy', colorClass: 'bg-[#2ECC71] dark:bg-[#27AE60]' },
+      { char: '辰', nameKo: '진토', nameEn: 'Jin Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '봄 기운을 갈무리·여름 준비', typeDescEn: 'Gathering spring energy and preparing for summer', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
     ],
     activeColor: 'bg-green-50/80 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
   },
@@ -16,9 +16,9 @@ const SEASONS = {
     ko: '여름 (Summer)',
     en: 'Summer',
     items: [
-      { char: '巳', nameKo: '사화', nameEn: 'Si Fire', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '밝은 열정과 확산의 시작', typeDescEn: 'Bright passion and the start of expansion', colorClass: 'bg-[#FF4136] dark:bg-[#E74C3C]' },
-      { char: '午', nameKo: '오화', nameEn: 'Wu Fire', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '가장 뜨겁고 화려한 여름 본질', typeDescEn: 'Hottest and most splendid summer essence', colorClass: 'bg-[#FF4136] dark:bg-[#E74C3C]' },
-      { char: '未', nameKo: '미토', nameEn: 'Wei Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '여름 열기를 담아 가을 준비', typeDescEn: 'Containing summer heat to prepare for autumn', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
+      { char: '巳', nameKo: '사화', nameEn: 'Sa Fire', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '밝은 열정과 확산의 시작', typeDescEn: 'Bright passion and the start of expansion', colorClass: 'bg-[#FF4136] dark:bg-[#E74C3C]' },
+      { char: '午', nameKo: '오화', nameEn: 'Oh Fire', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '가장 뜨겁고 화려한 여름 본질', typeDescEn: 'Hottest and most splendid summer essence', colorClass: 'bg-[#FF4136] dark:bg-[#E74C3C]' },
+      { char: '未', nameKo: '미토', nameEn: 'Mi Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '여름 열기를 담아 가을 준비', typeDescEn: 'Containing summer heat to prepare for autumn', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
     ],
     activeColor: 'bg-red-50/80 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
   },
@@ -26,9 +26,9 @@ const SEASONS = {
     ko: '가을 (Autumn)',
     en: 'Autumn',
     items: [
-      { char: '申', nameKo: '신금', nameEn: 'Shen Metal', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '결실을 맺기 위한 숙살의 시작', typeDescEn: 'Start of refinement for bearing fruit', colorClass: 'bg-white dark:bg-[#E2E8F0]' },
-      { char: '酉', nameKo: '유금', nameEn: 'You Metal', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '단단하고 예리한 가을 본질', typeDescEn: 'Solid and sharp autumn essence', colorClass: 'bg-white dark:bg-[#E2E8F0]' },
-      { char: '戌', nameKo: '술토', nameEn: 'Xu Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '가을 결실을 지키고 겨울 준비', typeDescEn: 'Guarding autumn fruits and preparing for winter', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
+      { char: '申', nameKo: '신금', nameEn: 'Sin Metal', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '결실을 맺기 위한 숙살의 시작', typeDescEn: 'Start of refinement for bearing fruit', colorClass: 'bg-white dark:bg-[#E2E8F0]' },
+      { char: '酉', nameKo: '유금', nameEn: 'Yu Metal', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '단단하고 예리한 가을 본질', typeDescEn: 'Solid and sharp autumn essence', colorClass: 'bg-white dark:bg-[#E2E8F0]' },
+      { char: '戌', nameKo: '술토', nameEn: 'Sul Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '가을 결실을 지키고 겨울 준비', typeDescEn: 'Guarding autumn fruits and preparing for winter', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
     ],
     activeColor: 'bg-slate-50/80 text-slate-700 border-slate-300 dark:bg-slate-800/50 dark:text-slate-200 dark:border-slate-600'
   },
@@ -36,9 +36,9 @@ const SEASONS = {
     ko: '겨울 (Winter)',
     en: 'Winter',
     items: [
-      { char: '亥', nameKo: '해수', nameEn: 'Hai Water', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '응축과 지혜의 씨앗이 시작됨', typeDescEn: 'Condensation and the seed of wisdom begins', colorClass: 'bg-[#1a1a2e] dark:bg-black' },
-      { char: '子', nameKo: '자수', nameEn: 'Zi Water', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '가장 차갑고 깊은 겨울 본질', typeDescEn: 'Coldest and deepest winter essence', colorClass: 'bg-[#1a1a2e] dark:bg-black' },
-      { char: '丑', nameKo: '축토', nameEn: 'Chou Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '겨울 추위를 품고 새 봄 준비', typeDescEn: 'Embracing winter cold and preparing for new spring', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
+      { char: '亥', nameKo: '해수', nameEn: 'Hae Water', type: '생 (시작)', typeEn: 'Birth (Begin)', typeKo: '응축과 지혜의 씨앗이 시작됨', typeDescEn: 'Condensation and the seed of wisdom begins', colorClass: 'bg-[#1a1a2e] dark:bg-black' },
+      { char: '子', nameKo: '자수', nameEn: 'Ja Water', type: '왕 (왕성)', typeEn: 'Prosperity', typeKo: '가장 차갑고 깊은 겨울 본질', typeDescEn: 'Coldest and deepest winter essence', colorClass: 'bg-[#1a1a2e] dark:bg-black' },
+      { char: '丑', nameKo: '축토', nameEn: 'Chuk Earth', type: '고 (저장)', typeEn: 'Storage (End)', typeKo: '겨울 추위를 품고 새 봄 준비', typeDescEn: 'Embracing winter cold and preparing for new spring', colorClass: 'bg-[#F1C40F] dark:bg-[#D4AC0D]' },
     ],
     activeColor: 'bg-slate-200 text-slate-800 border-slate-400 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700'
   }

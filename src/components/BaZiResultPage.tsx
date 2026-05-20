@@ -771,7 +771,22 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
           }
         });
 
-        const bestTagInfo = allRootedStems.find(r => r.pIdx === i) || allRootedStems.find(r => r.title === 'Day') || allRootedStems[0];
+        const getRootPriorityValue = (r: { pIdx: number, type: string }) => {
+          const isSamePillar = r.pIdx === i;
+          if (isSamePillar) {
+            if (r.type === 'main') return 10;
+            if (r.type === 'sub_residual') return 8;
+            if (r.type === 'generation') return 6;
+          } else {
+            if (r.type === 'main') return 9;
+            if (r.type === 'sub_residual') return 7;
+            if (r.type === 'generation') return 5;
+          }
+          return 0;
+        };
+
+        const sortedRootedStems = [...allRootedStems].sort((a, b) => getRootPriorityValue(b) - getRootPriorityValue(a));
+        const bestTagInfo = sortedRootedStems[0];
 
         if (bestTagInfo) {
           const type = bestTagInfo.type;
@@ -804,7 +819,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     if (lang === 'KO') {
       return `${info.ko}(${value})`;
     }
-    return info.en;
+    if (type === 'stem') {
+      return info.en.split(' ')[0]; // 'Gap'
+    } else {
+      const roman = getRomanized(value);
+      const animal = getCleanBranchEn(info.en);
+      return `${roman} (${animal})`; // 'Ja (Rat)'
+    }
   };
 
   const [expandedCycle, setExpandedCycle] = useState<number | null>(null);
@@ -2301,12 +2322,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               <span>각 지지 속에 숨겨져 있는 핵심 무기와 본능입니다. 하단의 꼬리표는 이 지장간이 사주 원국의 윗글자(천간)들과 얼마나 다각적으로 결속되어 현실로 발현되는지를 나타냅니다. 마우스를 올리면 통근된 글자가 반응합니다.</span>
                               {presentRootTags.size > 0 && (
                                 <span className={`text-[10px] sm:text-[11px] p-1.5 rounded break-keep flex flex-wrap gap-x-2 gap-y-1 mt-1 ${theme === 'light' ? 'bg-slate-50 text-slate-700 border border-slate-200' : 'bg-white/5 text-white/80 border border-white/10'}`}>
-                                  {presentRootTags.has('MAIN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>본기:</span> 직속 기둥의 강력한 주특기. </span>}
-                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>일간:</span> 일간과 연결된 강력한 주특기. </span>}
-                                  {presentRootTags.has('GEN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>생조:</span> 직속 기둥의 숨은 잠재력. </span>}
-                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>일생:</span> 일간이 공급받는 든든한 상상력. </span>}
-                                  {presentRootTags.has('SUB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>중여:</span> 유연하게 꺼내 쓰는 서브 무기. </span>}
-                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>일중:</span> 일간 특유의 유연한 서브 무기.</span>}
+                                  {presentRootTags.has('MAIN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>본기:</span> 제자리 천간에 직접 연결된 핵심 주특기. </span>}
+                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>연간/월간/일간/시간:</span> 각각 해당 천간으로 투출해 사회적/현실적 무기로 뻗어 나가는 강력한 본기 통근. </span>}
+                                  {presentRootTags.has('GEN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>생조:</span> 제자리 천간을 밀어주는 내적인 잠재력. </span>}
+                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>연생/월생/일생/시생:</span> 각각 해당 천간으로 기운을 공급하여 상생과 원조를 아끼지 않는 조력의 뿌리. </span>}
+                                  {presentRootTags.has('SUB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>중여:</span> 제자리 천간과 연결되는 유연하고 탄탄한 서브 무기. </span>}
+                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>연중/월중/일중/시중:</span> 각각 해당 천간에 유연한 수단을 한 단계 거쳐 작용하게 만드는 탄탄한 보완의 뿌리.</span>}
                                 </span>
                               )}
                             </span>
@@ -2338,12 +2359,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               <span>These are your true weapons and hidden instincts. The small tags below show how strongly this potential is connected to the Heavenly Stems above. Hover over them to see the glowing connections.</span>
                               {presentRootTags.size > 0 && (
                                 <span className={`text-[10px] sm:text-[11px] p-1.5 rounded break-keep flex flex-wrap gap-x-2 gap-y-1 mt-1 ${theme === 'light' ? 'bg-slate-50 text-slate-700 border border-slate-200' : 'bg-white/5 text-white/80 border border-white/10'}`}>
-                                  {presentRootTags.has('MAIN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>MAIN:</span> Direct Pillar core strength. </span>}
-                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>E-MN:</span> Day Master core strength. </span>}
-                                  {presentRootTags.has('GEN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>GEN:</span> Pillar's hidden potential. </span>}
-                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>E-GN:</span> Day Master steady energy. </span>}
-                                  {presentRootTags.has('SUB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>SUB:</span> A flexible secondary weapon. </span>}
-                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>E-SB:</span> Day Master sub weapon.</span>}
+                                  {presentRootTags.has('MAIN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>MAIN:</span> Core strength directly rooted to its own Heavenly Stem. </span>}
+                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>Year/Month/DM/Hour:</span> Strong Main-Qi root connecting directly to the designated Heavenly Stem. </span>}
+                                  {presentRootTags.has('GEN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>GEN:</span> Supportive potential feeding its own Heavenly Stem. </span>}
+                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>Year-GN/Month-GN/DM-GN/Hour-GN:</span> Generative support feeding and empowering the designated Heavenly Stem. </span>}
+                                  {presentRootTags.has('SUB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>SUB:</span> A highly flexible, resilient backup weapon for its own Heavenly Stem. </span>}
+                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>Year-SB/Month-SB/DM-SB/Hour-SB:</span> Resilient secondary/sub root backing up the designated Heavenly Stem.</span>}
                                 </span>
                               )}
                             </span>
@@ -2492,11 +2513,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
                           (showHanja ? (
                             <div className="flex flex-col items-center w-full min-w-0">
-                              <span className="truncate w-full text-center px-1">{pillar.stem}({getRomanized(pillar.stem)})</span>
+                              <span className="truncate w-full text-center px-1">{pillar.stem}({getRomanized(pillar.stem).toUpperCase()})</span>
                               <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter text-white/80 px-1">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || pillar.stem}</div>
                             </div>
                           ) : (
-                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || pillar.stem}</div>
+                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.stem).toUpperCase()}</div>
                           ))
                       )}
                     </div>
@@ -2556,7 +2577,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter px-1">{getCleanBranchEn(branchData?.en || pillar.branch)}</div>
                             </div>
                           ) : (
-                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getCleanBranchEn(branchData?.en || pillar.branch)}</div>
+                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.branch)} ({getCleanBranchEn(branchData?.en || pillar.branch)})</div>
                           ))
                       )}
                     </div>
@@ -2591,7 +2612,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         const hsTenGod = getDetailedTenGod(dayMaster, hs);
                         
                         const isMain = idx === hiddenStems.length - 1;
-                        const allRootedStems = result.pillars.map((p, pIdx) => {
+                        const rawRootStems = result.pillars.map((p, pIdx) => {
                           if (p.isUnknown) return null;
                           const rInfo = getRootingInfoText(p.stem, hs, isMain, lang);
                           if (rInfo) {
@@ -2606,6 +2627,22 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           }
                           return null;
                         }).filter(Boolean) as {pIdx: number, title: string, pNameKo: string, pNameEn: string, stem: string, type: string, text: string, short: string}[];
+
+                        const getRootPriorityValue = (r: { pIdx: number, type: string }) => {
+                          const isSamePillar = r.pIdx === i;
+                          if (isSamePillar) {
+                            if (r.type === 'main') return 10;
+                            if (r.type === 'sub_residual') return 8;
+                            if (r.type === 'generation') return 6;
+                          } else {
+                            if (r.type === 'main') return 9;
+                            if (r.type === 'sub_residual') return 7;
+                            if (r.type === 'generation') return 5;
+                          }
+                          return 0;
+                        };
+
+                        const allRootedStems = [...rawRootStems].sort((a, b) => getRootPriorityValue(b) - getRootPriorityValue(a));
 
                         const hasPillarRoot = allRootedStems.some(r => r.pIdx === i);
                         const hasDmRoot = allRootedStems.some(r => r.title === 'Day');
@@ -2714,7 +2751,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             conclusionBgClass = isLight ? "bg-amber-50 border-amber-200 text-amber-900 font-medium" : "bg-amber-950/20 border-amber-900/40 text-amber-100";
                           } else {
                             if (allRootedStems.length > 0) {
-                              const bestRoot = allRootedStems.find(r => r.pIdx === i) || allRootedStems.find(r => r.title === 'Day') || allRootedStems[0];
+                              const bestRoot = allRootedStems[0];
                               conclusionTitle = allRootedStems.length > 1 ? `✨ 다중 연계 [ ${bestRoot.short} 등 ]` : (bestRoot.pIdx === i ? `📍 기둥 연계 [ ${bestRoot.short} ]` : `🌟 외부 연계 [ ${bestRoot.short} ]`);
                               const rootTexts = allRootedStems.map(r => `[${r.pNameKo}(${r.stem}) -> ${r.short}]`).join(', ');
                               conclusionDesc = `다음 천간들과 연결되어 힘을 실어주고 있습니다:<br/><span class="text-[12px] font-bold mt-1 inline-block">${rootTexts}</span>`;
@@ -2776,7 +2813,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             conclusionBgClass = isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-amber-950/20 border-amber-900/40 text-amber-100";
                           } else {
                             if (allRootedStems.length > 0) {
-                              const bestRoot = allRootedStems.find(r => r.pIdx === i) || allRootedStems.find(r => r.title === 'Day') || allRootedStems[0];
+                              const bestRoot = allRootedStems[0];
                               conclusionTitle = allRootedStems.length > 1 ? `✨ Multi Alignment [ ${bestRoot.short} ]` : (bestRoot.pIdx === i ? `📍 Pillar Alignment [ ${bestRoot.short} ]` : `🌟 External Alignment [ ${bestRoot.short} ]`);
                               const rootTexts = allRootedStems.map(r => `[${r.pNameEn}(${r.stem}) -> ${r.short}]`).join(', ');
                               conclusionDesc = `Provides power and grounds the following stems:<br/><span class="text-[12px] font-bold mt-1 inline-block">${rootTexts}</span>`;
@@ -2893,7 +2930,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 </div>
 `;
 
-                        const bestTagInfo = allRootedStems.find(r => r.pIdx === i) || allRootedStems.find(r => r.title === 'Day') || allRootedStems[0];
+                        const bestTagInfo = allRootedStems[0];
+                        const itemMinWidthClass = lang === 'KO' 
+                          ? 'min-w-[24px] sm:min-w-[32px] md:min-w-[42px]' 
+                          : 'min-w-[32px] sm:min-w-[44px] md:min-w-[54px] lg:min-w-[62px]';
 
                         return (
                           <BaziTooltip 
@@ -2904,7 +2944,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             <div 
                               onMouseEnter={() => setHoveredHiddenStem({pillarIdx: i, hsIdx: idx, hs, connectedStems: allRootedStems.map(r => r.stem), isDestroyed})}
                               onMouseLeave={() => setHoveredHiddenStem(null)}
-                              className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded min-w-[24px] sm:min-w-[32px] md:min-w-[42px] border transition-all duration-300 relative ${highlightClass}`}
+                              className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemMinWidthClass} border transition-all duration-300 relative ${highlightClass}`}
                             >
                               {isDestroyed && (
                                 <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(239,68,68,0.5)]' : 'border-black shadow-[0_0_4px_rgba(239,68,68,0.8)]'} animate-pulse`} />
@@ -2913,16 +2953,27 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(245,158,11,0.5)]' : 'border-black shadow-[0_0_4px_rgba(245,158,11,0.8)]'} animate-pulse`} />
                               )}
                               <div 
-                                className="text-[10px] sm:text-sm md:text-base font-gothic mb-0.5"
+                                className="text-[10px] sm:text-xs md:text-sm font-semibold mb-0.5 text-center px-0.5"
                                 style={{ color: colorHex }}
                               >
-                                {showHanja ? hs : (lang === 'KO' ? hsData?.ko : hsData?.en.charAt(0))}
+                                {showHanja ? hs : (lang === 'KO' ? hsData?.ko : (hsNameEnBase.length <= 4 ? hsNameEnBase : (hsNameEnBase === 'Byeong' ? 'Byg.' : (hsNameEnBase === 'Gyeong' ? 'Gyg.' : (hsNameEnBase === 'Jeong' ? 'Jeg.' : hsNameEnBase.substring(0, 3) + '.')))))}
                               </div>
                               <div 
-                                className="text-[7.5px] sm:text-[9.5px] md:text-[11px] font-bold tracking-tighter opacity-70 animate-pulse duration-1000 mb-0.5"
+                                className="text-[7.5px] sm:text-[9.5px] md:text-[11px] font-bold tracking-tighter opacity-70 animate-pulse duration-1000 mb-0.5 w-full text-center"
                                 style={{ color: getTenGodColor(hsTenGod.ko) }}
                               >
-                                {lang === 'KO' ? hsTenGod.ko : hsTenGod.en.substring(0, 2)}
+                                {lang === 'KO' ? (
+                                  hsTenGod.ko
+                                ) : (
+                                  <>
+                                    <span className="block sm:hidden text-[7.5px]">
+                                      {hsTenGod.en.substring(0, 3)}
+                                    </span>
+                                    <span className="hidden sm:block text-[8.5px] md:text-[10px] truncate w-full px-0.5">
+                                      {hsTenGod.en}
+                                    </span>
+                                  </>
+                                )}
                               </div>
 
                               {/* Micro tag indicating the rooting relationship */}
@@ -2939,8 +2990,22 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                       : (isLight ? 'bg-emerald-400 text-black shadow-sm' : 'bg-amber-500/20 text-amber-300 border border-[#f5b800]/30')
                                 }`}>
                                   {lang === 'KO' 
-                                    ? (bestTagInfo.type === 'main' ? (bestTagInfo.pIdx === i ? '본기' : '일간') : bestTagInfo.type === 'sub_residual' ? (bestTagInfo.pIdx === i ? '중여' : '일중') : (bestTagInfo.pIdx === i ? '생조' : '일생'))
-                                    : (bestTagInfo.type === 'main' ? (bestTagInfo.pIdx === i ? 'MAIN' : 'E-MN') : bestTagInfo.type === 'sub_residual' ? (bestTagInfo.pIdx === i ? 'SUB' : 'E-SB') : (bestTagInfo.pIdx === i ? 'GEN' : 'E-GN'))}
+                                    ? (bestTagInfo.pIdx === i 
+                                        ? (bestTagInfo.type === 'main' ? '본기' : bestTagInfo.type === 'sub_residual' ? '중여' : '생조')
+                                        : (bestTagInfo.type === 'main' 
+                                            ? bestTagInfo.pNameKo 
+                                            : bestTagInfo.type === 'sub_residual' 
+                                              ? (bestTagInfo.pNameKo.charAt(0) + '중') 
+                                              : (bestTagInfo.pNameKo.charAt(0) + '생'))
+                                      )
+                                    : (bestTagInfo.pIdx === i 
+                                        ? (bestTagInfo.type === 'main' ? 'MAIN' : bestTagInfo.type === 'sub_residual' ? 'SUB' : 'GEN')
+                                        : (bestTagInfo.type === 'main' 
+                                            ? `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-MN` 
+                                            : bestTagInfo.type === 'sub_residual' 
+                                              ? `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-SB` 
+                                              : `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-GN`))
+                                  }
                                 </div>
                               )}
                               
@@ -4217,19 +4282,19 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        <ul className="text-xs sm:text-sm text-white/80 space-y-3 list-none pl-1 font-sans">
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '본기' : 'MAIN'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '본기(Main) 뿌리: 나의 밑바탕을 이루는 가장 핵심적이고 강력한 기반 무기.' : 'Main Root: The strongest and most direct foundation.'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '본기(Main) 뿌리: 제자리 천간에 직접 직결된 기운. 외부 기둥과 연결될 경우 해당 천간 배지(일간, 시간, 월간, 연간)로 교체되어 발현 범위를 표시합니다.' : 'Main Root: Directly connected core energy. When linked to other pillars, it dynamically shows the specific stem name (DM, Hour, Month, Year).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '중여' : 'SUB'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '여기/중기(Sub) 뿌리: 상황에 따라 다소 기복은 있지만 끈질기게 쓰이는 서브 무기.' : 'Sub Root: A persistent secondary weapon with some situational behavior.'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '중여(Sub) 뿌리: 상황에 따라 유연하게 꺼내는 보완 기운. 외부 기둥과 연결될 경우 접미사 "중"과 조합(일중, 시중, 월중, 연중)되어 표시됩니다.' : 'Sub Root: A flexible secondary/sub-Qi backup root. When connected to other pillars, it is displayed with the "-SB" suffix (DM-SB, Hour-SB, Month-SB, Year-SB).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '생조' : 'GEN'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '상생(Generative) 뿌리: 직접 같은 글자는 아니지만 나를 밀어주는 든든한 조력자.' : 'Generative Root: Not exactly the same element, but a reliable supporter pushing from behind.'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '생조(Generative) 지지: 오행 간 상생으로 끊임없이 기운을 공급하는 원조력. 외부 글자와 상생 시에는 접미사 "생"과 조합(일생, 시생, 월생, 연생)되어 표시됩니다.' : 'Generative Support: Energy supplying support through mutual generation. When supporting other pillars, it is displayed with the "-GN" suffix (DM-GN, Hour-GN, Month-GN, Year-GN).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-slate-500/20 text-slate-400 border border-slate-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '미통근' : 'NONE'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '뿌리 없음: 얽매이지 않고 유연하고 탄력적으로 쓰는 무기 (아무런 태그가 표시되지 않음).' : 'Unrooted: A flexibly used weapon not tied to a specific root (no tags).'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '뿌리 없음 (Unrooted): 상황이나 관계에 얽매이지 않고 필요할 때만 유연하고 순발력 있게 사용하는 무기 (배지가 표시되지 않음).' : 'Unrooted (No Tag): Used flexibly and casually depending on circumstances, unbound by deep roots (no badge shown).'}</span>
                          </li>
                        </ul>
                    </div>
@@ -4445,7 +4510,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     `The Ten Gods represent the 10 psychological and social roles formed by the relationship between 'You (Day Master)' and other characters in your BaZi. While Elements tell you 'what weapon' you have, Ten Gods tell you 'how you use it'.`}
                 </p>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">
+                <div className="flex flex-col gap-5 w-full font-gothic">
                   {[
                     { groupKo: '나침반', groupEn: 'Identity', color: 'var(--tengod-identity)', items: [
                       { nameKo: '비견', nameEn: 'Mirror', descKo: '주체성, 독립심, 평등, 마이웨이', descEn: 'Independence, self-esteem, equality' },
@@ -4468,13 +4533,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       { nameKo: '편인', nameEn: 'Mystic', descKo: '직관력, 눈치, 심리/철학, 비판사고', descEn: 'Intuition, insight, philosophy, critical thinking' }
                     ]}
                   ].map((g, i) => (
-                    <div key={i} className="flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                      <div className="w-full flex items-center justify-center py-1 border-b border-white/10" style={{ backgroundColor: `color-mix(in srgb, ${g.color} 20%, transparent)` }}>
-                        <span className="font-bold text-[10px] tracking-widest text-center" style={{ color: g.color }}>
-                          {lang === 'KO' ? g.groupKo : g.groupEn}
+                    <div key={i} className="flex flex-col lg:flex-row bg-[#1b1c31]/30 border border-white/10 rounded-xl overflow-hidden shadow-lg hover:border-white/20 transition-all duration-300">
+                      <div 
+                        className="lg:w-[180px] p-4 lg:p-6 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-1 shrink-0 border-b lg:border-b-0 lg:border-r border-white/10 text-center"
+                        style={{ backgroundColor: `color-mix(in srgb, ${g.color} 8%, transparent)` }}
+                      >
+                        <div className="flex flex-col items-start lg:items-center text-left lg:text-center">
+                          <span className="font-bold text-[10px] tracking-wider text-white/40 uppercase mb-0.5">Mask Group</span>
+                          <span className="font-black text-base sm:text-lg md:text-xl tracking-wide font-gothic" style={{ color: g.color }}>
+                            {lang === 'KO' ? g.groupKo : g.groupEn}
+                          </span>
+                        </div>
+                        <span className="text-white/60 text-xs font-medium">
+                          {lang === 'KO' ? g.groupEn : g.groupKo}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 divide-x divide-white/10 flex-1">
+
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10">
                         {g.items.map((item, j) => {
                           const tenGodChars: { char: string; hanja: string; type: 'stem'|'branch', element: string, inChart: boolean }[] = [];
                           const localDayPillar = result.pillars.find(p => p.title === 'Day' && !p.isUnknown);
@@ -4529,24 +4604,24 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           });
 
                           return (
-                            <div key={j} className="flex-1 p-2 bg-black/20 flex flex-col justify-between h-full">
-                              <div className="flex flex-col gap-1 mb-1.5">
-                                <div className="flex items-start justify-between gap-1 min-w-0">
-                                  <div className="flex flex-col min-w-0">
-                                    <span className="text-[10.5px] sm:text-[12px] font-bold text-white/90 leading-tight truncate">
+                            <div key={j} className="p-5 flex flex-col justify-between h-full bg-[#161623]/20 hover:bg-[#1c1c30]/40 transition-colors duration-300">
+                              <div className="flex flex-col gap-2 mb-3">
+                                <div className="flex items-center justify-between gap-3 min-w-0">
+                                  <div className="flex items-baseline gap-2 min-w-0">
+                                    <span className="text-sm sm:text-base md:text-lg font-bold text-white leading-tight">
                                       {lang === 'KO' ? item.nameKo : item.nameEn}
                                     </span>
-                                    <span className="text-[8px] sm:text-[9px] text-white/45 truncate">
+                                    <span className="text-xs text-white/45 font-medium">
                                       {lang === 'KO' ? item.nameEn : item.nameKo}
                                     </span>
                                   </div>
-                                  <div className="flex flex-wrap items-center justify-end gap-0.5 shrink-0 mb-auto">
+                                  <div className="flex flex-wrap items-center justify-end gap-1 shrink-0">
                                     {tenGodChars.filter(tc => tc.inChart).map((tc, idx) => (
                                       <div 
                                         key={idx} 
-                                        className="flex items-center justify-center w-[14px] h-[14px] sm:w-[16px] sm:h-[16px] rounded-full border bg-white/10 shadow-[0_0_8px_rgba(255,255,255,0.15)] border-white/30"
+                                        className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full border bg-white/10 shadow-[0_0_8px_rgba(255,255,255,0.15)] border-white/30"
                                       >
-                                        <span className="text-[8px] sm:text-[9px] font-bold leading-none" style={{ color: ELEMENT_COLORS[tc.element as keyof typeof ELEMENT_COLORS] || '#fff' }}>
+                                        <span className="text-[10px] sm:text-xs font-bold leading-none" style={{ color: ELEMENT_COLORS[tc.element as keyof typeof ELEMENT_COLORS] || '#fff' }}>
                                           {tc.hanja}
                                         </span>
                                       </div>
@@ -4554,7 +4629,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-[8.5px] sm:text-[9.5px] text-white/60 leading-snug break-keep" style={{ wordBreak: 'keep-all' }}>
+                              <div className="text-xs sm:text-sm text-white/70 leading-relaxed break-keep" style={{ wordBreak: 'keep-all' }}>
                                 {lang === 'KO' ? item.descKo : item.descEn}
                               </div>
                             </div>

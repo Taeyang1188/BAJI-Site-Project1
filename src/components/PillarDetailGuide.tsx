@@ -26,7 +26,7 @@ const TEN_GOD_DESC = {
     actionEn: 'My-Way Leadership', strategyEn: 'In your private moments, you quietly emit a [robust, mountain-like resilience that embraces everything] trait, finding peace. You recharge in your own unique way.', warningEn: 'If your stubbornness crosses the line, you might push away your true allies. Be careful not to trap yourself in your own cave!'
   },
   '겁재': {
-    actionKo: '승부사 기질', strategyKo: '결정적인 순간에는 무서울 정도의 집중력과 추진력을 발휘합니다. 목표가 생기면 물불 가리지 않고 쟁취해내는 승부사입니다.', warningKo: '지나친경쟁심으로 인해 인간관계에서 불필요한 마찰을 빚을 수 있습니다. 때로는 양보의 미덕이 필요합니다.',
+    actionKo: '승부사 기질', strategyKo: '결정적인 순간에는 무서울 정도의 집중력과 추진력을 발휘합니다. 목표가 생기면 물불 가리지 않고 쟁취해내는 승부사입니다.', warningKo: '지나친 경쟁심으로 인해 인간관계에서 불필요한 마찰을 빚을 수 있습니다. 때로는 양보의 미덕이 필요합니다.',
     actionEn: 'Competitive Spirit', strategyEn: 'At crucial moments, you show incredible focus and drive. Once a goal is set, you act as a fierce competitor who will do whatever it takes.', warningEn: 'Excessive competitiveness can cause unnecessary friction in relationships. Sometimes, the virtue of concession is needed.'
   },
   '식신': {
