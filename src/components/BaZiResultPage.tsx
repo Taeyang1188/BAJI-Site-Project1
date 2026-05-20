@@ -3828,24 +3828,38 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             </div>
                             <div className="flex flex-wrap gap-3">
                               {result.analysis.muJaRon?.map((item: any, i: number) => (
-                                <button 
-                                  key={i} 
-                                  onClick={() => setShowMuJaDaJaInfo(item)}
-                                  className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all group text-left border ${isLight ? 'bg-rose-50/50 border-rose-250 hover:border-rose-400 hover:bg-rose-50 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/20 hover:border-red-500/50'}`}
+                                <BaziTooltip 
+                                  key={i}
+                                  content={{
+                                    ko: `<div class="font-bold text-sm text-rose-400 mb-1 font-gothic">${item.title}</div><div class="text-xs leading-relaxed opacity-90">${item.description}</div>`,
+                                    en: `<div class="font-bold text-sm text-rose-400 mb-1">${item.title}</div><div class="text-xs leading-relaxed opacity-90">${item.enDescription || item.description}</div>`
+                                  }}
+                                  lang={lang}
                                 >
-                                  <span className="w-1 h-1 rounded-full bg-red-500 group-hover:animate-pulse" />
-                                  <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-red-700' : 'text-red-400'}`}>{item.title}</span>
-                                </button>
+                                  <div 
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-rose-50/50 border-rose-250 hover:border-rose-400 hover:bg-rose-50 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/25 hover:border-red-500/50 text-red-200'}`}
+                                  >
+                                    <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" />
+                                    <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-red-700' : 'text-red-400'}`}>{item.title}</span>
+                                  </div>
+                                </BaziTooltip>
                               ))}
                               {result.analysis.daJaRon?.map((item: any, i: number) => (
-                                <button 
-                                  key={i} 
-                                  onClick={() => setShowMuJaDaJaInfo(item)}
-                                  className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all group text-left border ${isLight ? 'bg-indigo-50/50 border-indigo-250 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/20 hover:border-purple-500/50'}`}
+                                <BaziTooltip
+                                  key={i}
+                                  content={{
+                                    ko: `<div class="font-bold text-sm text-purple-400 mb-1 font-gothic">${item.title}</div><div class="text-xs leading-relaxed opacity-90">${item.description}</div>`,
+                                    en: `<div class="font-bold text-sm text-purple-400 mb-1">${item.title}</div><div class="text-xs leading-relaxed opacity-90">${item.enDescription || item.description}</div>`
+                                  }}
+                                  lang={lang}
                                 >
-                                  <span className="w-1 h-1 rounded-full bg-purple-500 group-hover:animate-pulse" />
-                                  <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-indigo-700' : 'text-purple-400'}`}>{item.title}</span>
-                                </button>
+                                  <div 
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-indigo-50/50 border-indigo-250 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/25 hover:border-purple-500/50 text-purple-200'}`}
+                                  >
+                                    <span className="w-1 h-1 rounded-full bg-purple-500 animate-pulse" />
+                                    <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-indigo-700' : 'text-purple-400'}`}>{item.title}</span>
+                                  </div>
+                                </BaziTooltip>
                               ))}
                             </div>
                           </div>

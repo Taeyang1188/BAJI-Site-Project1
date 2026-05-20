@@ -156,9 +156,10 @@ export const calculateAdvancedAnalysis = (
     isDengLaJieJia: dayMaster === '乙', // Will check Gap Wood in cycle-vibe
     isDoSeJuOk: dayMaster === '辛', // Will check Im Water in cycle-vibe
     isGangHwiSangYeong: dayMaster === '壬', // Will check Byeong Fire in cycle-vibe
-    isHwaChiSeungRyong: (elementRatios.Fire >= 50) && hasJinEarth,
-    isGiToTakIm: dayMaster === '壬' // Will check Gi Earth in cycle-vibe
+    isHwaChiSeungRyong: (elementRatios.Fire >= 50) && hasJinEarth
   };
+
+  const isStrongDM = Number(strength.score) >= 50;
   
   // 1. Mu-Ja-Ron (Absence of Ten Gods)
   const muJaRon = Object.entries(tenGodsRatio)
@@ -196,7 +197,7 @@ export const calculateAdvancedAnalysis = (
           muBiDescEn = `A 'peerless blade' without [${metalCol}:Metal]. While you seem to lack forces to support your resolve, you maintain an uncompromising sense of justice and build an independent domain.`;
         } else if (dmElement === 'Water') {
           muBiDesc = `[${waterCol}:수(水) 비겁]이 없는 '흐르지 않는 물'이야. 지혜를 나눌 벗이 없어 생각이 깊어질 수 있지만, 외부의 오염 없이 맑은 통찰력을 유지하며 독자적인 지적 영역을 완성하는 힘이 있어.`;
-          muBiDescEn = `A 'non-flowing water' without [${waterCol}:Water]. Thoughts may deepen without friends to share wisdom, but you have the power to maintain clear insight without external pollution and complete an independent intellectual domain.`;
+          muBiDescEn = `A 'non-flowing water' without [${waterCol}:Water]. Thoughts may deepen without friends to share wisdom, but you have the power to maintain clear insight without external pollution and finish your independent intellectual domain.`;
         }
         descKo = muBiDesc;
         descEn = muBiDescEn;
@@ -213,21 +214,24 @@ export const calculateAdvancedAnalysis = (
           muSikDesc = `[${metalCol}:금(金) 식상]이 없는 '열매 없는 대지'야. 포용력은 넓으나 결실을 맺는 날카로운 추진력이 부족할 수 있어. 목표를 향한 과감한 결단력과 실행력을 기른다면 더 큰 성취를 이룰 거야.`;
           muSikDescEn = `A 'fruitless land' without [${metalCol}:Metal]. Broad tolerance but may lack the sharp drive to bear fruit. You'll achieve more by developing bold decisiveness and execution toward your goals.`;
         } else if (dmElement === 'Metal') {
-          muSikDesc = `[${waterCol}:수(水) 식상]이 없는 '무딘 칼날'이야. 강단은 있으나 유연함과 재치가 부족해 주변에 딱딱하게 느껴질 수 있어. 유머 감각을 기르고 상황에 유연하게 대처하는 여유를 갖는 것이 좋아.`;
-          muSikDescEn = `A 'blunt blade' without [${waterCol}:Water]. You have resolve but lack flexibility and wit, which may seem rigid to others. It's good to develop a sense of humor and the ease to handle situations flexibly.`;
+          muSikDesc = `[${waterCol}:수(水) 식상]이 없는 '녹슬지 않는 칼날'이야. 완벽주의적 성향이 강해 행동으로 옮기기까지 완벽한 타이밍을 기다리다 기회를 놓치기 쉬워. 80%만 준비되었을 때도 첫 단추를 채워보는 결단력이 유용해.`;
+          muSikDescEn = `An 'unrusting blade' without [${waterCol}:Water]. Due to strong perfectionism, you wait for the perfect timing before moving into action, which easily causes you to miss opportunities. Developing the courage to push start even at 80% readiness will serve you well.`;
         } else if (dmElement === 'Water') {
-          muSikDesc = `[${woodCol}:목(木) 식상]이 없는 '고인 물'과 같아. 지혜는 깊으나 이를 밖으로 흘려보내 생명을 키우는 활동력이 약할 수 있어. 적극적인 사회 참여와 취미 활동을 통해 내면의 에너지를 순환시켜야 해.`;
-          muSikDescEn = `Like 'stagnant water' without [${woodCol}:Wood]. Deep wisdom but weak vitality to flow out and grow life. You must circulate inner energy through active social participation and hobbies.`;
+          muSikDesc = `[${woodCol}:목(木) 식상]이 없는 '자라나지 않는 샘물'이야. 지혜와 영감은 무궁무진하지만 이를 실제 창작물이나 기획안 등 실재하는 가치로 설계하고 가꾸어내는 조경의 힘이 늦게 발발할 수 있어. 아이디어를 아끼지 말고 세상에 공개해 보길 바라.`;
+          muSikDescEn = `A 'non-growing spring' without [${woodCol}:Wood]. Wisdom and inspiration are boundless, but the landscaping force to design and cultivate them into real-world creations or projects can develop late. Don't hoard your ideas; publish them to the world.`;
         }
-        
-        if (gods.InSeong > 30) {
-          descKo = `[${artistCol}:식상(표현)]이 없고 [${inSeongCol}:인성(생각)]이 과다해. ${muSikDesc} 특히 머릿속의 구상은 화려하나 실행력이 마비될 수 있는 [#ef4444:도식(倒食)]의 위험이 있으니 즉각 행동에 옮기는 연습이 필수적이야.`;
-          descEn = `Missing [${artistCol}:Artist/Rebel] but excessive [${inSeongCol}:Mystic/Sage]. ${muSikDescEn} Especially, there is a risk of [#ef4444:Do-Sik] (paralysis by analysis) where ideas are brilliant but execution is paralyzed; immediate action is essential.`;
-        } else {
-          descKo = muSikDesc;
-          descEn = muSikDescEn;
-        }
+
+        descKo = muSikDesc + " " + (isStrongDM 
+          ? "특히 내면에 축적된 고유 에너지(신강)를 밖으로 배출할 마땅한 발산구가 미비한 구조입니다. 생각이 많아지면 결국 정체로 끝나니, 일단 작더라도 즉각적인 세상 릴리즈와 소통을 이행하셔야 건강해집니다." 
+          : "특히 기운의 손실을 최소화해 에너지를 지켜야 유용한 신약 가동 구조에 해당합니다. 과격한 표현이나 에너지를 마구 흘리는 문어발식 오프라인 활동 대신 내실 있고 전문적인 특기로서 담담히 표출해 보십시오.");
+        descEn = muSikDescEn + " " + (isStrongDM
+          ? "Highly critical, because your high baseline energy needs an expressive outlet. When ideas stagnate, it limits your overall fortune; bypass analytical overthinking and publish your creative outputs directly."
+          : "Highly beneficial, because conserving resources is preferred for an Adaptive DM profile. Focus on quiet, curated, or technical outputs rather than exhausting, multi-directional public speaking demands.");
       } else if (isJaeSeong) {
+        const dayMasterDetails = strength.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
+        const hasStrongRoots = dayMasterDetails?.roots?.some((r: any) => (r.type === 'main' || r.type === 'sub_residual') && !r.isDestroyed);
+        const isWeakButRooted = (strength.level === '신약' || strength.level === '극신약' || strength.level === '중화신약') && hasStrongRoots;
+
         let elementSpecific = '';
         let elementSpecificEn = '';
         if (dmElement === 'Wood') {
@@ -247,34 +251,68 @@ export const calculateAdvancedAnalysis = (
           elementSpecificEn = `Missing [${fireCol}:Fire Maverick/Architect], so you might be clumsy at catching intuitive timing or managing intangible assets (like stocks).`;
         }
 
+        let initialKo = '';
+        let initialEn = '';
         if (gods.InSeong > 30) {
-          descKo = `[${wealthCol}:무재(無財)]이면서 [${inSeongCol}:인성]이 강해. 직접 몸으로 뛰어 돈을 벌기보다 '자격'이나 '권리'로 먹고사는 형국이야. ${elementSpecific} 내 손에 당장 현금은 없어도 지적 재산권이나 라이선스를 통한 실속을 차리는 힘이 있어.`;
-          descEn = `Missing [${wealthCol}:Maverick/Architect] but strong [${inSeongCol}:Mystic/Sage]. You thrive on "qualifications" or "rights" rather than physical labor to earn money. ${elementSpecificEn} Even without cash in hand right now, you have the power to gain substance through intellectual property or licenses.`;
+          initialKo = `[${wealthCol}:무재(無財)]이면서 [${inSeongCol}:인성]이 강해. 직접 몸으로 뛰어 돈을 벌기보다 '자격'이나 '권리'로 먹고사는 형국이야. ${elementSpecific} 내 손에 당장 현금은 없어도 지적 재산권이나 라이선스를 통한 실속을 차리는 힘이 있어.`;
+          initialEn = `Missing [${wealthCol}:Maverick/Architect] but strong [${inSeongCol}:Mystic/Sage]. You thrive on "qualifications" or "rights" rather than physical labor to earn money. ${elementSpecificEn} Even without cash in hand right now, you have the power to gain substance through intellectual property or licenses.`;
         } else {
-          descKo = `[${wealthCol}:재성(결과/재물)]이 보이지 않아. 결과에 대한 한계를 정해두지 않아 역설적으로 거부가 될 수 있는 잠재력이 있어. ${elementSpecific} 목표를 구체화하고 끝까지 마무리하는 끈기가 성공의 열쇠야.`;
-          descEn = `The [${wealthCol}:Maverick/Architect] energy is absent. Because you don't set limits on results, you paradoxically have the potential to become immensely wealthy. ${elementSpecificEn} Materializing your goals and having the persistence to finish them is the key to success.`;
+          initialKo = `[${wealthCol}:재성(결과/재물)]이 보이지 않아. 결과에 대한 한계를 정해두지 않아 역설적으로 거부가 될 수 있는 잠재력이 있어. ${elementSpecific} 목표를 구체화하고 끝까지 마무리하는 끈기가 성공의 열쇠야.`;
+          initialEn = `The [${wealthCol}:Maverick/Architect] energy is absent. Because you don't set limits on results, you paradoxively have the potential to become immensely wealthy. ${elementSpecificEn} Materializing your goals and having the persistence to finish them is the key to success.`;
         }
+
+        const personAdviceKo = isWeakButRooted
+          ? "특히 사주 강도 상으로는 신약(身弱)으로 칩거하지만, 지지에 아주 든든하고 단단한 뿌리([tooltip:통근])를 완벽히 장착한 '외유내강' 격조의 지형입니다. 겉으로는 주변과 적절히 타협하는 듯해도 실제 결정적 고비에서는 결코 기백이나 주권을 양보하지 않는 튼튼함이 있습니다. 재물이 당장 노출되지 않더라도 무너지지 않는 이 지지기반이 최고의 자산입니다."
+          : (isStrongDM
+            ? "특히 주체적인 내적 자아의 힘(신강)이 풍부하게 솟아나는 특성입니다. 실속 없이 거대한 판만 벌여두기보단 최후의 소유권 계약이나 고유 브랜드 마크를 확실히 매듭짓는 수직 집중형 자산 관리가 자산가로 가는 절대 비결입니다."
+            : "특히 타인의 평가나 수치 변동성에 정신 에너지가 방출되기 쉬운 섬세한 신약 사주입니다. 무리한 단기 배팅을 멀리하고, 확실히 지켜지는 장기 고정수익이나 명확한 고유 문서를 든든하게 보유하는 현실형 우회 방어 전략을 설계하십시오.");
+
+        const personAdviceEn = isWeakButRooted
+          ? "Specifically, although technically categorized as 'Adaptive/Weak', you possess powerhouse roots in the branches. You may appear accommodating on the outside, but your core resolve is unbreakable when tested. This structural balance naturally shields you from speculative losses."
+          : (isStrongDM
+            ? "Specifically, your sheer self-reliance as a Strong Day Master is huge. To build dynamic riches, secure your nets by converting creative plans into strict copyright patents, exact ledger metrics, and contracts."
+            : "Specifically, speculatively hopping on raw market volatility easily drains your inner reserve. Opt for licensed products, long-term dividends, or highly secure document ownerships to guard your psychic perimeter.");
+
+        descKo = initialKo + " " + personAdviceKo;
+        descEn = initialEn + " " + personAdviceEn;
       } else if (isGwanSeong) {
+        const dayMasterDetails = strength.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
+        const hasStrongRoots = dayMasterDetails?.roots?.some((r: any) => (r.type === 'main' || r.type === 'sub_residual') && !r.isDestroyed);
+        const isWeakButRooted = (strength.level === '신약' || strength.level === '극신약' || strength.level === '중화신약') && hasStrongRoots;
+
         let muGwanDesc = '';
         let muGwanDescEn = '';
         if (dmElement === 'Wood') {
-          muGwanDesc = `[${metalCol}:금(金)]의 기운이 부족한 '울타리 없는 숲'과 같아. 자유분방함이 지나치면 조직 생활에서 갈등을 겪을 수 있으니, 스스로 규칙을 세우고 통제하는 자제력을 기른다면 더 큰 성취를 이룰 거야.`;
+          muGwanDesc = `[${metalCol}:금(金) 관성]의 기운이 부족한 '울타리 없는 숲'과 같아. 자유분방함이 지나치면 조직 생활에서 갈등을 겪을 수 있으니, 스스로 규칙을 세우고 통제하는 자제력을 기른다면 더 큰 성취를 이룰 거야.`;
           muGwanDescEn = `Like a 'forest without a fence' lacking [${metalCol}:Metal]. Excessive free-spiritedness may cause conflicts in organizational life; you'll achieve more by setting your own rules and self-discipline.`;
         } else if (dmElement === 'Fire') {
-          muGwanDesc = `열기를 식혀줄 [${waterCol}:수(水)]가 없는 '꺼지지 않는 불꽃'이야. 감정 조절이나 차분한 마무리가 어려울 수 있으니, 명상이나 정적인 취미를 통해 내면의 평화를 찾는 것이 중요해.`;
+          muGwanDesc = `열기를 식혀줄 [${waterCol}:수(水) 관성]이 없는 '꺼지지 않는 불꽃'이야. 감정 조절이나 차분한 마무리가 어려울 수 있으니, 명상이나 정적인 취미를 통해 내면의 평화를 찾는 것이 중요해.`;
           muGwanDescEn = `An 'unquenchable flame' without [${waterCol}:Water] to cool the heat. Emotional regulation or calm conclusions may be difficult; finding inner peace through meditation is crucial.`;
         } else if (dmElement === 'Earth') {
-          muGwanDesc = `토를 단단하게 잡아줄 [${woodCol}:목(木)]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.`;
+          muGwanDesc = `토를 단단하게 잡아줄 [${woodCol}:목(木) 관성]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.`;
           muGwanDescEn = `A 'pillarless land' without [${woodCol}:Wood] to hold the Earth. Life's direction can easily waver; establish strong pillars through clear goal setting and self-improvement.`;
         } else if (dmElement === 'Metal') {
-          muGwanDesc = `강한 금을 제련할 [${fireCol}:화(火)]가 없는 '제련되지 않은 원석'이야. 자신의 재능을 다듬고 빛내기 위해 혹독한 자기 훈련과 인내의 시간이 필요해.`;
+          muGwanDesc = `강한 금을 제련할 [${fireCol}:화(火) 관성]이 없는 '제련되지 않은 원석'이야. 자신의 재능을 다듬고 빛내기 위해 혹독한 자기 훈련과 인내의 시간이 필요해.`;
           muGwanDescEn = `An 'unrefined gemstone' without [${fireCol}:Fire] to smelt the Metal. You need rigorous self-discipline and patience to refine and shine your talents.`;
         } else if (dmElement === 'Water') {
-          muGwanDesc = `물의 흐름을 조절할 [${earthCol}:토(土)]가 없는 '제방 없는 강물'이야. 에너지가 사방으로 흩어지기 쉬우니, 선택과 집중을 통해 자신의 역량을 한곳으로 모으는 연습이 필요해.`;
+          muGwanDesc = `물의 흐름을 조절할 [${earthCol}:토(土) 관성]이 없는 '제방 없는 강물'이야. 에너지가 사방으로 흩어지기 쉬우니, 선택과 집중을 통해 자신의 역량을 한곳으로 모으는 연습이 필요해.`;
           muGwanDescEn = `A 'river without a levee' lacking [${earthCol}:Earth] to control the flow. Energy can easily scatter; practice focusing your capabilities through selection and concentration.`;
         }
-        descKo = muGwanDesc;
-        descEn = muGwanDescEn;
+
+        const personAdviceKo = isWeakButRooted
+          ? "특히 신약 사주 성향을 가졌으나 지지 통근이 단단해 타인의 수직 권위나 군대식 간섭에 무작정 동요되지 않습니다. 직장이라는 틀(관성)이 없어도 강력한 내적 원칙을 바탕으로 자율 프리랜서나 전문 연구직에서 더 눈부신 안정성을 구가할 수 있습니다."
+          : (isStrongDM
+            ? "특히 주관과 자아가 철철 흘러넘치는 강력한 에너지를 지닌 구조입니다. 스스로를 기율해 줄 명확한 공적 원칙이나 브랜드 라이센스를 직접 고안해 적용하지 않으면 종극엔 고독한 야당 성격이 될 수 있으니 주의하십시오."
+            : "특히 외부 환경의 돌발적인 과적 지시에 상처를 크게 입기 쉬운 약사주 구도입니다. 마음의 건강을 온전치 않게 하는 무구한 요구나 가스라이팅을 피하려면, '이 선을 지켜 달라'는 사적 경계선(Boundary)을 확실히 매듭짓는 수호 프로토콜이 필수입니다.");
+
+        const personAdviceEn = isWeakButRooted
+          ? "Specifically, you are root-grounded despite being socially adaptive. Instead of struggling under rigid hierarchical control systems, you thrive beautifully by building custom consulting operations or specialized projects."
+          : (isStrongDM
+            ? "Specifically, your self-will as a Strong Day Master is immense. Without establishing highly disciplined codes or formal credentials, you might retreat into severe non-conformity. Direct your strength into high professional standards."
+            : "Specifically, because your energy is highly receptive, chaotic or overly aggressive settings easily bruise your morale. Establish contractual limits and explicit boundaries to shield yourself from people-pleasing fatigue.");
+
+        descKo = muGwanDesc + " " + personAdviceKo;
+        descEn = muGwanDescEn + " " + personAdviceEn;
       } else if (isInSeong) {
         let muInDesc = '';
         let muInDescEn = '';

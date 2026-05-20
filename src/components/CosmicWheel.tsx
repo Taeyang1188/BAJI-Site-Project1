@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, animate } from 'framer-motion';
 import { ZODIAC_ANIMALS } from '../constants';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -22,12 +22,12 @@ const lightModeZodiacImages: Record<string, string> = {
   'hae': 'https://i.imgur.com/bhhCUj0.png'
 };
 
-const ASTRO_SYMBOLS = ['♈\uFE0E', '♉\uFE0E', '♊\uFE0E', '♋\uFE0E', '♌\uFE0E', '♍\uFE0E', '♎\uFE0E', '♏\uFE0E', '♐\uFE0E', '♑\uFE0E', '♒\uFE0E', '♓\uFE0E'];
+const ASTRO_SYMBOLS = ['♈︎', '♉︎', '♊︎', '♋︎', '♌︎', '♍︎', '♎︎', '♏︎', '♐︎', '♑︎', '♒︎', '♓︎'];
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
 const HorizontalDial = ({ 
   items, 
-  selectedIndex, 
+  targetValue, 
   radius, 
   anglePerItem = 15,
   isImage = false,
@@ -35,7 +35,7 @@ const HorizontalDial = ({
   visibleCount = 9
 }: { 
   items: any[], 
-  selectedIndex: number, 
+  targetValue: number, 
   radius: number, 
   anglePerItem?: number,
   isImage?: boolean,
@@ -43,8 +43,26 @@ const HorizontalDial = ({
   visibleCount?: number
 }) => {
   const { theme } = useTheme();
-  const [prevIndex, setPrevIndex] = useState(selectedIndex);
-  const [direction, setDirection] = useState(1);
+  // We track the continuous value to allow "spinning through" items
+  const animatedValue = useMotionValue(targetValue);
+  
+  // Create a spring-animated value for smooth movement
+  // Stiffness and mass adjusted for a "heavy" physical feel
+  const smoothValue = useSpring(animatedValue, {
+    stiffness: 25, 
+    damping: 14,
+    mass: 2.5
+  });
+
+  const [currentValue, setCurrentValue] = useState(targetValue);
+
+  useEffect(() => {
+    animatedValue.set(targetValue);
+    const unsubscribe = smoothValue.on('change', (v) => {
+      setCurrentValue(v);
+    });
+    return () => unsubscribe();
+  }, [targetValue, animatedValue, smoothValue]);
 
   const getImagePath = (item: any) => {
     if (theme === 'light' && item.slug && lightModeZodiacImages[item.slug]) {
@@ -53,129 +71,119 @@ const HorizontalDial = ({
     return item.imgUrl;
   };
 
-  useEffect(() => {
-    if (selectedIndex !== prevIndex) {
-      let diff = selectedIndex - prevIndex;
-      if (diff > items.length / 2) diff -= items.length;
-      if (diff < -items.length / 2) diff += items.length;
-      
-      setDirection(diff > 0 ? 1 : -1);
-      setPrevIndex(selectedIndex);
-    }
-  }, [selectedIndex, prevIndex, items.length]);
-
-  const half = Math.floor(visibleCount / 2);
-  const visibleOffsets = Array.from({ length: visibleCount }, (_, i) => i - half);
+  const normalizedValue = ((currentValue % items.length) + items.length) % items.length;
 
   return (
     <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30">
-      <AnimatePresence custom={direction}>
-        {visibleOffsets.map(offset => {
-          const itemIndex = (selectedIndex + offset + items.length * 100) % items.length;
-          const item = items[itemIndex];
-          
-          const isCenter = offset === 0;
-          const opacity = isCenter ? 1 : Math.max(0, 1 - Math.abs(offset) * (1 / half));
-          const scale = isCenter ? 1.2 : Math.max(0.6, 1 - Math.abs(offset) * 0.12);
-          const blurAmount = isCenter ? 0 : Math.abs(offset) * 1.2;
-          const rotateZ = offset * anglePerItem;
+      {items.map((item, index) => {
+        // Calculate shortest distance in circular list
+        let diff = index - normalizedValue;
+        if (diff > items.length / 2) diff -= items.length;
+        if (diff < -items.length / 2) diff += items.length;
 
-          return (
-            <motion.div
-              key={itemIndex}
-              custom={{ dir: direction, rz: rotateZ }}
-              variants={{
-                initial: (c: any) => ({ rotate: c.rz + c.dir * anglePerItem }),
-                animate: (c: any) => ({ rotate: c.rz }),
-                exit: (c: any) => ({ rotate: c.rz - c.dir * anglePerItem })
-              }}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ type: 'tween', ease: 'easeOut', duration: 0.6 }}
-              className="absolute flex flex-col items-center justify-start"
+        // Skip if far outside visible area for performance
+        const threshold = visibleCount / 2 + 1;
+        if (Math.abs(diff) > threshold) return null;
+
+        const rotateZ = diff * anglePerItem;
+        const distFromCenter = Math.abs(diff);
+        const opacity = Math.max(0, 1 - distFromCenter / threshold);
+        const scale = 1.2 * Math.max(0.4, 1 - distFromCenter * 0.12);
+        const blurAmount = distFromCenter * 2;
+        const isCenter = distFromCenter < 0.5;
+
+        return (
+          <div
+            key={index}
+            className="absolute flex flex-col items-center justify-start"
+            style={{
+              height: `${radius * 2}px`,
+              bottom: `-${radius}px`,
+              transformOrigin: 'center center',
+              transform: `rotate(${rotateZ}deg)`
+            }}
+          >
+            <div 
+              className="absolute top-0 flex items-center justify-center origin-center -translate-y-1/2"
               style={{
-                height: `${radius * 2}px`,
-                bottom: `-${radius}px`,
-                transformOrigin: 'center center'
+                opacity,
+                filter: `blur(${blurAmount}px)`,
+                transform: `scale(${scale}) rotate(${-rotateZ}deg)`
               }}
             >
-              <motion.div 
-                className="absolute top-0 flex items-center justify-center origin-center -translate-y-1/2"
-                custom={{ dir: direction, rz: rotateZ }}
-                variants={{
-                  initial: (c: any) => ({ 
-                    opacity: 0,
-                    filter: `blur(4px)`,
-                    scale: 0.5,
-                    rotate: -(c.rz + c.dir * anglePerItem)
-                  }),
-                  animate: (c: any) => ({ 
-                    opacity,
-                    filter: `blur(${blurAmount}px)`,
-                    scale,
-                    rotate: -c.rz
-                  }),
-                  exit: (c: any) => ({ 
-                    opacity: 0,
-                    filter: `blur(4px)`,
-                    scale: 0.5,
-                    rotate: -(c.rz - c.dir * anglePerItem)
-                  })
-                }}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ type: 'tween', ease: 'easeOut', duration: 0.6 }}
-              >
-                {isImage ? (
-                  <div className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all duration-500 ${isCenter ? 'scale-110' : 'scale-100'}`}>
-                    <img 
-                      src={getImagePath(item)} 
-                      alt={item.name} 
-                      className="w-full h-full object-contain" 
-                      loading="lazy"
-                      style={{ 
-                        mixBlendMode: theme === 'light' ? 'normal' : 'screen',
-                        filter: theme === 'light' 
-                          ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
-                          : isCenter 
-                            ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
-                            : 'sepia(1) saturate(2) hue-rotate(-10deg) brightness(0.8) contrast(1.1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.2))',
-                        opacity: isCenter ? 1 : 0.8
-                      }}
-                      referrerPolicy="no-referrer" 
-                    />
-                  </div>
-                ) : isSymbol ? (
-                  <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl [text-shadow:0_0_25px_rgba(255,215,0,1),0_0_10px_rgba(255,215,0,0.8)]') : (theme === 'light' ? 'text-3xl sm:text-4xl opacity-30' : 'text-3xl sm:text-4xl opacity-30 [text-shadow:0_0_10px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
-                    {item}
-                  </span>
-                ) : (
-                  <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-lg sm:text-xl' : 'text-lg sm:text-xl [text-shadow:0_0_15px_rgba(255,215,0,1)]') : (theme === 'light' ? 'text-sm sm:text-base opacity-30' : 'text-sm sm:text-base opacity-30 [text-shadow:0_0_8px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
-                    {item}
-                  </span>
-                )}
-              </motion.div>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+              {isImage ? (
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all duration-500 ${isCenter ? 'scale-110' : 'scale-100'}`}>
+                  <img 
+                    src={getImagePath(item)} 
+                    alt={item.name} 
+                    className="w-full h-full object-contain" 
+                    loading="lazy"
+                    style={{ 
+                      mixBlendMode: theme === 'light' ? 'normal' : 'screen',
+                      filter: theme === 'light' 
+                        ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
+                        : isCenter 
+                          ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
+                          : 'sepia(1) saturate(2) hue-rotate(-10deg) brightness(0.8) contrast(1.1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.2))',
+                      opacity: isCenter ? 1 : 0.8
+                    }}
+                    referrerPolicy="no-referrer" 
+                  />
+                </div>
+              ) : isSymbol ? (
+                <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl [text-shadow:0_0_25px_rgba(255,215,0,1),0_0_10px_rgba(255,215,0,0.8)]') : (theme === 'light' ? 'text-3xl sm:text-4xl opacity-30' : 'text-3xl sm:text-4xl opacity-30 [text-shadow:0_0_10px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
+                  {item}
+                </span>
+              ) : (
+                <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-lg sm:text-xl' : 'text-lg sm:text-xl [text-shadow:0_0_15px_rgba(255,215,0,1)]') : (theme === 'light' ? 'text-sm sm:text-base opacity-30' : 'text-sm sm:text-base opacity-30 [text-shadow:0_0_8px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
+                  {item}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
   const { theme } = useTheme();
-  const date = useMemo(() => {
-    const d = birthDate ? new Date(birthDate) : new Date();
-    return isNaN(d.getTime()) ? new Date() : d;
-  }, [birthDate]);
   
-  const yearIndex = (date.getFullYear() - 4) % 12;
-  const normalizedYearIndex = yearIndex < 0 ? yearIndex + 12 : yearIndex;
-  const monthIndex = date.getMonth(); 
-  const dayIndex = date.getDate() - 1; 
+  // Track "stable" states that only update after input is confirmed complete
+  const [stableTarget, setStableTarget] = useState(() => {
+    const d = birthDate ? new Date(birthDate) : new Date();
+    const date = isNaN(d.getTime()) ? new Date() : d;
+    return {
+      yearVal: date.getFullYear() - 4,
+      monthVal: date.getMonth(),
+      dayVal: date.getDate() - 1
+    };
+  });
+
+  const lastProcessedDate = useRef(birthDate);
+
+  useEffect(() => {
+    // Check if birthDate is a full YYYY-MM-DD string
+    // This prevents premature updates when only part of the date is typed
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    
+    if (birthDate && datePattern.test(birthDate) && birthDate !== lastProcessedDate.current) {
+      const timer = setTimeout(() => {
+        const d = new Date(birthDate);
+        if (!isNaN(d.getTime())) {
+          setStableTarget({
+            yearVal: d.getFullYear() - 4,
+            monthVal: d.getMonth(),
+            dayVal: d.getDate() - 1
+          });
+          lastProcessedDate.current = birthDate;
+        }
+      }, 700); // 0.7 second delay as requested
+      
+      return () => clearTimeout(timer);
+    }
+  }, [birthDate]);
 
   return (
     <div className={`relative w-full max-w-3xl h-[130px] sm:h-[240px] mx-auto flex items-center justify-center rounded-2xl border transition-all duration-500 overflow-hidden ${
@@ -249,14 +257,14 @@ export default function CosmicWheel({ birthDate }: CosmicWheelProps) {
             </div>
           </div>
 
-          {/* Outer Layer: Zodiac (Counter-rotated to stay upright) */}
-          <HorizontalDial items={ZODIAC_ANIMALS} selectedIndex={normalizedYearIndex} radius={220} anglePerItem={24} isImage={true} visibleCount={11} />
+          {/* Outer Layer: Zodiac (Sequential year rotation) */}
+          <HorizontalDial items={ZODIAC_ANIMALS} targetValue={stableTarget.yearVal} radius={220} anglePerItem={24} isImage={true} visibleCount={15} />
           
-          {/* Middle Layer: Symbols */}
-          <HorizontalDial items={ASTRO_SYMBOLS} selectedIndex={monthIndex} radius={150} anglePerItem={30} isSymbol={true} visibleCount={9} />
+          {/* Middle Layer: Symbols (Sequential month rotation) */}
+          <HorizontalDial items={ASTRO_SYMBOLS} targetValue={stableTarget.monthVal} radius={150} anglePerItem={30} isSymbol={true} visibleCount={11} />
           
-          {/* Inner Layer: Numbers */}
-          <HorizontalDial items={DAYS} selectedIndex={dayIndex} radius={80} anglePerItem={36} visibleCount={7} /> 
+          {/* Inner Layer: Numbers (Sequential day rotation) */}
+          <HorizontalDial items={DAYS} targetValue={stableTarget.dayVal} radius={80} anglePerItem={36} visibleCount={9} /> 
         </div>
       </div>
     </div>

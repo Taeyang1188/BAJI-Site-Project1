@@ -746,23 +746,44 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       }
 
       const comboIds = combos.map(c => c.id);
+      const activeCombosKo: string[] = [];
+      const activeCombosEn: string[] = [];
+
       if (comboIds.includes('상관패인')) {
         const fireRatio = analysis.elementRatios?.Fire || 0;
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n그리고.. 이건 아주 위험한 도박이 될수도 있어. 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지켜내는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히는 데만 집중해. 조급해지는 순간, 네 보석 같은 재능은 녹아버릴 테니까. 명심해, 태양도 너무 뜨거우면 스스로를 태우는 법이야. `;
+          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n게다가 이건 까딱하면 다칠 수 있는 위험한 도박이 될 수도 있으니, 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지키는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히며 기력을 비축해봐. 조급해지는 순간, 네 보석 같은 재능은 무기력하게 녹아버릴 테니까. `;
         } else if (!isFireExtreme) {
-          detailedEffect += `그리고.. 상관의 발산하는 힘을 인성이 세련되게 통제해주고 있네. `;
+          activeCombosKo.push("상관의 힘차게 뿜어져 나가는 발산력을 인성이 세련되게 통제해 주며 중심을 잡아주는 흐름");
+          activeCombosEn.push("your creative output is elegantly structured by deep wisdom");
         }
       }
-      if (comboIds.includes('식상생재')) detailedEffect += `그리고.. 식상이 재성으로 이어지는 흐름이라 결과물이 쏠쏠하겠어. `;
+      if (comboIds.includes('식상생재')) {
+        activeCombosKo.push("식상이 재성으로 물 흐르듯 이어지며 실질적인 성과와 쏠쏠한 결실을 가져다주는 기회");
+        activeCombosEn.push("with Artist/Rebel feeding Maverick/Architect, your efforts translate to highly solid financial gains");
+      }
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
-          detailedEffect += `다만 돈 욕심이 앞서면 공들여 쌓은 커리어의 안정성이 흔들릴 수 있으니, 현실적인 이득과 명예 사이에서 균형을 잘 잡는 게 중요해. `;
+          detailedEffect += `또한, 재성(결과물)과 인성(학문/안정)이 충돌하면서 돈 욕심이 앞선다면 공들여 쌓은 커리어 본연의 신뢰를 잃을 수도 있으니, 지적인 본분과 현실적 마진 사이에서 세심하게 줄타기를 할 필요도 있어. `;
         }
       }
-      if (comboIds.includes('관인상생')) detailedEffect += `그리고.. 조직의 보호 아래서 가치를 증명하기 좋아. `;
+      if (comboIds.includes('관인상생')) {
+        activeCombosKo.push("조직과 기틀의 든든한 날개 아래 보살핌을 받으며 네 정당한 가치를 증명할 수 있는 구석");
+        activeCombosEn.push("you will thrive elegantly under the security and support of established systems");
+      }
+
+      // 조립 및 매끄러운 바이브 연결
+      if (activeCombosKo.length > 0) {
+        if (activeCombosKo.length === 1) {
+          detailedEffect += `마침 기운을 살펴보니, 이번 주기에는 ${activeCombosKo[0]}이 예쁘게 들어서 눈을 사로잡네. `;
+        } else if (activeCombosKo.length === 2) {
+          detailedEffect += `마침 원국의 기세를 살펴보니, 이번 주기에는 ${activeCombosKo[0]}이 들어선 동시에, ${activeCombosKo[1]}까지 매끄럽게 교차하고 있어서 인생의 맛있는 하모니를 기대해 봐도 좋겠어. `;
+        } else {
+          detailedEffect += `마침 우주의 사이클을 보니, 이번 시기에는 ${activeCombosKo.slice(0, -1).join(', ')}, 그리고 무엇보다 ${activeCombosKo[activeCombosKo.length - 1]}까지 연달아 꼬리를 물며 놀라운 조력의 시너지를 일으키고 있네. `;
+        }
+      }
     } else {
       if (isFrozen && isFireLuck) {
         detailedEffect += `Your frozen documentation (Resource) and output (Wealth) are finally unlocking their values. It is a moment of raw power where cold persistence meets the sun to trigger an energy explosion. `;
@@ -799,6 +820,8 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       }
 
       const comboIds = combos.map(c => c.id);
+      const activeCombosEn: string[] = [];
+
       if (comboIds.includes('상관패인')) {
         const fireRatio = analysis.elementRatios?.Fire || 0;
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
@@ -806,16 +829,28 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         if (fireRatio > 60 && hasMetalSangGwan) {
           detailedEffect += `Others might call this 'Artist/Rebel meeting restraint' and celebrate your brilliance. But look closer: your talents are like a fragile blade thrown into a furnace. Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core against overheating. `;
         } else if (!isFireExtreme) {
-          detailedEffect += `Also, your creative output is being elegant structured by deep wisdom. `;
+          activeCombosEn.push("your creative output being elegantly structured by deep wisdom");
         }
       }
-      if (comboIds.includes('식상생재')) detailedEffect += `Additionally, with Artist/Rebel feeding Maverick/Architect, your efforts directly translate to highly practical financial gains. `;
+      if (comboIds.includes('식상생재')) {
+        activeCombosEn.push("your expressive talents feeding directly into solid material gains");
+      }
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
-          detailedEffect += `However, being blinded by sudden profit can shake your long-term career safety; balance real utility with integrity. `;
+          detailedEffect += `However, as realistic outcomes clash with inner values, being blinded by sudden profit can shake your long-term career safety; balance real utility with integrity. `;
         }
       }
-      if (comboIds.includes('관인상생')) detailedEffect += `Additionally, you will thrive easily when working under the security or sponsorship of structured systems. `;
+      if (comboIds.includes('관인상생')) {
+        activeCombosEn.push("rising easily under the security or sponsorship of established structures");
+      }
+
+      if (activeCombosEn.length > 0) {
+        if (activeCombosEn.length === 1) {
+          detailedEffect += `During this wave, we see a harmonious flow of ${activeCombosEn[0]}. `;
+        } else {
+          detailedEffect += `During this wave, we witness the beautiful synergy of ${activeCombosEn.slice(0, -1).join(', ')} combined perfectly with ${activeCombosEn[activeCombosEn.length - 1]}, enhancing your overall balance. `;
+        }
+      }
     }
     
     const coreRemedy = generateCoreRemedy(analysis, lang);

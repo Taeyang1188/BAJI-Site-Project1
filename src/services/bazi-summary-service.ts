@@ -271,7 +271,8 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
 
   // Step 2 & 3: Dynamic Filtering and Vibe Mapping (Granular Segmentation)
   let hashtags = [...charData.hashtags];
-  let oneLineReview = charData.scene;
+  
+  const oneLineReview = charData.scene;
 
   // Helper for random tags
   const pickRandom = (tags: string[], count: number = 2) => [...tags].sort(() => 0.5 - Math.random()).slice(0, count);
@@ -506,65 +507,127 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   };
   const metaphor = elementMetaphors[baseElement] || { ko: "자연스럽게", en: "naturally" };
 
+  const isStrongDM = (result.analysis?.dayMasterStrength?.score ?? 3.0) >= 3.5;
+
   const coreEnergyMap: Record<string, any> = {
     "인성": {
       ko: {
-        description: `${metaphor.ko} 모든 지식을 흡수하고, 당신만의 전문 자격과 지식 스택을 쌓는 것이 개운의 핵심이야.`,
-        practicalAdvice: `이론에 그치지 말고 자격증이나 결과물로 '전문가 포스'를 증명해봐.`,
-        luckyHabit: `매일 30분, 나만의 전문 분야 딥다이브로 뇌 근육 키우기`
+        description: isStrongDM 
+          ? `단단한 주관을 뒷받침할 객관적인 지식과 명확한 자격을 갖출 때 개운의 기회가 열려.`
+          : `학문이나 전문 분야 깊이 몰입하며, 내 능력을 증명서나 탄탄한 라이선스로 축적하는 게 중요해.`,
+        practicalAdvice: isStrongDM
+          ? `공인된 자격증이나 공식적 지표로 나만의 스택을 말끔히 증명해봐.`
+          : `외부의 과도한 약속을 줄이고 나만의 배움 공간에서 에너지를 확실하게 충전하자.`,
+        luckyHabit: isStrongDM
+          ? `매일 30분, 트렌디한 기술문서나 가치 있는 칼럼 정독`
+          : `중요한 선택 직전에 신뢰도 높은 서적이나 노트를 꺼내 일차 확인`
       },
       en: {
-        description: `Absorbing knowledge ${metaphor.en} and building your own unique skill stack is the ultimate cheat code.`,
-        practicalAdvice: `Talk is cheap. Flex your 'Expert Vibe' with actual receipts (certs, projects, results).`,
-        luckyHabit: `30 mins of daily deep-diving into your hyper-fixation to build that brain muscle.`
+        description: isStrongDM
+          ? `Balance your strong character with formal credentials and objective facts to secure authority.`
+          : `Protect your energy with formal certifications and specialized study to build your defensive armor.`,
+        practicalAdvice: isStrongDM
+          ? `Claim industry-standard certificates to solidify your existing authority.`
+          : `Step back from exhausting social schedules to study and recharge in peace.`,
+        luckyHabit: isStrongDM
+          ? `Spend 30 minutes reading structured manuals or analytical documents.`
+          : `Always check trusted records or guidelines before critical choices.`
       }
     },
     "비겁": {
       ko: {
-        description: `${metaphor.ko} 자신을 믿고 뚝심 있게 밀어붙이는 강한 자존감이 필요해.`,
-        practicalAdvice: `타인의 시선은 '노이즈'일 뿐, 나의 내면 목소리에 집중해봐.`,
-        luckyHabit: `거울 보며 '오늘도 내가 최고다' 3번 외치기`
+        description: !isStrongDM
+          ? `타인의 잔소리나 쓸데없는 시선을 칼같이 차단하고, 나의 주체적인 의사 결정을 1순위로 지켜.`
+          : `무리한 독고다이 돌파보다는, 끈끈한 의리를 공유할 알짜배기 동맹을 통해 힘을 크게 확장하자.`,
+        practicalAdvice: !isStrongDM
+          ? `남의 동의를 넙죽 구하려 하지 말고 독자적인 주관으로 프로젝트를 끌어 봐.`
+          : `나와 철학이 맞닿은 핵심 조력자와 단합을 일구어 전술 미팅을 추진해봐.`,
+        luckyHabit: !isStrongDM
+          ? `아침마다 거울을 보며 '내 삶의 주도권은 내가 쥔다' 확인`
+          : `평소 곁을 든든히 지켜준 찐 동지에게 기분 좋은 가벼운 커피 한 잔`
       },
       en: {
-        description: `You need that unbothered, main character energy to trust yourself and push through ${metaphor.en}.`,
-        practicalAdvice: `Other people's opinions are just background noise. Focus on your own plotline.`,
-        luckyHabit: `Looking in the mirror and saying 'I am the moment' 3 times.`
+        description: !isStrongDM
+          ? `Ignore gossip and set strict boundaries to secure your status as the main character.`
+          : `Do not run completely solo; collaborate with high-trust alliances to expand your reach.`,
+        practicalAdvice: !isStrongDM
+          ? `Stop seeking permission. Choose your milestone and advance independently.`
+          : `Have a highly targeted tactical chat with a proven, supportive ally.`,
+        luckyHabit: !isStrongDM
+          ? `Repeat to yourself: 'I set the rules and the timing' each morning.`
+          : `Drop a small note of appreciation to a trusted friend who keeps you grounded.`
       }
     },
     "식상": {
       ko: {
-        description: `${metaphor.ko} 당신의 재능과 아이디어를 세상에 화려하게 표출해봐.`,
-        practicalAdvice: `머릿속 구상을 즉각 행동으로 옮기는 '광속 실행력'이 답이야.`,
-        luckyHabit: `새로운 아이디어 떠오를 때마다 바로 메모하고 1개라도 실행하기`
+        description: isStrongDM
+          ? `마음에만 담아둔 아이디어들을 신속하게 결과물로 배포하거나, 창조적 예술로 마음껏 쏟아내.`
+          : `결과의 실질적 흑적에 과몰입하지 말고, 순수히 가볍고 재미있는 오락이나 취미로 에너지를 발산해.`,
+        practicalAdvice: isStrongDM
+          ? `너무 다듬기만 하려 마라. 거친 드래프트라도 우선 대중에 릴리즈 할 때 행운이 와.`
+          : `외부 평가에서 완전히 해방되는 흥미 위주의 놀이 공간이나 프로젝트를 만지작거려 봐.`,
+        luckyHabit: isStrongDM
+          ? `아이디어가 스칠 때 지체 없이 곧장 메모하거나 소박한 테스트 실행하기`
+          : `책상 구석이나 편안한 노트에 아무 눈치 없이 가볍고 발랄한 위트 낙서하기`
       },
       en: {
-        description: `Flex your talents and let your ideas flow into the world ${metaphor.en}. Don't hold back.`,
-        practicalAdvice: `Stop overthinking. 'Light-speed execution' is your best friend right now.`,
-        luckyHabit: `Jotting down every random 3 AM idea and actually doing one of them.`
+        description: isStrongDM
+          ? `Unleash your built-up drive into external outputs, sharp designs, and direct action immediately.`
+          : `Let go of hyper-competitive scores; allow your creative hobbies to act as a fun relief valve.`,
+        practicalAdvice: isStrongDM
+          ? `Stop over-polishing. Publicly launch your draft or prototype right away.`
+          : `Engage in casual, creative activities completely free from serious metric targets.`,
+        luckyHabit: isStrongDM
+          ? `Take an immediate, brief kinetic action the second inspiration strikes.`
+          : `Doodle or scribble concepts with full imaginative liberty in simple notebooks.`
       }
     },
     "재성": {
       ko: {
-        description: `${metaphor.ko} 현실적인 목표를 세우고 결과물을 만들어내는 감각을 키워봐.`,
-        practicalAdvice: `막연한 꿈보다 '통장 잔고'나 '구체적 숫자'로 성과를 확인해봐.`,
-        luckyHabit: `가계부 작성이나 투자 포트폴리오 점검하며 자산 감각 깨우기`
+        description: isStrongDM
+          ? `막연한 계획보단 명확한 수익, 세밀한 자급 구조와 구체적 숫자를 기준 삼아 가치를 통제해.`
+          : `무리한 확장으로 리스크를 키우지 말고, 확실히 내가 통제 가능한 안전한 영역만 다스리는 게 길해.`,
+        practicalAdvice: isStrongDM
+          ? `추상적인 환상을 끄고 실제 지출 구조나 계약 조건, 구체적 비용 통계를 꼼꼼히 정리해.`
+          : `무리하게 눈먼 소문에 흔들리지 말고, 수익성이 확실한 탄탄한 소수 옵션에 전념해.`,
+        luckyHabit: isStrongDM
+          ? `주말에 자산 장부를 검토하고 낭비 요인을 시원하게 정리하기`
+          : `보수성 높은 알짜배기 예적금이나 안전 자산 기조를 살포시 체킹하기`
       },
       en: {
-        description: `Time to secure the bag. Set realistic goals and develop a radar for actual results ${metaphor.en}.`,
-        practicalAdvice: `Dreams are cool, but numbers don't lie. Track your wins with actual data (and bank balances).`,
-        luckyHabit: `Checking your budget or portfolio to keep that financial energy high.`
+        description: isStrongDM
+          ? `Ground your big concepts with real numbers, clear conversion metrics, and solid financial checks.`
+          : `Avoid speculative bubbles; protect your ground by managing only what you strictly control.`,
+        practicalAdvice: isStrongDM
+          ? `Clean up loose financial details, re-examine contracts, and verify exact profit structures.`
+          : `Invest and commit only in low-risk, proven assets with steady margin structures.`,
+        luckyHabit: isStrongDM
+          ? `Analyze your subscriptions and balance your sheets every weekend.`
+          : `Formulate a quiet, safety-first layout to keep your liquid assets firmly secure.`
       }
     },
     "관성": {
       ko: {
-        description: `${metaphor.ko} 자신만의 규칙과 절제로 사회적 명예를 쌓아가는 힘이 필요해.`,
-        practicalAdvice: `루틴을 지키고 책임감 있는 모습으로 '신뢰 자본'을 쌓아봐.`,
-        luckyHabit: `정해진 시간에 기상하고 하루 계획 100% 완수 도전하기`
+        description: isStrongDM
+          ? `넘치는 개성을 신뢰도 높은 인프라나 커뮤니티 규칙, 공적인 약속에 동조시켜 명예를 배가시켜.`
+          : `공적 무게에 질질 끌려다니는 과노동을 멈추고, 건강한 생활 약속과 칼종료 루틴으로 평화를 찾아.`,
+        practicalAdvice: isStrongDM
+          ? `자유로운 돌발 행동을 일시 멈추고 약속한 규칙을 차분히 솔선수범하도록 해봐.`
+          : `부담스러운 기대를 정중하게 닫고, 나의 가동 범위를 확실하게 구획하여 울타리를 세워.`,
+        luckyHabit: isStrongDM
+          ? `오늘 세운 일정과 업무 규칙을 깔끔하고 오차 없이 끝내는 루틴`
+          : `퇴근 후 일과 가정을 완벽히 단절하는 명확한 자기 정비 시스템 칼이행`
       },
       en: {
-        description: `Channel your inner boss. You need discipline and your own set of rules to level up your status ${metaphor.en}.`,
-        practicalAdvice: `Build that 'trust capital' by sticking to your routines and actually showing up.`,
-        luckyHabit: `Waking up on time and speed-running your daily to-do list.`
+        description: isStrongDM
+          ? `Channel your independence into community standards and consistent pledges to score major respect.`
+          : `Do not assume endless chores; set hard boundaries and rely on rigorous daily cut-offs.`,
+        practicalAdvice: isStrongDM
+          ? `Lead by absolute discipline and systematic commitment rather than impulsive jumps.`
+          : `Politely decline overhead work requests. Mark a clear line around your core services.`,
+        luckyHabit: isStrongDM
+          ? `Complete your targeted agenda exactly according to the lock-step planner.`
+          : `Turn off work networks at a set time to preserve your private living space.`
       }
     }
   };

@@ -241,7 +241,21 @@ export default function App() {
   const { theme, toggleTheme } = useTheme();
   
   const [page, setPage] = useState<1 | 2 | 3>(1);
+  const [ufoLoaded, setUfoLoaded] = useState(false);
   const [lang, setLang] = useState<Language>('KO');
+
+  // Preload key assets eagerly on initialization
+  useEffect(() => {
+    const ufoImg = new Image();
+    ufoImg.src = "https://i.imgur.com/71XeUqK.png";
+    ufoImg.onload = () => {
+      setUfoLoaded(true);
+    };
+
+    const charImg = new Image();
+    charImg.src = characterApng;
+  }, []);
+
   const [skipTyping, setSkipTyping] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('void_skip_typing') === 'true';
@@ -602,8 +616,14 @@ export default function App() {
                     <img 
                       src="https://i.imgur.com/71XeUqK.png"
                       alt="UFO" 
-                      className="w-[440px] sm:w-[500px] max-w-none h-auto relative z-20 pointer-events-none shrink-0 -mt-[105px] sm:-mt-[135px]"
-                      style={theme === 'dark' ? { filter: 'hue-rotate(200deg) brightness(0.9) saturate(1.3)' } : {}}
+                      onLoad={() => setUfoLoaded(true)}
+                      className="w-[440px] sm:w-[500px] max-w-none h-auto relative z-20 pointer-events-none shrink-0 -mt-[105px] sm:-mt-[135px] transition-all duration-700 ease-out"
+                      style={{
+                        aspectRatio: '1448 / 1086',
+                        opacity: ufoLoaded ? 1 : 0,
+                        ...(theme === 'dark' ? { filter: 'hue-rotate(200deg) brightness(0.9) saturate(1.3)' } : {})
+                      }}
+                      loading="eager"
                     />
                   </div>
               </motion.div>
