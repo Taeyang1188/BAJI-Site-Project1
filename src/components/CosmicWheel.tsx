@@ -47,22 +47,15 @@ const HorizontalDial = ({
   const animatedValue = useMotionValue(targetValue);
   
   // Create a spring-animated value for smooth movement
-  // Stiffness and mass adjusted for a "heavy" physical feel
   const smoothValue = useSpring(animatedValue, {
     stiffness: 25, 
     damping: 14,
     mass: 2.5
   });
 
-  const [currentValue, setCurrentValue] = useState(targetValue);
-
   useEffect(() => {
     animatedValue.set(targetValue);
-    const unsubscribe = smoothValue.on('change', (v) => {
-      setCurrentValue(v);
-    });
-    return () => unsubscribe();
-  }, [targetValue, animatedValue, smoothValue]);
+  }, [targetValue, animatedValue]);
 
   const getImagePath = (item: any) => {
     if (theme === 'light' && item.slug && lightModeZodiacImages[item.slug]) {
@@ -71,48 +64,70 @@ const HorizontalDial = ({
     return item.imgUrl;
   };
 
-  const normalizedValue = ((currentValue % items.length) + items.length) % items.length;
+  // Optimization: Instead of re-rendering every frame with useState,
+  // we rotate the entire container and counter-rotate the items using motion values.
+  const containerRotation = useTransform(smoothValue, (v) => v * -anglePerItem);
 
   return (
-    <div className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30">
+    <motion.div 
+      style={{ rotate: containerRotation }}
+      className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30 transform-gpu"
+    >
       {items.map((item, index) => {
-        // Calculate shortest distance in circular list
-        let diff = index - normalizedValue;
-        if (diff > items.length / 2) diff -= items.length;
-        if (diff < -items.length / 2) diff += items.length;
+        const itemRotation = index * anglePerItem;
+        
+        // Calculate visual properties based on distance from center
+        // We use modular math to handle the infinite circularity
+        const opacity = useTransform(smoothValue, (v) => {
+          let diff = index - (v % items.length);
+          if (diff > items.length / 2) diff -= items.length;
+          if (diff < -items.length / 2) diff += items.length;
+          const dist = Math.abs(diff);
+          return Math.max(0, 1 - dist / (visibleCount / 2));
+        });
 
-        // Skip if far outside visible area for performance
-        const threshold = visibleCount / 2 + 1;
-        if (Math.abs(diff) > threshold) return null;
+        const scale = useTransform(smoothValue, (v) => {
+          let diff = index - (v % items.length);
+          if (diff > items.length / 2) diff -= items.length;
+          if (diff < -items.length / 2) diff += items.length;
+          const dist = Math.abs(diff);
+          return 1.2 * Math.max(0.4, 1 - dist * 0.12);
+        });
 
-        const rotateZ = diff * anglePerItem;
-        const distFromCenter = Math.abs(diff);
-        const opacity = Math.max(0, 1 - distFromCenter / threshold);
-        const scale = 1.2 * Math.max(0.4, 1 - distFromCenter * 0.12);
-        const blurAmount = distFromCenter * 2;
-        const isCenter = distFromCenter < 0.5;
+        const blur = useTransform(smoothValue, (v) => {
+          let diff = index - (v % items.length);
+          if (diff > items.length / 2) diff -= items.length;
+          if (diff < -items.length / 2) diff += items.length;
+          return `blur(${Math.abs(diff) * 1.5}px)`;
+        });
+
+        // Counter-rotation to keep the item upright
+        const selfRotation = useTransform(smoothValue, (v) => {
+           return v * anglePerItem - itemRotation;
+        });
 
         return (
-          <div
+          <motion.div
             key={index}
-            className="absolute flex flex-col items-center justify-start"
+            className="absolute flex flex-col items-center justify-start pointer-events-none will-change-transform"
             style={{
               height: `${radius * 2}px`,
               bottom: `-${radius}px`,
               transformOrigin: 'center center',
-              transform: `rotate(${rotateZ}deg)`
+              rotate: itemRotation,
+              opacity
             }}
           >
-            <div 
+            <motion.div 
               className="absolute top-0 flex items-center justify-center origin-center -translate-y-1/2"
               style={{
-                opacity,
-                filter: `blur(${blurAmount}px)`,
-                transform: `scale(${scale}) rotate(${-rotateZ}deg)`
+                filter: blur,
+                scale,
+                rotate: selfRotation
               }}
             >
               {isImage ? (
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all duration-500 ${isCenter ? 'scale-110' : 'scale-100'}`}>
+                <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transform-gpu">
                   <img 
                     src={getImagePath(item)} 
                     alt={item.name} 
@@ -122,28 +137,29 @@ const HorizontalDial = ({
                       mixBlendMode: theme === 'light' ? 'normal' : 'screen',
                       filter: theme === 'light' 
                         ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
-                        : isCenter 
-                          ? 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 2px rgba(255, 215, 0, 1))' 
-                          : 'sepia(1) saturate(2) hue-rotate(-10deg) brightness(0.8) contrast(1.1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.2))',
-                      opacity: isCenter ? 1 : 0.8
+                        : 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 12px rgba(255, 215, 0, 0.4))',
                     }}
                     referrerPolicy="no-referrer" 
                   />
                 </div>
-              ) : isSymbol ? (
-                <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl [text-shadow:0_0_25px_rgba(255,215,0,1),0_0_10px_rgba(255,215,0,0.8)]') : (theme === 'light' ? 'text-3xl sm:text-4xl opacity-30' : 'text-3xl sm:text-4xl opacity-30 [text-shadow:0_0_10px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
-                  {item}
-                </span>
               ) : (
-                <span className={`font-bold transition-all duration-500 ${theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'} ${isCenter ? (theme === 'light' ? 'text-lg sm:text-xl' : 'text-lg sm:text-xl [text-shadow:0_0_15px_rgba(255,215,0,1)]') : (theme === 'light' ? 'text-sm sm:text-base opacity-30' : 'text-sm sm:text-base opacity-30 [text-shadow:0_0_8px_rgba(255,215,0,0.4)]')}`} style={{ fontFamily: 'sans-serif' }}>
+                <span 
+                  className={`font-bold transition-colors duration-500 transform-gpu ${
+                    theme === 'light' ? 'text-[#222222]' : 'text-[#FFD700]'
+                  } ${isSymbol ? 'text-4xl sm:text-5xl' : 'text-lg sm:text-xl'}`} 
+                  style={{ 
+                    fontFamily: 'sans-serif',
+                    textShadow: theme === 'dark' ? '0 0 15px rgba(255,215,0,0.4), 0 0 5px rgba(255,215,0,0.2)' : 'none'
+                  }}
+                >
                   {item}
                 </span>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
 
