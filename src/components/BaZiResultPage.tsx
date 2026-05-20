@@ -5069,64 +5069,76 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
       viewport={{ once: true }}
       className="mt-12 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
     >
-      <div className={`bg-black/95 rounded-[1.9rem] border border-white/10 relative overflow-hidden flex flex-col justify-center transition-all duration-700 ${
-        isImageViewMode 
-          ? 'p-2 sm:p-6 min-h-[420px] sm:min-h-[580px]' 
-          : 'p-6 sm:p-10 min-h-[600px]'
-      }`}>
-        {/* Floating close button in image view mode */}
-        {isImageViewMode && iljuData?.detailImg && (
-          <button 
-            onClick={() => setIsImageViewMode(false)}
-            className="absolute top-3 right-3 z-50 px-3.5 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-[#39FF14]/40 hover:border-[#39FF14] text-[11px] sm:text-xs font-bold text-white hover:text-[#39FF14] transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(57,255,20,0.25)]"
-          >
-            <X className="w-3.5 h-3.5 text-[#39FF14]" />
-            {lang === 'KO' ? '이미지 닫기' : 'Close Image'}
-          </button>
+      <div className="bg-black/95 rounded-[1.9rem] border border-white/10 relative overflow-hidden flex flex-col justify-center p-6 sm:p-10 min-h-[600px]">
+        {iljuData?.detailImg && (
+          <img 
+            src={iljuData.cardBg || iljuData.detailImg}
+            alt={`${dayPillar?.hanja} Background`}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className="absolute inset-0 w-full h-full z-0 opacity-40 object-cover transition-opacity duration-700"
+          />
         )}
 
-        {iljuData?.detailImg && (
-          <>
-            <img 
-              src={isImageViewMode ? iljuData.detailImg : (iljuData.cardBg || iljuData.detailImg)}
-              alt="Blurred Background"
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              className={`absolute inset-0 w-full h-full z-0 object-cover blur-[40px] scale-125 brightness-50 saturate-150 transition-opacity duration-700 ${isImageViewMode ? 'opacity-100' : 'opacity-0'}`}
-            />
-            {!isImageViewMode ? (
-              <img 
-                src={iljuData.cardBg || iljuData.detailImg}
-                alt={`${dayPillar?.hanja} Background`}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                className="absolute inset-0 w-full h-full z-10 opacity-40 object-cover transition-opacity duration-700"
+        {/* Fullscreen popup overlay inside React Portal for robust rendering */}
+        {typeof document !== 'undefined' && createPortal(
+          <div 
+            onClick={() => setIsImageViewMode(false)}
+            className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 bg-black/95 backdrop-blur-md cursor-zoom-out transition-all duration-[400ms] ${
+              isImageViewMode 
+                ? 'opacity-100 pointer-events-auto' 
+                : 'opacity-0 pointer-events-none'
+            }`}
+            style={{
+              transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
+          >
+            {/* Floating close button */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsImageViewMode(false);
+              }}
+              className="absolute top-4 right-4 z-[10001] px-3.5 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-[#39FF14]/40 hover:border-[#39FF14] text-[11px] sm:text-xs font-bold text-white hover:text-[#39FF14] transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(57,255,20,0.25)]"
+            >
+              <X className="w-3.5 h-3.5 text-[#39FF14]" />
+              {lang === 'KO' ? '이미지 닫기' : 'Close Image'}
+            </button>
+
+            <div 
+              className="relative w-full max-w-[340px] sm:max-w-[380px] md:max-w-[425px] flex items-center justify-center"
+              style={{ aspectRatio: '9/16' }}
+            >
+              {iljuData?.detailImg && (
+                <img 
+                  src={iljuData.detailImg}
+                  alt={`${dayPillar?.hanja} Full Detail`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className={`w-full h-full object-cover rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(255,0,122,0.35)] transition-all duration-[400ms] origin-center ${
+                    isImageViewMode 
+                      ? 'scale-100 opacity-100 rotate-0' 
+                      : 'scale-[0.45] opacity-0 rotate-1'
+                  }`}
+                  style={{
+                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  }}
+                />
+              )}
+              {/* Decorative neon indicator bottom stream */}
+              <div 
+                className={`absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-neon-pink via-neon-cyan to-neon-purple transition-opacity duration-[400ms] ${
+                  isImageViewMode ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{
+                  transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}
               />
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                className="relative z-20 w-full max-w-[350px] sm:max-w-[400px] mx-auto my-auto flex flex-col items-center justify-center p-1 sm:p-2"
-              >
-                <div 
-                  onClick={() => setIsImageViewMode(false)}
-                  className="relative group overflow-hidden rounded-2xl border border-white/20 bg-black/40 shadow-[0_0_40px_rgba(255,0,122,0.2)] flex justify-center items-center w-full aspect-[2/3] cursor-zoom-out"
-                >
-                  <img 
-                    src={iljuData.detailImg}
-                    alt={`${dayPillar?.hanja} Detail`}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-contain rounded-2xl transition-transform duration-500 group-hover:scale-[1.01]"
-                  />
-                  {/* Subtle decorative neon indicator */}
-                  <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-neon-pink via-neon-cyan to-neon-purple opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              </motion.div>
-            )}
-          </>
+            </div>
+          </div>,
+          document.body
         )}
+
         {/* Decorative elements */}
         <div className={`absolute top-0 right-0 w-64 h-64 bg-neon-pink/5 blur-[100px] -z-10 transition-opacity duration-700 ${isImageViewMode ? 'opacity-0' : 'opacity-100'}`} />
         <div className={`absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/5 blur-[100px] -z-10 transition-opacity duration-700 ${isImageViewMode ? 'opacity-0' : 'opacity-100'}`} />
@@ -5137,7 +5149,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
             scale: isImageViewMode ? 0.95 : 1,
             pointerEvents: isImageViewMode ? 'none' : 'auto'
           }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
           className="relative z-10 flex flex-col items-center text-center space-y-6 w-full"
         >
           {/* Aligned balanced top header row when reading content to prevent visual overlap */}
