@@ -562,20 +562,20 @@ export function generateCycleVibe(
     const isGeukGang = strength.level === '극강';
     
     if (isGeukGang) {
-      strengthComment = '에너지가 정말 압도적이네. 누구의 간섭도 허용하지 않는 강력한 주체성이 느껴져.';
+      strengthComment = '에너지가 정말 압도적이야. 누구의 간섭도 허용하지 않는 강력한 주체성이 엿보이거든.';
     } else if (isSinGang) {
-      strengthComment = '주관이 뚜렷하고 밀어붙이는 힘이 느껴져.';
+      strengthComment = '주관이 뚜렷하고 목표를 향해 밀어붙이는 힘이 상당해 보여.';
     } else if (isNeutral) {
-      strengthComment = '에너지가 아주 균형 잡혀 있네. 상황에 따라 유연하게 대처하면서도 자기 중심을 잘 잡는 스타일이야.';
+      strengthComment = '에너지가 아주 균형 잡힌 편이야. 상황에 맞춰 유연하게 대처하면서도 자기 중심을 잃지 않는 스타일이지.';
     } else {
-      strengthComment = '섬세하고 차분한 에너지가 느껴져. 주변의 흐름을 잘 읽고 세밀하게 반응하는 감각이 있네.';
+      strengthComment = '섬세하고 차분한 무드가 감도네. 주변의 미묘한 흐름을 읽고 세밀하게 반응하는 남다른 감각이 있어.';
     }
 
     const isGeukYak = (strength.title && strength.title.includes('극약')) || (strength.score && strength.score < 20);
     const hasHeavyGwan = (tenGodsRatio['관성(Warrior/Judge)'] as number) > 25 || (tenGodsRatio['Warrior/Judge'] as number) > 25;
     
     if (isGeukYak && hasHeavyGwan) {
-      strengthComment = `${processedName} 너는 책임감(관성)은 태산 같은데 내 몸(일간)은 작은 언덕인 상태네. "책임감이라는 무게를 견디느라 그동안 얼마나 고단했겠어"라는 말이 먼저 나오네..`;
+      strengthComment = `${processedName} 씨는 책임감(관성)은 태산 같은데 내 몸(일간)은 작은 언덕인 상태네. 무거운 책임감을 견디느라 그동안 얼마나 고단했을까 싶어.`;
     }
     
     // Inject GeJu (Structure) insight if available
@@ -611,25 +611,23 @@ export function generateCycleVibe(
     if (balanceWarnings.length > 0) {
       const primaryWarning = balanceWarnings[0];
       balanceComment = `
-
-특히 ${processedName} 너는 '${primaryWarning.title}'의 기운이 강하게 느껴져. ${primaryWarning.description} `;
+\n특히 ${processedName} 씨한테는 '${primaryWarning.title}'의 기운이 강하게 감돌고 있어. ${primaryWarning.description} `;
     }
 
     let introPrefix = '';
     if (cityInsight) {
       introPrefix = `${cityInsight} [delay:1000]
-
-아무튼.. `;
+\n자, 전체적인 대화의 흐름을 열어보자면.. `;
     } else {
-      introPrefix = `흠.. `;
+      introPrefix = `가만보자.. `;
     }
 
     intro = `${missingTimeInsight}${introPrefix}${impression} [delay:1000]
-게다가 ${strengthComment} ${geJuComment} [delay:1000]
+\n무엇보다 ${strengthComment} ${geJuComment} [delay:1000]
 
 ${elementComment} ${balanceComment} [delay:1500]
 
-이런 다양한 매력이 더해지면 ${nameRef}너만의 색깔이 뚜렷할 거야 다분히. [delay:1000]`;
+이런 다채로운 매력들이 어우러져서 ${nameRef}너만의 독보적인 색깔이 완성되는 중이야. [delay:1000]`;
   } else {
     // English Intro (Simplified)
     const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title === "화토중탁";
@@ -756,13 +754,13 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         if (fireRatio > 60 && hasMetalSangGwan) {
           detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n게다가 이건 까딱하면 다칠 수 있는 위험한 도박이 될 수도 있으니, 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지키는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히며 기력을 비축해봐. 조급해지는 순간, 네 보석 같은 재능은 무기력하게 녹아버릴 테니까. `;
         } else if (!isFireExtreme) {
-          activeCombosKo.push("상관의 힘차게 뿜어져 나가는 발산력을 인성이 세련되게 통제해 주며 중심을 잡아주는 흐름");
-          activeCombosEn.push("your creative output is elegantly structured by deep wisdom");
+          activeCombosKo.push("상관의 발산하는 힘을 인성이 세련되게 통제하고 있는 형국");
+          activeCombosEn.push("your creative energy being elegantly refined by inner wisdom");
         }
       }
       if (comboIds.includes('식상생재')) {
-        activeCombosKo.push("식상이 재성으로 물 흐르듯 이어지며 실질적인 성과와 쏠쏠한 결실을 가져다주는 기회");
-        activeCombosEn.push("with Artist/Rebel feeding Maverick/Architect, your efforts translate to highly solid financial gains");
+        activeCombosKo.push("식상이 재성으로 매끄럽게 이어지면서 쏠쏠한 결과물을 만들어내는 흐름");
+        activeCombosEn.push("your expressive talents feeding directly into solid material gains");
       }
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
@@ -770,32 +768,32 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         }
       }
       if (comboIds.includes('관인상생')) {
-        activeCombosKo.push("조직과 기틀의 든든한 날개 아래 보살핌을 받으며 네 정당한 가치를 증명할 수 있는 구석");
-        activeCombosEn.push("you will thrive elegantly under the security and support of established systems");
+        activeCombosKo.push("조직과 기틀의 든든한 날개 아래에서 네 정당한 가치를 당당하게 입증하는 양상");
+        activeCombosEn.push("thriving under the solid protection and support of a structured system");
       }
 
       // 조립 및 매끄러운 바이브 연결
       if (activeCombosKo.length > 0) {
         if (activeCombosKo.length === 1) {
-          detailedEffect += `마침 기운을 살펴보니, 이번 주기에는 ${activeCombosKo[0]}이 예쁘게 들어서 눈을 사로잡네. `;
+          detailedEffect += `마침 기운을 살펴보니까, 여기에는 ${activeCombosKo[0]}이 보여서 눈길이 가네. `;
         } else if (activeCombosKo.length === 2) {
-          detailedEffect += `마침 원국의 기세를 살펴보니, 이번 주기에는 ${activeCombosKo[0]}이 들어선 동시에, ${activeCombosKo[1]}까지 매끄럽게 교차하고 있어서 인생의 맛있는 하모니를 기대해 봐도 좋겠어. `;
+          detailedEffect += `가만보자.. ${activeCombosKo[0]}인 동시에, 또한 ${activeCombosKo[1]}이라 전체적인 흐름이 아주 인상적이야. `;
         } else {
-          detailedEffect += `마침 우주의 사이클을 보니, 이번 시기에는 ${activeCombosKo.slice(0, -1).join(', ')}, 그리고 무엇보다 ${activeCombosKo[activeCombosKo.length - 1]}까지 연달아 꼬리를 물며 놀라운 조력의 시너지를 일으키고 있네. `;
+          detailedEffect += `마침 우주의 사이클을 보니, ${activeCombosKo.slice(0, -1).join(', ')}, 또한 무엇보다 ${activeCombosKo[activeCombosKo.length - 1]}까지 맞물리며 놀라운 시너지를 내고 있네. `;
         }
       }
     } else {
       if (isFrozen && isFireLuck) {
-        detailedEffect += `Your frozen documentation (Resource) and output (Wealth) are finally unlocking their values. It is a moment of raw power where cold persistence meets the sun to trigger an energy explosion. `;
+        detailedEffect += `Your frozen internal resources and potential outputs are finally beginning to glow. It's a phase where cold persistence meets the sun, triggering an explosion of dormant energy. `;
       } else if (isSinGang && !isFireExtreme) {
-        detailedEffect += `Your abundant raw energy demands a powerful outlet or structure to manifest. `;
+        detailedEffect += `Your overwhelming raw energy now finds a high-performance outlet or structure to manifest. `;
       } else if (isNeutral) {
-        detailedEffect += `With your energy highly balanced, you can efficiently convert all incoming waves. `;
+        detailedEffect += `Since your inner energy is already perfectly balanced, you can efficiently convert all these incoming waves into success. `;
       } else {
         if (isYongShinYear) {
-          detailedEffect += `Although your energy is delicate, the incoming forces serve as your sturdy fortress. `;
+          detailedEffect += `Though your core energy is delicate, these incoming forces will serve as a sturdy fortress for you. `;
         } else {
-          detailedEffect += `Your energy is delicate, so handling the incoming rushing waves can feel overwhelming. Focus strictly on practical defense. `;
+          detailedEffect += `Your energy is delicate, so these rushing waves might feel a bit heavy. Focus strictly on protecting your core for now. `;
         }
       }
 
@@ -806,16 +804,16 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const isJaHyeong = hasOhBranch;
 
         if (isFireExtreme) {
-          detailedEffect += `In 2026, the giant pillar of Fire brings intense heat instead of gentle warmth. `;
+          detailedEffect += `In 2026, the giant pillar of Fire brings intense heat instead of gentle warmth, which might be overwhelming. `;
           if (isBokEum) {
-            detailedEffect += `Specifically, as a 'Fu-yin' year matching your day pillar, stubborn self-conviction can be your own poison. `;
+            detailedEffect += `Specifically, as a 'Fu-yin' year matching your day master, excessive self-conviction could become a double-edged sword. `;
           } else if (isJaHyeong) {
-            detailedEffect += `With Self-Punishment active, beware of your own stubbornness acting as a blade against yourself. `;
+            detailedEffect += `With 'Self-Punishment' active, beware of your own stubbornness acting as a blade against your progress. `;
           }
         } else if (isYongShinYear) {
-          detailedEffect += `Specifically, the blazing sun of 2026 clears up stagnant issues. Your ideas solidify into recognized credentials, so ride this fiery wave confidently. `;
+          detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your ideas are finally solidifying into recognized results. `;
         } else if (isSinGang) {
-          detailedEffect += `The strong Fire in 2026 fuels your passion but risks creating friction due to overheating; step on the brakes occasionally. `;
+          detailedEffect += `The strong Fire in 2026 fuels your passion but risks friction due to sheer overheating; remember to step on the brakes occasionally. `;
         }
       }
 
@@ -827,28 +825,28 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `Others might call this 'Artist/Rebel meeting restraint' and celebrate your brilliance. But look closer: your talents are like a fragile blade thrown into a furnace. Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core against overheating. `;
+          detailedEffect += `Others might call this 'Rebel meeting restraint' and celebrate your brilliance. But look closer—your talents are like a fragile blade thrown into a furnace. Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core against overheating. `;
         } else if (!isFireExtreme) {
-          activeCombosEn.push("your creative output being elegantly structured by deep wisdom");
+          activeCombosEn.push("your creative energy is being elegantly refined by inner wisdom");
         }
       }
       if (comboIds.includes('식상생재')) {
-        activeCombosEn.push("your expressive talents feeding directly into solid material gains");
+        activeCombosEn.push("your expressive talents are feeding directly into solid material gains");
       }
       if (comboIds.includes('재극인')) {
         if (!isFrozen) {
-          detailedEffect += `However, as realistic outcomes clash with inner values, being blinded by sudden profit can shake your long-term career safety; balance real utility with integrity. `;
+          detailedEffect += `However, as realistic outcomes clash with inner values, being blinded by sudden profit could shake your long-term stability. Balance utility with integrity. `;
         }
       }
       if (comboIds.includes('관인상생')) {
-        activeCombosEn.push("rising easily under the security or sponsorship of established structures");
+        activeCombosEn.push("thriving under the security and sponsorship of established structures");
       }
 
       if (activeCombosEn.length > 0) {
         if (activeCombosEn.length === 1) {
-          detailedEffect += `During this wave, we see a harmonious flow of ${activeCombosEn[0]}. `;
+          detailedEffect += `During this wave, we observe a harmonious flow where ${activeCombosEn[0]}. `;
         } else {
-          detailedEffect += `During this wave, we witness the beautiful synergy of ${activeCombosEn.slice(0, -1).join(', ')} combined perfectly with ${activeCombosEn[activeCombosEn.length - 1]}, enhancing your overall balance. `;
+          detailedEffect += `During this wave, we witness a beautiful synergy of ${activeCombosEn.slice(0, -1).join(', ')} as well as ${activeCombosEn[activeCombosEn.length - 1]}, enhancing your overall balance. `;
         }
       }
     }
@@ -1543,7 +1541,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         yearDescriptionsKO = groupedYears.map(g => {
           const yearsStr = g.years.map(y => `**${y.year}년(${y.stem}${y.branch}년)**`).join(', ');
           return `${yearsStr}(${g.desc} 시기)`;
-        }).join(' 그리고 ');
+        }).join(' 때로는 ');
       }
       
       const yearListEN = filteredTopYears.map((y: any) => `**${y.year}**`).join(' and ');
