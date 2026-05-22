@@ -563,6 +563,17 @@ interface BaZiResultPageProps {
   skipTyping?: boolean;
 }
 
+const parseColorBracketsToHtml = (text: string): string => {
+  if (!text) return text;
+  let result = text;
+  result = result.replace(/\[tooltip:([^|\]]+)(?:\|[^\]]+)?\]/g, '$1');
+  result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  result = result.replace(/\[([^:\]]+):([^\]]+)\]/g, (match, color, content) => {
+    return `<span style="color: ${color}; font-weight: bold;">${content}</span>`;
+  });
+  return result;
+};
+
 const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: string }, children: React.ReactNode, lang: Language, key?: any }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
@@ -684,7 +695,9 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
             >
               <div 
                 className={`text-xs leading-relaxed font-sans ${isLight ? 'text-slate-800' : 'text-white/90'}`}
-                dangerouslySetInnerHTML={{ __html: lang === 'KO' ? content.ko : content.en }}
+                dangerouslySetInnerHTML={{ 
+                  __html: parseColorBracketsToHtml(lang === 'KO' ? content.ko : content.en) 
+                }}
               />
             </motion.div>
           )}
@@ -1525,9 +1538,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return stages.legacy;
   };
 
-  const PolarityIcon = ({ polarity, size = 10 }: { polarity: number, size?: number }) => {
-    if (polarity === 1) return <Sun size={size} className="text-yellow-400" />;
-    return <Moon size={size} className="text-blue-300" />;
+  const PolarityIcon = ({ polarity, size = 10, className = "" }: { polarity: number, size?: number, className?: string }) => {
+    if (polarity === 1) return <Sun size={size} className={`text-amber-400 drop-shadow-[0_0_2px_rgba(251,191,36,0.2)] ${className}`} strokeWidth={2.5} />;
+    return <Moon size={size} className={`text-sky-300 drop-shadow-[0_0_2px_rgba(125,211,252,0.2)] ${className}`} strokeWidth={2.5} />;
   };
 
   return (
@@ -2491,37 +2504,46 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   <div className="relative z-10 flex flex-col h-full w-full min-w-0">
                     <div className="w-full min-w-0 p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
                     {!isUnknownPillar && (
-                      <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
-                        <PolarityIcon polarity={pillar.stemPolarity} size={8} />
+                      <div 
+                        className={`absolute top-1 right-1 sm:top-1.5 sm:right-1.5 z-10 flex items-center justify-center w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border transition-all duration-300 ${
+                          isLight 
+                            ? 'bg-slate-50/95 border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+                            : 'bg-[#0f0f1b]/80 border-white/10 shadow-[0_1.5px_3px_rgba(0,0,0,0.25)]'
+                        }`}
+                        title={lang === 'KO' ? (pillar.stemPolarity === 1 ? '양(陽)' : '음(陰)') : (pillar.stemPolarity === 1 ? 'Yang (+)' : 'Yin (-)')}
+                      >
+                        <PolarityIcon polarity={pillar.stemPolarity} size={11} className="sm:scale-110" />
                       </div>
                     )}
-                    <div className="flex-1 flex items-start justify-center">
+                    <div className="absolute top-1.5 sm:top-2.5 left-0 right-0 px-6 flex justify-center">
                       <div className={`text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] uppercase ${isUnknownPillar ? 'text-white/20' : 'text-white/40'}`}>
                         {lang === 'KO' ? 
                           (pillar.title === 'Year' ? '연간' : pillar.title === 'Month' ? '월간' : pillar.title === 'Day' ? '일간' : '시간') : 
                           (pillar.title === 'Hour' ? 'Time Stem' : `${pillar.title} Stem`)}
                       </div>
                     </div>
-                    <div 
-                      className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : ''}`}
-                      style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
-                    >
-                      {isUnknownPillar ? (
-                        <span>?</span>
-                      ) : (
-                        lang === 'KO' ? 
-                          (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
-                          (showHanja ? (
-                            <div className="flex flex-col items-center w-full min-w-0">
-                              <span className="truncate w-full text-center px-1">{pillar.stem}({getRomanized(pillar.stem).toUpperCase()})</span>
-                              <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter text-white/80 px-1">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || pillar.stem}</div>
-                            </div>
-                          ) : (
-                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.stem).toUpperCase()}</div>
-                          ))
-                      )}
+                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-1.5 sm:pt-2.5 md:pt-3">
+                      <div 
+                        className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center py-1 ${isUnknownPillar ? 'text-white/30' : ''}`}
+                        style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
+                      >
+                        {isUnknownPillar ? (
+                          <span>?</span>
+                        ) : (
+                          lang === 'KO' ? 
+                            (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
+                            (showHanja ? (
+                              <div className="flex flex-col items-center w-full min-w-0">
+                                <span className="truncate w-full text-center px-1">{pillar.stem}({getRomanized(pillar.stem).toUpperCase()})</span>
+                                <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter text-white/80 px-1">{BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.element || pillar.stem}</div>
+                              </div>
+                            ) : (
+                              <div className="text-sm sm:text-[17px] md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.stem).toUpperCase()}</div>
+                            ))
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 flex items-end justify-center">
+                    <div className="absolute bottom-1 sm:bottom-1.5 left-0 right-0 px-2 flex justify-center">
                       <div className="text-[8px] sm:text-[10px] opacity-0 pointer-events-none font-bold select-none" aria-hidden="true">
                         {lang === 'KO' ? '장생' : 'Growth'}
                       </div>
@@ -2551,37 +2573,46 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   <div className="relative z-10 flex flex-col h-full w-full min-w-0">
                     <div className="w-full min-w-0 p-1.5 sm:p-3 md:p-4 flex flex-col text-center flex-grow relative">
                     {!isUnknownPillar && (
-                      <div className="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-40 z-10">
-                        <PolarityIcon polarity={pillar.branchPolarity} size={8} />
+                      <div 
+                        className={`absolute top-1 right-1 sm:top-1.5 sm:right-1.5 z-10 flex items-center justify-center w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border transition-all duration-300 ${
+                          isLight 
+                            ? 'bg-slate-50/95 border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+                            : 'bg-[#0f0f1b]/80 border-white/10 shadow-[0_1.5px_3px_rgba(0,0,0,0.25)]'
+                        }`}
+                        title={lang === 'KO' ? (pillar.branchPolarity === 1 ? '양(陽)' : '음(陰)') : (pillar.branchPolarity === 1 ? 'Yang (+)' : 'Yin (-)')}
+                      >
+                        <PolarityIcon polarity={pillar.branchPolarity} size={11} className="sm:scale-110" />
                       </div>
                     )}
-                    <div className="flex-1 flex items-start justify-center">
+                    <div className="absolute top-1.5 sm:top-2.5 left-0 right-0 px-6 flex justify-center">
                       <div className={`text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-tighter sm:tracking-[0.2em] uppercase ${isUnknownPillar ? 'text-white/20' : 'text-white/40'}`}>
                         {lang === 'KO' ? 
                           (pillar.title === 'Year' ? '연지' : pillar.title === 'Month' ? '월지' : pillar.title === 'Day' ? '일지' : '시지') : 
                           (pillar.title === 'Hour' ? 'Time Branch' : `${pillar.title} Branch`)}
                       </div>
                     </div>
-                    <div 
-                      className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center shrink-0 py-1 sm:py-2 ${isUnknownPillar ? 'text-white/30' : ''}`}
-                      style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
-                    >
-                      {isUnknownPillar ? (
-                        <span>?</span>
-                      ) : (
-                        lang === 'KO' ? 
-                          (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
-                          (showHanja ? (
-                            <div className="flex flex-col items-center w-full min-w-0">
-                              <span className="truncate w-full text-center px-1">{pillar.branch}({getRomanized(pillar.branch)})</span>
-                              <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter px-1">{getCleanBranchEn(branchData?.en || pillar.branch)}</div>
-                            </div>
-                          ) : (
-                            <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.branch)} ({getCleanBranchEn(branchData?.en || pillar.branch)})</div>
-                          ))
-                      )}
+                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-1.5 sm:pt-2.5 md:pt-3">
+                      <div 
+                        className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center py-1 ${isUnknownPillar ? 'text-white/30' : ''}`}
+                        style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
+                      >
+                        {isUnknownPillar ? (
+                          <span>?</span>
+                        ) : (
+                          lang === 'KO' ? 
+                            (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
+                            (showHanja ? (
+                              <div className="flex flex-col items-center w-full min-w-0">
+                                <span className="truncate w-full text-center px-1">{pillar.branch}({getRomanized(pillar.branch)})</span>
+                                <div className="text-[10px] sm:text-xs md:text-sm truncate w-full text-center tracking-tighter px-1">{getCleanBranchEn(branchData?.en || pillar.branch)}</div>
+                              </div>
+                            ) : (
+                              <div className="text-sm sm:text-base md:text-xl truncate w-full text-center tracking-tighter px-1">{getRomanized(pillar.branch)} ({getCleanBranchEn(branchData?.en || pillar.branch)})</div>
+                            ))
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 flex items-end justify-center">
+                    <div className="absolute bottom-1 sm:bottom-1.5 left-0 right-0 px-2 flex justify-center">
                       <div className="text-[8px] sm:text-[10px] text-neon-cyan font-bold">
                         {isUnknownPillar ? '' : (lang === 'KO' ? lifeStage?.ko : null)}
                       </div>
@@ -4864,68 +4895,69 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-[#0a0a0a] border border-purple-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden"
+              className="bg-[#0a0a0a] border border-purple-500/30 rounded-2xl p-4 sm:p-5 max-w-[420px] w-full shadow-2xl relative overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
               <button 
                 onClick={() => setShowYongshinRolesInfo(false)}
-                className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+                className="absolute top-3.5 right-3.5 text-white/40 hover:text-white transition-colors"
+                id="close-yongshin-roles-info-btn"
               >
                 <X className="w-5 h-5" />
               </button>
               
-              <h3 className="text-xl font-bold text-purple-400 mb-4">
+              <h3 className="text-lg sm:text-xl font-bold text-purple-400 mb-2.5">
                 {lang === 'KO' ? '희신, 기신, 구신이란?' : 'HeeShin, GiShin, and GuShin'}
               </h3>
               
-              <div className="text-sm text-white/80 space-y-4 leading-relaxed max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                <p>
+              <div className="text-xs sm:text-sm text-white/80 space-y-3 leading-relaxed max-h-[72vh] sm:max-h-[78vh] overflow-y-auto pr-1.5 custom-scrollbar">
+                <p className="text-white/70">
                   {lang === 'KO' 
                     ? '사주의 균형을 잡아주는 핵심 에너지인 용신(用神)을 기준으로, 나에게 도움이 되는 기운과 방해가 되는 기운을 분류한 거야.' 
                     : 'Based on the Yongshin (Useful God) which balances your chart, these represent the energies that either support or hinder you.'}
                 </p>
                 
-                <div className="space-y-3">
-                  <div className="bg-white/5 p-3 rounded-lg border border-green-400/30">
-                    <h4 className="font-bold text-green-400 mb-1">{lang === 'KO' ? '희신 (喜神 - 기쁠 희, 귀신 신)' : 'HeeShin (喜神 - Joyful God)'}</h4>
-                    <p className="text-xs text-white/70 mb-2">
+                <div className="space-y-2">
+                  <div className="bg-white/5 p-2.5 sm:p-3 rounded-lg border border-green-400/20">
+                    <h4 className="font-bold text-green-400 text-xs sm:text-sm mb-0.5">{lang === 'KO' ? '희신 (喜神 - 기쁠 희, 귀신 신)' : 'HeeShin (喜神 - Joyful God)'}</h4>
+                    <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                       {lang === 'KO' ? '용신을 도와주는 긍정적인 에너지야. 용신이 힘을 잃지 않도록 보좌하는 역할을 해.' : 'Positive energy that supports the Yongshin. It assists the Useful God so it doesn\'t lose power.'}
                     </p>
-                    <div className="text-xs bg-black/40 p-2 rounded text-green-400/90 flex items-center gap-2">
+                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-green-400/90 flex items-center gap-1.5">
                       <span className="font-bold">{lang === 'KO' ? '나의 희신:' : 'Your HeeShin:'}</span>
                       {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god, true)}
                     </div>
                   </div>
 
-                  <div className="bg-white/5 p-3 rounded-lg border border-red-400/30">
-                    <h4 className="font-bold text-red-400 mb-1">{lang === 'KO' ? '기신 (忌神 - 꺼릴 기, 귀신 신)' : 'GiShin (忌神 - Taboo God)'}</h4>
-                    <p className="text-xs text-white/70 mb-2">
+                  <div className="bg-white/5 p-2.5 sm:p-3 rounded-lg border border-red-400/20">
+                    <h4 className="font-bold text-red-400 text-xs sm:text-sm mb-0.5">{lang === 'KO' ? '기신 (忌神 - 꺼릴 기, 귀신 신)' : 'GiShin (忌神 - Taboo God)'}</h4>
+                    <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                       {lang === 'KO' ? '용신을 극(沖/剋)하여 방해하는 부정적인 에너지야. 이 기운이 강해지면 삶의 균형이 깨지기 쉬워.' : 'Negative energy that attacks or hinders the Yongshin. When this energy is strong, life\'s balance can easily be disrupted.'}
                     </p>
-                    <div className="text-xs bg-black/40 p-2 rounded text-red-400/90 flex items-center gap-2">
+                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-red-400/90 flex items-center gap-1.5">
                       <span className="font-bold">{lang === 'KO' ? '나의 기신:' : 'Your GiShin:'}</span>
                       {renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god, true)}
                     </div>
                   </div>
 
-                  <div className="bg-white/5 p-3 rounded-lg border border-orange-400/30">
-                    <h4 className="font-bold text-orange-400 mb-1">{lang === 'KO' ? '구신 (仇神 - 원수 구, 귀신 신)' : 'GuShin (仇神 - Enemy God)'}</h4>
-                    <p className="text-xs text-white/70 mb-2">
+                  <div className="bg-white/5 p-2.5 sm:p-3 rounded-lg border border-orange-400/20">
+                    <h4 className="font-bold text-orange-400 text-xs sm:text-sm mb-0.5">{lang === 'KO' ? '구신 (仇神 - 원수 구, 귀신 신)' : 'GuShin (仇神 - Enemy God)'}</h4>
+                    <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                       {lang === 'KO' ? '희신을 극하여 방해하거나, 기신을 도와주는 에너지야. 기신 다음으로 주의해야 할 기운이야.' : 'Energy that attacks the HeeShin or supports the GiShin. It is the second most cautious energy after GiShin.'}
                     </p>
-                    <div className="text-xs bg-black/40 p-2 rounded text-orange-400/90 flex items-center gap-2">
+                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-orange-400/90 flex items-center gap-1.5">
                       <span className="font-bold">{lang === 'KO' ? '나의 구신:' : 'Your GuShin:'}</span>
                       {renderYongshinWithElement(result.analysis.yongshinDetail.guShin.god, true)}
                     </div>
                   </div>
 
                   {result.analysis.yongshinDetail.hanShin && (
-                    <div className="bg-white/5 p-3 rounded-lg border border-blue-400/30">
-                      <h4 className="font-bold text-blue-400 mb-1">{lang === 'KO' ? '한신 (閑神 - 한가할 한, 귀신 신)' : 'HanShin (閑神 - Idle God)'}</h4>
-                      <p className="text-xs text-white/70 mb-2">
+                    <div className="bg-white/5 p-2.5 sm:p-3 rounded-lg border border-blue-400/20">
+                      <h4 className="font-bold text-blue-400 text-xs sm:text-sm mb-0.5">{lang === 'KO' ? '한신 (閑神 - 한가할 한, 귀신 신)' : 'HanShin (閑神 - Idle God)'}</h4>
+                      <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                         {lang === 'KO' ? '용신에 큰 영향을 주지 않는 중립적인 에너지야. 상황에 따라 희신이나 기신을 돕기도 해.' : 'Neutral energy that doesn\'t significantly affect the Yongshin. It may support HeeShin or GiShin depending on the situation.'}
                       </p>
-                      <div className="text-xs bg-black/40 p-2 rounded text-blue-400/90 flex items-center gap-2">
+                      <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-blue-400/90 flex items-center gap-1.5">
                         <span className="font-bold">{lang === 'KO' ? '나의 한신:' : 'Your HanShin:'}</span>
                         {renderYongshinWithElement(result.analysis.yongshinDetail.hanShin.god, true)}
                       </div>

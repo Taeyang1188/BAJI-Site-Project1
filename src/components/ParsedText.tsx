@@ -382,52 +382,53 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
           continue;
         }
 
+        // Improved color/element tag detection: handle both hex and var()
         const colonIndex = tagContent.indexOf(':');
         if (colonIndex !== -1) {
-          if (currentText) {
-            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
-            currentText = '';
-          }
-          const color = tagContent.substring(0, colonIndex);
+          const color = tagContent.substring(0, colonIndex).trim();
           const content = tagContent.substring(colonIndex + 1);
           
-          // Auto-wrap terms with tooltips ONLY inside color tags
-          let processedContent = content;
-          Object.keys(TOOLTIP_DICTIONARY).forEach(term => {
-            const regex = new RegExp(`(?<!\\[[^\\]]*)\\b${term}\\b(?!\\s*\\])`, 'gi');
-            const koRegex = new RegExp(`(?<!\\[[^\\]]*)${term}(?!\\s*\\])`, 'g');
-            
-            if (/[a-zA-Z]/.test(term)) {
-              processedContent = processedContent.replace(regex, `[tooltip:${term}]`);
-            } else {
-              processedContent = processedContent.replace(koRegex, `[tooltip:${term}]`);
+          if (color.startsWith('#') || color.startsWith('var(') || color.startsWith('rgba(') || color.startsWith('rgb(')) {
+            if (currentText) {
+              elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+              currentText = '';
             }
-          });
+            
+            // Auto-wrap terms with tooltips ONLY inside color tags
+            let processedContent = content;
+            Object.keys(TOOLTIP_DICTIONARY).forEach(term => {
+              // Properly escape term for regex
+              const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`(?<!\\[[^\\]]*)\\b${escapedTerm}\\b(?!\\s*\\])`, 'gi');
+              const koRegex = new RegExp(`(?<!\\[[^\\]]*)${escapedTerm}(?!\\s*\\])`, 'g');
+              
+              if (/[a-zA-Z]/.test(term)) {
+                processedContent = processedContent.replace(regex, `[tooltip:${term}]`);
+              } else {
+                processedContent = processedContent.replace(koRegex, `[tooltip:${term}]`);
+              }
+            });
 
-          // Recursively parse content in case of nested tags
-          elements.push(
-            <span 
-              key={`${idId}-${keyCount++}`} 
-              className="inline-flex items-center align-middle void-element-wrapper" 
-              style={{ '--elem-color': color, color: 'var(--text-elem-color, ' + color + ')' } as React.CSSProperties}
-            >
+            elements.push(
               <span 
-                className="void-element-badge w-2 h-2 rounded-full hidden shrink-0 mr-1" 
-                style={{ backgroundColor: color }}
-              />
-              <span className="inline">
-                <ParsedText text={processedContent} lang={lang} />
+                key={`${idId}-${keyCount++}`} 
+                className="inline-flex items-center align-middle void-element-wrapper" 
+                style={{ '--elem-color': color, color: 'var(--text-elem-color, ' + color + ')' } as React.CSSProperties}
+              >
+                <span 
+                  className="void-element-badge w-2 h-2 rounded-full hidden shrink-0 mr-1" 
+                  style={{ backgroundColor: color }}
+                />
+                <span className="inline">
+                  <ParsedText text={processedContent} lang={lang} />
+                </span>
               </span>
-            </span>
-          );
-          
-          i = endBracketIndex + 1;
-          continue;
+            );
+            
+            i = endBracketIndex + 1;
+            continue;
+          }
         }
-      } else {
-        // Tag is open but not yet closed (typing effect), hide it
-        i = processedText.length;
-        continue;
       }
     }
     currentText += processedText[i];
