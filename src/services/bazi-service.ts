@@ -372,7 +372,8 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const allStems = pillars.map(p => p.stem);
   
   const elementCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
-  pillars.forEach(p => {
+  pillars.forEach((p, idx) => {
+    if (input.isTimeUnknown && idx === 0) return; // Skip unknown hour
     if (p.element) elementCounts[p.element]++;
     const branchElement = BRANCHES_INFO[p.branch]?.element;
     if (branchElement) elementCounts[branchElement as keyof typeof elementCounts as keyof typeof elementCounts]++;
@@ -381,22 +382,22 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   const totalElements = Object.values(elementCounts).reduce((a, b) => a + b, 0) || 1;
   const elementRatios: Record<string, number> = {};
   Object.entries(elementCounts).forEach(([el, count]) => {
-    // Normalizing to 100% based on 8 positions (4 stems + 4 branches)
+    // Normalizing to 100% based on active positions (6 or 8)
     elementRatios[el] = Number(((count / totalElements) * 100).toFixed(1));
   });
 
-  const tenGodsRatio = calculateTenGodsRatio(pillars, lang);
+  const tenGodsRatio = calculateTenGodsRatio(pillars, lang, input.isTimeUnknown);
   
   // New detailed calculations
-  const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi);
-  const strength = calcDayMasterStrength(allStems, allBranches);
-  const specialPatterns = detectSpecialPatterns(allStems, allBranches, lang, elementRatios, strength);
-  const geJuResult = calculateGeJu(dayGan, monthZhi, allStems, allBranches, strength.elementScores, lang);
+  const shinsalResult = detectShinsal(allStems, allBranches, yearGan, yearZhi, dayGan, dayZhi, input.isTimeUnknown);
+  const strength = calcDayMasterStrength(allStems, allBranches, input.isTimeUnknown);
+  const specialPatterns = detectSpecialPatterns(allStems, allBranches, lang, elementRatios, strength, input.isTimeUnknown);
+  const geJuResult = calculateGeJu(dayGan, monthZhi, allStems, allBranches, strength.elementScores, lang, input.isTimeUnknown);
   const geJu = geJuResult.geJu;
-  let structureDetail: any = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang);
+  let structureDetail: any = determineStructure(dayGan, pillars, strength, tenGodsRatio, lang, input.isTimeUnknown);
 
   // Analyze Special Structure (Jun-wang, Image, etc.)
-  const specialStructure = analyzeSpecialStructure(allStems, allBranches, strength.elementScores, lang);
+  const specialStructure = analyzeSpecialStructure(allStems, allBranches, strength.elementScores, lang, input.isTimeUnknown);
   if (specialStructure && specialStructure.confidence >= 70) {
     structureDetail = {
       title: specialStructure.name,
@@ -413,7 +414,7 @@ export const calculateRealBaZi = (input: UserInput, lat: number, lon: number, la
   }
 
   const yongshinDetail = determineYongshin(allStems, allBranches, geJu, strength, structureDetail, tenGodsRatio);
-  const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail);
+  const interactionsResult = calculateDetailedInteractions(allStems, allBranches, pillars, yongshinDetail, input.isTimeUnknown);
   
   // Check for ByeongYak and TongGwan
   const byeongYak = checkByeongYak(allStems, allBranches, yongshinDetail);

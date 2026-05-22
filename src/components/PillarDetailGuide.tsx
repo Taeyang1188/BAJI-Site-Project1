@@ -80,23 +80,26 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const isKo = lang === 'KO';
+
+  const isHourUnknown = result.pillars.find(p => p.title === 'Hour')?.isUnknown;
+
+  React.useEffect(() => {
+    if (isHourUnknown && guideSelectedPillar === 'Hour') {
+      setGuideSelectedPillar('Day');
+    }
+  }, [isHourUnknown, guideSelectedPillar, setGuideSelectedPillar]);
+
   const selectedPillarData = result.pillars.find(p => p.title === guideSelectedPillar);
   const localDayPillar = result.pillars.find(p => p.title === 'Day' && !p.isUnknown);
   const dayMaster = localDayPillar ? localDayPillar.stem : '甲';
 
-  if (!selectedPillarData || selectedPillarData.isUnknown) {
-    return (
-      <div className="w-full flex items-center justify-center py-10 bg-black/20 rounded-xl border border-white/5">
-        <span className="text-white/40 text-sm">{isKo ? '생시를 기입하지 않아 분석할 수 없습니다.' : 'Provide an accurate time for analysis.'}</span>
-      </div>
-    );
-  }
+  const isPillarUnknown = !selectedPillarData || selectedPillarData.isUnknown;
 
   // Calculate info for the selected Pillar's Stem
-  const hs = selectedPillarData.stem;
-  const hsTenGod = getDetailedTenGod(dayMaster, hs);
-  const hsElement = BAZI_MAPPING.stems[hs as keyof typeof BAZI_MAPPING.stems]?.element;
-  const hsColor = ELEMENT_COLORS[hsElement as keyof typeof ELEMENT_COLORS] || '#ffffff';
+  const hs = !isPillarUnknown ? selectedPillarData.stem : '';
+  const hsTenGod = !isPillarUnknown ? getDetailedTenGod(dayMaster, hs) : { ko: '', en: '' };
+  const hsElement = !isPillarUnknown ? BAZI_MAPPING.stems[hs as keyof typeof BAZI_MAPPING.stems]?.element : '';
+  const hsColor = hsElement ? (ELEMENT_COLORS[hsElement as keyof typeof ELEMENT_COLORS] || '#ffffff') : '#ffffff';
   
   let rootingDescKo = '지지에 이렇다 할 명확한 뿌리를 두고 있지 않습니다. 상황에 따라 변칙적이고 유연하게 활용되는 기운입니다.';
   let rootingTitleKo = '단독적이고 유연한 기운 (미통근)';
@@ -111,22 +114,21 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
 
   const pIdx = result.pillars.findIndex(p => p.title === guideSelectedPillar);
   const pRootDetails = result.analysis?.dayMasterStrength?.rootingDetails?.[pIdx];
-  const branchChar = selectedPillarData.branch;
+  const branchChar = !isPillarUnknown ? selectedPillarData.branch : '';
 
-  // Scan all rooting details to see if the selected pillar's branch is clashed or punished
-  result.analysis?.dayMasterStrength?.rootingDetails?.forEach((dt: any) => {
-    dt.roots?.forEach((rt: any) => {
-      if (rt.branchTitle === guideSelectedPillar) {
-        if (rt.isDestroyed) pillarBranchClashed = true;
-        if (rt.isTwisted) pillarBranchPunished = true;
-      }
+  if (!isPillarUnknown) {
+    // Scan all rooting details to see if the selected pillar's branch is clashed or punished
+    result.analysis?.dayMasterStrength?.rootingDetails?.forEach((dt: any) => {
+      dt.roots?.forEach((rt: any) => {
+        if (rt.branchTitle === guideSelectedPillar) {
+          if (rt.isDestroyed) pillarBranchClashed = true;
+          if (rt.isTwisted) pillarBranchPunished = true;
+        }
+      });
     });
-  });
 
-  if (pRootDetails && pRootDetails.roots) {
-    pRootDetails.roots.forEach((rt: any) => {
-      // Evaluate only the root in this selected pillar's branch for self-rooting (자좌통근)
-      if (rt.branchTitle === guideSelectedPillar) {
+    if (pRootDetails && pRootDetails.roots) {
+      pRootDetails.roots.forEach((rt: any) => {
         if (rt.isDestroyed) {
           return; // Clashed root is completely shattered, don't count it for active rooting!
         }
@@ -138,47 +140,47 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
         if (rt.hiddenStem === hs) {
           strongRoots++;
         }
-      }
-    });
+      });
+    }
+
+    if (isRooted) {
+       if (isMainRooted) {
+          rootingTitleKo = '견고한 본기통근 (강력한 현실 구현력)';
+          rootingDescKo = '지지의 본기(가장 중심이 되는 기운)에 직접 뿌리를 내리고 있어 목표 달성률과 현실화 파워가 대단히 높습니다. 강한 실행력이 돋보입니다.';
+          rootingTitleEn = 'Strong Main Rooting (High Realization Power)';
+          rootingDescEn = 'Has a strong main root in branches. Extremely high execution power and consistency.';
+       } else if (strongRoots > 0) {
+          rootingTitleKo = '조력적 통근 (환경의 지지)';
+          rootingDescKo = '지지의 여기나 중기에 동일한 글자를 두어 환경의 지원을 구합니다. 상황에 맞춰 능동적으로 기운을 사용할 수 있습니다.';
+          rootingTitleEn = 'Supportive Rooting (Environmental Support)';
+          rootingDescEn = 'Rooted in secondary stems. Adaptable and active use of energy depending on the situation.';
+       } else {
+          rootingTitleKo = '일반적 통근 (잠재적 기반)';
+          rootingDescKo = '동일 오행으로 지지의 지원을 받아 바탕 에너지를 현실에서 무난하게 발휘할 수 있는 동력을 갖추고 있습니다.';
+          rootingTitleEn = 'Normal Rooting (Potential Base)';
+          rootingDescEn = 'Supported by the same element in the branches, giving you foundational momentum.';
+       }
+    } else if (pillarBranchClashed) {
+        rootingTitleKo = '충(衝)에 의한 무통근 (기반 소멸)';
+        rootingDescKo = '본래 지지에 든든한 뿌리를 두고 있었으나, 인접한 충(衝) 작용으로 인해 그 기반이 완전히 흩어져 실질적인 통근력을 상실한 상태입니다.';
+        rootingTitleEn = 'Root Lost to Adjacent Clash';
+        rootingDescEn = 'Originally had a root, but it was shattered due to an adjacent clash, losing practical stability.';
+    }
   }
 
-  if (isRooted) {
-     if (isMainRooted) {
-        rootingTitleKo = '견고한 본기통근 (강력한 현실 구현력)';
-        rootingDescKo = '지지의 본기(가장 중심이 되는 기운)에 직접 뿌리를 내리고 있어 목표 달성률과 현실화 파워가 대단히 높습니다. 강한 실행력이 돋보입니다.';
-        rootingTitleEn = 'Strong Main Rooting (High Realization Power)';
-        rootingDescEn = 'Has a strong main root in branches. Extremely high execution power and consistency.';
-     } else if (strongRoots > 0) {
-        rootingTitleKo = '조력적 통근 (환경의 지지)';
-        rootingDescKo = '지지의 여기나 중기에 동일한 글자를 두어 환경의 지원을 구합니다. 상황에 맞춰 능동적으로 기운을 사용할 수 있습니다.';
-        rootingTitleEn = 'Supportive Rooting (Environmental Support)';
-        rootingDescEn = 'Rooted in secondary stems. Adaptable and active use of energy depending on the situation.';
-     } else {
-        rootingTitleKo = '일반적 통근 (잠재적 기반)';
-        rootingDescKo = '동일 오행으로 지지의 지원을 받아 바탕 에너지를 현실에서 무난하게 발휘할 수 있는 동력을 갖추고 있습니다.';
-        rootingTitleEn = 'Normal Rooting (Potential Base)';
-        rootingDescEn = 'Supported by the same element in the branches, giving you foundational momentum.';
-     }
-  } else if (pillarBranchClashed) {
-      rootingTitleKo = '충(衝)에 의한 무통근 (기반 소멸)';
-      rootingDescKo = '본래 지지에 든든한 뿌리를 두고 있었으나, 인접한 충(衝) 작용으로 인해 그 기반이 완전히 흩어져 실질적인 통근력을 상실한 상태입니다.';
-      rootingTitleEn = 'Root Lost to Adjacent Clash';
-      rootingDescEn = 'Originally had a root, but it was shattered due to an adjacent clash, losing practical stability.';
-  }
-
-  const stemAction = isKo ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.actionKo || '고유의 기질') : ((TEN_GOD_DESC as any)[hsTenGod.ko]?.actionEn || 'Unique Trait');
+  const stemAction = !isPillarUnknown && isKo ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.actionKo || '고유의 기질') : (!isPillarUnknown ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.actionEn || 'Unique Trait') : '');
   
-  let rawStrategyKo = (TEN_GOD_DESC as any)[hsTenGod.ko]?.strategyKo || '';
-  let rawStrategyEn = (TEN_GOD_DESC as any)[hsTenGod.ko]?.strategyEn || '';
+  let rawStrategyKo = !isPillarUnknown ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.strategyKo || '') : '';
+  let rawStrategyEn = !isPillarUnknown ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.strategyEn || '') : '';
   
-  if (STEM_ATTRIBUTES[hs]) {
+  if (hs && STEM_ATTRIBUTES[hs]) {
     rawStrategyKo = rawStrategyKo.replace(/\[([^\]]+)\]/g, `[${STEM_ATTRIBUTES[hs].ko}]`);
     rawStrategyEn = rawStrategyEn.replace(/\[([^\]]+)\]/g, `[${STEM_ATTRIBUTES[hs].en}]`);
   }
   
   const stemStrategy = isKo ? rawStrategyKo : rawStrategyEn;
-  const stemWarning = isKo ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.warningKo || '') : ((TEN_GOD_DESC as any)[hsTenGod.ko]?.warningEn || '');
-  const branchMapping = BAZI_MAPPING.branches[branchChar as keyof typeof BAZI_MAPPING.branches];
+  const stemWarning = !isPillarUnknown && isKo ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.warningKo || '') : (!isPillarUnknown ? ((TEN_GOD_DESC as any)[hsTenGod.ko]?.warningEn || '') : '');
+  const branchMapping = branchChar ? BAZI_MAPPING.branches[branchChar as keyof typeof BAZI_MAPPING.branches] : null;
   
   return (
     <div className="w-full flex flex-col gap-4 mt-6 pt-6 border-t border-white/10">
@@ -190,19 +192,26 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
       <div className={`flex gap-2 p-1.5 rounded-xl overflow-x-auto no-scrollbar shadow-inner mt-2 ${isLight ? 'bg-slate-100' : 'bg-white/5'}`}>
         {GUIDE_PILLARS.map(p => {
           const isSelected = p.key === guideSelectedPillar;
+          const isTabDisabled = p.key === 'Hour' && isHourUnknown;
           return (
             <button
               key={p.key}
-              onClick={() => setGuideSelectedPillar(p.key)}
+              disabled={isTabDisabled}
+              onClick={() => !isTabDisabled && setGuideSelectedPillar(p.key)}
+              title={isTabDisabled ? (isKo ? '생시를 기입하지 않아 클릭할 수 없습니다.' : 'Time is unknown.') : undefined}
               className={`flex-1 min-w-max px-3 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all duration-300 relative ${
-                isSelected 
-                  ? (isLight ? 'bg-blue-500 text-white shadow-md' : 'bg-[#6DABFF] text-white shadow-[0_4px_12px_rgba(109,171,255,0.4)]') 
-                  : (isLight ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-200' : 'text-white/60 hover:text-white hover:bg-white/10')
+                isTabDisabled
+                  ? (isLight ? 'text-slate-300 bg-slate-100/50 cursor-not-allowed border border-dashed border-slate-200' : 'text-white/20 bg-white/5 cursor-not-allowed border border-dashed border-white/5')
+                  : isSelected 
+                    ? (isLight ? 'bg-blue-500 text-white shadow-md' : 'bg-[#6DABFF] text-white shadow-[0_4px_12px_rgba(109,171,255,0.4)]') 
+                    : (isLight ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-200' : 'text-white/60 hover:text-white hover:bg-white/10')
               }`}
             >
               <div className="flex items-center justify-center gap-1">
                 <span>{isKo ? p.ko : p.en}</span>
-                <span className={`text-[10px] ${isSelected ? 'opacity-80' : 'opacity-60'}`}>({isKo ? p.descKo : p.descEn})</span>
+                <span className={`text-[10px] ${isSelected ? 'opacity-80' : 'opacity-60'}`}>
+                  ({isTabDisabled ? (isKo ? '생시 미입력으로 클릭 불가' : 'Missing Time - Locked') : (isKo ? p.descKo : p.descEn)})
+                </span>
               </div>
             </button>
           );
@@ -210,10 +219,18 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
       </div>
 
       <div className="w-full relative mt-4">
-        {/* Animated Background fade effect per element color */}
-        <div className="absolute inset-0 opacity-10 rounded-2xl pointer-events-none blur-3xl transition-colors duration-700" style={{ backgroundColor: hsColor }}></div>
+        {isPillarUnknown ? (
+          <div className="w-full flex items-center justify-center py-16 bg-black/20 rounded-2xl border border-white/5">
+            <span className="text-white/45 text-sm font-medium font-sans">
+              {isKo ? '생시를 기입하지 않아 분석할 수 없습니다.' : 'Provide an accurate time for analysis.'}
+            </span>
+          </div>
+        ) : (
+          <>
+            {/* Animated Background fade effect per element color */}
+            <div className="absolute inset-0 opacity-10 rounded-2xl pointer-events-none blur-3xl transition-colors duration-700" style={{ backgroundColor: hsColor }}></div>
 
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
           
           {/* Card 1: 천간 */}
           <div className={`p-5 rounded-2xl shadow-md border ${isLight ? 'bg-[#fdfdfd] text-[#2d3748] border-slate-200' : 'bg-black/40 text-slate-200 border-white/10'}`}>
@@ -353,6 +370,8 @@ export function PillarDetailGuide({ result, lang, guideSelectedPillar, setGuideS
             </div>
           </div>
         </div>
+        </>
+      )}
       </div>
     </div>
   );

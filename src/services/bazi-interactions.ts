@@ -251,7 +251,11 @@ function generateInteractionNote(
   return `${koNote}|${enNote}`;
 }
 
-export function calculateInteractions(stems: string[], branches: string[], pillars?: BaZiCard[], yongshinDetail?: any): BaziInteractions {
+export function calculateInteractions(stems: string[], branches: string[], pillars?: BaZiCard[], yongshinDetail?: any, isTimeUnknown?: boolean): BaziInteractions {
+  if (isTimeUnknown) {
+    stems = ['X', ...stems.slice(1)];
+    branches = ['X', ...branches.slice(1)];
+  }
   const interactions: Interaction[] = [];
   const conflicts: { resolved: string; affected: string[]; note?: string }[] = [];
 

@@ -715,6 +715,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [guideSelectedPillar, setGuideSelectedPillar] = React.useState<'Year' | 'Month' | 'Day' | 'Hour'>('Day');
   const [hoveredHiddenStem, setHoveredHiddenStem] = React.useState<{pillarIdx: number, hsIdx: number, hs: string, connectedStems: string[], isDestroyed?: boolean} | null>(null);
 
+  const dayMasterDetails = result?.analysis?.dayMasterStrength?.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
+  const isDayMasterRooted = !!(dayMasterDetails && dayMasterDetails.roots && dayMasterDetails.roots.some((rt: any) => !rt.isDestroyed));
+
   const renderTenGodLabel = (ko: string, en: string, polarity: number) => {
     if (lang === 'KO') {
       return (
@@ -1133,20 +1136,32 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         </div>
         
         {isUnknown && (
-          <div className="flex flex-col items-center gap-2 mt-4 px-6 py-3 bg-neon-cyan/10 border border-neon-cyan/30 rounded-2xl max-w-md w-full">
-            <div className="flex justify-between w-full text-xs font-bold font-mono tracking-widest text-neon-cyan">
+          <div className={`flex flex-col items-center gap-2 mt-4 px-6 py-3 rounded-2xl max-w-md w-full border ${
+            isLight 
+              ? 'bg-blue-50/60 border-blue-200/70 shadow-sm' 
+              : 'bg-neon-cyan/10 border-neon-cyan/30'
+          }`}>
+            <div className={`flex justify-between w-full text-xs font-bold tracking-widest ${
+              isLight ? 'text-blue-700 font-semibold' : 'text-neon-cyan font-mono'
+            }`}>
               <span>{lang === 'KO' ? '분석 완성도' : 'Analysis Completeness'}</span>
               <span>75%</span>
             </div>
-            <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden">
+            <div className={`w-full h-1.5 rounded-full overflow-hidden ${
+              isLight ? 'bg-slate-200/80' : 'bg-black/50'
+            }`}>
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: '75%' }}
                 transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                className="h-full bg-neon-cyan shadow-[0_0_10px_#00F2FF]"
+                className={`h-full ${
+                  isLight ? 'bg-blue-500 shadow-sm' : 'bg-neon-cyan shadow-[0_0_10px_#00F2FF]'
+                }`}
               />
             </div>
-            <p className="text-[10px] sm:text-xs text-white/60 text-center mt-1">
+            <p className={`text-[10px] sm:text-xs text-center mt-1 leading-relaxed ${
+              isLight ? 'text-slate-600 font-medium' : 'text-white/60'
+            }`}>
               {lang === 'KO' 
                 ? '시주(시간)가 미반영된 삼주 기반 리포트입니다. 정확한 시간을 알면 100% 완성된 분석을 볼 수 있습니다.' 
                 : 'This is a Three-Pillar report excluding birth time. Precise time provides a 100% complete analysis.'}
@@ -2327,9 +2342,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           {guideStep === 4 && '나무가 열매를 맺듯 당신이 이루어낼 무의식적 결과이자 인생의 후반기입니다. 생시를 알아야 완벽한 통변이 가능한 이유입니다.'}
                           {guideStep === 5 && (
                             <span className="flex flex-col gap-2">
-                              {(result.analysis?.dayMasterStrength?.score || 0) >= 3.5 && (
+                              {isDayMasterRooted ? (
                                 <span className={`text-[10.5px] sm:text-[11.5px] p-2 rounded-lg break-keep shadow-sm ${theme === 'light' ? 'bg-amber-50 text-amber-900 border border-amber-200' : 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20'}`}>
                                   <span className="font-bold">✨ 통근(뿌리) 총람:</span> 귀하는 지지에 강력한 뿌리를 두고 있는 <strong className={theme === 'light' ? 'text-amber-700' : 'text-white'}>기반이 튼튼한 사주</strong>입니다.
+                                </span>
+                              ) : (
+                                <span className={`text-[10.5px] sm:text-[11.5px] p-2 rounded-lg break-keep shadow-sm ${theme === 'light' ? 'bg-slate-50 text-slate-800 border border-slate-200' : 'bg-white/5 text-white/80 border border-white/10'}`}>
+                                  <span className="font-bold">✨ 통근(뿌리) 총람:</span> 귀하는 지지에 뚜렷한 뿌리가 없어 <strong className={theme === 'light' ? 'text-slate-700' : 'text-slate-300'}>고정된 틀에서 자유롭고 환경에 대한 유연한 대처능력</strong>을 지닌 사주입니다.
                                 </span>
                               )}
                               <span>각 지지 속에 숨겨져 있는 핵심 무기와 본능입니다. 하단의 꼬리표는 이 지장간이 사주 원국의 윗글자(천간)들과 얼마나 다각적으로 결속되어 현실로 발현되는지를 나타냅니다. 마우스를 올리면 통근된 글자가 반응합니다.</span>
@@ -2364,9 +2383,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           {guideStep === 4 && 'The fruits you bear in your twilight years. It symbolizes your offspring, hidden desires, and long-term results.'}
                           {guideStep === 5 && (
                             <span className="flex flex-col gap-2">
-                              {(result.analysis?.dayMasterStrength?.score || 0) >= 3.5 && (
+                              {isDayMasterRooted ? (
                                 <span className={`text-[10.5px] sm:text-[11.5px] p-2 rounded-lg break-keep shadow-sm ${theme === 'light' ? 'bg-amber-50 text-amber-900 border border-amber-200' : 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20'}`}>
                                   <span className="font-bold">✨ Rooting Overview:</span> You have a <strong className={theme === 'light' ? 'text-amber-700' : 'text-white'}>strongly rooted and stable foundation</strong> in your chart.
+                                </span>
+                              ) : (
+                                <span className={`text-[10.5px] sm:text-[11.5px] p-2 rounded-lg break-keep shadow-sm ${theme === 'light' ? 'bg-slate-50 text-slate-800 border border-slate-200' : 'bg-white/5 text-white/80 border border-white/10'}`}>
+                                  <span className="font-bold">✨ Rooting Overview:</span> You have a <strong className={theme === 'light' ? 'text-slate-700' : 'text-slate-300'}>highly flexible, adaptive, and frame-free foundation</strong> with great versatility in life.
                                 </span>
                               )}
                               <span>These are your true weapons and hidden instincts. The small tags below show how strongly this potential is connected to the Heavenly Stems above. Hover over them to see the glowing connections.</span>
@@ -4199,60 +4222,78 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 className={`text-lg font-bold flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm">2</span>
                   {lang === 'KO' ? '땅 속에 감춰진 씨앗: 지장간' : 'Hidden Seeds: Ji-Jang-Gan'}
                 </h4>
-                <div className="relative w-full rounded-2xl bg-black/50 border border-amber-500/20 p-4 sm:p-6 flex flex-col gap-6">
+                <div className={`relative w-full rounded-2xl border p-4 sm:p-6 flex flex-col gap-6 ${isLight ? 'bg-slate-50 border-amber-200/80 shadow-sm' : 'bg-black/50 border-amber-500/20'}`}>
                   
                   {/* Concept Intro */}
                   <div className="flex flex-col gap-4">
-                    <p className="text-sm leading-relaxed text-white/80">
+                    <p className={`text-sm leading-relaxed ${isLight ? 'text-slate-700 font-medium' : 'text-white/80'}`}>
                       {lang === 'KO' ? 
                         `사람의 마음은 단 하나로 정의할 수 없는 여러 개의 '페르소나(가면)'로 이루어져 있습니다. 사주에서 땅(지지) 속에 감춰진 2~3개의 숨은 성향이 바로 '지장간(地藏干)'입니다. 평소에는 겉으로 드러나지 않지만, 내 무의식의 밑바탕을 지배하는 '진짜 속마음'과 '숨은 잠재력'을 의미합니다.` : 
                         `A human mind is not defined by a single trait but made up of multiple 'personas'. In BaZi, the 2-3 hidden energies concealed within the earth (branches) are called 'Ji-Jang-Gan'. They represent your 'true inner mind' and 'hidden potential' that typically remain unseen but unconsciously influence you.`}
                     </p>
 
-                    {(result?.analysis?.dayMasterStrength?.score || 0) >= 3.5 && (
-                      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex flex-col gap-2 shadow-[inset_0_0_15px_rgba(245,158,11,0.05)]">
-                        <h5 className="text-amber-500 font-bold text-xs sm:text-sm flex items-center gap-2">
-                          ✨ {lang === 'KO' ? '통근(뿌리) 총람' : 'Rooting Overview'}
-                        </h5>
-                        <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-sans">
-                          {lang === 'KO' ? (
+                    <div className={
+                      isLight 
+                        ? (isDayMasterRooted 
+                            ? 'bg-amber-100/40 border-amber-200 rounded-xl p-4 flex flex-col gap-2 border' 
+                            : 'bg-slate-100/70 border-slate-200 rounded-xl p-4 flex flex-col gap-2 border')
+                        : (isDayMasterRooted 
+                            ? 'bg-amber-500/10 border-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.05)] border rounded-xl p-4 flex flex-col gap-2' 
+                            : 'bg-slate-500/10 border-slate-500/20 shadow-[inset_0_0_15px_rgba(255,255,255,0.02)] border rounded-xl p-4 flex flex-col gap-2')
+                    }>
+                      <h5 className={`${isLight ? (isDayMasterRooted ? 'text-amber-800' : 'text-slate-700') : (isDayMasterRooted ? 'text-amber-500' : 'text-slate-400')} font-bold text-xs sm:text-sm flex items-center gap-2`}>
+                        ✨ {lang === 'KO' ? '통근(뿌리) 총람' : 'Rooting Overview'}
+                      </h5>
+                      <p className={`text-xs sm:text-sm leading-relaxed font-sans ${isLight ? 'text-slate-700' : 'text-white/80'}`}>
+                        {lang === 'KO' ? (
+                          isDayMasterRooted ? (
                             <>
-                              귀하는 지지에 강력한 뿌리를 두고 있는 <strong className="text-amber-400">기반이 튼튼한 사주</strong>입니다.
+                              귀하는 지지에 강력한 뿌리를 두고 있는 <strong className={`font-extrabold ${isLight ? 'text-amber-800' : 'text-amber-400'}`}>기반이 튼튼한 사주</strong>입니다.
                             </>
                           ) : (
                             <>
-                              You possess a <strong className="text-amber-400">strongly rooted and stable foundation</strong> in your chart.
+                              귀하는 지지에 뚜렷한 뿌리가 없어 고정된 기성 틀에 얽매이지 않고, 대단히 <strong className={`font-extrabold ${isLight ? 'text-indigo-600' : 'text-[#6DABFF]'}`}>자유롭고 유연하게 대처할 수 있는 기반</strong>을 품은 사주입니다.
                             </>
-                          )}
-                        </p>
-                      </div>
-                    )}
+                          )
+                        ) : (
+                          isDayMasterRooted ? (
+                            <>
+                              You possess a <strong className={`font-extrabold ${isLight ? 'text-amber-800' : 'text-amber-400'}`}>strongly rooted and stable foundation</strong> in your chart.
+                            </>
+                          ) : (
+                            <>
+                              You carry a <strong className={`font-extrabold ${isLight ? 'text-indigo-600' : 'text-[#6DABFF]'}`}>fluid, self-adaptive and versatile layout</strong> that thrives on change rather than rigid forms.
+                            </>
+                          )
+                        )}
+                      </p>
+                    </div>
 
                     {/* PIllar differences */}
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex flex-col gap-3 shadow-[inset_0_0_15px_rgba(245,158,11,0.05)]">
-                      <h5 className="text-amber-500 font-bold text-xs sm:text-sm">
+                    <div className={`border rounded-xl p-4 flex flex-col gap-3 ${isLight ? 'bg-amber-50/40 border-amber-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.01)]' : 'bg-amber-500/10 border-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.05)]'}`}>
+                      <h5 className={`font-bold text-xs sm:text-sm ${isLight ? 'text-amber-800' : 'text-amber-500'}`}>
                         {lang === 'KO' ? '네 기둥의 지장간은 역할이 다릅니다' : 'The roles of Hidden Stems in Four Pillars'}
                       </h5>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-xs sm:text-sm">
                         <div className="grid grid-cols-[auto_1fr] items-start gap-2">
-                          <span className="text-white/50 whitespace-nowrap">🌱 {lang === 'KO' ? '년지:' : 'Year Branch:'}</span> 
-                          <span className="text-white/90 leading-snug">{lang === 'KO' ? '가문으로부터 물려받은 무의식적 기질' : 'Unconscious traits inherited from ancestors'}</span>
+                          <span className={`whitespace-nowrap ${isLight ? 'text-slate-500' : 'text-white/50'}`}>🌱 {lang === 'KO' ? '년지:' : 'Year Branch:'}</span> 
+                          <span className={`${isLight ? 'text-slate-700 font-medium' : 'text-white/90'} leading-snug`}>{lang === 'KO' ? '가문으로부터 물려받은 무의식적 기질' : 'Unconscious traits inherited from ancestors'}</span>
                         </div>
                         <div className="grid grid-cols-[auto_1fr] items-start gap-2">
-                          <span className="text-white/50 whitespace-nowrap">🪵 {lang === 'KO' ? '월지:' : 'Month Branch:'}</span> 
-                          <span className="text-white/90 leading-snug">{lang === 'KO' ? '사회생활, 직업에서 드러나는 찐 능력' : 'True abilities shown in society and career'}</span>
+                          <span className={`whitespace-nowrap ${isLight ? 'text-slate-500' : 'text-white/50'}`}>🪵 {lang === 'KO' ? '월지:' : 'Month Branch:'}</span> 
+                          <span className={`${isLight ? 'text-slate-705 font-medium' : 'text-white/90'} leading-snug`}>{lang === 'KO' ? '사회생활, 직업에서 드러나는 찐 능력' : 'True abilities shown in society and career'}</span>
                         </div>
                         <div className="grid grid-cols-[auto_1fr] items-start gap-2">
-                          <span className="text-white/50 whitespace-nowrap">🌸 {lang === 'KO' ? '일지:' : 'Day Branch:'}</span> 
-                          <span className="text-neon-cyan font-bold leading-snug">{lang === 'KO' ? '남들은 모르는 나의 은밀한 속마음(본성)' : 'My secret inner mind & true nature'}</span>
+                          <span className={`whitespace-nowrap ${isLight ? 'text-slate-500' : 'text-white/50'}`}>🌸 {lang === 'KO' ? '일지:' : 'Day Branch:'}</span> 
+                          <span className={`${isLight ? 'text-blue-600' : 'text-neon-cyan'} font-bold leading-snug`}>{lang === 'KO' ? '남들은 모르는 나의 은밀한 속마음(본성)' : 'My secret inner mind & true nature'}</span>
                         </div>
                         <div className="grid grid-cols-[auto_1fr] items-start gap-2">
-                          <span className="text-white/50 whitespace-nowrap">🍏 {lang === 'KO' ? '시지:' : 'Hour Branch:'}</span> 
-                          <span className="text-white/90 leading-snug">{lang === 'KO' ? '내 심연에 숨겨진 마지막 미래의 욕망' : 'Deepest hidden desires and future traits'}</span>
+                          <span className={`whitespace-nowrap ${isLight ? 'text-slate-500' : 'text-white/50'}`}>🍏 {lang === 'KO' ? '시지:' : 'Hour Branch:'}</span> 
+                          <span className={`${isLight ? 'text-slate-700 font-medium' : 'text-white/90'} leading-snug`}>{lang === 'KO' ? '내 심연에 숨겨진 마지막 미래의 욕망' : 'Deepest hidden desires and future traits'}</span>
                         </div>
                       </div>
                     </div>
@@ -4578,23 +4619,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       { nameKo: '편인', nameEn: 'Mystic', descKo: '직관력, 눈치, 심리/철학, 비판사고', descEn: 'Intuition, insight, philosophy, critical thinking' }
                     ]}
                   ].map((g, i) => (
-                    <div key={i} className="flex flex-col lg:flex-row bg-[#1b1c31]/30 border border-white/10 rounded-xl overflow-hidden shadow-lg hover:border-white/20 transition-all duration-300">
+                    <div key={i} className={`flex flex-col lg:flex-row rounded-xl overflow-hidden transition-all duration-300 border ${isLight ? 'bg-slate-50 border-slate-200 shadow-sm hover:border-slate-300/80' : 'bg-[#1b1c31]/30 border-white/10 shadow-lg hover:border-white/20'}`}>
                       <div 
-                        className="lg:w-[180px] p-4 lg:p-6 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-1 shrink-0 border-b lg:border-b-0 lg:border-r border-white/10 text-center"
-                        style={{ backgroundColor: `color-mix(in srgb, ${g.color} 8%, transparent)` }}
+                        className={`lg:w-[180px] p-4 lg:p-6 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-1 shrink-0 border-b lg:border-b-0 lg:border-r text-center ${isLight ? 'border-slate-200' : 'border-white/10'}`}
+                        style={{ backgroundColor: isLight ? `color-mix(in srgb, ${g.color} 12%, transparent)` : `color-mix(in srgb, ${g.color} 8%, transparent)` }}
                       >
                         <div className="flex flex-col items-start lg:items-center text-left lg:text-center">
-                          <span className="font-bold text-[10px] tracking-wider text-white/40 uppercase mb-0.5">Mask Group</span>
+                          <span className={`font-bold text-[10px] tracking-wider uppercase mb-0.5 ${isLight ? 'text-slate-400 font-medium' : 'text-white/40'}`}>Mask Group</span>
                           <span className="font-black text-base sm:text-lg md:text-xl tracking-wide font-gothic" style={{ color: g.color }}>
                             {lang === 'KO' ? g.groupKo : g.groupEn}
                           </span>
                         </div>
-                        <span className="text-white/60 text-xs font-medium">
+                        <span className={`text-xs font-medium ${isLight ? 'text-slate-600' : 'text-white/60'}`}>
                           {lang === 'KO' ? g.groupEn : g.groupKo}
                         </span>
                       </div>
 
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10">
+                      <div className={`flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x ${isLight ? 'divide-slate-200' : 'divide-white/10'}`}>
                         {g.items.map((item, j) => {
                           const tenGodChars: { char: string; hanja: string; type: 'stem'|'branch', element: string, inChart: boolean }[] = [];
                           const localDayPillar = result.pillars.find(p => p.title === 'Day' && !p.isUnknown);
@@ -4649,14 +4690,14 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           });
 
                           return (
-                            <div key={j} className="p-5 flex flex-col justify-between h-full bg-[#161623]/20 hover:bg-[#1c1c30]/40 transition-colors duration-300">
+                            <div key={j} className={`p-5 flex flex-col justify-between h-full transition-colors duration-300 ${isLight ? 'bg-white hover:bg-slate-100/50' : 'bg-[#161623]/20 hover:bg-[#1c1c30]/40'}`}>
                               <div className="flex flex-col gap-2 mb-3">
                                 <div className="flex items-center justify-between gap-3 min-w-0">
                                   <div className="flex items-baseline gap-2 min-w-0">
-                                    <span className="text-sm sm:text-base md:text-lg font-bold text-white leading-tight">
+                                    <span className={`text-sm sm:text-base md:text-lg font-bold leading-tight ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                       {lang === 'KO' ? item.nameKo : item.nameEn}
                                     </span>
-                                    <span className="text-xs text-white/45 font-medium">
+                                    <span className={`text-xs font-medium ${isLight ? 'text-slate-400' : 'text-white/45'}`}>
                                       {lang === 'KO' ? item.nameEn : item.nameKo}
                                     </span>
                                   </div>
@@ -4664,9 +4705,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     {tenGodChars.filter(tc => tc.inChart).map((tc, idx) => (
                                       <div 
                                         key={idx} 
-                                        className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full border bg-white/10 shadow-[0_0_8px_rgba(255,255,255,0.15)] border-white/30"
+                                        className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full border ${isLight ? 'bg-slate-100/95 shadow-sm border-slate-300' : 'bg-white/10 shadow-[0_0_8px_rgba(255,255,255,0.15)] border-white/30'}`}
                                       >
-                                        <span className="text-[10px] sm:text-xs font-bold leading-none" style={{ color: ELEMENT_COLORS[tc.element as keyof typeof ELEMENT_COLORS] || '#fff' }}>
+                                        <span className="text-[10px] sm:text-xs font-bold leading-none" style={{ color: ELEMENT_COLORS[tc.element as keyof typeof ELEMENT_COLORS] || (isLight ? '#333' : '#fff') }}>
                                           {tc.hanja}
                                         </span>
                                       </div>
@@ -4674,7 +4715,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-xs sm:text-sm text-white/70 leading-relaxed break-keep" style={{ wordBreak: 'keep-all' }}>
+                              <div className={`text-xs sm:text-sm leading-relaxed break-keep ${isLight ? 'text-slate-600 font-medium' : 'text-white/70'}`} style={{ wordBreak: 'keep-all' }}>
                                 {lang === 'KO' ? item.descKo : item.descEn}
                               </div>
                             </div>

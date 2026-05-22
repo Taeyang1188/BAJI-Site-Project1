@@ -19,7 +19,11 @@ export interface Gongmang {
 
 const PILLAR_NAMES = ["시주", "일주", "월주", "년주"];
 
-export function detectShinsal(stems: string[], branches: string[], yearStem: string, yearBranch: string, dayStem: string, dayBranch: string): { shinsal: Shinsal[], gongmang: Gongmang } {
+export function detectShinsal(stems: string[], branches: string[], yearStem: string, yearBranch: string, dayStem: string, dayBranch: string, isTimeUnknown?: boolean): { shinsal: Shinsal[], gongmang: Gongmang } {
+  if (isTimeUnknown) {
+    stems = ['X', ...stems.slice(1)];
+    branches = ['X', ...branches.slice(1)];
+  }
   const shinsal: Shinsal[] = [];
   const dayPillar = `${dayStem}${dayBranch}`;
   const yearPillar = `${yearStem}${yearBranch}`;

@@ -110,7 +110,12 @@ function isAdjacentPunished(b: string, bIdx: number, branches: string[]): boolea
   return false;
 }
 
-export function calcDayMasterStrength(stems: string[], branches: string[]) {
+export function calcDayMasterStrength(stems: string[], branches: string[], isTimeUnknown?: boolean) {
+  if (isTimeUnknown) {
+    stems = ['X', ...stems.slice(1)];
+    branches = ['X', ...branches.slice(1)];
+  }
+
   const dayMaster = stems[1]; // 일간
   const dmElement = STEM_ELEMENTS[dayMaster];
   const monthZhi = branches[2]; // 월지
@@ -119,8 +124,10 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   // Compute adjacent clashes
   const adjacentClashedIndices = new Set<number>();
   for (let j = 0; j < branches.length - 1; j++) {
+    if (isTimeUnknown && j === 0) continue; // Skip clash checking between Hour and Day
     const b1 = branches[j];
     const b2 = branches[j + 1];
+    if (b1 === 'X' || b2 === 'X') continue;
     if (CLASH_PAIRS[b1] === b2) {
       adjacentClashedIndices.add(j);
       adjacentClashedIndices.add(j + 1);
@@ -130,6 +137,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   // Check if any branch of the combination is adjacent-clashed
   const isGroupComboBroken = (groupBranches: string[]) => {
     for (let idx = 0; idx < branches.length; idx++) {
+      if (isTimeUnknown && idx === 0) continue;
       if (groupBranches.includes(branches[idx]) && adjacentClashedIndices.has(idx)) {
         return true;
       }
@@ -143,14 +151,16 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   
   // Stems: 10 points each (DM gets 20 for base presence)
   stems.forEach((s, i) => {
+    if (s === 'X') return; // Skip unknown hour stem
     const base = i === 1 ? 20 : 10;
     
     // Check for Floating Stems (Heo-bu)
     const rooting = ROOTING_DATA[s];
-    const hasRoot = rooting && branches.some((b, bIdx) => 
-      !adjacentClashedIndices.has(bIdx) &&
-      (rooting.strong.includes(b) || rooting.mid.includes(b) || rooting.weak.includes(b))
-    );
+    const hasRoot = rooting && branches.some((b, bIdx) => {
+      if (isTimeUnknown && bIdx === 0) return false;
+      return !adjacentClashedIndices.has(bIdx) &&
+      (rooting.strong.includes(b) || rooting.mid.includes(b) || rooting.weak.includes(b));
+    });
     
     if (!hasRoot) {
       floatingStems.push(s);
@@ -162,6 +172,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   
   // Branches: Using JIJANGAN for accurate distribution
   branches.forEach((b, i) => {
+    if (b === 'X') return; // Skip unknown hour branch
     const totalPoints = i === 2 ? 40 : 20;
     const jijangan = JIJANGAN[b];
     if (jijangan) {
@@ -181,7 +192,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   // Check Bang-hap
   COMBINATIONS.BANG_HAP.forEach(group => {
     if (isGroupComboBroken(group.branches)) return;
-    const present = group.branches.filter(b => branches.includes(b));
+    const present = group.branches.filter(b => branches.includes(b) && b !== 'X');
     if (present.length === 3 || (present.length === 2 && present.includes(monthZhi))) {
       const bonus = present.length === 3 ? 40 : 20;
       elementScores[group.element] += bonus;
@@ -192,9 +203,9 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   // Check Sam-hap
   COMBINATIONS.SAM_HAP.forEach(group => {
     if (isGroupComboBroken(group.branches)) return;
-    const present = group.branches.filter(b => branches.includes(b));
+    const present = group.branches.filter(b => branches.includes(b) && b !== 'X');
     const center = group.branches[1];
-    if (present.length === 3 || (present.length === 2 && branches.includes(center))) {
+    if (present.length === 3 || (present.length === 2 && branches.includes(center) && center !== 'X')) {
       const bonus = present.length === 3 ? 30 : 15;
       elementScores[group.element] += bonus;
       activeCombinations.push({ type: 'Sam-hap', element: group.element });
@@ -204,12 +215,14 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
   // Stem Hap Transformation (Identity Crisis)
   // Check for jaeng-hap (competition) - if multiple stems of same kind exist, transformation is hindered
   const stemCounts: Record<string, number> = {};
-  stems.forEach(s => stemCounts[s] = (stemCounts[s] || 0) + 1);
+  stems.forEach(s => {
+    if (s !== 'X') stemCounts[s] = (stemCounts[s] || 0) + 1;
+  });
 
   COMBINATIONS.STEM_HAP.forEach(group => {
     const s1 = group.stems[0];
     const s2 = group.stems[1];
-    if (stems.includes(s1) && stems.includes(s2)) {
+    if (stems.includes(s1) && stems.includes(s2) && s1 !== 'X' && s2 !== 'X') {
       // Check for competition (Jaeng-hap)
       if (stemCounts[s1] > 1 || stemCounts[s2] > 1) {
         activeCombinations.push({ type: 'Jaeng-hap', stems: [s1, s2], note: 'Competition prevents full transformation' });
@@ -233,11 +246,13 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
 
   // 3. Rooting (Tong-geun) Logic
   stems.forEach((s, i) => {
+    if (s === 'X') return; // Skip unknown hour stem
     const rooting = ROOTING_DATA[s];
     if (!rooting) return;
 
     let maxMult = 0.5;
     branches.forEach((b, bIdx) => {
+      if (b === 'X') return; // Skip unknown hour branch
       // If of adjacent-clashed index, rooting is completely wiped out!
       if (adjacentClashedIndices.has(bIdx)) return;
 
@@ -255,6 +270,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
     if (i === 1) {
       let strongRootCount = 0;
       branches.forEach((b, bIdx) => {
+        if (b === 'X') return; // Skip unknown hour branch
         if (adjacentClashedIndices.has(bIdx)) return;
         if (rooting.strong.includes(b)) strongRootCount++;
       });
@@ -318,6 +334,16 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
 
   stems.forEach((s, sIdx) => {
     const pTitle = titles[sIdx];
+    if (isTimeUnknown && sIdx === 0) {
+      rootingDetails.push({
+        stem: '?',
+        pillarTitle: pTitle,
+        isFloat: true,
+        roots: [],
+        combinations: []
+      });
+      return;
+    }
     const itemRoots: any[] = [];
     const elStem = STEM_ELEMENTS[s];
 
@@ -471,6 +497,7 @@ export function calcDayMasterStrength(stems: string[], branches: string[]) {
     }
 
     branches.forEach((b, bIdx) => {
+      if (isTimeUnknown && bIdx === 0) return; // Skip unknown hour branch
       const bTitle = titles[bIdx];
       const jijangan = JIJANGAN[b];
       
@@ -928,7 +955,11 @@ export function checkTongGwan(stems: string[], branches: string[]) {
   return null;
 }
 
-export function analyzeSpecialStructure(stems: string[], branches: string[], elementScores: Record<string, number>, lang: any) {
+export function analyzeSpecialStructure(stems: string[], branches: string[], elementScores: Record<string, number>, lang: any, isTimeUnknown?: boolean) {
+  if (isTimeUnknown) {
+    stems = ['X', ...stems.slice(1)];
+    branches = ['X', ...branches.slice(1)];
+  }
   const dayMaster = stems[1];
   const dmElement = STEM_ELEMENTS[dayMaster];
   const monthZhi = branches[2];
@@ -951,6 +982,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
   // Filter 1: The Survivor Check (반대 세력의 생존력)
   // Check if Sik/Jae/Gwan (Artist/Wealth/Power) has a functional root
   const hasFunctionalOpponentRoot = branches.some((b, idx) => {
+    if (isTimeUnknown && idx === 0) return false;
+    if (b === 'X') return false;
     const el = BRANCH_ELEMENTS[b];
     if (el !== powerEl && el !== wealthEl && el !== artistEl) return false;
     

@@ -26,11 +26,11 @@ function getRelationship(dmElement: string, targetElement: string): string {
 }
 
 // 1. 격국 (Structure/Pattern) - Refined based on Month Branch (월지) and Revelation (투출)
-export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string[], allBranches: string[], elementScores: Record<string, number>, lang: Language): { geJu: string, isOverridden: boolean, originalGeJu: string } => {
+export const calculateGeJu = (dayGan: string, monthZhi: string, allStems: string[], allBranches: string[], elementScores: Record<string, number>, lang: Language, isTimeUnknown?: boolean): { geJu: string, isOverridden: boolean, originalGeJu: string } => {
   const hiddenStems = JIJANGAN[monthZhi]?.stems || [];
   
-  // Stems to check for revelation (Hour, Month, Year)
-  const externalStems = [allStems[0], allStems[2], allStems[3]];
+  // Stems to check for revelation (Hour, Month, Year - skip Hour if unknown)
+  const externalStems = isTimeUnknown ? [allStems[2], allStems[3]] : [allStems[0], allStems[2], allStems[3]];
   
   // Find which hidden stems are revealed
   const revealedStems = hiddenStems.filter(s => externalStems.includes(s));
@@ -146,7 +146,8 @@ export const determineStructure = (
   pillars: any[],
   strength: any,
   tenGodsRatio: Record<string, number>,
-  lang: Language
+  lang: Language,
+  isTimeUnknown?: boolean
 ) => {
   const dmElement = STEM_ELEMENTS[dayGan];
   const isYangGan = ['甲', '丙', '戊', '庚', '壬'].includes(dayGan);
@@ -174,7 +175,7 @@ export const determineStructure = (
     };
     
     // Guardrail: Check for clashing/controlling elements in stems (Purity check)
-    const externalStems = [stems[0], stems[2], stems[3]]; // Year, Month, Hour
+    const externalStems = isTimeUnknown ? [stems[2], stems[3]] : [stems[0], stems[2], stems[3]]; // Year, Month, Hour (Skip Hour if unknown)
     let isPure = true;
     
     externalStems.forEach(s => {
@@ -354,7 +355,7 @@ export const determineStructure = (
 };
 
 // 2. 십성비율 (Ten Gods Ratio)
-export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
+export const calculateTenGodsRatio = (pillars: any[], lang: Language, isTimeUnknown?: boolean) => {
   const counts: Record<string, number> = {
     'Mirror/Rival': 0,
     'Artist/Rebel': 0,
@@ -365,7 +366,8 @@ export const calculateTenGodsRatio = (pillars: any[], lang: Language) => {
 
   let total = 0;
 
-  pillars.forEach(p => {
+  pillars.forEach((p, idx) => {
+    if (isTimeUnknown && idx === 0) return; // Skip unknown hour
     const stemGod = p.stemKoreanName;
     const branchGod = p.branchKoreanName;
 
@@ -407,7 +409,8 @@ export const detectSpecialPatterns = (
   branches: string[],
   lang: string,
   elementRatios: Record<string, number> = {},
-  strength: any = {}
+  strength: any = {},
+  isTimeUnknown?: boolean
 ) => {
   const patterns: { 
     code: string; 
@@ -424,7 +427,7 @@ export const detectSpecialPatterns = (
     tooltipTextEn?: string;
   }[] = [];
 
-  if (stems.length !== 4 || branches.length !== 4) return patterns;
+  if (stems.length !== 4 || branches.length !== 4 || isTimeUnknown) return patterns;
 
   // 천원일기격 (天元一氣) / 천지동도격
   if (stems.every(s => s === stems[0])) {

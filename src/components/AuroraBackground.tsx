@@ -64,10 +64,10 @@ const AuroraBackground: React.FC = () => {
       </style>
 
       <div className="fluid-bg">
-        <div className="blob blob-1" style={{ animation: `fluid-wrap-1 ${isDark ? '11s' : '22s'} ease-in-out infinite` }} />
-        <div className="blob blob-2" style={{ animation: `fluid-wrap-2 ${isDark ? '15s' : '30s'} ease-in-out infinite` }} />
-        <div className="blob blob-3" style={{ animation: `fluid-wrap-3 ${isDark ? '13s' : '26s'} ease-in-out infinite` }} />
-        <div className="blob blob-4" style={{ animation: `fluid-wrap-4 ${isDark ? '18s' : '36s'} ease-in-out infinite` }} />
+        <div className="blob blob-1" style={{ animation: `fluid-wrap-1 ${isDark ? '11s' : '11s'} ease-in-out infinite` }} />
+        <div className="blob blob-2" style={{ animation: `fluid-wrap-2 ${isDark ? '15s' : '15s'} ease-in-out infinite` }} />
+        <div className="blob blob-3" style={{ animation: `fluid-wrap-3 ${isDark ? '13s' : '13s'} ease-in-out infinite` }} />
+        <div className="blob blob-4" style={{ animation: `fluid-wrap-4 ${isDark ? '18s' : '18s'} ease-in-out infinite` }} />
       </div>
     </div>
   );

@@ -957,6 +957,12 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
     const dayBranch = result.pillars[1].branch;
     const yearBranch = result.pillars[3]?.branch || '';
     
+    // Check if user has Jong-Jae (follow wealth) or Jae-Da-Shin-Yak (wealth-heavy weak) layout
+    const isJongJae = analysis.structureDetail?.title?.includes('종재') || analysis.structureDetail?.title?.includes('Jong-Jae') || analysis.structureDetail?.title?.includes('Follow Wealth');
+    const wealthRatio = (analysis.tenGodsRatio?.['재성(Maverick/Architect)'] as number) || (analysis.tenGodsRatio?.['재성 (Maverick/Architect)'] as number) || (analysis.tenGodsRatio?.['Maverick/Architect'] as number) || 0;
+    const dmStrength = result.analysis?.dayMasterStrength?.score || 50;
+    const isJaeDaShinYak = (dmStrength < 35 && wealthRatio >= 40) || (analysis.structureDetail?.logicNote?.includes('재다신약') || analysis.structureDetail?.marketingMessage?.includes('재다신약'));
+    
     const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || 'Wood';
     const ELEMENT_CYCLE = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
     const dmIndex = ELEMENT_CYCLE.indexOf(dmElement);
@@ -1053,7 +1059,36 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const isSikSang = sEl === sikSang || bEl === sikSang;
         const isPyeonGwan = (m.stem === '壬' && dayMaster === '丙') || (m.stem === '庚' && dayMaster === '甲') || (m.stem === '甲' && dayMaster === '戊') || (m.stem === '丙' && dayMaster === '庚') || (m.stem === '戊' && dayMaster === '壬') || (m.stem === '癸' && dayMaster === '丁') || (m.stem === '辛' && dayMaster === '乙') || (m.stem === '乙' && dayMaster === '己') || (m.stem === '丁' && dayMaster === '辛') || (m.stem === '己' && dayMaster === '癸'); // 7 Killings rough check on stem
 
-        if (isMale) {
+        const isYearlyDohwa = myDohwas.includes(seunBranch);
+        const isMonthlyDohwa = myDohwas.includes(m.branch);
+
+        if (isMale && (isJongJae || isJaeDaShinYak)) {
+            if (isSikSang) {
+                sc += 45;
+                reasonKO = `월운에 본인을 적극 표출해 주는 식상운(${m.stem === sikSang ? c(m.stem) : c(m.branch)})의 기운이 강력하게 흘러 본인의 연애 적극성과 매력 지수가 최고조에 달하는 대길의 타이밍이므로`;
+                reasonEN = `Monthly Expression energy (${m.stem === sikSang ? c(m.stem) : c(m.branch)}) arrives, significantly boosting your romantic drive, confidence, and attractive power to a maximum`;
+            } else if (sEl === wealth) {
+                sc += 35;
+                reasonKO = `월간에 천간 재성운(${c(m.stem)})이 직접 투출하여 첫눈에 시선을 강탈할 만큼 치명적으로 마음에 쏙 드는 사랑스러운 이성이 눈앞에 나타나는 길한 시기이므로`;
+                reasonEN = `Wealth energy emerges in the heavenly stem (${c(m.stem)}), predicting the dramatic appearance of a partner capturing your heart at first sight`;
+            } else if (isMonthlyDohwa) {
+                sc += 30;
+                reasonKO = `월지에 도화/홍염의 기분 좋은 기운(${c(m.branch)})이 일렁여 이성이 매력을 적극 인지하고 나에게 먼저 수동적으로 수줍게 다가올 기회가 확장되므로`;
+                reasonEN = `Dohwa/Hongyeom glamour (${c(m.branch)}) activates your branch, increasing romantic contexts where someone approaches you with interest first`;
+            } else if (sEl === controlsDm || bEl === controlsDm) {
+                sc += 25;
+                reasonKO = `중심을 채우는 진지한 관성(${sEl === controlsDm ? c(m.stem) : c(m.branch)})이 겉돌던 재성 에너지를 책임감과 윤리로 조절해주어 안정적인 연애와 서약을 깊이 그리게 되기 때문이므로`;
+                reasonEN = `Power energy (${sEl === controlsDm ? c(m.stem) : c(m.branch)}) boundaries your floating wealth, establishing a sincere and disciplined connection`;
+            } else if (bEl === wealth) {
+                sc += 20;
+                reasonKO = `월지에 현실적인 지지 재성운(${c(m.branch)})이 스며들어 일상 연애 기류에 소소하지만 흔들림 없는 친근감과 연정의 온기가 채워지는 달이기 때문이므로`;
+                reasonEN = `Wealth energy flows in the branches (${c(m.branch)}), gently sparking realistic and stable attraction in your daily environment`;
+            } else {
+                sc += 0;
+                reasonKO = `연애의 열기가 잠시 조율되는 기류이나 내실을 가다듬고 세련되게 매력을 충전시킬 수 있는 시기라`;
+                reasonEN = `Romance energy is quiet, perfect for focusing on self-improvement and preparing your magnetism`;
+            }
+        } else if (isMale) {
             if (sEl === wealth || bEl === wealth) { sc += 40; reasonKO = `월운에 ${c(m.stem)}${c(m.branch)}(${getRelationKO(sEl || bEl || wealth)})이 들어와`; reasonEN = `Monthly ${c(m.stem)}${c(m.branch)} (${getRelationEN(sEl || bEl || wealth)}) energy approaches`; }
             if (isSikSang) { sc += 20; reasonKO = `월간의 식상(${m.stem === sikSang ? c(m.stem) : c(m.branch)})이 매력을 밖으로 표출시켜주는 달이므로`; reasonEN = `Monthly Expression energy (${m.stem === sikSang ? c(m.stem) : c(m.branch)}) lets your charm shine outwards`; }
             if (sEl === controlsDm || bEl === controlsDm) { sc += 15; reasonKO = `책임감과 무게를 더하는 관성(${sEl === controlsDm ? c(m.stem) : c(m.branch)})의 텐션이 감도는 시기이므로`; reasonEN = `Monthly Power energy (${sEl === controlsDm ? c(m.stem) : c(m.branch)}) brings tension and responsibility`; }
@@ -1063,17 +1098,16 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
             if (sEl === wealth || bEl === wealth) { sc += 15; reasonKO = `현실적인 감각을 더하는 재성(${sEl === wealth ? c(m.stem) : c(m.branch)})의 텐션이 감도는 시기이므로`; reasonEN = `Monthly Wealth energy (${sEl === wealth ? c(m.stem) : c(m.branch)}) brings practical tension`; }
         }
 
-        const isYearlyDohwa = myDohwas.includes(seunBranch);
-        const isMonthlyDohwa = myDohwas.includes(m.branch);
-
-        if (isYearlyDohwa && isSikSang) {
-             sc += 40;
-             reasonKO = `세운의 도화(${c(seunBranch)})를 월운의 식상(${sEl === sikSang ? c(m.stem) : c(m.branch)})이 활짝 드러내어 매력이 표출되는 달이므로`;
-             reasonEN = `Yearly [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(seunBranch)}) is beautifully expressed by monthly Expression energy (${sEl === sikSang ? c(m.stem) : c(m.branch)})`;
-        } else if (isMonthlyDohwa) {
-             sc += 30; 
-             reasonKO = `잠재된 도화(${c(m.branch)}) 에너지를 직접 깨워 매력을 극대화하므로`;
-             reasonEN = `Latent [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(m.branch)}) energy is awakened`;
+        if (!(isMale && (isJongJae || isJaeDaShinYak))) {
+            if (isYearlyDohwa && isSikSang) {
+                 sc += 40;
+                 reasonKO = `세운의 도화(${c(seunBranch)})를 월운의 식상(${sEl === sikSang ? c(m.stem) : c(m.branch)})이 활짝 드러내어 매력이 표출되는 달이므로`;
+                 reasonEN = `Yearly [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(seunBranch)}) is beautifully expressed by monthly Expression energy (${sEl === sikSang ? c(m.stem) : c(m.branch)})`;
+            } else if (isMonthlyDohwa) {
+                 sc += 30; 
+                 reasonKO = `잠재된 도화(${c(m.branch)}) 에너지를 직접 깨워 매력을 극대화하므로`;
+                 reasonEN = `Latent [tooltip:Dohwa|도화살(Peach Blossom Star), 인기, 매력적인 기운을 의미합니다.|Peach Blossom Star, representing popularity, charm, and romantic attraction.] (${c(m.branch)}) energy is awakened`;
+            }
         }
 
         if(dayMaster === '辛' && (m.stem === '壬' || m.branch === '亥')) {
@@ -1241,6 +1275,25 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
     const baziMappingStems = { '甲': { element: 'Wood' }, '乙': { element: 'Wood' }, '丙': { element: 'Fire' }, '丁': { element: 'Fire' }, '戊': { element: 'Earth' }, '己': { element: 'Earth' }, '庚': { element: 'Metal' }, '辛': { element: 'Metal' }, '壬': { element: 'Water' }, '癸': { element: 'Water' } };
     const baziMappingBranches = { '子': { element: 'Water' }, '丑': { element: 'Earth' }, '寅': { element: 'Wood' }, '卯': { element: 'Wood' }, '辰': { element: 'Earth' }, '巳': { element: 'Fire' }, '午': { element: 'Fire' }, '未': { element: 'Earth' }, '申': { element: 'Metal' }, '酉': { element: 'Metal' }, '戌': { element: 'Earth' }, '亥': { element: 'Water' } };
 
+    // Check if user has Jong-Jae (follow wealth) or Jae-Da-Shin-Yak (wealth-heavy weak) layout
+    const isJongJae = analysis.structureDetail?.title?.includes('종재') || analysis.structureDetail?.title?.includes('Jong-Jae') || analysis.structureDetail?.title?.includes('Follow Wealth');
+    const wealthRatio = (analysis.tenGodsRatio?.['재성(Maverick/Architect)'] as number) || (analysis.tenGodsRatio?.['재성 (Maverick/Architect)'] as number) || (analysis.tenGodsRatio?.['Maverick/Architect'] as number) || 0;
+    const dmStrength = result.analysis?.dayMasterStrength?.score || 50;
+    const isJaeDaShinYak = (dmStrength < 35 && wealthRatio >= 40) || (analysis.structureDetail?.logicNote?.includes('재다신약') || analysis.structureDetail?.marketingMessage?.includes('재다신약'));
+
+    const checkBranchHap = (b: string, targetB: string) => {
+      if (!b || !targetB) return false;
+      const isHap = (b === '子' && targetB === '丑') || (b === '丑' && targetB === '子') ||
+                    (b === '寅' && targetB === '亥') || (b === '亥' && targetB === '寅') ||
+                    (b === '卯' && targetB === '戌') || (b === '戌' && targetB === '卯') ||
+                    (b === '辰' && targetB === '酉') || (b === '酉' && targetB === '辰') ||
+                    (b === '巳' && targetB === '申') || (b === '申' && targetB === '巳') ||
+                    (b === '午' && targetB === '未') || (b === '未' && targetB === '午');
+      const samHapGroups = [['亥', '卯', '未'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['申', '子', '辰']];
+      const isSamHap = samHapGroups.some(g => g.includes(b) && g.includes(targetB) && b !== targetB);
+      return isHap || isSamHap;
+    };
+
     const evaluateMarriageLuck = (luck) => {
       let score = 0;
       let reason = '';
@@ -1252,32 +1305,63 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       const formatKo = (el: string, title: string) => `[${elementColors[el]}:${{'Wood':'목(木)', 'Fire':'화(火)', 'Earth':'토(土)', 'Metal':'금(金)', 'Water':'수(水)'}[el] || el} ${title}]`;
       const formatEn = (el: string, title: string) => `[${elementColors[el]}:${el} (${title})]`;
 
-      if (isPowerHeavy && (sEl === reinforcesDm || bEl === reinforcesDm)) {
-        score += 150;
-        reason = lang === 'KO' ? 
-          `강력한 ${formatKo(reinforcesDm, '인성')}의 기운이 들어와 나를 짓누르던 관성(책임감/압박)을 안정적인 가정이라는 울타리로 비로소 승화시키는 해` :
-          `Strong ${formatEn(reinforcesDm, 'Resource')} energy enters, transforming crushing pressure into a stable family haven`;
-      } else if (!isMale && (sEl === controlsDm || bEl === controlsDm)) {
-        score += 100;
-        reason = lang === 'KO' ? `${formatKo(controlsDm, '관성')}(남성/안정의 책임)이 내 일간을 감싸 안는 해` : `Strong ${formatEn(controlsDm, 'Power')} energy connects deeply, bringing a significant other`;
-      } else if (isMale && (sEl === wealth || bEl === wealth)) {
-        score += 100;
-        reason = lang === 'KO' ? `${formatKo(wealth, '재성')}(여성/결실)이 직접 도래하여 인연의 결실을 맺는 해` : `${formatEn(wealth, 'Wealth/Spouse')} energy directly arrives for a fruitful connection`;
-      } else if (isMale && (sEl === sikSang || bEl === sikSang)) {
-        score += 80;
-        reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}(표현력)이 생재하여 이성을 향해 마음이 적극적으로 움직이는 해` : `Your ${formatEn(sikSang, 'Expression')} energy actively moves towards romance`;
-      } else if (!isMale && (sEl === sikSang || bEl === sikSang)) {
-        score += 80;
-        reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}의 발현으로 내 가족, 내 식구를 꾸리고자 하는 강한 열망이 생기는 시기` : `${formatEn(sikSang, 'Expression')} brings a strong desire to build your own family`;
-      } else if (sEl === controlsDm || bEl === reinforcesDm) {
-         score += 90;
-         reason = lang === 'KO' ? '사회적 책임과 안정적인 가정을 꾸리고자 하는 의지가 강해지는 해' : 'Strong will to take social responsibility and build a stable family';
-      } else if (luck.stem === dayMaster || luck.branch === dayBranch) {
-        score += 80;
-        reason = lang === 'KO' ? '일간/일지와 동기화되어 내 삶에 결정적인 배우자의 방이 열리는 시기' : 'Alignment with day pillar opens the door to marriage';
+      if (isMale && (isJongJae || isJaeDaShinYak)) {
+        if (sEl === controlsDm || bEl === controlsDm) {
+          score += 120;
+          reason = lang === 'KO' 
+            ? `대운이나 세운에서 ${formatKo(controlsDm, '관성')}(정관/편관)이 들어와 겉돌기만 하던 강한 재성을 책임감과 안정적인 가정의 고리로 완벽하게 묶어 두어 결혼의 기틀이 안착되는 해 (1순위 안착의 길년)`
+            : `Power energy (${formatEn(controlsDm, 'Power')}) enters, anchoring and stabilizing the floating wealth under a protective boundary of responsibility, laying a perfect foundation for marriage`;
+        } else if (checkBranchHap(luck.branch, dayBranch)) {
+          score += 100;
+          reason = lang === 'KO'
+            ? `세운에서 배우자 자리인 일지(${dayBranch})와 합(合)이 강력하게 작용하여 배우자 자리가 활성화되고 소중한 동반자 인연과 일생의 결합을 맺게 되는 해 (2순위 결합의 길년)`
+            : `Earthly branch forms a powerful harmony with your Day Branch (${dayBranch}), activating your spouse palace to unite deeply with a true partner`;
+        } else if (sEl === sikSang || bEl === sikSang) {
+          score += 90;
+          reason = lang === 'KO'
+            ? `${formatKo(sikSang, '식상')}운이 영리하게 생재(生財)하여 당신의 주도적인 매력과 적극성으로 혼담 및 결혼 과정을 위풍당당하게 진행하고 이끄는 해 (3순위 진행의 길년)`
+            : `Your Expression energy (${formatEn(sikSang, 'Expression')}) flows strongly, giving you the focus and proactive leadership to carry out the marriage process`;
+        } else if (sEl === wealth || bEl === wealth) {
+          score += 80;
+          reason = lang === 'KO'
+            ? `${formatKo(wealth, '재성')}(여성/결실)운이 도래했으나 사주 내 재성이 이미 매우 강하므로, 지나치게 서두르기보다는 내실 있는 결합을 차근차근 다져야 하는 조율의 해`
+            : `Wealth energy (${formatEn(wealth, 'Wealth')}) arrives, but since your wealth is already abundant, focus on steady paces rather than rushing`;
+        } else {
+          score += 40;
+          reason = lang === 'KO' ? '사랑의 기운이 비교적 고요하게 스쳐가며 준비와 안정을 다듬어 나가는 해' : 'A slower romantic flow requiring patience and inner strength';
+        }
       } else {
-        score += 30;
-        reason = lang === 'KO' ? '인연의 흐름이 잔잔하게 스쳐가는 시기' : 'A calm period of relationship flow';
+        if (isPowerHeavy && (sEl === reinforcesDm || bEl === reinforcesDm)) {
+          score += 150;
+          reason = lang === 'KO' ? 
+            `강력한 ${formatKo(reinforcesDm, '인성')}의 기운이 들어와 나를 짓누르던 관성(책임감/압박)을 안정적인 가정이라는 울타리로 비로소 승화시키는 해` :
+            `Strong ${formatEn(reinforcesDm, 'Resource')} energy enters, transforming crushing pressure into a stable family haven`;
+        } else if (!isFemale && (sEl === controlsDm || bEl === controlsDm)) {
+          // Adjust checks slightly for default cases
+          score += 95;
+          reason = lang === 'KO' ? `${formatKo(controlsDm, '관성')}(남성/안정의 책임)이 무게를 안착시키는 해` : `Strong ${formatEn(controlsDm, 'Power')} energy connects deeply, bringing responsibility`;
+        } else if (!isMale && (sEl === controlsDm || bEl === controlsDm)) {
+          score += 100;
+          reason = lang === 'KO' ? `${formatKo(controlsDm, '관성')}(남성/안정의 책임)이 내 일간을 감싸 안는 해` : `Strong ${formatEn(controlsDm, 'Power')} energy connects deeply, bringing a significant other`;
+        } else if (isMale && (sEl === wealth || bEl === wealth)) {
+          score += 100;
+          reason = lang === 'KO' ? `${formatKo(wealth, '재성')}(여성/결실)이 직접 도래하여 인연의 결실을 맺는 해` : `${formatEn(wealth, 'Wealth/Spouse')} energy directly arrives for a fruitful connection`;
+        } else if (isMale && (sEl === sikSang || bEl === sikSang)) {
+          score += 80;
+          reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}(표현력)이 생재하여 이성을 향해 마음이 적극적으로 움직이는 해` : `Your ${formatEn(sikSang, 'Expression')} energy actively moves towards romance`;
+        } else if (!isMale && (sEl === sikSang || bEl === sikSang)) {
+          score += 80;
+          reason = lang === 'KO' ? `${formatKo(sikSang, '식상')}의 발현으로 내 가족, 내 식구를 꾸리고자 하는 강한 열망이 생기는 시기` : `${formatEn(sikSang, 'Expression')} brings a strong desire to build your own family`;
+        } else if (sEl === controlsDm || bEl === reinforcesDm) {
+           score += 90;
+           reason = lang === 'KO' ? '사회적 책임과 안정적인 가정을 꾸리고자 하는 의지가 강해지는 해' : 'Strong will to take social responsibility and build a stable family';
+        } else if (luck.stem === dayMaster || luck.branch === dayBranch) {
+          score += 80;
+          reason = lang === 'KO' ? '일간/일지와 동기화되어 내 삶에 결정적인 배우자의 방이 열리는 시기' : 'Alignment with day pillar opens the door to marriage';
+        } else {
+          score += 30;
+          reason = lang === 'KO' ? '인연의 흐름이 잔잔하게 스쳐가는 시기' : 'A calm period of relationship flow';
+        }
       }
 
       const monthlyData = getMonthlyLuckForYear(luck.year).map(m => {
