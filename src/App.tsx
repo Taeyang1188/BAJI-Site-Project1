@@ -84,6 +84,7 @@ const TimeInput = ({
   onUnknownChange: (u: boolean) => void,
   lang: Language 
 }) => {
+  const { theme } = useTheme();
   // value is HH:MM (24h)
   const [hour24, minute24] = value.split(':');
   const h24 = parseInt(hour24);
@@ -163,7 +164,7 @@ const TimeInput = ({
 
   return (
     <div className="flex gap-2 items-center w-full">
-      <div className={`flex-1 min-w-0 flex items-center bg-white/5 border rounded-2xl transition-all h-[44px] ${isUnknown ? 'border-white/5 opacity-50' : 'border-white/10 focus-within:border-neon-pink'}`}>
+      <div className={`flex-1 min-w-0 flex items-center border rounded-2xl transition-all h-[44px] ${isUnknown ? (theme === 'light' ? 'border-transparent opacity-50 bg-slate-100/50' : 'border-white/5 opacity-50 bg-white/5') : (theme === 'light' ? 'border-slate-200/80 bg-slate-100/80 focus-within:border-neon-pink' : 'border-white/10 bg-white/5 focus-within:border-neon-pink')}`}>
         <Clock className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
         
         <input 
@@ -181,7 +182,7 @@ const TimeInput = ({
             const padded = inputValue.padEnd(4, '0');
             handleInputChange(padded);
           }}
-          className="flex-1 min-w-0 bg-transparent px-3 h-full text-white tracking-[0.1em] font-mono focus:outline-none placeholder:text-white/20"
+          className={`flex-1 min-w-0 bg-transparent px-3 h-full tracking-[0.1em] font-mono focus:outline-none ${theme === 'light' ? 'text-slate-800 placeholder:text-slate-400 font-semibold' : 'text-white placeholder:text-white/20'}`}
           placeholder="00 : 00"
         />
 
@@ -196,7 +197,7 @@ const TimeInput = ({
       </div>
       <button
         onClick={() => onUnknownChange(!isUnknown)}
-        className={`shrink-0 px-3 flex items-center justify-center rounded-2xl text-xs font-bold transition-all whitespace-nowrap border h-[44px] ${isUnknown ? 'bg-neon-pink text-white border-neon-pink shadow-[0_0_15px_rgba(255,0,122,0.4)]' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/80'}`}
+        className={`shrink-0 px-3 flex items-center justify-center rounded-2xl text-xs font-bold transition-all whitespace-nowrap border h-[44px] ${isUnknown ? 'bg-neon-pink text-white border-neon-pink shadow-[0_0_15px_rgba(255,0,122,0.4)]' : (theme === 'light' ? 'bg-slate-100/80 border-slate-200/80 text-slate-500 hover:text-slate-800' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/80')}`}
       >
         {lang === 'KO' ? '모름' : 'Unknown'}
       </button>
@@ -716,14 +717,18 @@ export default function App() {
                     />
 
                     {/* Name */}
-                    <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all h-[44px]">
+                    <div className={`flex items-center rounded-2xl focus-within:border-neon-pink border transition-all h-[44px] ${
+                      theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                    }`}>
                       <User className="ml-4 w-4 h-4 text-neon-pink shrink-0" />
                       <input 
                         type="text"
                         placeholder={t.input.name}
                         value={userInput.name}
                         onChange={(e) => setUserInput({ ...userInput, name: e.target.value })}
-                        className="flex-1 bg-transparent px-3 py-1 h-full text-base focus:outline-none placeholder:text-white/20 min-w-0"
+                        className={`flex-1 bg-transparent px-3 py-1 h-full text-base focus:outline-none min-w-0 ${
+                          theme === 'light' ? 'text-slate-800 placeholder:text-slate-400 font-medium' : 'text-white placeholder:text-white/20'
+                        }`}
                       />
                     </div>
 
@@ -732,7 +737,9 @@ export default function App() {
                       <>
                         {/* Date Row (KO) */}
                         <div className="flex gap-2 items-center">
-                          <div className="flex-1 flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all min-w-0 h-[44px]">
+                          <div className={`flex-1 flex items-center rounded-2xl focus-within:border-neon-pink border transition-all min-w-0 h-[44px] ${
+                            theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                          }`}>
                             <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                             <input 
                               type="date"
@@ -740,19 +747,23 @@ export default function App() {
                               required
                               value={userInput.birthDate}
                               onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                              className="flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert min-w-0 m-0"
+                              className={`flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all min-w-0 m-0 ${
+                                theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
+                              }`}
                             />
                           </div>
-                          <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 h-[44px] items-center shrink-0">
+                          <div className={`flex rounded-2xl p-1 gap-1 h-[44px] items-center shrink-0 border ${
+                            theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                          }`}>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                              className={`flex-1 h-full px-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                              className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
                             >
                               {t.input.solar}
                             </button>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                              className={`flex-1 h-full px-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                              className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
                             >
                               {t.input.lunar}
                             </button>
@@ -770,7 +781,9 @@ export default function App() {
                     ) : (
                       /* Date & Time Section (EN) */
                       <>
-                        <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all h-[44px]">
+                        <div className={`flex items-center rounded-2xl focus-within:border-neon-pink border transition-all h-[44px] ${
+                          theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                        }`}>
                           <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                           <input 
                             type="date"
@@ -778,7 +791,9 @@ export default function App() {
                             required
                             value={userInput.birthDate}
                             onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                            className="flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert min-w-0"
+                            className={`flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all min-w-0 ${
+                              theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
+                            }`}
                           />
                         </div>
                         <TimeInput 
@@ -792,33 +807,35 @@ export default function App() {
                     )}
 
                     {/* Gender Selection */}
-                    <div className="flex items-center gap-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl">
+                    <div className={`flex items-center gap-2 p-1.5 border rounded-2xl ${
+                      theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                    }`}>
                       <div className="flex items-center gap-1.5 pl-2 border-r border-white/10 pr-2">
                         <User className="w-3.5 h-3.5 text-neon-pink" />
-                        <span className="text-[10px] sm:text-xs font-bold tracking-widest text-white/40 uppercase whitespace-nowrap">{t.input.gender}</span>
+                        <span className={`text-[10px] sm:text-xs font-bold tracking-widest uppercase whitespace-nowrap ${theme === 'light' ? 'text-slate-400' : 'text-white/40'}`}>{t.input.gender}</span>
                       </div>
                       <HorizontalScrollArea className="flex flex-1 items-center gap-1">
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'male' })}
-                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'male' ? 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.3)]' : (theme === 'light' ? 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/40' : 'text-white/40 hover:text-white/60')}`}
                         >
                           {t.input.male}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'female' })}
-                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'female' ? 'bg-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'female' ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.3)]' : (theme === 'light' ? 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/40' : 'text-white/40 hover:text-white/60')}`}
                         >
                           {t.input.female}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'non-binary' })}
-                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'non-binary' ? 'bg-gradient-to-r from-neon-cyan to-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.3)]' : (theme === 'light' ? 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/40' : 'text-white/40 hover:text-white/60')}`}
                         >
                           {t.input.nonBinary}
                         </button>
                         <button 
                           onClick={() => setUserInput({ ...userInput, gender: 'prefer-not-to-tell' })}
-                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : 'text-white/40 hover:text-white/60'}`}
+                          className={`px-2.5 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.gender === 'prefer-not-to-tell' ? 'bg-red-900 text-white' : (theme === 'light' ? 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/40' : 'text-white/40 hover:text-white/60')}`}
                         >
                           {t.input.preferNotToTell}
                         </button>
@@ -826,7 +843,9 @@ export default function App() {
                     </div>
 
                     {/* City */}
-                    <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl focus-within:border-neon-pink transition-all relative">
+                    <div className={`flex items-center rounded-2xl focus-within:border-neon-pink border transition-all relative ${
+                      theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+                    }`}>
                       <Globe className="ml-4 w-4 h-4 text-neon-pink shrink-0" />
                       <input 
                         ref={inputRef}
@@ -834,7 +853,9 @@ export default function App() {
                         placeholder={t.input.city}
                         value={userInput.city}
                         onChange={(e) => setUserInput({ ...userInput, city: e.target.value })}
-                        className="flex-1 bg-transparent py-2.5 pl-3 pr-4 text-base focus:outline-none placeholder:text-white/20 min-w-0"
+                        className={`flex-1 bg-transparent py-2.5 pl-3 pr-4 text-base focus:outline-none min-w-0 ${
+                          theme === 'light' ? 'text-slate-800 placeholder:text-slate-400 font-medium' : 'text-white placeholder:text-white/20'
+                        }`}
                       />
                       <AnimatePresence>
                         {isLocationSynced && (
@@ -851,20 +872,22 @@ export default function App() {
                     </div>
 
                     <div className="relative flex flex-col gap-1.5 mt-2">
-                       <label className="text-xs text-white/50 pl-2 uppercase font-mono">{lang === 'KO' ? '사회적 환경 (선택)' : 'Social Context (Optional)'}</label>
+                       <label className={`text-xs pl-2 uppercase font-mono ${theme === 'light' ? 'text-slate-500' : 'text-white/50'}`}>{lang === 'KO' ? '사회적 환경 (선택)' : 'Social Context (Optional)'}</label>
                        <select 
                           value={userInput.socialContext || 'none'}
                           onChange={(e) => setUserInput({ ...userInput, socialContext: e.target.value as any })}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-4 text-base focus:outline-none focus:border-neon-pink transition-all text-white/80 appearance-none"
+                          className={`w-full border rounded-2xl py-2.5 px-4 text-base focus:outline-none focus:border-neon-pink transition-all appearance-none ${
+                            theme === 'light' ? 'bg-slate-100/80 border-slate-200/80 text-slate-800 font-medium' : 'bg-white/5 border-white/10 text-white/80'
+                          }`}
                        >
-                         <option value="none" className="bg-black text-white">{lang === 'KO' ? '선택 안함' : 'None'}</option>
-                         <option value="military_public" className="bg-black text-white">{lang === 'KO' ? '군인/경찰/공무원' : 'Military/Public Service'}</option>
-                         <option value="corporate" className="bg-black text-white">{lang === 'KO' ? '일반 직장인' : 'Corporate Employee'}</option>
-                         <option value="business_freelance" className="bg-black text-white">{lang === 'KO' ? '사업/프리랜서' : 'Business/Freelance'}</option>
-                         <option value="professional_it" className="bg-black text-white">{lang === 'KO' ? '전문직/IT' : 'Professional/IT'}</option>
-                         <option value="education" className="bg-black text-white">{lang === 'KO' ? '교육/교직' : 'Education/Teaching'}</option>
-                         <option value="arts_creative" className="bg-black text-white">{lang === 'KO' ? '예술/창작' : 'Arts/Creative'}</option>
-                         <option value="student" className="bg-black text-white">{lang === 'KO' ? '학생/취업준비' : 'Student/Job Seeker'}</option>
+                         <option value="none" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '선택 안함' : 'None'}</option>
+                         <option value="military_public" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '군인/경찰/공무원' : 'Military/Public Service'}</option>
+                         <option value="corporate" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '일반 직장인' : 'Corporate Employee'}</option>
+                         <option value="business_freelance" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '사업/프리랜서' : 'Business/Freelance'}</option>
+                         <option value="professional_it" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '전문직/IT' : 'Professional/IT'}</option>
+                         <option value="education" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '교육/교직' : 'Education/Teaching'}</option>
+                         <option value="arts_creative" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '예술/창작' : 'Arts/Creative'}</option>
+                         <option value="student" className={theme === 'light' ? 'bg-white text-slate-800' : 'bg-black text-white'}>{lang === 'KO' ? '학생/취업준비' : 'Student/Job Seeker'}</option>
                        </select>
                     </div>
                   </div>

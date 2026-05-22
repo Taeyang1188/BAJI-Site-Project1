@@ -74,7 +74,13 @@ const HorizontalDial = ({
       className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30 transform-gpu"
     >
       {items.map((item, index) => {
-        const itemRotation = index * anglePerItem;
+        // Dynamic positional angle calculation to avoid physical overlaps 
+        const itemRotation = useTransform(smoothValue, (v) => {
+          let diff = index - (v % items.length);
+          if (diff > items.length / 2) diff -= items.length;
+          if (diff < -items.length / 2) diff += items.length;
+          return (v + diff) * anglePerItem;
+        });
         
         // Calculate visual properties based on distance from center
         // We use modular math to handle the infinite circularity
@@ -103,7 +109,18 @@ const HorizontalDial = ({
 
         // Counter-rotation to keep the item upright
         const selfRotation = useTransform(smoothValue, (v) => {
-           return v * anglePerItem - itemRotation;
+           let diff = index - (v % items.length);
+           if (diff > items.length / 2) diff -= items.length;
+           if (diff < -items.length / 2) diff += items.length;
+           return -diff * anglePerItem;
+        });
+
+        // Hide elements that are not in the active visible view range to 100% prevent rendering overlaps and boost performance
+        const display = useTransform(smoothValue, (v) => {
+           let diff = index - (v % items.length);
+           if (diff > items.length / 2) diff -= items.length;
+           if (diff < -items.length / 2) diff += items.length;
+           return Math.abs(diff) > (visibleCount / 2) ? 'none' : 'flex';
         });
 
         return (
@@ -115,7 +132,8 @@ const HorizontalDial = ({
               bottom: `-${radius}px`,
               transformOrigin: 'center center',
               rotate: itemRotation,
-              opacity
+              opacity,
+              display
             }}
           >
             <motion.div 
