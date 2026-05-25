@@ -2796,8 +2796,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             let rootTypeKo = "";
                             let origRootTextKo = "";
                             if (pillarRootInfo && dmRootInfo) {
-                              rootTypeKo = " [일간·천간 이중 결속]";
-                              origRootTextKo = `원래는 천간 [${pillar.stem}] 및 일간 [${dayMaster}]과 이중 통근/상생 결속되어 수호하는 중심 역할을 했습니다.`;
+                              if (pillar.title === 'Day') {
+                                rootTypeKo = " [일간 결속]";
+                                origRootTextKo = `원래는 본신인 일간 [${dayMaster}]과 직접 통근/상생 결속되어 수호하는 중심 역할을 했습니다.`;
+                              } else {
+                                rootTypeKo = " [일간·천간 이중 결속]";
+                                origRootTextKo = `원래는 천간 [${pillar.stem}] 및 일간 [${dayMaster}]과 이중 통근/상생 결속되어 수호하는 중심 역할을 했습니다.`;
+                              }
                             } else if (hasPillarRoot || allRootedStems.length > 0) {
                               rootTypeKo = ` [다중 연계 파괴]`;
                               origRootTextKo = `천간의 에너지를 강하게 지지해주던 뿌리였습니다.`;
@@ -2814,8 +2819,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             let rootTypeKo = "";
                             let origRootTextKo = "";
                             if (pillarRootInfo && dmRootInfo) {
-                              rootTypeKo = " [일간·천간 이중 결속]";
-                              origRootTextKo = `천간 [${pillar.stem}] 및 일간 [${dayMaster}]과 강력한 이중 수호 결속을 형성하고 있습니다.`;
+                              if (pillar.title === 'Day') {
+                                rootTypeKo = " [일간 결속]";
+                                origRootTextKo = `본신인 일간 [${dayMaster}]과 직접 강력한 수호 결속을 형성하고 있습니다.`;
+                              } else {
+                                rootTypeKo = " [일간·천간 이중 결속]";
+                                origRootTextKo = `천간 [${pillar.stem}] 및 일간 [${dayMaster}]과 강력한 이중 수호 결속을 형성하고 있습니다.`;
+                              }
                             } else if (hasPillarRoot || allRootedStems.length > 0) {
                               rootTypeKo = ` [다중 연계 불안정]`;
                               origRootTextKo = `천간에 연결된 소중한 비옥한 뿌리입니다.`;
@@ -2858,8 +2868,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             let rootTypeEn = "";
                             let origRootTextEn = "";
                             if (pillarRootInfo && dmRootInfo) {
-                              rootTypeEn = " [Double Guard]";
-                              origRootTextEn = `Originally established a powerful double connection protecting both stem [${pillar.stem}] and day master [${dayMaster}].`;
+                              if (pillar.title === 'Day') {
+                                rootTypeEn = " [Day Master Guard]";
+                                origRootTextEn = `Originally established a powerful direct protective connection to the Day Master [${dayMaster}].`;
+                              } else {
+                                rootTypeEn = " [Double Guard]";
+                                origRootTextEn = `Originally established a powerful double connection protecting both stem [${pillar.stem}] and day master [${dayMaster}].`;
+                              }
                             } else if (hasPillarRoot || allRootedStems.length > 0) {
                               rootTypeEn = ` [Multi-Root Shattered]`;
                               origRootTextEn = `Originally rooted directly into top stems.`;
@@ -2876,8 +2891,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             let rootTypeEn = "";
                             let origRootTextEn = "";
                             if (pillarRootInfo && dmRootInfo) {
-                              rootTypeEn = " [Double Guard]";
-                              origRootTextEn = `Forms a dual protective connection to both stem [${pillar.stem}] and day master [${dayMaster}].`;
+                              if (pillar.title === 'Day') {
+                                rootTypeEn = " [Day Master Guard]";
+                                origRootTextEn = `Forms a protective connection to Day Master [${dayMaster}].`;
+                              } else {
+                                rootTypeEn = " [Double Guard]";
+                                origRootTextEn = `Forms a dual protective connection to both stem [${pillar.stem}] and day master [${dayMaster}].`;
+                              }
                             } else if (hasPillarRoot || allRootedStems.length > 0) {
                               rootTypeEn = ` [Multi-Root Twisted]`;
                               origRootTextEn = `An important root for top stems, currently unstable.`;
