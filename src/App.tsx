@@ -206,6 +206,124 @@ const TimeInput = ({
   );
 };
 
+const DateInput = ({
+  value,
+  onChange,
+  lang,
+  calendarType,
+  onCalendarTypeChange,
+  theme,
+  t
+}: {
+  value: string,
+  onChange: (v: string) => void,
+  lang: Language,
+  calendarType: 'solar' | 'lunar',
+  onCalendarTypeChange: (type: 'solar' | 'lunar') => void,
+  theme: string,
+  t: any
+}) => {
+  const getDisplayValue = (val: string) => {
+    if (!val) return '';
+    return val.replace(/\D/g, '').slice(0, 8);
+  };
+
+  const [inputValue, setInputValue] = useState(getDisplayValue(value));
+
+  useEffect(() => {
+    setInputValue(getDisplayValue(value));
+  }, [value]);
+
+  const handleInputChange = (val: string) => {
+    const clean = val.replace(/\D/g, '').slice(0, 8);
+    setInputValue(clean);
+
+    if (clean.length === 8) {
+      const y = clean.slice(0, 4);
+      let m = clean.slice(4, 6);
+      let d = clean.slice(6, 8);
+      
+      let intM = parseInt(m);
+      if (intM < 1) intM = 1;
+      if (intM > 12) intM = 12;
+      m = intM.toString().padStart(2, '0');
+
+      let intD = parseInt(d);
+      if (intD < 1) intD = 1;
+      if (intD > 31) intD = 31;
+      d = intD.toString().padStart(2, '0');
+
+      onChange(`${y}-${m}-${d}`);
+    }
+  };
+
+  const displayString = useMemo(() => {
+    if (!inputValue) return '';
+    const y = inputValue.slice(0, 4);
+    const m = inputValue.slice(4, 6);
+    const d = inputValue.slice(6, 8);
+    
+    if (inputValue.length <= 4) {
+      return y;
+    } else if (inputValue.length <= 6) {
+      return `${y} . ${m}`;
+    } else {
+      return `${y} . ${m} . ${d}`;
+    }
+  }, [inputValue]);
+
+  return (
+    <div className="flex gap-2 items-center w-full">
+      <div className={`flex-1 min-w-0 flex items-center border rounded-2xl transition-all h-[44px] ${
+        theme === 'light' 
+          ? 'border-slate-200/80 bg-slate-100/80 focus-within:border-neon-pink' 
+          : 'border-white/10 bg-white/5 focus-within:border-neon-pink'
+      }`}>
+        <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
+        
+        <input 
+          type="text"
+          inputMode="numeric"
+          value={displayString}
+          onChange={(e) => handleInputChange(e.target.value)}
+          placeholder="YYYY . MM . DD"
+          onFocus={(e) => e.target.select()}
+          onBlur={() => {
+            if (inputValue.length > 0 && inputValue.length < 8) {
+              const padded = inputValue.padEnd(8, '1');
+              handleInputChange(padded);
+            }
+          }}
+          className={`flex-1 min-w-0 bg-transparent px-3 h-full tracking-[0.1em] font-mono focus:outline-none ${
+            theme === 'light' ? 'text-slate-800 placeholder:text-slate-400 font-semibold text-base' : 'text-white placeholder:text-white/20 text-base'
+          }`}
+        />
+      </div>
+
+      {lang === 'KO' && (
+        <div className={`flex rounded-2xl p-1 gap-1 h-[44px] items-center shrink-0 border ${
+          theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
+        }`}>
+          <button 
+            onClick={() => onCalendarTypeChange('solar')}
+            type="button"
+            className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!calendarType || calendarType === 'solar') ? 'bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
+          >
+            {t.input.solar}
+          </button>
+          <button 
+            type="button"
+            onClick={() => onCalendarTypeChange('lunar')}
+            className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${calendarType === 'lunar' ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,122,0.4)]' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
+          >
+            {t.input.lunar}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 declare global {
   interface Window {
     google: any;
@@ -749,39 +867,15 @@ export default function App() {
                     {lang === 'KO' ? (
                       <>
                         {/* Date Row (KO) */}
-                        <div className="flex gap-1.5 sm:gap-2 items-center">
-                          <div className={`flex-1 flex items-center rounded-2xl focus-within:border-neon-pink border transition-all min-w-0 h-[44px] ${
-                            theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
-                          }`}>
-                            <Calendar className="ml-2.5 sm:ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
-                            <input 
-                              type="date"
-                              max="9999-12-31"
-                              required
-                              value={userInput.birthDate}
-                              onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                              className={`flex-1 bg-transparent pl-1.5 sm:pl-3 pr-2 sm:pr-3 h-full appearance-none text-sm sm:text-base font-mono tracking-normal sm:tracking-wide focus:outline-none transition-all min-w-0 m-0 ${
-                                theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
-                              }`}
-                            />
-                          </div>
-                          <div className={`flex rounded-2xl p-1 gap-0.5 sm:gap-1 h-[44px] items-center shrink-0 border ${
-                            theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
-                          }`}>
-                            <button 
-                              onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                              className={`flex-1 h-full px-2 sm:px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
-                            >
-                              {t.input.solar}
-                            </button>
-                            <button 
-                              onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                              className={`flex-1 h-full px-2 sm:px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
-                            >
-                              {t.input.lunar}
-                            </button>
-                          </div>
-                        </div>
+                        <DateInput 
+                          value={userInput.birthDate}
+                          onChange={(v) => setUserInput({ ...userInput, birthDate: v })}
+                          lang={lang}
+                          calendarType={userInput.calendarType || 'solar'}
+                          onCalendarTypeChange={(type) => setUserInput({ ...userInput, calendarType: type })}
+                          theme={theme}
+                          t={t}
+                        />
                         {/* Time Row (KO) */}
                         <TimeInput 
                           value={userInput.birthTime}
@@ -794,21 +888,15 @@ export default function App() {
                     ) : (
                       /* Date & Time Section (EN) */
                       <>
-                        <div className={`flex items-center rounded-2xl focus-within:border-neon-pink border transition-all h-[44px] ${
-                          theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
-                        }`}>
-                          <Calendar className="ml-2.5 sm:ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
-                          <input 
-                            type="date"
-                            max="9999-12-31"
-                            required
-                            value={userInput.birthDate}
-                            onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                            className={`flex-1 bg-transparent px-2 sm:px-3 h-full appearance-none text-sm sm:text-base font-mono tracking-normal sm:tracking-wide focus:outline-none transition-all min-w-0 ${
-                              theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
-                            }`}
-                          />
-                        </div>
+                        <DateInput 
+                          value={userInput.birthDate}
+                          onChange={(v) => setUserInput({ ...userInput, birthDate: v })}
+                          lang={lang}
+                          calendarType={userInput.calendarType || 'solar'}
+                          onCalendarTypeChange={(type) => setUserInput({ ...userInput, calendarType: type })}
+                          theme={theme}
+                          t={t}
+                        />
                         <TimeInput 
                           value={userInput.birthTime}
                           isUnknown={userInput.isTimeUnknown}
