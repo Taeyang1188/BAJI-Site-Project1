@@ -1172,57 +1172,8 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
     return null;
   };
 
-  // 2. 특수 이미지 격국 (Image Logic)
+  // 2. 특수 이미지 격국 (Image Logic) - 병적 불균형(화토중탁, 수화상전)만 핵심 격국 재판정으로 유지하고, 귀격들(목화통명, 금수쌍청 등)은 특정격국과 조화하기 위해 스페셜 패턴으로만 분리
   const checkImage = () => {
-    // 금수쌍청
-    if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '亥', '子'].includes(monthZhi)) {
-      if ((ratios?.['Metal'] || 0) + (ratios?.['Water'] || 0) >= 70) {
-        const isDirty = (ratios?.['Earth'] || 0) > 10 || (ratios?.['Fire'] || 0) > 15;
-        return {
-          name: '금수쌍청',
-          nameEn: 'Metal-Water Purity',
-          category: 'Image',
-          mainElement: 'Water',
-          confidence: isDirty ? 60 : 80,
-          isDirty,
-          description: "금과 수의 기운이 맑고 깨끗한 격국.",
-          enDescription: "A structure where Metal and Water energies are clear and pure."
-        };
-      }
-    }
-    // 목화통명
-    if (['甲', '乙'].includes(dayMaster) && ['寅', '卯', '辰', '巳', '午'].includes(monthZhi)) {
-      if ((ratios?.['Wood'] || 0) + (ratios?.['Fire'] || 0) >= 60) {
-        const isDirty = (ratios?.['Water'] || 0) > 25 || (ratios?.['Metal'] || 0) > 20;
-        return {
-          name: '목화통명',
-          nameEn: 'Wood-Fire Brilliance',
-          category: 'Image',
-          mainElement: 'Fire',
-          confidence: isDirty ? 60 : 80,
-          isDirty,
-          description: "나무가 불을 만나 밝게 빛나는 총명한 격국.",
-          enDescription: "A brilliant structure where Wood meets Fire and shines brightly."
-        };
-      }
-    }
-    // 수목청화
-    if (['壬', '癸'].includes(dayMaster) && ['亥', '子', '丑', '寅', '卯'].includes(monthZhi)) {
-      if ((ratios?.['Water'] || 0) >= 30 && (ratios?.['Wood'] || 0) >= 15 && ((ratios?.['Water'] || 0) + (ratios?.['Wood'] || 0) >= 60)) {
-        const isDirty = (ratios?.['Earth'] || 0) > 20 || (ratios?.['Metal'] || 0) > 30;
-        return {
-          name: '수목청화',
-          nameEn: 'Water-Wood Purity',
-          category: 'Image',
-          mainElement: 'Wood',
-          confidence: isDirty ? 60 : 80,
-          isDirty,
-          description: "물과 나무가 어우러져 맑고 화사한 격국.",
-          enDescription: "A clear and radiant structure where Water and Wood harmonize."
-        };
-      }
-    }
-    
     // 수화상전 (수화기제/상쟁)
     if (['壬', '癸', '丙', '丁'].includes(dayMaster)) {
       const waterScore = ratios?.['Water'] || 0;
@@ -1242,22 +1193,6 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
       }
     }
 
-    // 금백수청
-    if (['庚', '辛'].includes(dayMaster) && ['申', '酉', '戌', '亥', '子'].includes(monthZhi)) {
-      if ((ratios?.['Metal'] || 0) >= 40 && (ratios?.['Water'] || 0) >= 30) {
-        const isDirty = (ratios?.['Earth'] || 0) > 10 || (ratios?.['Fire'] || 0) > 15;
-        return {
-          name: '금백수청',
-          nameEn: 'Metal-White Water-Clear',
-          category: 'Image',
-          mainElement: 'Water',
-          confidence: isDirty ? 60 : 85,
-          isDirty,
-          description: "금은 하얗고 물은 맑으니 고결하고 깨끗한 격국.",
-          enDescription: "A noble and clean structure where Metal is white and Water is clear."
-        };
-      }
-    }
     // 화토중탁
     if (['丙', '丁', '戊', '己'].includes(dayMaster) && (monthElement === 'Fire' || ['辰', '戌', '丑', '未'].includes(monthZhi))) {
       // Strict filter for Fire-Earth Turbid

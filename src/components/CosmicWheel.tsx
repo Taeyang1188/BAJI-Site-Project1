@@ -64,6 +64,16 @@ const HorizontalDial = ({
     return item.imgUrl;
   };
 
+  // Render-time calculation to only build DOM nodes for items inside the active visibility viewport
+  const visibleItems = useMemo(() => {
+    return items.map((item, index) => {
+      let diff = index - (targetValue % items.length);
+      if (diff > items.length / 2) diff -= items.length;
+      if (diff < -items.length / 2) diff += items.length;
+      return { item, index, diff };
+    }).filter(x => Math.abs(x.diff) <= Math.ceil(visibleCount / 2) + 1); // added a small 1-item margin buffer for smooth spinning edge enter/exits
+  }, [items, targetValue, visibleCount]);
+
   // Optimization: Instead of re-rendering every frame with useState,
   // we rotate the entire container and counter-rotate the items using motion values.
   const containerRotation = useTransform(smoothValue, (v) => v * -anglePerItem);
@@ -73,7 +83,7 @@ const HorizontalDial = ({
       style={{ rotate: containerRotation }}
       className="absolute bottom-[-60px] sm:bottom-[-40px] left-1/2 w-0 h-0 flex items-center justify-center z-30 transform-gpu"
     >
-      {items.map((item, index) => {
+      {visibleItems.map(({ item, index }) => {
         // Dynamic positional angle calculation to avoid physical overlaps 
         const itemRotation = useTransform(smoothValue, (v) => {
           let diff = index - (v % items.length);
@@ -104,7 +114,9 @@ const HorizontalDial = ({
           let diff = index - (v % items.length);
           if (diff > items.length / 2) diff -= items.length;
           if (diff < -items.length / 2) diff += items.length;
-          return `blur(${Math.abs(diff) * 1.5}px)`;
+          // Safari-friendly Blur: Keep the blur maxed tightly to 3px to avoid massive layer paints
+          const b = Math.min(3, Math.abs(diff) * 0.8);
+          return b === 0 ? 'none' : `blur(${b}px)`;
         });
 
         // Counter-rotation to keep the item upright

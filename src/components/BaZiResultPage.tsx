@@ -949,7 +949,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     const { geJu, yongShen, structureDetail } = result.analysis;
     if (structureDetail) {
       if (lang === 'KO') {
-        return `${structureDetail.title} (${structureDetail.category === 'Standard' ? '내격' : '종격'})으로 태어났어. ${structureDetail.marketingMessage} ${yongShen}을 삶의 핵심 에너지로 사용해.`;
+        let categoryName = '종격';
+        if (structureDetail.category === 'Standard') categoryName = '내격';
+        else if (structureDetail.category === 'Image') categoryName = '특수격';
+        else if (structureDetail.category === 'Monarch') categoryName = '전왕격';
+        return `${structureDetail.title} (${categoryName})으로 태어났어. ${structureDetail.marketingMessage} ${yongShen}을 삶의 핵심 에너지로 사용해.`;
       }
       return `Born with ${structureDetail.enTitle} (${structureDetail.category} Alignment). ${structureDetail.enMarketingMessage} Utilizing ${yongShen} as your primary cosmic driver.`;
     }
@@ -3530,7 +3534,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   </span>
                                   {result.analysis.structureDetail && (
                                     <span className="text-[10px] text-neon-pink/70 font-medium uppercase tracking-wider">
-                                      {result.analysis.structureDetail.category === 'Standard' ? (lang === 'KO' ? '내격' : 'Standard') : (lang === 'KO' ? '종격/전왕격' : 'Special')}
+                                      {(() => {
+                                        const cat = result.analysis.structureDetail.category;
+                                        if (cat === 'Standard') return lang === 'KO' ? '내격' : 'Standard';
+                                        if (cat === 'Image') return lang === 'KO' ? '특수격' : 'Special';
+                                        if (cat === 'Monarch') return lang === 'KO' ? '전왕격' : 'Monarch';
+                                        return lang === 'KO' ? '종격' : 'Adaptive';
+                                      })()}
                                     </span>
                                   )}
                                 </div>

@@ -583,62 +583,154 @@ export const detectSpecialPatterns = (
     });
   }
 
-  // 2. 목화통명 (木火通明)
-  // 일간이 목(甲, 乙)이면서 인접한 천간(시간 stems[0] 또는 월간 stems[2])에 화(丙, 丁)가 뜨거나 주위 지지(시간, 일지, 월지)에 강력한 화(巳, 午)가 박혀야 함 (또는 반대)
+  // 2. 목화통명 (木火通明) - 고도의 엄밀한 고전 정론 기준
   let isMokhwaAdjacent = false;
+  let mokhwaType = "";
+  
   if (['甲', '乙'].includes(dayMaster)) {
-    const hasAdjacentFireStem = ['丙', '丁'].includes(stems[0]) || ['丙', '丁'].includes(stems[2]);
-    const hasNearbyFireBranch = ['巳', '午'].includes(branches[0]) || ['巳', '午'].includes(branches[1]) || ['巳', '午'].includes(branches[2]);
-    if (hasAdjacentFireStem || hasNearbyFireBranch) {
+    // 나무(일간)가 불을 살리는 구조
+    // 1) 계절성 조건: 봄(인, 묘) 또는 여름(사, 오) 태생만 인정 (차가운 가을/겨울은 배제)
+    const isValidSeason = ['寅', '卯', '巳', '午'].includes(monthZhi);
+    
+    // 2) 투출성 조건: 반드시 천간(시간 stems[0] 또는 월간 stems[2] 또는 년간 stems[3])에 화(丙, 丁)가 완전히 투출해야 통명됨
+    const hasRevealedFireStem = ['丙', '丁'].includes(stems[0]) || ['丙', '丁'].includes(stems[2]) || ['丙', '丁'].includes(stems[3]);
+    
+    // 3) 생명력 조건: 나무의 뿌리가 지지(寅, 卯, 亥, 辰) 중 하나 이상에 단단히 박혀 땔감이 타버리지 않도록 자양해야 함
+    const hasWoodRoot = branches.some(b => ['寅', '卯', '亥', '辰'].includes(b));
+    
+    // 4) 농도 조건: 원국 내 목(Wood) + 화(Fire) 비율 합이 최소 55% 이상이어야 함
+    const isStrongWoodFire = (woodRatio + fireRatio) >= 55;
+    
+    // 5) 수극화 방지: 원국 청결 조건으로 수(Water)가 20% 이하여야 함 (물이 너무 많으면 광명이 완전히 꺼지고 나무가 젖음)
+    const isLowWater = waterRatio <= 20;
+
+    // 6) 금극목 방지: 원국 청결 조건으로 금(Metal)이 15% 이하여야 함 (날카로운 금이 나무를 극하면 두뇌가 산만해져 통명이 무너짐)
+    const isLowMetal = metalRatio <= 15;
+
+    if (isValidSeason && hasRevealedFireStem && hasWoodRoot && isStrongWoodFire && isLowWater && isLowMetal) {
       isMokhwaAdjacent = true;
+      mokhwaType = "wood_to_fire";
     }
   } else if (['丙', '丁'].includes(dayMaster)) {
-    const hasAdjacentWoodStem = ['甲', '乙'].includes(stems[0]) || ['甲', '乙'].includes(stems[2]);
-    const hasNearbyWoodBranch = ['寅', '卯'].includes(branches[0]) || ['寅', '卯'].includes(branches[1]) || ['寅', '卯'].includes(branches[2]);
-    if (hasAdjacentWoodStem || hasNearbyWoodBranch) {
+    // 불(일간)이 봄철 나무로부터 인성 생조를 받는 구조
+    // 1) 계절성 조건: 봄(寅, 卯) 태생만 인정 (따뜻한 인성의 공급을 뜻함)
+    const isValidSeason = ['寅', '卯'].includes(monthZhi);
+    
+    // 2) 투출성 조건: 반드시 천간(시간 stems[0] 또는 월간 stems[2] 또는 년간 stems[3])에 목(甲, 乙)이 완전히 투출해야 땔감이 계속 지펴짐
+    const hasRevealedWoodStem = ['甲', '乙'].includes(stems[0]) || ['甲', '乙'].includes(stems[2]) || ['甲', '乙'].includes(stems[3]);
+    
+    // 3) 농도 조건: 원국 내 목(Wood) + 화(Fire) 비율 합이 최소 55% 이상이어야 함
+    const isStrongWoodFire = (woodRatio + fireRatio) >= 55;
+
+    // 4) 수극화 방지: 원국 청결 조건으로 수(Water)가 20% 이하여야 함
+    const isLowWater = waterRatio <= 20;
+
+    // 5) 금극목 방지: 원국 청결 조건으로 금(Metal)이 15% 이하여야 함
+    const isLowMetal = metalRatio <= 15;
+
+    if (isValidSeason && hasRevealedWoodStem && isStrongWoodFire && isLowWater && isLowMetal) {
       isMokhwaAdjacent = true;
+      mokhwaType = "fire_from_wood";
     }
   }
 
-  const woodFireSum = woodRatio + fireRatio;
-
-  if (isMokhwaAdjacent && woodFireSum >= 45) {
+  if (isMokhwaAdjacent) {
     let efficiency = 100;
     const logicDetails: string[] = [];
     const logicDetailsEn: string[] = [];
 
-    // 동결 상태 검증 (겨울철 지독히 차가운 경우 나무가 얼어 불을 지피기 힘듬)
-    const isWinter = ['亥', '子', '丑'].includes(monthZhi);
-    if (isWinter && waterRatio >= 30 && fireRatio < 15) {
-      efficiency -= 30;
-      logicDetails.push("동결된 땔감인자(-30%): 겨울철 얼어붙은 수기운(水)이 화기를 억누르고 나무를 젖게 만들어, 불길이 활발히 타오르기 어렵습니다.");
-      logicDetailsEn.push("Frozen Wood (-30%): Cold winter water dampens the wood and suppresses heat, preventing the flame from shining widely.");
+    // 겨울철이나 수기가 차오르면 나무가 젖음 경고 (여유 필터 - 만일을 대비한 설명 보강)
+    if (waterRatio > 15) {
+      efficiency -= 15;
+      logicDetails.push("수기 잔존 감점(-15%): 다소 존재하는 수(Water) 기운으로 인해 불의 밝기에 살짝 미세한 수분이 틈입합니다.");
+      logicDetailsEn.push("Moisture Intrusion (-15%): Minor Water presence creates vapor that slightly dampens the absolute clarity of Wood-Fire.");
     }
 
-    // 강력한 금극목 충돌로 나무 밑둉이 망가짐 (인신충, 묘유충)
-    const hasInShinClash = branches.includes('寅') && branches.includes('申');
-    const hasMyoYuClash = branches.includes('卯') && branches.includes('酉');
-    if ((hasInShinClash || hasMyoYuClash) && metalRatio >= 25) {
-      efficiency -= 20;
-      logicDetails.push("금극목 충돌 위협(-20%): 지지 금기운의 도끼질로 인해 나무 뿌리가 훼손되어 지식의 안정적인 유통과 계승에 차질이 생깁니다.");
-      logicDetailsEn.push("Metal-Wood Fracture (-20%): Earthly metal clashes shear the wood's vital core, disrupting consistent intellectual focus.");
+    if (metalRatio > 10) {
+      efficiency -= 15;
+      logicDetails.push("금기 잔존 감점(-15%): 다소 잔존해 있는 금(Metal) 기운으로 인해 목화의 순수한 상생 순도가 살짝 조율을 겪습니다.");
+      logicDetailsEn.push("Metal Friction (-15%): Slight residual Metal presence creates a minor clash that challenges the absolute purity of Wood-Fire.");
     }
 
-    efficiency = Math.max(30, efficiency);
+    efficiency = Math.max(50, efficiency);
 
     patterns.push({
       code: "mokhwa_tongmyeong",
       name: "목화통명(木火通明)",
       rarity: "SSR",
-      effect: "나무가 아낌없이 타올라 어둠을 깊은 슬기로 밝힙니다. 깊은 학문 연구, 언론, 지식전달 등 지혜와 명성을 지배하는 총명한 두뇌의 귀격입니다.",
+      effect: "나무가 티 없이 따사로운 화기를 받아 아낌없이 빛납니다. 명석한 두뇌, 깊은 사려, 뛰어난 교육적/창작 역량과 지혜를 상징하는 최상급 귀격입니다.",
       enName: "Wood-Fire Brilliancy (Mokhwa-Tongmyeong)",
-      enEffect: "Wood transforms into pure, illuminating Fire. Represents high intellect, brilliant wisdom, and sublime academic or artistic success.",
+      enEffect: "Pure timber feeding a clear flame to illuminate the landscape. Grants superior intellect, deep thought, and eminent success in fields of expression and wisdom.",
       isNoble: true,
       efficiency,
       logicDetails,
       logicDetailsEn,
-      tooltipText: "초목이 따사로운 불길을 만나 자신의 지혜와 재능을 세상만방에 널리 퍼트리는 귀격입니다. 지적 탁월함, 언론, 강단에서의 명망을 상징합니다.",
+      tooltipText: "초목이 맑은 광명(火)과 결합하여 자신의 깊은 지혜와 영감을 세상만방에 널리 퍼트리는 최고의 귀격 중 하나입니다.",
       tooltipTextEn: "Benevolent wood fueling an eternal light. Symbolizes academic genius, clarity of speech, and high reputation through intellectual work."
+    });
+  }
+
+  // 2.2 금백수청 / 금수쌍청 (金白水淸 / 金水雙淸)
+  let isGeumSuSSangCheong = false;
+  if (['庚', '辛'].includes(dayMaster)) {
+    // 금일간이 수로 씻어내는 구조
+    const isValidSeason = ['申', '酉', '亥', '子'].includes(monthZhi);
+    const hasRevealedWaterStem = ['壬', '癸'].includes(stems[0]) || ['壬', '癸'].includes(stems[2]) || ['壬', '癸'].includes(stems[3]);
+    const isStrongMetalWater = (metalRatio + waterRatio) >= 60;
+    const isLowEarth = earthRatio <= 15; // 수기를 탁하게 만드는 토(土) 제어
+    const isLowFire = fireRatio <= 15;   // 금을 녹이고 수기를 소모하는 화(火) 제어
+
+    if (isValidSeason && hasRevealedWaterStem && isStrongMetalWater && isLowEarth && isLowFire) {
+      isGeumSuSSangCheong = true;
+    }
+  }
+
+  if (isGeumSuSSangCheong) {
+    patterns.push({
+      code: "geum_baek_su_cheong",
+      name: "금수쌍청(金水雙淸)",
+      rarity: "SSR",
+      effect: "맑고 깨끗해진 쇠와 티 없이 푸른 물이 만나 기묘한 기운을 흘려보냅니다. 최고의 학식, 청아한 명예, 명료한 논리적 지적 능력을 부여하는 문학가/천재형 귀격입니다.",
+      enName: "Metal-Water Dual Resonance (Geumsu-SSangcheong)",
+      enEffect: "Metal polished to perfection by clear, pure water. Confers deep cognitive clarity, high literary talent, and noble, unblemished prestige.",
+      isNoble: true,
+      efficiency: 100,
+      logicDetails: ["기본 조건 만족: 가을/겨울 금일간이 깨끗하게 수기(Water)를 보아 조화로움.", "원국 토기/화기 통제완료: 흙에 의해 물이 혼탁(濁)해지지 않아 물이 시리도록 투명함."],
+      logicDetailsEn: ["Core condition met: Metal master in Autumn/Winter meeting clear Water streams.", "Impurities suppressed: Absence of heavy Earth/Fire preserves absolute translucent clarity."],
+      tooltipText: "금과 수가 만나 불순물 없이 흐르는 맑은 시내와 같습니다. 흠집 없는 영예와 명품 두뇌를 뜻합니다.",
+      tooltipTextEn: "Metal meets clear water without earthly soil. Brings unmatched intellectual focus and academic excellence."
+    });
+  }
+
+  // 2.3 수목청화 (水木淸華)
+  let isSuMokCheongHwa = false;
+  if (['壬', '癸'].includes(dayMaster)) {
+    // 수일간이 목으로 발산하는 구조
+    const isValidSeason = ['亥', '子', '寅', '卯'].includes(monthZhi);
+    const hasRevealedWoodStem = ['甲', '乙'].includes(stems[0]) || ['甲', '乙'].includes(stems[2]) || ['甲', '乙'].includes(stems[3]);
+    const isStrongWaterWood = (waterRatio + woodRatio) >= 60;
+    const isLowMetal = metalRatio <= 15;  // 나무를 찍는 금(Metal) 제어
+    const isLowEarth = earthRatio <= 15;  // 수기를 흐리는 흙(Earth) 제어
+
+    if (isValidSeason && hasRevealedWoodStem && isStrongWaterWood && isLowMetal && isLowEarth) {
+      isSuMokCheongHwa = true;
+    }
+  }
+
+  if (isSuMokCheongHwa) {
+    patterns.push({
+      code: "su_mok_cheong_hwa",
+      name: "수목청화(水木淸華)",
+      rarity: "SSR",
+      effect: "흐르는 맑은 물이 푸른 청목을 길러 청아한 꽃을 피웁니다. 인품의 온화함, 뛰어난 예술적 천재성, 화사한 대인적 평판과 문장력의 귀격입니다.",
+      enName: "Water-Wood Elegance (Sumok-Cheonghwa)",
+      enEffect: "Crystalline streams nurturing verdant forest wood, blooming beautifully. Bestows deep artistic intuition, smooth social charisma, and high scholarly reputation.",
+      isNoble: true,
+      efficiency: 100,
+      logicDetails: ["기본 조건 만족: 겨울/봄의 수일간이 맑고 푸른 목(Wood)의 기운을 보아 자양함.", "방해 원소 통제완료: 금극목의 가위질이나 토극수의 흙탕물로부터 자유롭게 보호받고 있음."],
+      logicDetailsEn: ["Core condition met: Winter/Spring Water master nurturing pristine Wood elements.", "Obstacles neutralized: Free from Metal clashing or Earth muddying, allowing serene, continuous expansion."],
+      tooltipText: "물과 나무가 화합하여 푸른 대지 위에 봄꽃을 피우는 격입니다. 예술적인 영감과 온정 어린 성품의 발현을 뜻합니다.",
+      tooltipTextEn: "Streams flowing smoothly to blossom plants. Encourages highly expressive, artistic, and literary talents."
     });
   }
 

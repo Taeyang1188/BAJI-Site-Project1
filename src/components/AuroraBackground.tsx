@@ -6,13 +6,7 @@ const AuroraBackground: React.FC = () => {
   const isDark = theme === 'dark';
 
   return (
-    <div 
-      className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
-      style={{
-        maskImage: 'radial-gradient(ellipse at 50% 30%, black 0%, black 25%, transparent 60%)',
-        WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, black 0%, black 25%, transparent 60%)',
-      }}
-    >
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       <style>
         {`
           .fluid-bg {
@@ -31,7 +25,7 @@ const AuroraBackground: React.FC = () => {
             border-radius: 50%;
             filter: blur(120px);
             opacity: 0.7;
-            will-change: transform, background-color;
+            will-change: transform;
             width: 700px;
             height: 700px;
             top: 30%;
@@ -41,33 +35,43 @@ const AuroraBackground: React.FC = () => {
           }
 
           @keyframes fluid-wrap-1 {
-            0% { transform: translate(-80%, -20%) scale(1.2); background-color: ${isDark ? '#C4275A' : '#ff6ec7'}; }
-            50% { transform: translate(40%, 10%) scale(1.5); background-color: ${isDark ? '#B85A00' : '#7b61ff'}; }
-            100% { transform: translate(-80%, -20%) scale(1.2); background-color: ${isDark ? '#C4B800' : '#00d4ff'}; }
+            0% { transform: translate(-80%, -20%) scale(1.2); }
+            50% { transform: translate(40%, 10%) scale(1.5); }
+            100% { transform: translate(-80%, -20%) scale(1.2); }
           }
           @keyframes fluid-wrap-2 {
-            0% { transform: translate(70%, 30%) scale(1.4); background-color: ${isDark ? '#00C4B8' : '#00d4ff'}; }
-            50% { transform: translate(-30%, -20%) scale(1.1); background-color: ${isDark ? '#0052CC' : '#ff6ec7'}; }
-            100% { transform: translate(70%, 30%) scale(1.4); background-color: ${isDark ? '#8800CC' : '#a8ff78'}; }
+            0% { transform: translate(70%, 30%) scale(1.4); }
+            50% { transform: translate(-30%, -20%) scale(1.1); }
+            100% { transform: translate(70%, 30%) scale(1.4); }
           }
           @keyframes fluid-wrap-3 {
-            0% { transform: translate(-75%, 20%) scale(1.1); background-color: ${isDark ? '#CC0088' : '#7b61ff'}; }
-            50% { transform: translate(45%, -10%) scale(1.6); background-color: ${isDark ? '#CC3700' : '#00d4ff'}; }
-            100% { transform: translate(-75%, 20%) scale(1.1); background-color: ${isDark ? '#00CC6D' : '#ff6ec7'}; }
+            0% { transform: translate(-75%, 20%) scale(1.1); }
+            50% { transform: translate(45%, -10%) scale(1.6); }
+            100% { transform: translate(-75%, 20%) scale(1.1); }
           }
           @keyframes fluid-wrap-4 {
-            0% { transform: translate(80%, -10%) scale(1.6); background-color: ${isDark ? '#6200CC' : '#a8ff78'}; }
-            50% { transform: translate(-40%, 15%) scale(1.2); background-color: ${isDark ? '#00A8CC' : '#7b61ff'}; }
-            100% { transform: translate(80%, -10%) scale(1.6); background-color: ${isDark ? '#C4275A' : '#00d4ff'}; }
+            0% { transform: translate(80%, -10%) scale(1.6); }
+            50% { transform: translate(-40%, 15%) scale(1.2); }
+            100% { transform: translate(80%, -10%) scale(1.6); }
           }
         `}
       </style>
 
+      {/* GPU-Optimized Vignette Layer (Replaces WebKit CSS stencils for buttery smooth layout painting) */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-10"
+        style={{
+          background: isDark 
+            ? 'radial-gradient(ellipse at 50% 30%, rgba(11, 4, 22, 0) 15%, rgba(11, 4, 22, 0.4) 45%, #0B0416 85%)'
+            : 'radial-gradient(ellipse at 50% 30%, rgba(250, 249, 246, 0) 15%, rgba(250, 249, 246, 0.4) 45%, #FAF9F6 85%)'
+        }}
+      />
+
       <div className="fluid-bg">
-        <div className="blob blob-1" style={{ animation: `fluid-wrap-1 ${isDark ? '11s' : '11s'} ease-in-out infinite` }} />
-        <div className="blob blob-2" style={{ animation: `fluid-wrap-2 ${isDark ? '15s' : '15s'} ease-in-out infinite` }} />
-        <div className="blob blob-3" style={{ animation: `fluid-wrap-3 ${isDark ? '13s' : '13s'} ease-in-out infinite` }} />
-        <div className="blob blob-4" style={{ animation: `fluid-wrap-4 ${isDark ? '18s' : '18s'} ease-in-out infinite` }} />
+        <div className="blob blob-1" style={{ backgroundColor: isDark ? '#C4275A' : '#ff6ec7', animation: 'fluid-wrap-1 11s ease-in-out infinite' }} />
+        <div className="blob blob-2" style={{ backgroundColor: isDark ? '#00C4B8' : '#00d4ff', animation: 'fluid-wrap-2 15s ease-in-out infinite' }} />
+        <div className="blob blob-3" style={{ backgroundColor: isDark ? '#CC0088' : '#7b61ff', animation: 'fluid-wrap-3 13s ease-in-out infinite' }} />
+        <div className="blob blob-4" style={{ backgroundColor: isDark ? '#6200CC' : '#a8ff78', animation: 'fluid-wrap-4 18s ease-in-out infinite' }} />
       </div>
     </div>
   );
