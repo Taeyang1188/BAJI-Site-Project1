@@ -126,6 +126,36 @@ const HorizontalDial = ({
            return Math.abs(diff) > (visibleCount / 2) ? 'none' : 'flex';
         });
 
+        // Dynamic visual boldness/thickness & glow mapping based on distance to core center axis
+        const imageFilter = useTransform(smoothValue, (v) => {
+          let diff = index - (v % items.length);
+          if (diff > items.length / 2) diff -= items.length;
+          if (diff < -items.length / 2) diff += items.length;
+          const dist = Math.abs(diff);
+          
+          // Normalized proximity factor: 1.0 = center focus, 0.0 = edge boundary focus
+          const centerWeight = Math.max(0, 1 - dist);
+          
+          if (theme === 'light') {
+            // Light Mode: Black charcoal crisp silhouette + dynamic micro-stroke + subtle warm glow
+            // Keep strokes very thin (0.2px to 0.5px) to prevent merging fine details of the zodiac animals
+            const strokeSize = 0.25 + centerWeight * 0.25; 
+            const glowOpacity = centerWeight * 0.35;
+            const glowRadius = 3 + centerWeight * 5;
+            
+            return `brightness(0) drop-shadow(${strokeSize}px ${strokeSize}px 0px rgba(0,0,0,1)) drop-shadow(-${strokeSize}px -${strokeSize}px 0px rgba(0,0,0,1)) drop-shadow(0 0 ${glowRadius}px rgba(244,63,94,${glowOpacity}))`;
+          } else {
+            // Dark Mode: Golden hue with dynamic crisp gold outlines and warm clean golden glow
+            const strokeSize = 0.25 + centerWeight * 0.25; 
+            const glowRadius = 4 + centerWeight * 8;
+            const glowOpacity = 0.3 + centerWeight * 0.45;
+            const brightnessVal = 1.1 + centerWeight * 0.3;
+            const contrastVal = 1.1 + centerWeight * 0.2;
+            
+            return `sepia(1) saturate(3.5) hue-rotate(-10deg) brightness(${brightnessVal}) contrast(${contrastVal}) drop-shadow(${strokeSize}px ${strokeSize}px 0 rgba(255,210,0,1)) drop-shadow(-${strokeSize}px -${strokeSize}px 0 rgba(255,210,0,1)) drop-shadow(0 0 ${glowRadius}px rgba(255, 215, 0, ${glowOpacity}))`;
+          }
+        });
+
         return (
           <motion.div
             key={index}
@@ -148,16 +178,14 @@ const HorizontalDial = ({
             >
               {isImage ? (
                 <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transform-gpu">
-                  <img 
+                  <motion.img 
                     src={getImagePath(item)} 
                     alt={item.name} 
                     className="w-full h-full object-contain" 
                     loading="lazy"
                     style={{ 
                       mixBlendMode: theme === 'light' ? 'normal' : 'screen',
-                      filter: theme === 'light' 
-                        ? `brightness(0) drop-shadow(0 2px 4px rgba(0,0,0,0.1))`
-                        : 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.2) contrast(1.2) drop-shadow(0 0 12px rgba(255, 215, 0, 0.4))',
+                      filter: imageFilter
                     }}
                     referrerPolicy="no-referrer" 
                   />
