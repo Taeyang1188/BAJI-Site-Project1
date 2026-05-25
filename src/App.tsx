@@ -266,9 +266,9 @@ const DateInput = ({
     if (inputValue.length <= 4) {
       return y;
     } else if (inputValue.length <= 6) {
-      return `${y} . ${m}`;
+      return `${y}. ${m}`;
     } else {
-      return `${y} . ${m} . ${d}`;
+      return `${y}. ${m}. ${d}`;
     }
   }, [inputValue]);
 
@@ -279,14 +279,14 @@ const DateInput = ({
           ? 'border-slate-200/80 bg-slate-100/80 focus-within:border-neon-pink' 
           : 'border-white/10 bg-white/5 focus-within:border-neon-pink'
       }`}>
-        <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
+        <Calendar className="ml-3 sm:ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
         
         <input 
           type="text"
           inputMode="numeric"
           value={displayString}
           onChange={(e) => handleInputChange(e.target.value)}
-          placeholder="YYYY . MM . DD"
+          placeholder="YYYY. MM. DD"
           onFocus={(e) => e.target.select()}
           onBlur={() => {
             if (inputValue.length > 0 && inputValue.length < 8) {
@@ -294,7 +294,7 @@ const DateInput = ({
               handleInputChange(padded);
             }
           }}
-          className={`flex-1 min-w-0 bg-transparent px-3 h-full tracking-[0.1em] font-mono focus:outline-none ${
+          className={`flex-1 min-w-0 bg-transparent px-2 sm:px-3 h-full tracking-normal sm:tracking-[0.05em] font-mono focus:outline-none ${
             theme === 'light' ? 'text-slate-800 placeholder:text-slate-400 font-semibold text-base' : 'text-white placeholder:text-white/20 text-base'
           }`}
         />
