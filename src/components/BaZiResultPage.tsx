@@ -650,9 +650,14 @@ const BaziTooltip = ({
     }, 5000);
   };
 
+  const onVisibleChangeRef = React.useRef(onVisibleChange);
   React.useEffect(() => {
-    onVisibleChange?.(isVisible);
-  }, [isVisible, onVisibleChange]);
+    onVisibleChangeRef.current = onVisibleChange;
+  }, [onVisibleChange]);
+
+  React.useEffect(() => {
+    onVisibleChangeRef.current?.(isVisible);
+  }, [isVisible]);
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
