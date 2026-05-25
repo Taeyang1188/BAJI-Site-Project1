@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react';
+import React, { useState, useEffect, useMemo, useRef, MouseEvent as ReactMouseEvent, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Globe, Calendar, User, ChevronRight, ChevronLeft, Languages, Clock, Sun, Moon, Keyboard, Zap } from 'lucide-react';
 import { useTheme } from './contexts/ThemeContext';
 import { Language, UserInput, BaZiResult } from './types';
 import { TRANSLATIONS } from './constants';
 import CosmicWheel from './components/CosmicWheel';
-import BaZiResultPage from './components/BaZiResultPage';
 import AuroraBackground from './components/AuroraBackground';
+
+const BaZiResultPage = lazy(() => import('./components/BaZiResultPage'));
 
 import { calculateRealBaZi } from './services/bazi-service';
 
@@ -285,6 +286,8 @@ export default function App() {
   // Google Maps Autocomplete Ref
   const autocompleteRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteTimeoutRef = useRef<any>(null);
+  const autocompleteRetryCount = useRef<number>(0);
 
   // Debounce Input for Calculation
   useEffect(() => {
@@ -348,17 +351,26 @@ export default function App() {
     if (page !== 2) {
       autocompleteRef.current = null;
     }
+
+    return () => {
+      if (autocompleteTimeoutRef.current) {
+        clearTimeout(autocompleteTimeoutRef.current);
+        autocompleteTimeoutRef.current = null;
+      }
+    };
   }, [page, lang]);
 
   const initAutocomplete = async () => {
+    // Clear any preceding retry timer to prevent runaway multiple loops
+    if (autocompleteTimeoutRef.current) {
+      clearTimeout(autocompleteTimeoutRef.current);
+      autocompleteTimeoutRef.current = null;
+    }
+
     if (autocompleteRef.current) return; // Guard against multiple initializations
 
-    console.log("Initializing Autocomplete...", { 
-      hasInput: !!inputRef.current, 
-      hasGoogle: !!window.google?.maps 
-    });
-
     if (inputRef.current && window.google?.maps) {
+      autocompleteRetryCount.current = 0; // Reset retries on success
       try {
         const { Autocomplete } = await window.google.maps.importLibrary("places");
         
@@ -391,9 +403,10 @@ export default function App() {
       } catch (e) {
         console.error("Error initializing Autocomplete", e);
       }
-    } else if (page === 2) {
-      // If we are on page 2 but input is not ready, retry once
-      setTimeout(initAutocomplete, 100);
+    } else if (page === 2 && autocompleteRetryCount.current < 20) {
+      // Limit to max 20 retries (2 seconds) to protect browser resources on fail
+      autocompleteRetryCount.current++;
+      autocompleteTimeoutRef.current = setTimeout(initAutocomplete, 100);
     }
   };
 
@@ -944,16 +957,25 @@ export default function App() {
               animate={{ opacity: 1 }}
               className="relative w-full z-10"
             >
-              <BaZiResultPage 
-                result={result} 
-                lang={lang} 
-                userName={userInput.name}
-                gender={userInput.gender}
-                city={userInput.city}
-                socialContext={userInput.socialContext}
-                onBack={() => setPage(2)} 
-                skipTyping={skipTyping}
-              />
+              <Suspense fallback={
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-neon-pink p-8">
+                  <Sparkles className="w-10 h-10 animate-spin mb-4 text-neon-pink" />
+                  <p className="text-sm font-mono tracking-widest uppercase text-white/80">
+                    {lang === 'KO' ? '깊은 운명의 비밀들을 정교하게 계산하는 중...' : 'Decoding cosmic timelines...'}
+                  </p>
+                </div>
+              }>
+                <BaZiResultPage 
+                  result={result} 
+                  lang={lang} 
+                  userName={userInput.name}
+                  gender={userInput.gender}
+                  city={userInput.city}
+                  socialContext={userInput.socialContext}
+                  onBack={() => setPage(2)} 
+                  skipTyping={skipTyping}
+                />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>
