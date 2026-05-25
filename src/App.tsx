@@ -749,34 +749,34 @@ export default function App() {
                     {lang === 'KO' ? (
                       <>
                         {/* Date Row (KO) */}
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-1.5 sm:gap-2 items-center">
                           <div className={`flex-1 flex items-center rounded-2xl focus-within:border-neon-pink border transition-all min-w-0 h-[44px] ${
                             theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
                           }`}>
-                            <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
+                            <Calendar className="ml-2.5 sm:ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                             <input 
                               type="date"
                               max="9999-12-31"
                               required
                               value={userInput.birthDate}
                               onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                              className={`flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all min-w-0 m-0 ${
+                              className={`flex-1 bg-transparent pl-1.5 sm:pl-3 pr-2 sm:pr-3 h-full appearance-none text-sm sm:text-base font-mono tracking-normal sm:tracking-wide focus:outline-none transition-all min-w-0 m-0 ${
                                 theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
                               }`}
                             />
                           </div>
-                          <div className={`flex rounded-2xl p-1 gap-1 h-[44px] items-center shrink-0 border ${
+                          <div className={`flex rounded-2xl p-1 gap-0.5 sm:gap-1 h-[44px] items-center shrink-0 border ${
                             theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
                           }`}>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'solar' })}
-                              className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
+                              className={`flex-1 h-full px-2 sm:px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${(!userInput.calendarType || userInput.calendarType === 'solar') ? 'bg-neon-cyan text-black' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
                             >
                               {t.input.solar}
                             </button>
                             <button 
                               onClick={() => setUserInput({ ...userInput, calendarType: 'lunar' })}
-                              className={`flex-1 h-full px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
+                              className={`flex-1 h-full px-2 sm:px-3 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${userInput.calendarType === 'lunar' ? 'bg-neon-pink text-white' : (theme === 'light' ? 'text-slate-400 hover:text-slate-600' : 'text-white/40 hover:text-white/60')}`}
                             >
                               {t.input.lunar}
                             </button>
@@ -797,14 +797,14 @@ export default function App() {
                         <div className={`flex items-center rounded-2xl focus-within:border-neon-pink border transition-all h-[44px] ${
                           theme === 'light' ? 'bg-slate-100/80 border-slate-200/80' : 'bg-white/5 border-white/10'
                         }`}>
-                          <Calendar className="ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
+                          <Calendar className="ml-2.5 sm:ml-4 w-4 h-4 text-neon-pink pointer-events-none shrink-0" />
                           <input 
                             type="date"
                             max="9999-12-31"
                             required
                             value={userInput.birthDate}
                             onChange={(e) => setUserInput({ ...userInput, birthDate: e.target.value })}
-                            className={`flex-1 bg-transparent px-3 h-full appearance-none text-base font-mono tracking-[0.1em] focus:outline-none transition-all min-w-0 ${
+                            className={`flex-1 bg-transparent px-2 sm:px-3 h-full appearance-none text-sm sm:text-base font-mono tracking-normal sm:tracking-wide focus:outline-none transition-all min-w-0 ${
                               theme === 'light' ? 'text-slate-800 font-bold [&::-webkit-calendar-picker-indicator]:opacity-80' : 'text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert'
                             }`}
                           />

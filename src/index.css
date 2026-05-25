@@ -630,3 +630,50 @@ body.light-mode .goth-glass-hover-active {
   box-shadow: none !important;
 }
 
+/* ==========================================================================
+   WEBKIT & SAFARI DATE-PICKER PREVENT TEXT WRAPPING & OPTIMIZE SPACING
+   ========================================================================== */
+input[type="date"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+/* Prevent internal WebKit text components from wrapping across lines */
+input[type="date"]::-webkit-datetime-edit {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* Minimize layout gap between year, month, and day dividers */
+input[type="date"]::-webkit-datetime-edit-text {
+  padding: 0 1px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Force day/month/year segments to fit compactly */
+input[type="date"]::-webkit-datetime-edit-year-field,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline !important;
+  white-space: nowrap !important;
+}
+
+

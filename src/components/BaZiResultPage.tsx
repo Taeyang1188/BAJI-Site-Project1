@@ -574,7 +574,18 @@ const parseColorBracketsToHtml = (text: string): string => {
   return result;
 };
 
-const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: string }, children: React.ReactNode, lang: Language, key?: any }) => {
+const BaziTooltip = ({ 
+  content, 
+  children, 
+  lang, 
+  onVisibleChange 
+}: { 
+  content: { ko: string, en: string }, 
+  children: React.ReactNode, 
+  lang: Language, 
+  key?: any,
+  onVisibleChange?: (visible: boolean) => void 
+}) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const [isVisible, setIsVisible] = useState(false);
@@ -617,22 +628,31 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
     setIsVisible(false);
   };
 
-  const handleInteraction = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleInteraction = (e: React.MouseEvent) => {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    if (isTouch) {
-      // On touch, toggle and prevent default to avoid hover/click conflict
+    if (!isTouch) {
       if (isVisible) {
         hideTooltip();
       } else {
         showTooltip();
-        // Auto hide after 5s for touch
-        timerRef.current = setTimeout(() => {
-          setIsVisible(false);
-        }, 5000);
       }
     }
   };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    updatePosition();
+    setIsVisible((prev) => !prev);
+
+    // Auto hide after 5s for touch
+    timerRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 5000);
+  };
+
+  React.useEffect(() => {
+    onVisibleChange?.(isVisible);
+  }, [isVisible, onVisibleChange]);
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -658,7 +678,7 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
   return (
     <motion.div 
       ref={containerRef}
-      className="relative inline-block cursor-help" 
+      className="relative inline-block cursor-help animate-none" 
       onMouseEnter={() => {
         if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
           showTooltip();
@@ -669,6 +689,7 @@ const BaziTooltip = ({ content, children, lang }: { content: { ko: string, en: s
           hideTooltip();
         }
       }}
+      onTouchStart={handleTouchStart}
       onClick={handleInteraction}
       whileTap={{ scale: 0.95 }}
     >
@@ -2998,10 +3019,26 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             key={idx}
                             content={{ ko: tooltipContentKo, en: tooltipContentEn }}
                             lang={lang}
+                            onVisibleChange={(visible) => {
+                              if (visible) {
+                                setHoveredHiddenStem({
+                                  pillarIdx: i, 
+                                  hsIdx: idx, 
+                                  hs, 
+                                  connectedStems: allRootedStems.map(r => r.stem), 
+                                  isDestroyed
+                                });
+                              } else {
+                                setHoveredHiddenStem(prev => {
+                                  if (prev && prev.pillarIdx === i && prev.hsIdx === idx) {
+                                    return null;
+                                  }
+                                  return prev;
+                                });
+                              }
+                            }}
                           >
                             <div 
-                              onMouseEnter={() => setHoveredHiddenStem({pillarIdx: i, hsIdx: idx, hs, connectedStems: allRootedStems.map(r => r.stem), isDestroyed})}
-                              onMouseLeave={() => setHoveredHiddenStem(null)}
                               className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemMinWidthClass} border transition-all duration-300 relative ${highlightClass}`}
                             >
                               {isDestroyed && (
