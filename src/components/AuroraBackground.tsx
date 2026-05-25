@@ -6,7 +6,7 @@ const AuroraBackground: React.FC = () => {
   const isDark = theme === 'dark';
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
       <style>
         {`
           .fluid-bg {
@@ -16,15 +16,17 @@ const AuroraBackground: React.FC = () => {
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: ${isDark ? '0.45' : '0.35'};
+            opacity: ${isDark ? '0.5' : '0.4'};
             mix-blend-mode: ${isDark ? 'screen' : 'multiply'};
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
           }
           
+          /* Substantially lightweight blur (only 28px) combined with radial-gradients for outstanding performance and zero cooling-fan overhead */
           .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.7;
+            filter: blur(28px);
             will-change: transform;
             width: 700px;
             height: 700px;
@@ -32,32 +34,34 @@ const AuroraBackground: React.FC = () => {
             left: 50%;
             margin-top: -350px;
             margin-left: -350px;
+            transform: translate3d(0, 0, 0);
           }
 
+          /* Hardware acceleration enabled using translate3d instead of standard translate */
           @keyframes fluid-wrap-1 {
-            0% { transform: translate(-80%, -20%) scale(1.2); }
-            50% { transform: translate(40%, 10%) scale(1.5); }
-            100% { transform: translate(-80%, -20%) scale(1.2); }
+            0% { transform: translate3d(-60%, -20%, 0) scale(1.1); }
+            50% { transform: translate3d(30%, 10%, 0) scale(1.3); }
+            100% { transform: translate3d(-60%, -20%, 0) scale(1.1); }
           }
           @keyframes fluid-wrap-2 {
-            0% { transform: translate(70%, 30%) scale(1.4); }
-            50% { transform: translate(-30%, -20%) scale(1.1); }
-            100% { transform: translate(70%, 30%) scale(1.4); }
+            0% { transform: translate3d(50%, 20%, 0) scale(1.3); }
+            50% { transform: translate3d(-20%, -15%, 0) scale(1.0); }
+            100% { transform: translate3d(50%, 20%, 0) scale(1.3); }
           }
           @keyframes fluid-wrap-3 {
-            0% { transform: translate(-75%, 20%) scale(1.1); }
-            50% { transform: translate(45%, -10%) scale(1.6); }
-            100% { transform: translate(-75%, 20%) scale(1.1); }
+            0% { transform: translate3d(-55%, 15%, 0) scale(1.0); }
+            50% { transform: translate3d(35%, -10%, 0) scale(1.4); }
+            100% { transform: translate3d(-55%, 15%, 0) scale(1.0); }
           }
           @keyframes fluid-wrap-4 {
-            0% { transform: translate(80%, -10%) scale(1.6); }
-            50% { transform: translate(-40%, 15%) scale(1.2); }
-            100% { transform: translate(80%, -10%) scale(1.6); }
+            0% { transform: translate3d(60%, -10%, 0) scale(1.4); }
+            50% { transform: translate3d(-30%, 10%, 0) scale(1.1); }
+            100% { transform: translate3d(60%, -10%, 0) scale(1.4); }
           }
         `}
       </style>
 
-      {/* GPU-Optimized Vignette Layer (Replaces WebKit CSS stencils for buttery smooth layout painting) */}
+      {/* GPU-Optimized Vignette Layer */}
       <div 
         className="absolute inset-0 pointer-events-none z-10"
         style={{
@@ -68,14 +72,46 @@ const AuroraBackground: React.FC = () => {
       />
 
       <div className="fluid-bg">
-        <div className="blob blob-1" style={{ backgroundColor: isDark ? '#C4275A' : '#ff6ec7', animation: 'fluid-wrap-1 11s ease-in-out infinite' }} />
-        <div className="blob blob-2" style={{ backgroundColor: isDark ? '#00C4B8' : '#00d4ff', animation: 'fluid-wrap-2 15s ease-in-out infinite' }} />
-        <div className="blob blob-3" style={{ backgroundColor: isDark ? '#CC0088' : '#7b61ff', animation: 'fluid-wrap-3 13s ease-in-out infinite' }} />
-        <div className="blob blob-4" style={{ backgroundColor: isDark ? '#6200CC' : '#a8ff78', animation: 'fluid-wrap-4 18s ease-in-out infinite' }} />
+        {/* We use inline radial-gradients so that the edges naturally blend and fade prior to any browser blur evaluation */}
+        <div 
+          className="blob blob-1" 
+          style={{ 
+            background: isDark 
+              ? 'radial-gradient(circle, rgba(196, 39, 90, 0.8) 0%, rgba(196, 39, 90, 0.3) 40%, rgba(196, 39, 90, 0) 70%)' 
+              : 'radial-gradient(circle, rgba(255, 110, 199, 0.8) 0%, rgba(255, 110, 199, 0.3) 40%, rgba(255, 110, 199, 0) 70%)', 
+            animation: 'fluid-wrap-1 14s ease-in-out infinite' 
+          }} 
+        />
+        <div 
+          className="blob blob-2" 
+          style={{ 
+            background: isDark 
+              ? 'radial-gradient(circle, rgba(0, 196, 184, 0.7) 0%, rgba(0, 196, 184, 0.25) 40%, rgba(0, 196, 184, 0) 70%)' 
+              : 'radial-gradient(circle, rgba(0, 212, 255, 0.7) 0%, rgba(0, 212, 255, 0.25) 40%, rgba(0, 212, 255, 0) 70%)', 
+            animation: 'fluid-wrap-2 18s ease-in-out infinite' 
+          }} 
+        />
+        <div 
+          className="blob blob-3" 
+          style={{ 
+            background: isDark 
+              ? 'radial-gradient(circle, rgba(204, 0, 136, 0.75) 0%, rgba(204, 0, 136, 0.3) 40%, rgba(204, 0, 136, 0) 70%)' 
+              : 'radial-gradient(circle, rgba(123, 97, 255, 0.75) 0%, rgba(123, 97, 255, 0.3) 40%, rgba(123, 97, 255, 0) 70%)', 
+            animation: 'fluid-wrap-3 16s ease-in-out infinite' 
+          }} 
+        />
+        <div 
+          className="blob blob-4" 
+          style={{ 
+            background: isDark 
+              ? 'radial-gradient(circle, rgba(98, 0, 204, 0.7) 0%, rgba(98, 0, 204, 0.25) 40%, rgba(98, 0, 204, 0) 70%)' 
+              : 'radial-gradient(circle, rgba(168, 255, 120, 0.6) 0%, rgba(168, 255, 120, 0.2) 40%, rgba(168, 255, 120, 0) 70%)', 
+            animation: 'fluid-wrap-4 22s ease-in-out infinite' 
+          }} 
+        />
       </div>
     </div>
   );
 };
 
 export default AuroraBackground;
-

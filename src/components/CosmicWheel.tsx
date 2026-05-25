@@ -110,15 +110,6 @@ const HorizontalDial = ({
           return 1.2 * Math.max(0.4, 1 - dist * 0.12);
         });
 
-        const blur = useTransform(smoothValue, (v) => {
-          let diff = index - (v % items.length);
-          if (diff > items.length / 2) diff -= items.length;
-          if (diff < -items.length / 2) diff += items.length;
-          // Safari-friendly Blur: Keep the blur maxed tightly to 3px to avoid massive layer paints
-          const b = Math.min(3, Math.abs(diff) * 0.8);
-          return b === 0 ? 'none' : `blur(${b}px)`;
-        });
-
         // Counter-rotation to keep the item upright
         const selfRotation = useTransform(smoothValue, (v) => {
            let diff = index - (v % items.length);
@@ -151,7 +142,6 @@ const HorizontalDial = ({
             <motion.div 
               className="absolute top-0 flex items-center justify-center origin-center -translate-y-1/2"
               style={{
-                filter: blur,
                 scale,
                 rotate: selfRotation
               }}
