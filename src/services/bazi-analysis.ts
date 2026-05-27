@@ -837,5 +837,34 @@ export const detectSpecialPatterns = (
     });
   }
 
+  // 5. 화토중탁 (火土重濁)
+  // 일간이 丙, 丁, 戊, 己 중 하나인 사주에서 화(Fire)와 토(Earth)의 비율의 합이 65% 이상이고, 수(Water)가 15% 이하인 상태
+  const isFireEarthHeavy = ['丙', '丁', '戊', '己'].includes(dayMaster) && 
+                           (fireRatio + earthRatio >= 65) && 
+                           (waterRatio <= 15);
+  
+  if (isFireEarthHeavy) {
+    patterns.push({
+      code: "hwa_to_jung_tak",
+      name: "화토중탁(火土重濁)",
+      rarity: "R",
+      effect: "불(火)과 흙(土)이 한데 흘러 물기가 말라붙고 탁해진 형국입니다. 온 세상이 뜨겁고 건조하여 만물이 자라기 어려우므로, 금(金)으로 뜨거운 열기를 흘려보내거나 수(Water)로 조열함을 적셔주는 개운법이 필수적입니다. 종교, 철학, 심리, 정신 계통에서 대단히 고차원적인 지적/영성적 잠재력을 지녔지만, 세속적이고 물질적인 성취나 정착에는 부서지는 파도처럼 다소간의 지체와 번민을 겪기 쉬운 특성입니다.",
+      enName: "Fire-Earth Turbidity",
+      enEffect: "A dry configuration where intense Fire and dry Earth mix to dry up Water. Denotes deep spiritual and philosophical aptitude, while worldy or materialistic pursuits often face temporary delays.",
+      isNoble: false,
+      efficiency: 100,
+      logicDetails: [
+        `기본 조건 만족: 일간이 화토(${dayMaster}) 성분군이며 화토 합산 비율이 ${fireRatio + earthRatio}%로 극도로 조열함.`,
+        "조후 제어 취약: 원국의 메마름을 조화롭게 식혀줄 수(Water)가 유실되거나 고갈되어 화토중탁의 원국상이 발생함."
+      ],
+      logicDetailsEn: [
+        `Core condition met: Day master belongs to Fire/Earth group and combined ratio is ${fireRatio + earthRatio}% leading to high dryness.`,
+        `Impaired cooling support: Water levels are under ${waterRatio}%, failing to nourish or balance the intense heat.`
+      ],
+      tooltipText: "불과 흙이 뒤엉켜 사막처럼 메마르고 탁해진 원국 상태를 뜻합니다. 깊은 영성적 통찰과 세속적 조율이 필요한 국면입니다.",
+      tooltipTextEn: "A parched state where heat and soil merge without water. Brings deep metaphysical talent, and temporary delay in materialistic gains."
+    });
+  }
+
   return patterns;
 };

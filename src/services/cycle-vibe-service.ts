@@ -112,25 +112,118 @@ export function generateCoreRemedy(analysis: any, lang: Language): string {
     const mappedGiEn = godGroupToEn[mappedGi] || mappedGi;
     const mappedHeeEn = godGroupToEn[mappedHee] || mappedHee;
 
-    if (lang === "KO") {
-        const colorVarGi = getElementColorVar(giElement);
-        const colorVarHee = getElementColorVar(heeElement);
-        const giCombo = `[${colorVarGi}:${elementToKoRaw[giElement]} ${getGodWithHanja(mappedGi)}]`;
-        const heeCombo = `[${colorVarHee}:${elementToKoRaw[heeElement]} ${getGodWithHanja(mappedHee)}]`;
+    // --- High-Resolution Sublimation Logic for Extreme 10-God / Special Structures ---
+    const tenGodsRatio = analysis?.tenGodsRatio || {};
+    const getRatioByKo = (koKeyword: string): number => {
+        const entry = Object.entries(tenGodsRatio).find(([k]) => k.includes(koKeyword));
+        return entry ? (entry[1] as number) : 0;
+    };
 
+    const bigyeopPct = getRatioByKo('비겁');
+    const siksangPct = getRatioByKo('식상');
+    const jaeseongPct = getRatioByKo('재성');
+    const gwanseongPct = getRatioByKo('관성');
+    const inseongPct = getRatioByKo('인성');
+
+    const structTitle = analysis?.structureDetail?.title || "";
+
+    // Resolve exact 5 Elements for each of the 5 main ten-god groupings based on Day Master Element
+    const getGodElements = (dayMasterElement: string) => {
+        const list = ["Wood", "Fire", "Earth", "Metal", "Water"];
+        const idx = list.indexOf(dayMasterElement);
+        if (idx === -1) return { 비겁: "Water", 식상: "Wood", 재성: "Fire", 관성: "Earth", 인성: "Metal" };
+        return {
+            비겁: list[idx],
+            식상: list[(idx + 1) % 5],
+            재성: list[(idx + 2) % 5],
+            관성: list[(idx + 3) % 5],
+            인성: list[(idx + 4) % 5],
+        };
+    };
+
+    const dayMasterStem = analysis?.dayMaster || analysis?.pillars?.[1]?.stem || "";
+    const dayMasterElement = BAZI_MAPPING.stems[dayMasterStem as keyof typeof BAZI_MAPPING.stems]?.element || "Water";
+    const godToElement = getGodElements(dayMasterElement);
+
+    const makeGodCombo = (godKo: string, godEn: string) => {
+        const el = godToElement[godKo as keyof typeof godToElement] || "Water";
+        const elKo = elementToKoRaw[el] || el;
+        const color = getElementColorVar(el);
+        return {
+            ko: `[${color}:${elKo} ${getGodWithHanja(godKo)}]`,
+            en: `[${color}:${el} (${godEn})]`
+        };
+    };
+
+    const siksangCombo = makeGodCombo("식상", "Artist/Rebel");
+    const jaeseongCombo = makeGodCombo("재성", "Maverick/Architect");
+    const gwanseongCombo = makeGodCombo("관성", "Warrior/Judge");
+    const bigyeopCombo = makeGodCombo("비겁", "Mirror/Rival");
+    const inseongCombo = makeGodCombo("인성", "Mystic/Sage");
+    
+    const colorVarGi = getElementColorVar(giElement);
+    const colorVarHee = getElementColorVar(heeElement);
+    const giCombo = `[${colorVarGi}:${elementToKoRaw[giElement]} ${getGodWithHanja(mappedGi)}]`;
+    const heeCombo = `[${colorVarHee}:${elementToKoRaw[heeElement]} ${getGodWithHanja(mappedHee)}]`;
+
+    const giComboEn = `[${getElementColorVar(giElement)}:${giElement} (${mappedGiEn})]`;
+    const heeComboEn = `[${getElementColorVar(heeElement)}:${heeElement} (${mappedHeeEn})]`;
+
+    if (lang === "KO") {
+        // Mode 1: Siksang Overload or Jong-Ah (식상용신 또는 식상과다)
+        if (siksangPct >= 35 || structTitle.includes("종아")) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국을 가득 채운 강력한 ${siksangCombo.ko}의 분출력 때문에, 머릿속에 수만 가지 매력적인 기획과 표현 욕구를 품어두면서도 한 줄기의 결과물(${jaeseongCombo.ko})로 매끄럽게 마무리지어 매각하지 못해 문득 가벼운 정서적 번아웃이나 잔재주 섞인 허탈감에 빠지기 쉬운 상태야.\n\n이 시기엔 가만히 앉아서 요행을 바라거나 망상에만 머물러선 곤란해. 내면의 화산 같은 표현력과 기획 감각(식상)을 단순히 혼자 노는 동굴에 썩혀두지 말고, **글, 디자인, 소리, 기술처럼 눈에 보이는 독립된 물질적 결과물로 어떻게든 다듬어 세상에 통하게 매치시키는 아웃풋 승화법(식상생재)**을 기치로 걸어봐. 내 재능이 실재하는 가치이자 주체적인 쓸모로 번역되어 순환될 때, 영혼의 지독한 갑갑함이 마법처럼 씻겨 내려갈 테니까.`;
+        }
+        // Mode 2: Jaeseong Overload or Jong-Jae (재성용신 또는 재성과다)
+        if (jaeseongPct >= 35 || structTitle.includes("종재")) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 끊임없이 계산을 강요하는 ${jaeseongCombo.ko}의 지배력 때문에, 눈앞의 쓸모와 단기적인 이익, 가성비에 촉이 곤두서며 매 순간 손익 계산에 뇌가 터질 듯 과적되어 일찌감치 정서적 영양이 메마르고 지독한 육체적 과로에 노출되기 쉬운 상태야.\n\n이 시기에는 주머니 사정이나 가쁜 현실에만 집착하여 스스로를 들들 볶지 않는 게 개운의 첫 단추야. **길게 내다보고 나를 탄탄하게 받쳐줄 학문적 깊이, 지격 면허, 무형의 사유 자산(${inseongCombo.ko})을 은밀히 축적하거나 장기적인 비즈니스 룰을 디자인(식상생재)**하여 무대 뒤의 진짜 지배자로 우뚝 서봐. 내실을 도모하고 가치 수확의 판을 설계할 때 비로소 진정한 거부의 여유를 쥐게 될 거야.`;
+        }
+        // Mode 3: Gwanseong Overload or Jong-Sal (관성용신 또는 관성과다)
+        if (gwanseongPct >= 35 || structTitle.includes("종살") || structTitle.includes("종관")) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 한 치의 누설을 허용치 않는 ${gwanseongCombo.ko}의 무거운 수직적 압박감 때문에, 타인의 시선과 규율, 보이지 않는 셀프 통제선 안으로 스스로를 과도하게 밀어 넣어 온몸의 날 선 감각이 뻣뻣이 경직되고 강박적인 과호흡에 질식당하기 쉬운 상태야.\n\n억압된 껍질 안에 갇혀서 지쳐 쓰러지지 말고, **타인에게 반박당하지 않을 강력한 무형의 지적 자산과 전문 자격(${inseongCombo.ko})을 취득해 법과 규칙의 핵심 키맨으로 조직을 장악(관인상생)**하거나, **나만의 날카로운 아웃풋과 표현력(${siksangCombo.ko})의 카타르시스로 그 단단한 룰을 속 시원히 깨부수어 기치를 드높이는 승화법**을 설계해봐. 통제권을 수동적으로 휘둘리는 게 아니라 내가 게임 체인저가 되어 판을 쥐어야만 비로소 완전한 리더로 거듭날 수 있어.`;
+        }
+        // Mode 4: Bigyeop Overload or Jeon-Wang (비겁용신 또는 비겁과다)
+        if (bigyeopPct >= 40 || structTitle.includes("종강") || structTitle.includes("종왕")) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 우주라도 다 뚫어버릴 듯 팽창해 가는 ${bigyeopCombo.ko}의 강력한 에고 때문에, 타인의 진심 가득한 피드백을 본능적으로 거부해 사서 고독에 파묻히거나 주변과의 소모적인 기싸움, 자강두천식 감정 다툼에 내 진짜 보물인 에너지와 정서(${jaeseongCombo.ko})를 불태워 탕진하기 쉬운 상태야.\n\n주변 경쟁자들과 소소한 무대를 두고 자존심 개싸움을 벌이며 푼돈과 건강을 잃지 않는 게 최고 개운의 비밀이야. **내가 애초에 세상의 압도적 거목이자 독보적 룰메이커임을 의연히 인정하고, 그 한계 없는 주체성의 불꽃을 온 인류 단위의 거대한 문명 기획이나 거시적 예술 도전(${siksangCombo.ko}설기)으로 대방출**해봐. 내 프라이드를 소모적 다툼이 아니라 전무후무한 개척자의 독보적 아이콘으로 승화하는 고난도 번역이 발현될 때 진짜 천군만마를 품에 안게 되니까.`;
+        }
+        // Mode 5: Inseong Overload (인성과다)
+        if (inseongPct >= 40) {
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국을 가득 고이 채운 깊고 광대한 ${inseongCombo.ko}의 지적 사유와 직관력 때문에, 머리와 상상 속에서는 이미 전 우주의 완벽한 해독과 혁명을 끝냈으면서도 정작 현실의 육체는 차디찬 문 밖 한 발자국을 넘지 못하는 지독한 고결성 무기력과 지적 환멸감에 질식하기 쉬운 상태야.\n\n완벽하게 고인 사유의 성 안에 평생 망상을 찌며 갇혀 지내는 영혼의 탈옥을 감행해야 해. **설령 설익은 미완성의 작품이더라도 두 발로 질질 끌며 일단 비장하게 문밖으로 아웃풋(${siksangCombo.ko})을 기워 뱉어 내거나, 세속의 지극히 작고 어찌 보면 속물적인 자잘한 화폐 교환 감각(${jaeseongCombo.ko})과 직접 온몸으로 부딪혀보는 것**이 지상 최강의 개운요법이야. 머릿속 완벽을 찢고 현실의 투박한 쓸모로 내 생각을 당장 번역해 굴릴 때 비로소 우주 정복이 실체적인 삶으로 뒤집어질 테니까.`;
+        }
+
+        // Standard Balance Fallback
         if (giRatio >= 25) {
             return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 너무 과열되어 제어되지 않는 ${giCombo} 기운 때문에 ${edgyGiDescMap[mappedGi]} 있어. 이 답답한 과포화 상태에 시원하게 찬물이라도 부으려면 어떻게든 ${heeCombo}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
         } else {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 다소 약하고 부실하게 자리 잡은 ${giCombo} 기운 때문에 오히려 이 기운이 약한 것에 대해 조급해지고 집착하게 되어 ${edgyGiDescMap[mappedGi]} 있어. 부족하고 불안정한 기운에 휘둘리는 상태인 거지. 이 부실한 중심을 다잡고 건강하게 보완하려면 어떻게든 ${heeCombo}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 ${giCombo} 기운이 희박한 빈틈으로 자리하고 있어, 현대 사회의 바쁜 흐름과 일시적인 내적 단절 속에서 자칫 나도 모르게 이 기운의 역효과에 휩쓸려 ${edgyGiDescMap[mappedGi]} 쉬운 심리적 함정이 도사리고 있어. 온 세상이 물질적 집착과 쓸모에 목을 매며 사람을 지치고 조급하게 만드는 시대잖아. 이처럼 흐릿한 에너지의 기조에 은연중 에너지를 뺏기지 말고, 가장 든든하고 강력한 무기 역할을 해줄 ${heeCombo}의 기운을 확실히 깨워서 주체적으로 써먹어야 할 때야.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
         }
     } else {
-        const giComboEn = `[${getElementColorVar(giElement)}:${giElement} (${mappedGiEn})]`;
-        const heeComboEn = `[${getElementColorVar(heeElement)}:${heeElement} (${mappedHeeEn})]`;
+        // Mode 1: Siksang Overload or Jong-Ah (식상용신 또는 식상과다)
+        if (siksangPct >= 35 || structTitle.includes("종아")) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart is swept by an incredible, overflowing force of ${siksangCombo.en}. Because this explosive creative impulse can fire in all directions without structured material outlets, you may experience sudden emotional waves or finish-line fatigue where brilliant plans stall before completion.\n\nRather than staying in quiet thought, you must actively express this energy. **Refine your unique creative sparks, technical designs, or raw talents into concrete, market-ready deliverables (Wealth: ${jaeseongCombo.en})**. Treating your distinct expression not as a private daydream but as an invaluable, visible asset is your ultimate strategy to unlock your path.`;
+        }
+        // Mode 2: Jaeseong Overload or Jong-Jae (재성용신 또는 재성과다)
+        if (jaeseongPct >= 35 || structTitle.includes("종재")) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart is loaded with a driving intensity of ${jaeseongCombo.en}. Being constantly hyper-focused on productivity, tangible profit, and immediate efficiency can silently deplete your emotional energy, leading to nervous overload and executive exhaustion.\n\nTo transcend these limits, shift your focus from chasing short-term gains, and instead **cultivate profound intellectual capital, valuable credentials, or structured passive frameworks (Wisdom: ${inseongCombo.en}) that anchor you from behind the scenes**. Mastering the rules of the game rather than rushing on the field is your true leverage for wealth.`;
+        }
+        // Mode 3: Gwanseong Overload or Jong-Sal (관성용신 또는 관성과다)
+        if (gwanseongPct >= 35 || structTitle.includes("종살") || structTitle.includes("종관")) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart carries an ironclad, heavy presence of ${gwanseongCombo.en}. Under this intense vertical pressure, you may experience excessive self-censorship, perfectionist anxiety, or the suffocating weight of keeping up outer standards.\n\nBreak free from this internal cage. Instead of silently absorbing the stress, **secure advanced specialized credentials (Wisdom: ${inseongCombo.en}) to align with and master the high-level decision structure, or utilize your sharp rebellious talents (Expression: ${siksangCombo.en}) to boldly remake the rules**. Elevating your professional ownership to command the framework itself is your definitive key to crown authority.`;
+        }
+        // Mode 4: Bigyeop Overload or Jeon-Wang (비겁용신 또는 비겁과다)
+        if (bigyeopPct >= 40 || structTitle.includes("종강") || structTitle.includes("종왕")) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart swells with an indomitable ego and burning self-will governed by ${bigyeopCombo.en}. If this immense self-conviction is kept bottled inside, it easily manifests as isolating pride or triggers costly, petty rivalries that drain your long-term wealth.\n\nDo not waste your titanium drive on low-level matches. **Own your identity as a sovereign trailblazer, and direct your extreme propulsion onto titanic creative challenges, systemic disruptions, or macro-scale innovations that no one else dares to touch (Expression: ${siksangCombo.en})**. Translating your pride into a legendary pioneer icon rather than a defensive wall is your guaranteed path to ultimate success.`;
+        }
+        // Mode 5: Inseong Overload (인성과다)
+        if (inseongPct >= 40) {
+            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart holds a deep, introspective ocean of ${inseongCombo.en}. While you are capable of reading the absolute secrets of the universe in your mind, this overwhelming mental weight can paralyze your body, locking you in noble procrastination and heavy existential overthinking.\n\nShatter your sacred perfectionism to escape this palace of thought. **Force immediate raw outputs—even if crude or imperfect (Expression: ${siksangCombo.en})—and hurl yourself into down-to-earth, material realities and monetary validations in the real market (Wealth: ${jaeseongCombo.en})**. Translating your inner wisdom into practical secular utility is the exact alchemical catalyst that turns your brilliant ideas into tangible power.`;
+        }
 
+        // Standard Balance Fallback
         if (giRatio >= 25) {
             return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart currently shows over-saturated and uncontrolled ${giComboEn} energy, leading you to experience a state of ${edgyGiDescMapEn[mappedGi]}. To harmonize this overwhelming pressure, you must actively channel your ${heeComboEn} essence.\n\nRather than waiting passively, **${edgyHeeActionMapEn[mappedHee]}** is your most practical and powerful strategy to transcend your current limits.`;
         } else {
-            return `\n\n📌 **[ Core Task & Remedy ]**\nYour Bazi chart shows fragile or unstable ${giComboEn} energy. Because the energy is weak, you tend to get impatient and excessively cling to ${edgyGiDescMapEn[mappedGi]}. To stabilize and ground this vulnerable state, you must actively channel your ${heeComboEn} essence.\n\nRather than waiting passively, **${edgyHeeActionMapEn[mappedHee]}** is your most practical and powerful strategy to transcend your current limits.`;
+            return `\n\n📌 **[ Core Task & Remedy ]**\nAlthough the ${giComboEn} energy in your Bazi chart appears minor in raw percentage, the noisy stimuli of modern life can easily tempt you into its shadow side—experiencing a state of ${edgyGiDescMapEn[mappedGi]}. In a hyper-competitive world where everyone is obsessed with material results and direct utility, let us not waste your vital spirit on this instability. Rather, you must anchor your focus and actively manifest your ${heeComboEn} essence to find true ground.\n\nRather than waiting passively, **${edgyHeeActionMapEn[mappedHee]}** is your most practical and powerful strategy to transcend your current limits.`;
         }
     }
 }
@@ -182,7 +275,11 @@ const CITY_META_TABLE: Record<string, { impression: string, enImpression: string
   "델리": { impression: "오 델리라고? 고대의 유적과 혼란스러운 시장의 기묘한 조화가 매력적인 곳이지? 진한 버터 치킨 향기를 떠올리니 갑자기 식욕이 돋네.", enImpression: "Oh, Delhi? A place appealing for its bizarre harmony of ancient ruins and chaotic markets? Just thinking of the rich butter chicken scent stimulates my appetite." },
   "뭄바이": { impression: "뭄바이라... 볼리우드의 화려함과 아라비아해의 바람이 만나는 곳이지? 길거리에서 파는 매콤한 바다 파브의 맛이 문득 궁금해지네.", enImpression: "Mumbai... Where the glamour of Bollywood meets the winds of the Arabian Sea? Suddenly I'm curious about the taste of the spicy street food Vada Pav." },
   "벵갈루루": { impression: "벵갈루루? 정원 도시이자 첨단 기술이 꿈틀대는 인도의 실리콘밸리지. 진한 필터 커피 한 잔으로 머리를 맑게 깨우고 싶어지네.", enImpression: "Bengaluru? The Silicon Valley of India, wriggling with high tech and known as the Garden City. A strong cup of filter coffee would perfectly clear my head." },
-  "콜카타": { impression: "콜카타? 지성이 숨 쉬는 문화의 중심지이자 역사가 깊은 곳이지. 달콤하고 부드러운 라스굴라 한 알이면 하루의 피로가 다 녹을 것 같아.", enImpression: "Kolkata? The intellectual cultural hub with profound history. A single sweet and soft Rasgulla would melt away the day's fatigue." }
+  "콜카타": { impression: "콜카타? 지성이 숨 쉬는 문화의 중심지이자 역사가 깊은 곳이지. 달콤하고 부드러운 라스굴라 한 알이면 하루의 피로가 다 녹을 것 같아.", enImpression: "Kolkata? The intellectual cultural hub with profound history. A single sweet and soft Rasgulla would melt away the day's fatigue." },
+  
+  // 터키
+  "이스탄불": { impression: "이스탄불이라... 동양과 서양이 만나며 찬란한 역사를 품은 보스포루스의 도시네! 은은한 홍차 한 잔과 쫀득하고 달콤한 바클라바의 조화가 온몸에 초월적 영감을 전해주는 것 같아.", enImpression: "Istanbul... The city of the Bosphorus, where East meets West, holding a brilliant history! The harmony of mild Turkish tea and chewy, sweet Baklava feels like passing down transcendent inspiration to your soul." },
+  "Istanbul": { impression: "이스탄불이라... 동양과 서양이 만나며 찬란한 역사를 품은 보스포루스의 도시네! 은은한 홍차 한 잔과 쫀득하고 달콤한 바클라바의 조화가 온몸에 초월적 영감을 전해주는 것 같아.", enImpression: "Istanbul... The city of the Bosphorus, where East meets West, holding a brilliant history! The harmony of mild Turkish tea and chewy, sweet Baklava feels like passing down transcendent inspiration to your soul." }
 };
 
 const formatGod = (god: string, stemOrBranch: string, lang: Language) => {
@@ -223,6 +320,7 @@ export function generateCycleVibe(
   const analysis = result.analysis || {} as any;
   const currentCycle = result.grandCycles[result.currentCycleIndex] || {} as any;
   const currentAnnualPillar = result.currentYearPillar;
+  const dayMaster = result.pillars[1]?.stem || '';
   
   const daewunElement = currentCycle.element || '';
   const seunElement = currentAnnualPillar?.element || '';
@@ -512,6 +610,19 @@ export function generateCycleVibe(
     }
   }
 
+  // --- Jae-Ja-Yak-Sal (재자약살) ---
+  const isWeakGwan = gwanRatio > 0 && gwanRatio < 30;
+  if ((isSinGang || !isSinYak) && isWeakGwan && hasJaeSeongLuck) {
+    combos.push({
+      id: '재자약살',
+      priority: 88,
+      name: lang === 'KO' ? '재자약살(財滋弱殺)' : 'Wealth Nourishing Weak Power',
+      desc: lang === 'KO'
+        ? `강인한 흐름에 비해 다소 약했던 사회적 명예나 리더십([var(--color-water):관성])을, 새로이 들어오는 풍요로운 재물의 기운([var(--color-wood):재성])이 기가 막히게 생조하고 떠받쳐 주는 형국(재자약살)이야. 네가 거두는 성과와 수익이 다소 부담스러웠던 규칙이나 감투를 안정적으로 장악할 힘이 되어 주며 명예를 드높여줄 거야.`
+        : `Your strong self meets the supportive flow where your incoming Wealth energy ([var(--color-wood):Wealth]) elegantly elevates and solidifies your relatively light public authority ([var(--color-water):Power]). Your material results become the powerful launching pad to vertical-climb your honor.`
+    });
+  }
+
   combos.sort((a, b) => b.priority - a.priority);
   if (combos.length > 2) combos.splice(2);
 
@@ -531,7 +642,7 @@ export function generateCycleVibe(
 
     if (lang === 'KO') {
       if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
-        comboInsight = `이번 시기는 '화다금용(火多金鎔)'의 위태로운 흐름이야. 네 넘치는 생각이 실질적인 재능(상관)을 녹여버리고 있어. 머리만 쓰지 말고 손을 움직여 결과물을 굳혀야 해.`;
+        comboInsight = `이번 시기는 거대한 불길이 단단한 쇠붙이를 녹여버리는 [var(--color-fire):'화다금용(火多金鎔)']의 위태로운 기류가 감돌고 있어. 머릿속의 어지러운 생각이나 구상([var(--color-water):상관])을 가만히 두면 뜨거운 기운에 쓸려가기 쉬우니, 실천적인 행동([var(--color-fire):식상])과 집요한 노력으로 결과물을 단단히 굳혀나가야만 해.`;
       } else if (combos.length === 1) {
         comboInsight = `이번 시기는 '${combos[0].name}'의 격을 갖췄어. ${combos[0].desc}`;
       } else {
@@ -539,7 +650,7 @@ export function generateCycleVibe(
       }
     } else {
       if (isJeonWang && isFireExtreme && is2026 && combos.some(c => c.id === '상관패인')) {
-        comboInsight = `This cycle presents the perilous state of 'Fire melting Metal'. Your intense ideas are dissolving your actual practical skills. Stop passive contemplating; take direct action to solidify your results.`;
+        comboInsight = `This cycle brings the perilous wave of [var(--color-fire):'Hwa-da-geum-yong' (Fire melting Metal)]. Your overflowing thoughts and talent ([var(--color-water):Expression]) risk being dissolved by the blazing heat, so you must firmly solidify achievements through direct action rather than passive contemplation.`;
       } else if (combos.length === 1) {
         comboInsight = `This cycle manifests the alignment of '${combos[0].name}'. ${combos[0].desc}`;
       } else {
@@ -630,7 +741,7 @@ ${elementComment} ${balanceComment} [delay:1500]
 이런 다채로운 매력들이 어우러져서 ${nameRef}너만의 독보적인 색깔이 완성되는 중이야. [delay:1000]`;
   } else {
     // English Intro (Simplified)
-    const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title === "화토중탁";
+    const isFireEarthTurbid = analysis.yongshinDetail?.method === "특수격용신" && analysis.structureDetail?.title?.includes("화토중탁");
     let enCityGreeting = '';
     
     const matchedCityEn = Object.keys(CITY_META_TABLE).find(c => city && city.includes(c));
@@ -737,7 +848,18 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
             detailedEffect += `스스로를 옥죄는 '자형(自刑)'의 기운이 겹치니, 네 고집이 결국 너를 찌르는 칼날이 되지 않게 조심해야 해. `;
           }
         } else if (isYongShinYear) {
-          detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 아이디어가 드디어 '공인된 문서'나 '자격'으로 변하는 시기니, 겁먹지 말고 그 기운을 온전히 타도 좋아. `;
+          const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth';
+          if (dmElement === 'Metal') {
+            detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 명예와 관직(관성)의 운이 상징하는 높은 자리나 자격, 혹은 사회적 영향력이 수직 상승하는 최고의 시기니, 망설임 없이 기회를 나꿔채봐. `;
+          } else if (dmElement === 'Water') {
+            detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 피땀 어린 결실과 재물(재성)의 주도권이 극대화되는 시기라, 노력했던 일들이 마침내 화끈한 현실적 성과와 높은 실물적 보상으로 변해줄 거야. `;
+          } else if (dmElement === 'Wood') {
+            detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 기발한 재능과 창의적 생산력(식상)이 마침내 뜨겁게 분출되는 해지. 너의 독창적인 구상과 행동력이 세상의 환호와 갈채를 크게 자아낼 거야. `;
+          } else if (dmElement === 'Fire') {
+            detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 내면의 주체성과 든든한 아군(비겁)의 세력이 극대화되는 때니, 타인의 이목에 구속당하지 말고 너만의 무대를 거침없이 선점해봐. `;
+          } else {
+            detailedEffect += `특히 2026년의 뜨거운 태양은 그동안 정체되었던 일들을 시원하게 뚫어줄 거야. 네 배움과 지혜, 그리고 부동산이나 계약 등의 공인된 문서나 라이선스(인성)가 빛을 발하는 타이밍이라, 그간의 아이디어가 단단한 공인 스펙으로 확정될 거야. `;
+          }
         } else if (isSinGang) {
           detailedEffect += `2026년의 강한 화(Fire) 기운은 너의 열정을 더욱 부채질하겠지만, 자칫 과열되어 주변과 마찰이 생길 수 있으니 속도 조절이 필요해. `;
         }
@@ -752,7 +874,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `사람들은 이걸 보고 '상관패인'이라며 네 기발한 재능이 고삐를 만났다고 축복할지 몰라. 하지만 내가 보기엔 글쎄... 지금 네 재능(상관)은 너무 뜨거운 불길(인성) 속에 던져진 작은 칼날 같아. 날카롭게 빛나야 할 네 아이디어가 강렬한 화기운에 녹아내리는 '화다금용(火多金鎔)'의 형국이지. \n\n2026년의 병오(丙午)라는 거대한 불기둥은 네 열정을 부채질하겠지만, 그건 '열정'이라기보다 '과열'에 가까워. 자칫하면 네가 가진 기술이나 재능이 고집과 감정에 휘말려 형태도 없이 사라질 수 있어. \n\n게다가 이건 까딱하면 다칠 수 있는 위험한 도박이 될 수도 있으니, 억지로 무언가를 발산하려고 하지 마. 지금은 상관의 힘을 휘두를 때가 아니라, 그 뜨거운 불길 속에서 네 자신을 지키는 '디펜스'가 최우선이야. 불길이 너를 태우지 않도록 차갑게 식히며 기력을 비축해봐. 조급해지는 순간, 네 보석 같은 재능은 무기력하게 녹아버릴 테니까. `;
+          detailedEffect += `사람들은 이걸 보고 [var(--color-water):'상관패인(傷官佩印)']이라며 네 기발한 재능이 학문과 자격이라는 단단한 고삐를 만났다고 축복할지 몰라. 하지만 내가 명리학적으로 깊이 들여다보니 글쎄... 지금 네 예리한 재능과 아이디어([var(--color-water):상관])는 너무 격렬하고 뜨거운 불길([var(--color-fire):인성/관성]) 속에 무방비로 던져진 차가운 쇠붙이([var(--color-metal):금]) 같아. 날카롭게 정련되어 활약해야 할 무기가, 통제할 수 없는 과열된 기운에 휩쓸려 쉽게 녹아내릴 수 있는 까다로운 형세기 때문이지. \n\n2026년의 [var(--color-fire):병오(丙午)]라는 거대한 불기둥은 겉보기엔 네 앞길과 열정을 화려하게 펼쳐줄 것 같지만, 실상은 에너지의 균형을 쉽게 깨뜨리는 '과열 상태'를 의미해. 자칫하면 네가 지닌 세련된 기술이나 이성적인 판단이 고집과 고독감, 혹은 타오르는 충동에 휘말려 제 빛을 잃을 수 있거든. \n\n게다가 이건 무책임하게 배짱을 부리면 다쳐서 손해를 보기 쉬우니, 억지로 내면의 칼날을 꺼내 남들과 부딪히지 마. 지금은 네 재능([var(--color-water):상관])을 무작정 휘두르며 무대를 키울 때가 아니야. 그 뜨거운 불꽃 속에서 나 자신([var(--color-metal):일간])의 소중한 가치를 차분히 지키는 '방어망 구축(디펜스)'이 최우선이지. 불길이 너를 삼키지 않도록 침착함과 여유를 유지하며 내적 기력을 단단히 저축해둬. 조급하게 욕심을 내거나 폭발하는 순간, 네 보석 같은 특별한 무기가 맥없이 녹아버릴 수도 있으니까. `;
         } else if (!isFireExtreme) {
           activeCombosKo.push("상관의 발산하는 힘을 인성이 세련되게 통제하고 있는 형국");
           activeCombosEn.push("your creative energy being elegantly refined by inner wisdom");
@@ -806,12 +928,23 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         if (isFireExtreme) {
           detailedEffect += `In 2026, the giant pillar of Fire brings intense heat instead of gentle warmth, which might be overwhelming. `;
           if (isBokEum) {
-            detailedEffect += `Specifically, as a 'Fu-yin' year matching your day master, excessive self-conviction could become a double-edged sword. `;
+            detailedEffect += `Specifically, as a [var(--color-fire):'Bok-eum' (伏吟)] year matching your day master, excessive self-conviction could become a double-edged sword. `;
           } else if (isJaHyeong) {
             detailedEffect += `With 'Self-Punishment' active, beware of your own stubbornness acting as a blade against your progress. `;
           }
         } else if (isYongShinYear) {
-          detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your ideas are finally solidifying into recognized results. `;
+          const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || 'Earth';
+          if (dmElement === 'Metal') {
+            detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your honor, career status, and authoritative presence (Power) are bound to rise sharply. Step into your leadership potential with bold moves. `;
+          } else if (dmElement === 'Water') {
+            detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your financial endeavors and practical goals (Wealth) are entering a highly lucrative phase, translating past hard work into juicy material rewards. `;
+          } else if (dmElement === 'Wood') {
+            detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your self-expression, innovative actions, and talents (Expression) can find powerful channels to capture public support. Let your genius run wild. `;
+          } else if (dmElement === 'Fire') {
+            detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your inner confidence, autonomy, and trustworthy allies (Companion/Self) are heavily reinforced. Walk your own path and take full control. `;
+          } else {
+            detailedEffect += `Specifically, the blazing sun of 2026 will clear up long-stagnant issues. Your wisdom, official contracts, and certifications (Resource) are solidifying beautifully, turning abstract ideas into recognized qualifications. `;
+          }
         } else if (isSinGang) {
           detailedEffect += `The strong Fire in 2026 fuels your passion but risks friction due to sheer overheating; remember to step on the brakes occasionally. `;
         }
@@ -825,7 +958,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const hasMetalSangGwan = (seunBranch === '酉' || seunBranch === '申' || (tenGodsRatio['식상(Artist/Rebel)'] as number) > 10 || (tenGodsRatio['Artist/Rebel'] as number) > 10);
         
         if (fireRatio > 60 && hasMetalSangGwan) {
-          detailedEffect += `Others might call this 'Rebel meeting restraint' and celebrate your brilliance. But look closer—your talents are like a fragile blade thrown into a furnace. Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core against overheating. `;
+          detailedEffect += `Others might call this [var(--color-water):'Sang-gwan-pae-in' (Rebel restrained by Sage)] and celebrate your brilliance. But look closer—your talents ([var(--color-water):Expression]) are like a fragile blade ([var(--color-metal):Metal]) thrown into a raging furnace ([var(--color-fire):Fire]). Your sharp insights risk melting under extreme passion. Do not force output; prioritize protecting your core ([var(--color-metal):Day Master]) against overheating. `;
         } else if (!isFireExtreme) {
           activeCombosEn.push("your creative energy is being elegantly refined by inner wisdom");
         }
@@ -851,9 +984,49 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       }
     }
     
+    // --- Companion (비겁) overload & JaeSeong (재성) presence check ---
+    const biGyeopRatio = (tenGodsRatio['비겁(Companion/Sibling)'] as number) || 
+                         (tenGodsRatio['Companion/Sibling'] as number) || 
+                         (tenGodsRatio['비겁'] as number) || 0;
+    
+    const isBiGyeopOverload = biGyeopRatio >= 35 || 
+                              (biGyeopRatio >= 20 && (daewunStemGodKo === '비견' || daewunStemGodKo === '겁재' || daewunBranchGodKo === '비견' || daewunBranchGodKo === '겁재' || seunStemGodKo === '비견' || seunStemGodKo === '겁재' || seunBranchGodKo === '비견' || seunBranchGodKo === '겁재')) ||
+                              (daewunBranchGodKo === '비견' || daewunBranchGodKo === '겁재' || seunBranchGodKo === '비견' || seunBranchGodKo === '겁재');
+                              
+    const hasJaeToProtect = hasJaeSeongBase || hasJaeSeongLuck;
+    
+    let peerRivalryWarning = '';
+    if (isBiGyeopOverload && hasJaeToProtect) {
+      if (lang === 'KO') {
+        peerRivalryWarning = `\n\n[ ⚠️ 자산 보호 권고 ]\n현재 비겁(동료/경쟁자)의 기운이 강력하게 차오르거나 활성화되어, 내 소중한 수입이나 결과물(재물)을 경쟁 속에서 손실하기 쉬운 [var(--color-fire):군비쟁재]의 흐름이 감지되고 있어. 동업, 자금 대여, 무리한 무대 확장을 절대적으로 피하고 내실을 은밀히 축적하는 전략이 최선이야.`;
+      } else {
+        peerRivalryWarning = `\n\n[ ⚠️ Asset Protection Recommendation ]\nWith the peak expansion of Peer/Companion energies, you are entering a cycle of [var(--color-fire):Peer Rivalry for Wealth] where your hard-earned assets face high competition. Strictly avoid joint investments, lending money, or aggressive expansions, and secure your resources carefully.`;
+      }
+    }
+    
     const coreRemedy = generateCoreRemedy(analysis, lang);
-    main += `${comboInsight}\n\n${detailedEffect}${coreRemedy}`;
+    main += `${comboInsight}\n\n${detailedEffect}${peerRivalryWarning}${coreRemedy}`;
   } else {
+    // --- Companion (비겁) overload & JaeSeong (재성) presence check ---
+    const biGyeopRatio = (tenGodsRatio['비겁(Companion/Sibling)'] as number) || 
+                         (tenGodsRatio['Companion/Sibling'] as number) || 
+                         (tenGodsRatio['비겁'] as number) || 0;
+    
+    const isBiGyeopOverload = biGyeopRatio >= 35 || 
+                              (biGyeopRatio >= 20 && (daewunStemGodKo === '비견' || daewunStemGodKo === '겁재' || daewunBranchGodKo === '비견' || daewunBranchGodKo === '겁재' || seunStemGodKo === '비견' || seunStemGodKo === '겁재' || seunBranchGodKo === '비견' || seunBranchGodKo === '겁재')) ||
+                              (daewunBranchGodKo === '비견' || daewunBranchGodKo === '겁재' || seunBranchGodKo === '비견' || seunBranchGodKo === '겁재');
+                              
+    const hasJaeToProtect = hasJaeSeongBase || hasJaeSeongLuck;
+    
+    let peerRivalryWarning = '';
+    if (isBiGyeopOverload && hasJaeToProtect) {
+      if (lang === 'KO') {
+        peerRivalryWarning = `\n\n[ ⚠️ 자산 보호 권고 ]\n현재 비겁(동료/경쟁자)의 기운이 강력하게 차오르거나 활성화되어, 내 소중한 수입이나 결과물(재물)을 경쟁 속에서 손실하기 쉬운 [var(--color-fire):군비쟁재]의 흐름이 감지되고 있어. 동업, 자금 대여, 무리한 무대 확장을 절대적으로 피하고 내실을 은밀히 축적하는 전략이 최선이야.`;
+      } else {
+        peerRivalryWarning = `\n\n[ ⚠️ Asset Protection Recommendation ]\nWith the peak expansion of Peer/Companion energies, you are entering a cycle of [var(--color-fire):Peer Rivalry for Wealth] where your hard-earned assets face high competition. Strictly avoid joint investments, lending money, or aggressive expansions, and secure your resources carefully.`;
+      }
+    }
+
     // No combo logic
     if (lang === 'KO') {
       const dominantLuckElement = daewunElement;
@@ -876,7 +1049,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       };
       main += elementAdviceEn[dominantLuckElement] || `A subtle cycle providing smooth stimulation without rocking Bazi's core equilibrium. `;
     }
-    main += generateCoreRemedy(analysis, lang);
+    main += `${peerRivalryWarning}${generateCoreRemedy(analysis, lang)}`;
   }
 
   // 6. Luck Score (Already computed above)

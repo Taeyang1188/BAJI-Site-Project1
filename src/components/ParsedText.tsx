@@ -42,12 +42,28 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
     en: 'Jae-da-sin-yak: Too much Wealth energy but weak Daily Master. Indicates overwhelming opportunities that one lacks the strength to handle, leading to debt or health issues.'
   },
   '군비쟁재': {
-    ko: '군비쟁재: 비견/겁재(나와 같은 기운)가 많아 하나의 재성(재물/결과)을 두고 다투는 형국. 금전 손실이나 경쟁이 치열할 수 있습니다.',
-    en: 'Gun-bi-jaeng-jae: Many Peer energies competing for a single Wealth energy. Indicates potential financial loss or fierce competition.'
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
   },
   'Gun-bi-jaeng-jae': {
-    ko: '군비쟁재: 비견/겁재(나와 같은 기운)가 많아 하나의 재성(재물/결과)을 두고 다투는 형국. 금전 손실이나 경쟁이 치열할 수 있습니다.',
-    en: 'Gun-bi-jaeng-jae: Many Peer energies competing for a single Wealth energy. Indicates potential financial loss or fierce competition.'
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
+  },
+  'Peer Rivalry for Wealth': {
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
+  },
+  '재자약살': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
+  },
+  '재자약살(財滋弱殺)': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
+  },
+  'Wealth Nourishing Weak Power': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
   },
   '모다멸자': {
     ko: '모다멸자: 인성(어머니/지원)이 너무 많아 오히려 식상(자식/행동력)을 극하여 자립심을 잃게 만드는 형국입니다.',
@@ -74,8 +90,16 @@ const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
     en: 'Mok-da-hwa-sik: Too much Wood (firewood) extinguishing the Fire. Indicates excessive support or expectations hindering progress.'
   },
   '복음': {
-    ko: '복음: 일지와 똑같은 글자가 들어오는 시기. 과거에는 흉하게 보았으나, 현대에는 자신의 영역을 확고히 하고 뿌리를 내리는 시기로 봅니다.',
-    en: 'Fu-yin: A period where the exact same character as the Day Branch arrives. A time of establishing one\'s domain and taking root.'
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
+  },
+  'Bok-eum': {
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
+  },
+  'Bokeum': {
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
   },
   '자형': {
     ko: '자형: 스스로를 형(刑)하는 기운. 내적 갈등이나 자기 검열이 심해질 수 있으나, 이를 극복하면 큰 성장을 이룰 수 있습니다.',

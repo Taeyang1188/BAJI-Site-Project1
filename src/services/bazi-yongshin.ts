@@ -662,7 +662,7 @@ export function determineYongshin(stems: string[], branches: string[], geju: str
   const fireRatio = (ratios?.['Fire'] || 0) || 0;
   const earthRatio = (ratios?.['Earth'] || 0) || 0;
 
-  const isHwaDaToCho = (dmElement === 'Earth' && fireRatio >= 40) || (structureDetail?.title === '화토중탁') || (structureDetail?.title === '화다토초');
+  const isHwaDaToCho = (dmElement === 'Earth' && fireRatio >= 40) || (structureDetail?.title?.includes('화토중탁')) || (structureDetail?.title === '화다토초');
   const isToDaMaeGeum = (dmElement === 'Metal' && earthRatio >= 40) || (structureDetail?.title === '토다매금');
 
   if (isHwaDaToCho) {
@@ -1191,73 +1191,6 @@ export function analyzeSpecialStructure(stems: string[], branches: string[], ele
           enDescription: "A structure where Water and Fire are in fierce conflict, containing immense explosive potential."
         };
       }
-    }
-
-    // 화토중탁
-    if (['丙', '丁', '戊', '己'].includes(dayMaster) && (monthElement === 'Fire' || ['辰', '戌', '丑', '未'].includes(monthZhi))) {
-      // Strict filter for Fire-Earth Turbid
-      const isYinEarth = dayMaster === '己';
-      const isJeongFire = dayMaster === '丁';
-      const fireEarthRatio = (ratios?.['Fire'] || 0) + (ratios?.['Earth'] || 0);
-      
-      // Filter 3: Leakage Check (Sik-sang Metal in stems with root)
-      const hasFunctionalMetalInStem = stems.some((s, idx) => {
-        if (idx === 1) return false;
-        if (STEM_ELEMENTS[s] !== 'Metal') return false;
-        
-        // Check for clash (e.g., Gyeong-Metal vs Gap-Wood is not a clash that destroys Metal)
-        return true;
-      });
-      
-      const hasFunctionalMetalRoot = branches.some(b => {
-        const el = BRANCH_ELEMENTS[b];
-        if (el !== 'Metal') return false;
-        
-        // Metal root in Fire-heavy chart
-        if ((ratios?.['Fire'] || 0) > 50) {
-          const hasMetalHap = (branches.includes('酉') && (branches.includes('巳') || branches.includes('丑'))) ||
-                             (branches.includes('申') && (branches.includes('子') || branches.includes('辰')));
-          if (hasMetalHap) return true;
-          return false; // Melted
-        }
-        return true;
-      });
-      
-      if (hasFunctionalMetalInStem && hasFunctionalMetalRoot) {
-        // If Metal is present and has functional root (like 19890618 10:00), it's not turbid
-        return null;
-      }
-
-    if (fireEarthRatio >= 75 && (ratios?.['Water'] || 0) < 10) {
-      // Check for Water survival
-      const hasFunctionalWater = stems.some((s, idx) => {
-        if (idx === 1) return false;
-        if (STEM_ELEMENTS[s] !== 'Water') return false;
-        
-        // Check for clash (e.g., 1992's Im-Water vs Byeong-Fire)
-        const prev = idx > 0 ? stems[idx - 1] : null;
-        const next = idx < stems.length - 1 ? stems[idx + 1] : null;
-        const isClashed = (prev && STEM_CLASHES[prev] === s) || (next && STEM_CLASHES[next] === s);
-        if (isClashed) return false; // Evaporated
-        return true;
-      });
-
-      if (hasFunctionalWater) return null; // If Water survives (like 19920611 10:40), it's not turbid
-
-      // Filter 2: Yin Stem Strictness
-      if ((isYinEarth || isJeongFire) && fireEarthRatio < 85) return null;
-      
-      return {
-        name: '화토중탁',
-        nameEn: 'Fire-Earth Heavy-Turbid',
-        category: 'Image',
-        mainElement: 'Metal', // Remedy is Metal (draining) or Water (cooling)
-        confidence: 90,
-        isDirty: true,
-        description: "불과 흙이 뒤섞여 메마르고 탁해진 격국. 금(Metal)으로 설기하거나 수(Water)로 식혀야 함.",
-        enDescription: "A dry and turbid structure where Fire and Earth are mixed. Needs Metal to drain or Water to cool."
-      };
-    }
     }
     return null;
   };

@@ -740,9 +740,182 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const t = TRANSLATIONS[lang].result as any;
   const [guideSelectedPillar, setGuideSelectedPillar] = React.useState<'Year' | 'Month' | 'Day' | 'Hour'>('Day');
   const [hoveredHiddenStem, setHoveredHiddenStem] = React.useState<{pillarIdx: number, hsIdx: number, hs: string, connectedStems: string[], isDestroyed?: boolean} | null>(null);
+  const [guideRelTab, setGuideRelTab] = React.useState<'samhap' | 'banghap' | 'yukhap' | 'clash' | 'punish' | 'destroy' | 'harm'>('clash');
+  const [activeSubIndex, setActiveSubIndex] = React.useState<number>(0);
+  const [guideInsightCollapsed, setGuideInsightCollapsed] = React.useState<boolean>(true);
 
   const dayMasterDetails = result?.analysis?.dayMasterStrength?.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
   const isDayMasterRooted = !!(dayMasterDetails && dayMasterDetails.roots && dayMasterDetails.roots.some((rt: any) => !rt.isDestroyed));
+
+  const getUserInteractionMatch = (guideCategory: string, itemBranchesStr: string) => {
+    if (!result || !result.analysis || !result.analysis.interactions) return null;
+    
+    const branchHanjaToKo: Record<string, string> = {
+      '子': '자', '丑': '축', '寅': '인', '卯': '묘', '辰': '진', '巳': '사',
+      '午': '오', '未': '미', '申': '신', '酉': '유', '戌': '술', '亥': '해'
+    };
+
+    const stemHanjaToKo: Record<string, string> = {
+      '甲': '갑', '乙': '을', '丙': '병', '丁': '정', '戊': '무', '己': '기',
+      '庚': '경', '辛': '신', '壬': '임', '癸': '계'
+    };
+
+    const convertHanjaListToKo = (hanjaList: string[]): string[] => {
+      return hanjaList.map(h => branchHanjaToKo[h] || stemHanjaToKo[h] || h);
+    };
+
+    const interactions = result.analysis.interactions;
+    const subItems = itemBranchesStr.split('/').map(s => s.trim());
+    const parsedGuideGroups: string[][] = subItems.map(subStr => {
+      const koChars = subStr.match(/[가-힣]/g) || [];
+      return koChars as string[];
+    });
+    
+    const matchedInteractions: any[] = [];
+    
+    for (const inter of interactions) {
+      const interType = inter.type; // standard Korean or specific string like '삼합', '반합', etc.
+      
+      let isCategoryMatch = false;
+      if (guideCategory === 'samhap' && (interType === '삼합' || interType === '반합')) isCategoryMatch = true;
+      else if (guideCategory === 'banghap' && (interType === '방합' || interType === '준방합')) isCategoryMatch = true;
+      else if (guideCategory === 'yukhap' && interType === '육합') isCategoryMatch = true;
+      else if (guideCategory === 'clash' && (interType === '지지충' || interType === '격충' || interType === '원충' || interType === '천간충')) isCategoryMatch = true;
+      else if (guideCategory === 'punish' && (interType === '삼형' || interType === '반형' || interType === '자형' || interType === '복음' || interType === '상형')) isCategoryMatch = true;
+      else if (guideCategory === 'destroy' && interType === '파') isCategoryMatch = true;
+      else if (guideCategory === 'harm' && interType === '해') isCategoryMatch = true;
+      
+      if (!isCategoryMatch) continue;
+      
+      const interBranches = (inter.branches || []) as string[];
+      const interStems = (inter.stems || []) as string[];
+      const interItems = interBranches.length > 0 ? interBranches : interStems;
+      if (interItems.length === 0) continue;
+
+      const interItemsKo = convertHanjaListToKo(interItems);
+      
+      for (const gdGroup of parsedGuideGroups) {
+        if (gdGroup.length === 0) continue;
+        const uniqueInterItems = Array.from(new Set(interItemsKo));
+        const uniqueGdGroup = Array.from(new Set(gdGroup));
+        const uniqueOverlap = uniqueInterItems.filter((char: string) => uniqueGdGroup.includes(char));
+        
+        let isMatch = false;
+        if (interType === '자형' || interType === '복음') {
+          // Self-relations (e.g. 진진, 오오, 유유, 해해): match if the single unique branch is contained in gdGroup
+          isMatch = uniqueOverlap.length === 1 && (gdGroup.includes('진') || gdGroup.includes('오') || gdGroup.includes('유') || gdGroup.includes('해'));
+        } else {
+          // Multi-party relations (combinations, clashes, punishments, harms, destructions etc.)
+          // require at least 2 distinct matching characters to prevent false matching from duplicate single branches
+          isMatch = uniqueOverlap.length >= 2;
+        }
+        
+        if (isMatch) {
+          if (!matchedInteractions.some(m => m === inter)) {
+            matchedInteractions.push(inter);
+          }
+        }
+      }
+    }
+    
+    if (matchedInteractions.length === 0) return null;
+    
+    const getInterPriority = (it: any) => {
+      const sev = it.severity || "full";
+      const type = it.type || "";
+      
+      if (type === '지지충' || type === '천간충' || type === '삼형' || type === '자형' || type === '복음' || type === '육합' || type === '삼합' || type === '방합') {
+        if (sev === 'full') return 10;
+      }
+      if (type === '격충' || type === '반형' || type === '상형' || type === '반합' || type === '준방합') {
+        if (sev === 'half') return 7;
+      }
+      if (type === '원충' || type === '격합' || type === '원합' || type === '원격합' || type === '원형' || type === '원격충') {
+        if (sev === 'partial' || sev === 'half') return 4;
+      }
+      if (sev === 'full') return 9;
+      if (sev === 'half') return 6;
+      if (sev === 'partial') return 3;
+      return 1;
+    };
+    
+    matchedInteractions.sort((a, b) => getInterPriority(b) - getInterPriority(a));
+    
+    return {
+      ...matchedInteractions[0],
+      allMatches: matchedInteractions
+    };
+  };
+
+  const getInteractionStrength = (inter: any) => {
+    if (!inter) return null;
+    const type = inter.type;
+    const severity = inter.severity || "full"; // "full" | "half" | "partial"
+    
+    const isHap = type.includes('합');
+    
+    if (isHap) {
+      if (severity === 'full') {
+        return {
+          level: 'full',
+          labelKo: '합완성',
+          labelEn: 'Full Combo',
+          colorKo: 'text-amber-600 dark:text-amber-400',
+          badgeClass: 'bg-amber-400/20 text-amber-700 dark:text-amber-400 border border-amber-500/30'
+        };
+      } else if (severity === 'half' || type === '반합' || type === '준방합') {
+        return {
+          level: 'half',
+          labelKo: '반합 형성',
+          labelEn: 'Half Combo',
+          colorKo: 'text-sky-600 dark:text-cyan-300',
+          badgeClass: 'bg-sky-100 text-sky-900 dark:bg-sky-400/20 dark:text-cyan-300 border border-sky-300 dark:border-sky-450/30 font-bold'
+        };
+      } else {
+        // partial (격합, 원합 등)
+        return {
+          level: 'remote',
+          labelKo: '원격합',
+          labelEn: 'Remote Combo',
+          colorKo: 'text-violet-600 dark:text-violet-300',
+          badgeClass: 'bg-violet-400/20 text-violet-750 dark:text-violet-300 border border-violet-400/30'
+        };
+      }
+    } else {
+      // Clashes, punishments, harms, destructions
+      const isClash = type.includes('충');
+      const isPunish = type.includes('형');
+      const isPa = type === '파';
+      const isHae = type === '해';
+      
+      if (severity === 'full') {
+        return {
+          level: 'clash_full',
+          labelKo: isClash ? '완전충' : (isPunish ? '형살완전' : (isPa ? '파살완전' : '해살완전')),
+          labelEn: 'Full Friction',
+          colorKo: 'text-rose-600 dark:text-neon-pink',
+          badgeClass: 'bg-rose-400/20 text-rose-700 dark:text-neon-pink border border-rose-500/30'
+        };
+      } else if (severity === 'half') {
+        return {
+          level: 'clash_half',
+          labelKo: isClash ? '격충/마찰' : (isPunish ? '반형/마찰' : '중급마찰'),
+          labelEn: 'Mid Friction',
+          colorKo: 'text-orange-600 dark:text-orange-300',
+          badgeClass: 'bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-500/25'
+        };
+      } else {
+        // partial (e.g. 원충)
+        return {
+          level: 'clash_remote',
+          labelKo: isClash ? '원격충' : '원격마찰',
+          labelEn: 'Remote Friction',
+          colorKo: 'text-fuchsia-600 dark:text-fuchsia-300',
+          badgeClass: 'bg-fuchsia-500/15 text-fuchsia-750 dark:text-fuchsia-300 border border-fuchsia-500/25'
+        };
+      }
+    }
+  };
 
   const renderTenGodLabel = (ko: string, en: string, polarity: number) => {
     if (lang === 'KO') {
@@ -1242,6 +1415,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       if (!text) return text;
       let colorized = text;
       
+      // Protect '천재성' by temporarily shielding it
+      colorized = colorized.replace(/천재성/g, '##CHEONJAESEONG##');
+      
       const godToCategory: Record<string, string> = {
         '비견': '비겁', '겁재': '비겁', '비겁': '비겁',
         '식신': '식상', '상관': '식상', '식상': '식상',
@@ -1259,6 +1435,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
           colorized = colorized.replace(regex, `<span style="color: ${color}">${god}</span>`);
         }
       });
+      
+      // Restore '천재성' back to normal
+      colorized = colorized.replace(/##CHEONJAESEONG##/g, '천재성');
       
       return colorized;
     };
@@ -1664,7 +1843,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        </motion.div>
                     )}
                   </AnimatePresence>
-                  <p className="text-sm sm:text-[15px] font-display italic font-bold text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse leading-relaxed transition-colors cycle-vibe-preview-text">
+                  <p className={`text-sm sm:text-[15px] ${lang === 'KO' ? 'font-display italic' : 'font-sans'} font-bold text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse leading-relaxed transition-colors cycle-vibe-preview-text`}>
                     <TypingText 
                            key="short-vibe-preview" 
                            text={lang === 'KO' 
@@ -4517,149 +4696,1295 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                      {/* 3. Autumn (Harvest): Descending slope - 66.7% left, 50% top */}
                      <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '50%', left: '66.7%' }}>
-                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.5)] backdrop-blur-md">
-                         <span className="text-sm sm:text-lg">🍂</span>
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 border-2 border-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.5)] backdrop-blur-md">
+                         <span className="text-sm sm:text-lg">🌾</span>
                        </div>
                        <div className="absolute top-[24px] sm:top-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
                          <span className="text-yellow-400 font-bold block text-xs">{lang === 'KO' ? '수확기(가을)' : 'Harvest(Autumn)'}</span>
-                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '열매를 맺고\n결실을 거둠' : 'Bear fruit\nand harvest'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '열매를 맺고\n결실을 거둠' : 'Fruits ripen\nand harvest'}</span>
                        </div>
                        <div className="absolute top-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-yellow-400 font-bold block text-[10px]">{lang === 'KO' ? '가을' : 'Autumn'}</span>
                        </div>
                      </div>
 
-                     {/* 4. Winter (Contraction): Valley 2 - 83.3% left, 85% top */}
+                     {/* 4. Winter (Storage): Valley 2 - 83.3% left, 85% top */}
                      <div className="absolute z-10 transition-transform hover:scale-110" style={{ top: '85%', left: '83.3%' }}>
-                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(96,165,250,0.5)] backdrop-blur-md">
+                       <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] backdrop-blur-md">
                          <span className="text-sm sm:text-lg">❄️</span>
                        </div>
                        <div className="absolute bottom-[24px] sm:bottom-[28px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 hidden sm:block whitespace-nowrap">
-                         <span className="text-blue-400 font-bold block text-xs">{lang === 'KO' ? '수축기(겨울)' : 'Contraction(Winter)'}</span>
-                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '생명력을 비축하며\n휴식함' : 'Rest and reserve\nvitality'}</span>
+                         <span className="text-blue-400 font-bold block text-xs">{lang === 'KO' ? '저장기(겨울)' : 'Storage(Winter)'}</span>
+                         <span className="text-white/50 text-[10px] block leading-tight mt-1">{lang === 'KO' ? '만물을 저장하고\n휴식하며 준비함' : 'Storing all\nresting & preparing'}</span>
                        </div>
                        <div className="absolute bottom-[24px] -translate-x-1/2 text-center bg-black/70 px-2 py-1 rounded backdrop-blur-md border border-white/10 sm:hidden whitespace-nowrap">
                          <span className="text-blue-400 font-bold block text-[10px]">{lang === 'KO' ? '겨울' : 'Winter'}</span>
                        </div>
                      </div>
-                  </div>
-                </div>
-                <p className="text-sm leading-relaxed text-white/70">
-                  {lang === 'KO' ? 
-                    '태어날 때 받은 사주가 자동차라면, 대운(大運)은 그 자동차가 달리는 도로와 같습니다. 10년 단위로 바뀌는 이 운의 흐름에 따라 내게 유리한 환경이 오기도 하고, 폭풍우가 치기도 합니다. 사주 자체의 구조만큼이나 지금 내가 어느 계절을 지나는지가 중요합니다.' : 
-                    'If your BaZi chart is the vehicle you were born with, Daewun (10-year cycle) is the road you are driving on. This cycle changes every 10 years, shifting the environment like seasons. Recognizing which "season" you are passing through helps align your life strategy.'}
-                </p>
-              </div>
+                   </div>
+                 </div>
+               </div>
+
+               {/* Sub-section 1: Branch Interactivity */}
+                {(() => {
+                  const baziBranchData: Record<string, { hanja: string; en: string; colorLight: string; colorDark: string; elementKo: string; elementEn: string }> = {
+                    '자': { hanja: '子', en: 'Ja', colorLight: 'text-sky-600 font-extrabold', colorDark: 'text-[#00bfff] font-extrabold', elementKo: '수(Water)', elementEn: 'Water' },
+                    '축': { hanja: '丑', en: 'Chuk', colorLight: 'text-amber-700 font-extrabold', colorDark: 'text-[#f5b800] font-extrabold', elementKo: '토(Earth)', elementEn: 'Earth' },
+                    '인': { hanja: '寅', en: 'In', colorLight: 'text-emerald-600 font-extrabold', colorDark: 'text-[#00ea5e] font-extrabold', elementKo: '목(Wood)', elementEn: 'Wood' },
+                    '묘': { hanja: '卯', en: 'Myo', colorLight: 'text-emerald-600 font-extrabold', colorDark: 'text-[#00ea5e] font-extrabold', elementKo: '목(Wood)', elementEn: 'Wood' },
+                    '진': { hanja: '辰', en: 'Jin', colorLight: 'text-amber-700 font-extrabold', colorDark: 'text-[#f5b800] font-extrabold', elementKo: '토(Earth)', elementEn: 'Earth' },
+                    '사': { hanja: '巳', en: 'Sa', colorLight: 'text-rose-600 font-extrabold', colorDark: 'text-[#ff4747] font-extrabold', elementKo: '화(Fire)', elementEn: 'Fire' },
+                    '오': { hanja: '午', en: 'Oh', colorLight: 'text-rose-600 font-extrabold', colorDark: 'text-[#ff4747] font-extrabold', elementKo: '화(Fire)', elementEn: 'Fire' },
+                    '미': { hanja: '未', en: 'Mi', colorLight: 'text-amber-700 font-extrabold', colorDark: 'text-[#f5b800] font-extrabold', elementKo: '토(Earth)', elementEn: 'Earth' },
+                    '신': { hanja: '申', en: 'Sin', colorLight: 'text-slate-500 font-extrabold', colorDark: 'text-[#d8d8d8] font-extrabold', elementKo: '금(Metal)', elementEn: 'Metal' },
+                    '유': { hanja: '酉', en: 'Yu', colorLight: 'text-slate-500 font-extrabold', colorDark: 'text-[#d8d8d8] font-extrabold', elementKo: '금(Metal)', elementEn: 'Metal' },
+                    '술': { hanja: '戌', en: 'Sul', colorLight: 'text-amber-700 font-extrabold', colorDark: 'text-[#f5b800] font-extrabold', elementKo: '토(Earth)', elementEn: 'Earth' },
+                    '해': { hanja: '亥', en: 'Hae', colorLight: 'text-sky-600 font-extrabold', colorDark: 'text-[#00bfff] font-extrabold', elementKo: '수(Water)', elementEn: 'Water' },
+                  };
+
+                  const renderFormattedBranches = (inputText: string, lang: string, isLight: boolean) => {
+                    const parts = inputText.split('/');
+                    return parts.map((part, partIdx) => {
+                      const trimmed = part.trim();
+                      if (!trimmed) return null;
+
+                      const matches = trimmed.match(/^([가-힣\s]+)\(([^)]+)\)$/);
+                      let element: React.ReactNode;
+
+                      if (matches) {
+                        const koStr = matches[1].replace(/\s+/g, '');
+                        const hanjaStr = matches[2].replace(/\s+/g, '');
+
+                        const koSpans: React.ReactNode[] = [];
+                        const hanjaSpans: React.ReactNode[] = [];
+
+                        for (let i = 0; i < koStr.length; i++) {
+                          const char = koStr[i];
+                          const data = baziBranchData[char];
+                          const color = data ? (isLight ? data.colorLight : data.colorDark) : '';
+
+                          if (lang === 'KO') {
+                            koSpans.push(
+                              <span key={`ko-${i}`} className={color}>
+                                {char}
+                              </span>
+                            );
+                          } else {
+                            const enStr = data ? data.en : char;
+                            koSpans.push(
+                              <span key={`en-${i}`} className={color}>
+                                {enStr}
+                              </span>
+                            );
+                            if (i < koStr.length - 1) {
+                              koSpans.push(
+                                <span key={`hyphen-${i}`} className={isLight ? 'text-slate-400 mx-0.5 font-normal' : 'text-white/40 mx-0.5 font-normal'}>
+                                  -
+                                </span>
+                              );
+                            }
+                          }
+
+                          const hanjaChar = hanjaStr[i] || '';
+                          hanjaSpans.push(
+                            <span key={`hanja-${i}`} className={color}>
+                              {hanjaChar}
+                            </span>
+                          );
+                        }
+
+                        element = (
+                          <span className="inline-flex items-center whitespace-nowrap flex-nowrap">
+                            {koSpans}
+                            <span className={isLight ? 'text-slate-400 ml-0.5 font-normal' : 'text-white/40 ml-0.5 font-normal'}>(</span>
+                            {hanjaSpans}
+                            <span className={isLight ? 'text-slate-400 font-normal' : 'text-white/40 font-normal'}>)</span>
+                          </span>
+                        );
+                      } else {
+                        // For items without parenthesis or with plain slash format
+                        const textSpans: React.ReactNode[] = [];
+                        for (let i = 0; i < trimmed.length; i++) {
+                          const char = trimmed[i];
+                          const data = baziBranchData[char];
+                          const color = data ? (isLight ? data.colorLight : data.colorDark) : '';
+                          if (data) {
+                            if (lang === 'KO') {
+                              textSpans.push(<span key={i} className={color}>{char}</span>);
+                            } else {
+                              textSpans.push(
+                                <span key={i} className={color}>
+                                  {data.en}
+                                </span>
+                              );
+                              if (i < trimmed.length - 1 && baziBranchData[trimmed[i + 1]]) {
+                                textSpans.push(<span key={`hyphen-${i}`} className="opacity-40">-</span>);
+                              }
+                            }
+                          } else {
+                            textSpans.push(<span key={i}>{char}</span>);
+                          }
+                        }
+                        element = <span className="inline-flex items-center whitespace-nowrap flex-nowrap">{textSpans}</span>;
+                      }
+
+                      return (
+                        <React.Fragment key={partIdx}>
+                          {partIdx > 0 && (
+                            <span className={isLight ? 'text-slate-400 mx-1.5' : 'text-white/30 mx-1.5'}>
+                              /
+                            </span>
+                          )}
+                          {element}
+                        </React.Fragment>
+                      );
+                    });
+                  };
+
+                  const relationCategories = {
+                    samhap: {
+                      titleKo: '삼합 (三合) - 사회적 목적과 비전',
+                      titleEn: 'Sam-hap: Business & Common Goal',
+                      icon: '🪐',
+                      borderClass: 'border-neon-purple/30',
+                      bgClass: 'bg-indigo-50/40 border-indigo-100 dark:border-neon-purple/20',
+                      badgeClass: 'text-indigo-800 bg-indigo-100/50',
+                      badgeDarkClass: 'text-neon-purple bg-neon-purple/5',
+                      descKo: '서로 완전히 다른 오행 세 글자가 특정한 "사회적 합작 및 공통 목표(비즈니스, 학문, 정신)"를 두고 똘똘 뭉쳐 하나의 거대한 성향을 이끌어내는 결합입니다.',
+                      descEn: 'Three distinct branches unite with shared professional/metaphysical purpose, forming powerful elemental fields.',
+                      items: [
+                        {
+                          branches: '해묘미(亥卯未)',
+                          resultKo: '목(Wood)국 형성',
+                          resultEn: 'Wood Realm',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '해수(지혜와 자원)와 묘목(중심세력), 미토(완성 및 보관)가 합쳐져 강력한 시작과 추진력, 성장의 나무 기운을 창조해냅니다. 기획력과 창의성, 새로운 아이디어 개척에 최고의 시너지를 냅니다.',
+                          detailEn: 'Hae (Water-resource), Myo (Wood-core), and Mi (Earth-storage) unite to create powerful vertical growth. Brings creativity, vision-sharing, and pioneering academic/professional ventures.'
+                        },
+                        {
+                          branches: '인오술(寅午戌)',
+                          resultKo: '화(Fire)국 형성',
+                          resultEn: 'Fire Realm',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-[#f87171]',
+                          detailKo: '인목(시작과 동력)과 오화(정상과 중심), 술토(회수 및 저장)가 결집하여 찬란하고 폭발적인 불의 기운을 발산합니다. 예술, 미디어, 브랜딩, 사람들의 마음에 큰 파급력을 행사하는 영역에서 발군의 능력을 발휘합니다.',
+                          detailEn: 'In (Wood-start), Oh (Fire-peak), and Sul (Earth-end) unite to generate brilliant radiant heat. Ideal for public relations, entertainment, expressive arts, and high-influence leadership.'
+                        },
+                        {
+                          branches: '사유축(巳酉丑)',
+                          resultKo: '금(Metal)국 형성',
+                          resultEn: 'Metal Realm',
+                          colorKo: 'text-slate-600',
+                          colorEn: 'text-[#d8d8d8]',
+                          detailKo: '사화(전환과 발열)와 유금(순수 보석과 구조), 축토(안정과 마감)가 응축하여 예리하고 단단한 금속 기운을 만듭니다. 법률, 금융, 정밀 과학, 조직 설계 등 체계적인 규칙과 고성능 정교함을 상징합니다.',
+                          detailEn: 'Sa (Fire-catalyst), Yu (Metal-gem), and Chuk (Earth-lock) condense into super-dense focus. Best for legal planning, financial calculation, high-precision engineering, and systemic execution.'
+                        },
+                        {
+                          branches: '신자진(申子辰)',
+                          resultKo: '수(Water)국 형성',
+                          resultEn: 'Water Realm',
+                          colorKo: 'text-sky-705',
+                          colorEn: 'text-[#00bfff]',
+                          detailKo: '신금(근원과 정수)과 자수(심연과 중심), 진토(통제 및 저장)가 넓게 수렴하여 깊고 한계 없는 수의 지혜와 흐름을 만듭니다. 물류, 무역, 학문, 사색, 시장 유통망 형성 같이 국경과 장벽을 뛰어넘는 교류를 뜻합니다.',
+                          detailEn: 'Sin (Metal-wellhead), Ja (Water-deep), and Jin (Earth-delta) flow together into broad currents of wisdom. Fosters international trade, deep research, dynamic distribution networks, and intelligence.'
+                        }
+                      ]
+                    },
+                    banghap: {
+                      titleKo: '방합 (方合) - 계절적 동맹 / 가족적 세력',
+                      titleEn: 'Bang-hap: Family & Seasonal Gravity',
+                      icon: '🌲',
+                      borderClass: 'border-[#00ea5e]/30',
+                      bgClass: 'bg-green-50/40 border-green-105 dark:border-green-500/20',
+                      badgeClass: 'text-emerald-800 bg-green-100/50',
+                      badgeDarkClass: 'text-[#00ea5e] bg-green-500/5',
+                      descKo: '같은 계절과 방위(봄·여름·가을·겨울)를 온전히 차지한 혈연, 고향, 가문, 혹은 기득권적인 강력한 연대감입니다. 기운의 크기로는 명리학상 가장 막강합니다.',
+                      descEn: 'Alliances representing coordinates of the same season. Uniquely stable block resembling regional, familial, or massive organizational gravity.',
+                      items: [
+                        {
+                          branches: '인묘진(寅卯辰)',
+                          resultKo: '동방 목국 (봄)',
+                          resultEn: 'Wood (Spring / East)',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '봄철과 동방을 관장하는 인묘진이 모여 자연스러운 생명력의 연대를 구축합니다. 교육, 자선, 기여, 봄날 아지랑이 같은 순수한 생기 투사력을 나타냅니다.',
+                          detailEn: 'Wood elemental fortress dominant in Spring and Eastern direction. Represents community growth, education, nurturing, and pure lifeforce drive.'
+                        },
+                        {
+                          branches: '사오미(巳午未)',
+                          resultKo: '남방 화국 (여름)',
+                          resultEn: 'Fire (Summer / South)',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-[#f87171]',
+                          detailKo: '여름철과 남방을 달구는 사오미가 모여 뜨겁고 강력한 외향적 발산력을 이룹니다. 축제, 마케팅, 광활한 표현 영역에서 활기를 최대화합니다.',
+                          detailEn: 'Fire elemental fortress dominant in Summer and Southern direction. Shows highly expressive, energetic outreach, marketing expansion, and passion.'
+                        },
+                        {
+                          branches: '신유술(申酉戌)',
+                          resultKo: '서방 금국 (가을)',
+                          resultEn: 'Metal (Autumn / West)',
+                          colorKo: 'text-slate-600',
+                          colorEn: 'text-[#d8d8d8]',
+                          detailKo: '가을철과 서방을 이끄는 신유술이 모여 단호하고 알찬 결실의 연대를 이룹니다. 단단한 조직력, 군경, 정제된 실리 및 계약 중심의 세력을 의미합니다.',
+                          detailEn: 'Metal elemental fortress dominant in Autumn and Western direction. Portrays sharp structural discipline, security operations, contracts, and harvesting practical results.'
+                        },
+                        {
+                          branches: '해자축(亥子丑)',
+                          resultKo: '북방 수국 (겨울)',
+                          resultEn: 'Water (Winter / North)',
+                          colorKo: 'text-sky-705',
+                          colorEn: 'text-[#00bfff]',
+                          detailKo: '겨울철과 북방을 덮는 해자축이 모여 침잠하고 꼼꼼한 응축의 연대를 갖춥니다. 철학, 연구, 내실형 자본 축적, 보이지 않는 곳에서 작용하는 영향력을 의미합니다.',
+                          detailEn: 'Water elemental fortress dominant in Winter and Northern direction. Signifies deep philosophical intuition, research-dominated work, and covert financial/strategic planning.'
+                        }
+                      ]
+                    },
+                    yukhap: {
+                      titleKo: '육합 (六合) - 개인적 끌림 / 애정',
+                      titleEn: 'Yuk-hap: Close & Secret Affinity',
+                      icon: '💞',
+                      borderClass: 'border-neon-cyan/30',
+                      bgClass: 'bg-cyan-50/40 border-cyan-105 dark:border-neon-cyan/20',
+                      badgeClass: 'text-cyan-800 bg-cyan-100/50',
+                      badgeDarkClass: 'text-neon-cyan bg-neon-cyan/5',
+                      descKo: '열두 지지가 1:1로 비밀스럽게 짝을 지어 자석처럼 꼭 달라붙는 끌림입니다. 사적 비밀 연애나 소중하고 내밀한 오행의 협력을 의미합니다.',
+                      descEn: 'A personal 1:1 partnership formed by direct magnetic attraction, representing private affection or supportive micro-alliances.',
+                      items: [
+                        {
+                          branches: '자축(子丑)',
+                          resultKo: '토/수 합',
+                          resultEn: 'Earth/Water Union',
+                          colorKo: 'text-indigo-750',
+                          colorEn: 'text-indigo-400',
+                          detailKo: '밤과 겨울의 가장 깊은 지점에서의 결합으로, 내밀한 자금 거래나 깊은 신뢰 등 한눈에 드러나지 않는 아주 친밀한 동맹을 뜻합니다.',
+                          detailEn: 'Combination at the deepest midnight points. Suggests deep private contracts, confidential fund pools, or profound personal trusts.'
+                        },
+                        {
+                          branches: '인해(寅亥)',
+                          resultKo: '목 합',
+                          resultEn: 'Wood Union',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '차갑고 넘실대는 바다(해)가 어린 생명의 나무(인)에 유기적으로 기운을 적셔주어, 생기가 새로 피어나는 따뜻한 끌림과 상부상조의 뜻을 갖습니다.',
+                          detailEn: 'Generates Wood energy as Hae (Water) nurtures In (Wood). Represents life-producing empathy, academic support, and productive synergy.'
+                        },
+                        {
+                          branches: '묘술(卯戌)',
+                          resultKo: '화 합',
+                          resultEn: 'Fire Union',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-[#f87171]',
+                          detailKo: '봄 풀잎(묘)이 메마른 가을 영토(술)에 안겨 따스하게 보호막을 친 뒤 화(Fire) 기운으로 피어오르는 모양새로, 서로 이질적인 환경을 극복하는 강렬한 정을 의미합니다.',
+                          detailEn: 'Grass (Myo) seeking safe shelter in Earth soil (Sul) to blossom with Fire. Fosters strong emotional bond despite contrasting backgrounds.'
+                        },
+                        {
+                          branches: '진유(辰酉)',
+                          resultKo: '금 합',
+                          resultEn: 'Metal Union',
+                          colorKo: 'text-slate-650',
+                          colorEn: 'text-[#d8d8d8]',
+                          detailKo: '비옥하고 습한 대지(진)가 귀한 금속과 보석(유)을 영양 공급하듯 든든히 지원하여 강력한 단단함을 얻어내며, 확실하게 실속을 차리는 굳건한 약속을 나타냅니다.',
+                          detailEn: 'Fertile moist earth (Jin) wrapping precious metal gems (Yu). Assures premium commercial deals and sturdy material agreements.'
+                        },
+                        {
+                          branches: '사신(巳申)',
+                          resultKo: '수/금 합',
+                          resultEn: 'Water/Metal Union',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '뜨거운 빛(사)과 차가운 철강(신)이 부딪혀 녹아내리며 물로 수렴되거나 결합하는 과정입니다. 애증이 공존하며 복잡한 법적 타협이나 고난도 연대합의 과정을 겪습니다.',
+                          detailEn: 'Complex blend of clash, punishment, and eventual fluid union. Best for resolving delicate administrative negotiations and deep technical contracts.'
+                        },
+                        {
+                          branches: '오미(午未)',
+                          resultKo: '화/토 합',
+                          resultEn: 'Fire/Earth Union',
+                          colorKo: 'text-amber-755',
+                          colorEn: 'text-amber-400',
+                          detailKo: '가장 강렬한 대낮의 화염(오)과 가득 머금은 열풍의 건조한 흙(미)이 하나로 녹아나는 결합으로, 타오르는 공동의 이상과 높은 자존심, 사적인 열렬성을 의미합니다.',
+                          detailEn: 'Midday sun (Oh) and baking warm soil (Mi) dissolving into a dry heat fields. Promotes strong spiritual bonds, mutual defense, and shared core values.'
+                        }
+                      ]
+                    },
+                    clash: {
+                      titleKo: '충 (冲) - 격렬한 확장 / 역동적인 Reset',
+                      titleEn: 'Clash (冲) - Dynamic Reset & Extension',
+                      icon: '💥',
+                      borderClass: 'border-red-500/30',
+                      bgClass: 'bg-rose-50/70 border-rose-205 dark:border-red-500/20',
+                      badgeClass: 'text-rose-705 bg-rose-100/55',
+                      badgeDarkClass: 'text-rose-400 bg-rose-500/5',
+                      descKo: '반대 방향의 기류가 정면 충돌하여 극단적인 이동, 돌발적 깨어남, 혹은 이사/이직 마인드를 폭발시킵니다. 정체된 에너지를 돌리는 일생일대의 파격적인 원동력입니다.',
+                      descEn: 'Forces crashing from opposite directions, stimulating immediate movement, abrupt growth, or dynamic re-evaluation.',
+                      items: [
+                        {
+                          branches: '자오(子午)',
+                          resultKo: '수화충돌 (정서와 이성의 격돌)',
+                          resultEn: 'Water-Fire Clash',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-rose-400',
+                          detailKo: '가장 어두운 자수와 가장 밝은 오화가 격돌해 심리적 동요, 환경 리셋, 급변하는 이동을 만듭니다. 신체적 심장/신장 조절 신경과 영감의 충돌이기도 합니다.',
+                          detailEn: 'Midnight Water facing Midday Fire. Causes high emotional fluctuation, mental awakening, sudden movement, or deep relocations. Takes care of cardiovascular systems.'
+                        },
+                        {
+                          branches: '사해(巳亥)',
+                          resultKo: '수화충돌 (글로벌 이동과 정보 교환)',
+                          resultEn: 'Fire-Water Global Clash',
+                          colorKo: 'text-sky-705',
+                          colorEn: 'text-[#00bfff]',
+                          detailKo: '하늘을 가르는 빛(사)과 온 바다의 물길(해)이 만나서 빚는 세계적인 역마살입니다. 비행기 선박을 이용한 해외 출장, 기술 특화 연동, 격정적인 시야 변화를 유래합니다.',
+                          detailEn: 'Solar thermal light rays meeting deep global oceanic stream. Sparks high-frequency flight travels, foreign network upgrades, and technological changes.'
+                        },
+                        {
+                          branches: '인신(寅申)',
+                          resultKo: '금목충돌 (행동과 이동의 정면격돌)',
+                          resultEn: 'Wood-Metal Clash',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-emerald-450',
+                          detailKo: '달리기 시작하려는 역마(인)와 이를 가로막는 무거운 철갑차(신)가 만납니다. 급격한 역마살 변동, 해외 교류 추진, 교통이나 신체 동력의 대수선, 돌격 성향을 나타냅니다.',
+                          detailEn: 'Rising Wood (In) hitting dense Metal wagon (Sin). Fosters extreme geographical travel, vehicle switches, swift career turns, or muscular/spine care.'
+                        },
+                        {
+                          branches: '묘유(卯酉)',
+                          resultKo: '금목충돌 (섬세한 분리 및 갈등)',
+                          resultEn: 'Wood-Metal Sharp Clash',
+                          colorKo: 'text-slate-650',
+                          colorEn: 'text-slate-400',
+                          detailKo: '부드러운 화초나 신경선(묘)에 날카로운 칼(유)을 대고 수술하거나 다듬는 상태입니다. 인간관계 결별이나 세련된 전문 수술, 미용, 신경계통의 정교한 탈바꿈을 띱니다.',
+                          detailEn: 'Soft twigs (Myo) vs razor blades (Yu). Represents surgical intervention, crisp separations in close unions, neurological updates, or precision craftsmanship.'
+                        },
+                        {
+                          branches: '진술(辰戌)',
+                          resultKo: '토토충돌 (정신 세계와 창고의 대격변)',
+                          resultEn: 'Earth-Earth Clash (The Underworlds)',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '저승과 하늘의 관문인 진과 술이 만나 깊은 심리적 영역이나 천문, 종교, 철학, 깊이 갈고닦은 사색, 문서화된 영토의 대규모 개방과 수정을 낳습니다.',
+                          detailEn: 'Confrontation of mystical reservoirs (Jin as water storage vs Sul as fire storage). Promotes metaphysical breakthroughs, large document redesigns, or spiritual renewals.'
+                        },
+                        {
+                          branches: '축미(丑未)',
+                          resultKo: '토토충돌 (자산 및 내부 조율)',
+                          resultEn: 'Earth-Earth Clash',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '얼어붙은 겨울 흙(축)과 뜨거운 여름 흙(미)이 부딪혀 속의 금고들을 여는 양상입니다. 금전, 부동산, 가문 이권, 상속 등 물질적 기반의 리모델링을 의미합니다.',
+                          detailEn: 'Wet frozen earth contrasting baked hot soil. Triggers asset reallocation, estate modifications, deep vault opening, or structural reassessments.'
+                        }
+                      ]
+                    },
+                    punish: {
+                      titleKo: '형 (刑) - 제어와 정교한 조율',
+                      titleEn: 'Punishment (刑) - Precision Correction',
+                      icon: '⛓️',
+                      borderClass: 'border-amber-500/30',
+                      bgClass: 'bg-amber-50/70 border-amber-205 dark:border-amber-500/20',
+                      badgeClass: 'text-amber-805 bg-amber-100/55',
+                      badgeDarkClass: 'text-amber-400 bg-amber-500/5',
+                      descKo: '서로 마찰하며 쓸모없는 뼈대를 깎아내거나 칼을 대어 가공하는 에너지입니다. 꼼꼼한 마찰을 겪으며 의료, 법무, 세무, 세밀 가공 등 최고의 극기형 전문성으로 거듭납니다.',
+                      descEn: 'A carving friction that forces systematic adjustments, refinement of systems, or professional authority like legal/medical/computational arts.',
+                      items: [
+                        {
+                          branches: '인사신(寅巳申)',
+                          resultKo: '지세지형 (조직의 과속 제어)',
+                          resultEn: 'Regulatory speed-control of system',
+                          colorKo: 'text-red-750',
+                          colorEn: 'text-red-400',
+                          detailKo: '날렵한 세 역마가 모여 최고 속도로 달리다가 정밀 충돌 조율을 겪는 상황입니다. 강한 추진력을 바탕으로 군경검, 대형 엔지니어링, 복잡한 사법적/의료적 집행 능력을 이끌어냅니다.',
+                          detailEn: 'Three speedways interacting at full gallop. Empowers supreme authority in legal structures, critical surgical commands, or complex system integrations.'
+                        },
+                        {
+                          branches: '축술미(丑戌未)',
+                          resultKo: '무은지형 (자산/이권 조절 갈등)',
+                          resultEn: 'Resource Allocation friction',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '대지의 보물 상자 세 개가 모여 흙먼지를 피우며 내부 규칙을 고치는 양상입니다. 금전 분쟁, 지분 조절, 정교한 공적 감사, 세무 조사, 부동산 리빌딩의 전조입니다.',
+                          detailEn: 'Three giant earth vaults restructuring. Directs detailed audits, financial compromise, land division, and rigorous organizational realignment.'
+                        },
+                        {
+                          branches: '자묘(子卯)',
+                          resultKo: '무례지형 (인적 예의와 감정 마찰)',
+                          resultEn: 'Interpersonal & courtesy friction',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-rose-450',
+                          detailKo: '맑고 차가운 이슬(자)이 화초(묘)에 지나치게 쏟아져 짓무르는 갈등입니다. 남녀나 가족간의 서운함, 소통의 예의 결여, 산부인과/비뇨기 정밀 수술, 혹은 계약 마찰을 제어합니다.',
+                          detailEn: 'Excess dew causing minor branch rot. Challenges social relationships to implement high courtesy, emotional intelligence, skin/urological medicine, or fine adjustments.'
+                        },
+                        {
+                          branches: '진진 / 오오 / 유유 / 해해',
+                          resultKo: '자형 (과잉과 고집해결 및 성찰)',
+                          resultEn: 'Self-Correction of Excess',
+                          colorKo: 'text-indigo-750',
+                          colorEn: 'text-indigo-400',
+                          detailKo: '똑같은 넘치는 기운이 겹쳐 스스로 고심하며 오답 노트를 적는 격입니다. 지나친 완벽주의나 고집을 꺾고 자기 성찰을 거치면 최고의 독자적 대가로 발돋움합니다.',
+                          detailEn: 'Doubled energy fields leading to inner reflections. Fosters extreme professional focus and artistic perfectionism through personal audit cycles.'
+                        }
+                      ]
+                    },
+                    destroy: {
+                      titleKo: '파 (破) - 국소 미세균열',
+                      titleEn: 'Destruction (破) - Local Fissures',
+                      icon: '🔨',
+                      borderClass: 'border-yellow-600/30',
+                      bgClass: 'bg-yellow-50/50 border-yellow-250 dark:border-yellow-600/20',
+                      badgeClass: 'text-yellow-805 bg-yellow-101',
+                      badgeDarkClass: 'text-yellow-500 bg-yellow-500/5',
+                      descKo: '어떤 틀이나 진행중인 사안 중 불필요한 일부 부품을 "깨뜨려 보수하는" 미세조정입니다. 리모델링, 기획 단계의 기민한 수정 등을 유인합니다.',
+                      descEn: 'Local fissures introducing small micro-adjustments or component replacements. Perfect for fine polishing and repair stages.',
+                      items: [
+                        {
+                          branches: '자유(子酉)',
+                          resultKo: '정밀보완 (가습 및 보정 조율)',
+                          resultEn: 'Fluid Adjustment',
+                          colorKo: 'text-sky-705',
+                          colorEn: 'text-sky-400',
+                          detailKo: '귀한 금속(유)을 수(자)로 씻겨내는 도중 금이 가거나 너무 매끄러워 미끄러지는 형국입니다. 미세한 가습, 수술, 기획안의 잔부분 교체를 요합니다.',
+                          detailEn: 'Water and Metal slipping on subtle friction. Demands minor revision of drafts, surgical polish, or chemical adjustments.'
+                        },
+                        {
+                          branches: '축진(丑辰)',
+                          resultKo: '습토 결의 조율 및 윤택화',
+                          resultEn: 'Mud Wall Fissures',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '질퍽한 봄 흙(진)과 동토(축)가 비벼지며 미세하게 둑이 가라앉는 격입니다. 기초 대사 조절이나 오래된 부품 갈아끼우기를 진행하는 데 쓰입니다.',
+                          detailEn: 'Two wet soft soils blending loosely. Refreshes obsolete database elements or physical joint/metabolism routines.'
+                        },
+                        {
+                          branches: '인해(寅亥)',
+                          resultKo: '선합후파 (밀착 후 미세교정)',
+                          resultEn: 'First Combine, Then Refine',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '먼저 친하여 강력하게 뭉쳐진 뒤(육합), 상호간의 세부 역할 분담 과정에서 한두 군데 삐걱거리는 것을 수정하여 더욱 완벽한 결속을 자아냅니다.',
+                          detailEn: 'A bond that seals tightly first and then undergoes a fine-tuning phase to re-delegate exact responsibilities.'
+                        },
+                        {
+                          branches: '묘오(卯午)',
+                          resultKo: '속도연소 및 활력 리듬제어',
+                          resultEn: 'Sudden Fire Burn Repair',
+                          colorKo: 'text-rose-750',
+                          colorEn: 'text-[#ff4747]',
+                          detailKo: '목재(묘)가 용광로(오)에서 불타며 연기를 내기 쉬워, 연소 화력을 제어하는 굴뚝의 마찰과 같습니다. 감정 발산 속도의 리듬을 타게 돕습니다.',
+                          detailEn: 'Dry grass feeding a giant bonfire too rapidly. Sparks a need to manage expressiveness rhythm and physical fatigue.'
+                        },
+                        {
+                          branches: '사신(巳申)',
+                          resultKo: '용하 결합과 구조적 입체화',
+                          resultEn: 'Break and Bond Re-cycle',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '육합, 형, 파가 얽힌 사신은 격정적 결성 뒤 한 번 완전히 뜯어고쳐 새로운 패러다임으로 업그레이드하는 극적 리모델링 가치를 내포합니다.',
+                          detailEn: 'Contains multi-layered fusion, penalty, and fraction. Converts old systems entirely into state-of-the-art standards.'
+                        },
+                        {
+                          branches: '술미(戌未)',
+                          resultKo: '건토 버석거림 조절',
+                          resultEn: 'Dry Clay Fracture',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '가을 영토(술)와 뜨거운 모래밭(미)이 만나 뭉쳐지지 않고 버석거리며 갈라지는 틈입니다. 계약서의 특약 사항이나 겉핥기 협약의 공백을 정위합니다.',
+                          detailEn: 'Baked clay and warm desert dust colliding. Leads to re-checking safety clauses in loose partnerships.'
+                        }
+                      ]
+                    },
+                    harm: {
+                      titleKo: '해 (害) - 은밀한 정체/방해',
+                      titleEn: 'Harm (害) - Passive Friction',
+                      icon: '🛡️',
+                      borderClass: 'border-indigo-500/30',
+                      bgClass: 'bg-indigo-50/70 border-indigo-200/80 dark:border-indigo-500/20',
+                      badgeClass: 'text-indigo-805 bg-indigo-100/55',
+                      badgeDarkClass: 'text-indigo-400 bg-indigo-500/5',
+                      descKo: '합(끌림)을 뒤에서 훼방 놓는 성분으로, 진행이 다소 늦어지거나 인간관계 오해를 자아내며 속을 끓입니다. 정면승부보단 기민한 심리적 경계 정리가 요망됩니다.',
+                      descEn: 'Passive elements blocking cozy combinations, suggesting invisible delays or subtle psychological distances.',
+                      items: [
+                        {
+                          branches: '자미(子未)',
+                          resultKo: '탁수 원망 (정서 미묘 원망)',
+                          resultEn: 'Muddy Stream Friction',
+                          colorKo: 'text-purple-750',
+                          colorEn: 'text-purple-400',
+                          detailKo: '자수의 맑음과 미토의 건조함이 섞여 흙탕물을 형성하듯 미성숙한 원망심이 일어날 수 있습니다. 내면의 정서를 고요하게 관망하는 지혜가 필요합니다.',
+                          detailEn: 'Clean spring mixed with hot dust. Invites you to let emotional sediments settle naturally rather than reacting hastily.'
+                        },
+                        {
+                          branches: '축오(丑午)',
+                          resultKo: '탕화 가열 (내면 조급증 극복)',
+                          resultEn: 'Steam Engine Friction',
+                          colorKo: 'text-red-750',
+                          colorEn: 'text-red-400',
+                          detailKo: '얼음 땅(축)과 뜨거운 쇳물(오)이 만나 증기를 급작스럽게 뿜으며 내부 압력이 오르는 격입니다. 충동적 분노를 가라앉히고 우아하게 삭여 해결합니다.',
+                          detailEn: 'Extreme hot and extreme cold touching. Generates internal thermal pressure, advising slow, conscious breathing and mindful meditation.'
+                        },
+                        {
+                          branches: '인사(寅巳)',
+                          resultKo: '조급 가열 조절',
+                          resultEn: 'Overheated Drive',
+                          colorKo: 'text-orange-750',
+                          colorEn: 'text-orange-400',
+                          detailKo: '거친 나무(인)가 너무 센 화염(사) 속으로 자진해서 뛰어들듯 하여 일찍 연고가 소모되는 모양입니다. 완급조절과 일과 휴식의 분배가 최선입니다.',
+                          detailEn: 'Wood pushing its bounds into dynamic Fire prematurely. Demands strategic pacing to avoid exhaustion.'
+                        },
+                        {
+                          branches: '묘진(卯辰)',
+                          resultKo: '경계 협조 조정',
+                          resultEn: 'Territorial Boundary Spans',
+                          colorKo: 'text-emerald-750',
+                          colorEn: 'text-[#00ea5e]',
+                          detailKo: '봄 풀잎이 윤택한 토양의 주권을 가두려 하여 가까운 사이의 서운한 이기심이 생깁니다. 각자의 고유 영토와 경제적 선을 명확히 함으로써 완충됩니다.',
+                          detailEn: 'Minor boundary disputes between plants and mud beds. Fixed by setting sweet, respectful personal lines.'
+                        },
+                        {
+                          branches: '신해(申亥)',
+                          resultKo: '소소 정체 (강철 부식 습기)',
+                          resultEn: 'Metallic Corrosion Damp',
+                          colorKo: 'text-teal-750',
+                          colorEn: 'text-teal-400',
+                          detailKo: '잘 다듬어진 강철(신)이 흐르지 않는 수중에 침잠해 미세하게 녹이 스는 듯한 passive 한 오해입니다. 명징한 텍스트로 오해 요소를 선제 타파하십시오.',
+                          detailEn: 'Steel (Sin) soaking in damp channels (Hae). Reminds you to document all verbal plans to prevent unwritten issues.'
+                        },
+                        {
+                          branches: '유술(酉戌)',
+                          resultKo: '찰과상 극복 (보검의 자갈밭 격마찰)',
+                          resultEn: 'Jewel Sand Abrasion',
+                          colorKo: 'text-amber-750',
+                          colorEn: 'text-amber-400',
+                          detailKo: '금 보검(유)이 메마른 자갈 영토(술)에 긁혀 잔상이 생기는 격마찰입니다. 남모르게 내뱉는 질투 섞인 말들로부터 내 진성 가치를 굳게 지킬 때입니다.',
+                          detailEn: 'High polished metal sliding across gravel soil. Encourages you to ignore peripheral complaints and shine with master dignity.'
+                        }
+                      ]
+                    }
+                  } satisfies Record<string, { titleKo: string; titleEn: string; icon: string; borderClass: string; bgClass: string; badgeClass: string; badgeDarkClass: string; descKo: string; descEn: string; items: any[] }>;
+
+                  const getPillarNameLocal = (idx: number, lg: 'KO' | 'EN') => {
+                    if (lg === 'KO') {
+                      return ["시주", "일주", "월주", "연주"][idx] || "";
+                    }
+                    return ["Hour", "Day", "Month", "Year"][idx] || "";
+                  };
+
+                  const getPillarMeaningLocal = (idx: number, lg: 'KO' | 'EN') => {
+                    if (lg === 'KO') {
+                      return ["자식/미래", "나/배우자", "부모/사회", "조상/근본"][idx] || "";
+                    }
+                    return ["Children/Future", "Self/Spouse", "Parents/Society", "Ancestors/Roots"][idx] || "";
+                  };
+
+                  const tabsConf = [
+                    { id: 'samhap', labelKo: '삼합 (三合)', labelEn: 'Sam-hap', themeColor: 'text-[#a78bfa] dark:text-[#c084fc]', colorClass: 'border-neon-purple/20' },
+                    { id: 'banghap', labelKo: '방합 (方合)', labelEn: 'Bang-hap', themeColor: 'text-emerald-600 dark:text-[#a3e635]', colorClass: 'border-green-500/20' },
+                    { id: 'yukhap', labelKo: '육합 (六合)', labelEn: 'Yuk-hap', themeColor: 'text-cyan-600 dark:text-[#22d3ee]', colorClass: 'border-neon-cyan/20' },
+                    { id: 'clash', labelKo: '충 (冲)', labelEn: 'Clash', themeColor: 'text-rose-600 dark:text-[#f43f5e]', colorClass: 'border-red-500/20' },
+                    { id: 'punish', labelKo: '형 (刑)', labelEn: 'Punishment', themeColor: 'text-amber-600 dark:text-[#fbbf24]', colorClass: 'border-amber-500/20' },
+                    { id: 'destroy', labelKo: '파 (破)', labelEn: 'Destruction', themeColor: 'text-yellow-600 dark:text-[#facc15]', colorClass: 'border-yellow-500/10' },
+                    { id: 'harm', labelKo: '해 (害)', labelEn: 'Harm', themeColor: 'text-indigo-600 dark:text-[#818cf8]', colorClass: 'border-indigo-500/20' },
+                  ] as const;
+
+                  const currentCategory = relationCategories[guideRelTab] || relationCategories.clash;
+                  const currentCategoryItems = currentCategory.items;
+                  const safeActiveIndex = activeSubIndex >= currentCategoryItems.length ? 0 : activeSubIndex;
+                  const activeItem = currentCategoryItems[safeActiveIndex];
+                  const activeUserMatch = activeItem ? getUserInteractionMatch(guideRelTab, activeItem.branches) : null;
+
+                  const handlePrevItem = () => {
+                    const len = currentCategoryItems.length;
+                    setActiveSubIndex((safeActiveIndex - 1 + len) % len);
+                  };
+
+                  const handleNextItem = () => {
+                    const len = currentCategoryItems.length;
+                    setActiveSubIndex((safeActiveIndex + 1) % len);
+                  };
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Sub-navigation tabs: Slide rail style */}
+                      <div className={`p-1.5 rounded-xl border flex items-center gap-1.5 overflow-x-auto no-scrollbar scrollbar-none select-none ${isLight ? 'bg-slate-100/80 border-slate-200' : 'bg-black/55 border-white/5'}`}>
+                        {tabsConf.map((tab) => {
+                          const isActive = guideRelTab === tab.id;
+                          return (
+                            <button
+                              key={tab.id}
+                              id={`bazi-guide-tab-${tab.id}`}
+                              onClick={() => {
+                                setGuideRelTab(tab.id);
+                                setActiveSubIndex(0);
+                              }}
+                              className={`px-3 py-2 text-xs font-bold rounded-lg shrink-0 transition-all duration-300 active:scale-95 flex items-center gap-1 cursor-pointer border ${
+                                isActive 
+                                  ? (isLight 
+                                      ? `bg-white border-slate-300 text-slate-800 shadow-sm ${tab.themeColor}` 
+                                      : `bg-[#24253e] border-white/10 ${tab.themeColor} shadow-md shadow-black/40 glow-[0_0_12px_rgba(255,255,255,0.05)]`)
+                                  : (isLight
+                                      ? 'bg-transparent border-transparent text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                      : 'bg-transparent border-transparent text-white/50 hover:text-white/80 hover:bg-white/5')
+                              }`}
+                            >
+                              <span>{relationCategories[tab.id].icon}</span>
+                              <span>{lang === 'KO' ? tab.labelKo : tab.labelEn}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Main explanation card */}
+                      <div className={`p-5 rounded-2xl border transition-all duration-300 ${
+                        isLight 
+                          ? 'bg-white border-slate-200 shadow-sm' 
+                          : 'bg-[#1c1d30]/65 border-white/10 shadow-xl'
+                      }`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                          <h5 className={`text-base font-black flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                            <span className="text-xl">{currentCategory.icon}</span>
+                            <span>{lang === 'KO' ? currentCategory.titleKo : currentCategory.titleEn}</span>
+                          </h5>
+                          <span className={`text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full border border-dashed shrink-0 self-start ${
+                            isLight ? 'bg-slate-50 border-slate-300 text-slate-400' : 'bg-black/30 border-white/10 text-white/40'
+                          }`}>
+                            {guideRelTab}
+                          </span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${isLight ? 'text-slate-600' : 'text-white/70'}`}>
+                          {lang === 'KO' ? currentCategory.descKo : currentCategory.descEn}
+                        </p>
+
+                        {/* Combined Grid selector and carousel view */}
+                        <div className="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                          
+                          {/* Left Panel: Direct list selectors (Compact buttons grid) */}
+                          <div className="lg:col-span-5 space-y-2">
+                            <span className={`text-[10px] uppercase font-semibold tracking-wider block ${isLight ? 'text-slate-450' : 'text-white/40'}`}>
+                              {lang === 'KO' ? '지자 조합 리스트' : 'Combination List'}
+                            </span>
+                            
+                            <style>{`
+                              @keyframes bazi-glow-full-l {
+                                0%, 100% { border-color: rgba(217, 119, 6, 0.45); background-color: rgba(254, 243, 199, 0.65); box-shadow: 0 0 6px rgba(245, 158, 11, 0.15); }
+                                50% { border-color: rgba(180, 83, 9, 1); background-color: rgba(254, 243, 199, 1); box-shadow: 0 0 18px rgba(245, 158, 11, 0.85), inset 0 0 8px rgba(245, 158, 11, 0.3); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-full-d {
+                                0%, 100% { border-color: rgba(245, 158, 11, 0.35); background-color: rgba(49, 35, 20, 0.45); box-shadow: 0 0 6px rgba(245, 158, 11, 0.15); }
+                                50% { border-color: rgba(245, 158, 11, 1); background-color: rgba(60, 42, 22, 0.95); box-shadow: 0 0 24px rgba(245, 158, 11, 0.75), inset 0 0 10px rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-half-l {
+                                0%, 100% { border-color: rgba(14, 165, 233, 0.4); background-color: rgba(240, 249, 255, 0.65); box-shadow: 0 0 6px rgba(14, 165, 233, 0.15); }
+                                50% { border-color: rgba(2, 132, 199, 1); background-color: rgba(224, 242, 254, 1); box-shadow: 0 0 16px rgba(14, 165, 233, 0.75), inset 0 0 6px rgba(14, 165, 233, 0.25); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-half-d {
+                                0%, 100% { border-color: rgba(0, 191, 255, 0.3); background-color: rgba(18, 40, 62, 0.45); box-shadow: 0 0 6px rgba(0, 191, 255, 0.15); }
+                                50% { border-color: rgba(0, 191, 255, 1); background-color: rgba(18, 40, 62, 0.95); box-shadow: 0 0 22px rgba(0, 191, 255, 0.7), inset 0 0 8px rgba(0, 191, 255, 0.3); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-remote-l {
+                                0%, 100% { border-color: rgba(139, 92, 246, 0.35); background-color: rgba(245, 243, 255, 0.65); box-shadow: 0 0 4px rgba(139, 92, 246, 0.1); }
+                                50% { border-color: rgba(109, 40, 217, 0.85); background-color: rgba(237, 233, 254, 0.95); box-shadow: 0 0 14px rgba(139, 92, 246, 0.55), inset 0 0 6px rgba(139, 92, 246, 0.2); transform: translateY(-1px); }
+                              }
+                              @keyframes bazi-glow-remote-d {
+                                0%, 100% { border-color: rgba(139, 92, 246, 0.25); background-color: rgba(28, 20, 48, 0.45); box-shadow: 0 0 4px rgba(139, 92, 246, 0.1); }
+                                50% { border-color: rgba(167, 139, 250, 0.9); background-color: rgba(40, 28, 68, 0.95); box-shadow: 0 0 18px rgba(139, 92, 246, 0.6), inset 0 0 6px rgba(139, 92, 246, 0.2); transform: translateY(-1px); }
+                              }
+                              @keyframes bazi-glow-clash-full-l {
+                                0%, 100% { border-color: rgba(244, 63, 94, 0.45); background-color: rgba(255, 241, 242, 0.65); box-shadow: 0 0 6px rgba(244, 63, 94, 0.15); }
+                                50% { border-color: rgba(225, 29, 72, 1); background-color: rgba(254, 226, 226, 1); box-shadow: 0 0 18px rgba(244, 63, 94, 0.85), inset 0 0 8px rgba(244, 63, 94, 0.3); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-clash-full-d {
+                                0%, 100% { border-color: rgba(244, 63, 94, 0.35); background-color: rgba(41, 17, 28, 0.45); box-shadow: 0 0 6px rgba(244, 63, 94, 0.15); }
+                                50% { border-color: rgba(255, 0, 122, 1); background-color: rgba(41, 17, 28, 0.95); box-shadow: 0 0 24px rgba(255, 0, 122, 0.75), inset 0 0 10px rgba(255, 0, 122, 0.4); transform: translateY(-2px); }
+                              }
+                              @keyframes bazi-glow-clash-half-l {
+                                0%, 100% { border-color: rgba(249, 115, 22, 0.4); background-color: rgba(255, 247, 237, 0.65); box-shadow: 0 0 6px rgba(249, 115, 22, 0.15); }
+                                50% { border-color: rgba(234, 88, 12, 1); background-color: rgba(255, 237, 213, 1); box-shadow: 0 0 16px rgba(249, 115, 22, 0.75); transform: translateY(-1.5px); }
+                              }
+                              @keyframes bazi-glow-clash-half-d {
+                                0%, 100% { border-color: rgba(249, 115, 22, 0.3); background-color: rgba(56, 27, 12, 0.45); box-shadow: 0 0 6px rgba(249, 115, 22, 0.15); }
+                                50% { border-color: rgba(249, 115, 22, 1); background-color: rgba(56, 27, 12, 0.95); box-shadow: 0 0 20px rgba(249, 115, 22, 0.65); transform: translateY(-1.5px); }
+                              }
+                              @keyframes bazi-glow-clash-remote-l {
+                                0%, 100% { border-color: rgba(217, 70, 239, 0.35); background-color: rgba(253, 244, 255, 0.65); box-shadow: 0 0 4px rgba(217, 70, 239, 0.10); }
+                                50% { border-color: rgba(192, 38, 211, 0.85); background-color: rgba(250, 232, 255, 0.95); box-shadow: 0 0 14px rgba(217, 70, 239, 0.55); transform: translateY(-1px); }
+                              }
+                              @keyframes bazi-glow-clash-remote-d {
+                                0%, 100% { border-color: rgba(217, 70, 239, 0.25); background-color: rgba(43, 15, 48, 0.45); box-shadow: 0 0 4px rgba(217, 70, 239, 0.10); }
+                                50% { border-color: rgba(217, 70, 239, 0.95); background-color: rgba(43, 15, 48, 0.95); box-shadow: 0 0 18px rgba(217, 70, 239, 0.6); transform: translateY(-1px); }
+                              }
+
+                              @keyframes bazi-desc-glow-half {
+                                0%, 100% { border-color: rgba(14, 165, 233, 0.3); box-shadow: 0 0 4px rgba(14, 165, 233, 0.05); }
+                                50% { border-color: rgba(14, 165, 233, 0.85); box-shadow: 0 0 12px rgba(14, 165, 233, 0.3); }
+                              }
+                              @keyframes bazi-desc-glow-full {
+                                0%, 100% { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 4px rgba(245, 158, 11, 0.05); }
+                                50% { border-color: rgba(245, 158, 11, 0.85); box-shadow: 0 0 12px rgba(245, 158, 11, 0.3); }
+                              }
+                              @keyframes bazi-desc-glow-present {
+                                0%, 100% { border-color: rgba(244, 63, 94, 0.3); box-shadow: 0 0 4px rgba(244, 63, 94, 0.05); }
+                                50% { border-color: rgba(244, 63, 94, 0.85); box-shadow: 0 0 12px rgba(244, 63, 94, 0.3); }
+                              }
+                              
+                              .bazi-pulse-full-light { animation: bazi-glow-full-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-full-dark { animation: bazi-glow-full-d 2.4s infinite ease-in-out; }
+                              .bazi-pulse-half-light { animation: bazi-glow-half-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-half-dark { animation: bazi-glow-half-d 2.4s infinite ease-in-out; }
+                              .bazi-pulse-remote-light { animation: bazi-glow-remote-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-remote-dark { animation: bazi-glow-remote-d 2.4s infinite ease-in-out; }
+
+                              .bazi-pulse-clash-full-light { animation: bazi-glow-clash-full-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-clash-full-dark { animation: bazi-glow-clash-full-d 2.4s infinite ease-in-out; }
+                              .bazi-pulse-clash-half-light { animation: bazi-glow-clash-half-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-clash-half-dark { animation: bazi-glow-clash-half-d 2.4s infinite ease-in-out; }
+                              .bazi-pulse-clash-remote-light { animation: bazi-glow-clash-remote-l 2.4s infinite ease-in-out; }
+                              .bazi-pulse-clash-remote-dark { animation: bazi-glow-clash-remote-d 2.4s infinite ease-in-out; }
+
+                              .desc-glow-half { animation: bazi-desc-glow-half 2.8s infinite ease-in-out; }
+                              .desc-glow-full { animation: bazi-desc-glow-full 2.8s infinite ease-in-out; }
+                              .desc-glow-present { animation: bazi-desc-glow-present 2.8s infinite ease-in-out; }
+                            `}</style>
+
+                            <div className="grid grid-cols-2 gap-2 min-h-[182px] w-full min-w-0">
+                               {currentCategoryItems.map((item, idx) => {
+                                 const isItemActive = idx === safeActiveIndex;
+                                 const userMatch = getUserInteractionMatch(guideRelTab, item.branches);
+                                 const matchStrength = getInteractionStrength(userMatch);
+
+                                 let buttonStyleClass = "";
+                                 let animStyleClass = "";
+
+                                 if (matchStrength) {
+                                   const level = matchStrength.level;
+                                   if (level === 'full') {
+                                     animStyleClass = isLight ? "bazi-pulse-full-light" : "bazi-pulse-full-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-amber-600 text-amber-950 ring-2 ring-amber-400 bg-amber-100/40 shadow-md font-black'
+                                         : 'border-amber-400 text-white ring-2 ring-amber-400/40 bg-[#312314] shadow-[0_0_15px_rgba(245,158,11,0.5)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-amber-300 text-amber-900 bg-amber-50/25 font-bold hover:bg-amber-100/30'
+                                         : 'border-amber-500/20 text-amber-300 font-bold bg-amber-500/5 hover:bg-amber-500/10';
+                                     }
+                                   } else if (level === 'half') {
+                                     animStyleClass = isLight ? "bazi-pulse-half-light" : "bazi-pulse-half-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-sky-500 text-sky-950 ring-2 ring-sky-305 font-black bg-sky-100/40 shadow-md'
+                                         : 'border-sky-400 text-white ring-2 ring-sky-400/40 bg-[#12283e] shadow-[0_0_15px_rgba(0,191,255,0.45)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-sky-300 text-sky-900 bg-sky-50/25 font-bold hover:bg-sky-100/30'
+                                         : 'border-[#0ea5e9]/20 text-sky-300 font-bold bg-sky-500/5 hover:bg-sky-500/10';
+                                     }
+                                   } else if (level === 'remote') {
+                                     animStyleClass = isLight ? "bazi-pulse-remote-light" : "bazi-pulse-remote-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-violet-550 text-violet-950 ring-2 ring-violet-350 bg-violet-100/40 shadow-md font-black'
+                                         : 'border-violet-400 text-white ring-2 ring-violet-455/40 bg-[#21163a] shadow-[0_0_15px_rgba(139,92,246,0.45)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-violet-300 text-violet-900 bg-violet-50/25 font-bold hover:bg-violet-100/30'
+                                         : 'border-violet-500/20 text-violet-300 font-bold bg-violet-500/5 hover:bg-violet-500/10';
+                                     }
+                                   } else if (level === 'clash_full') {
+                                     animStyleClass = isLight ? "bazi-pulse-clash-full-light" : "bazi-pulse-clash-full-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-rose-600 text-rose-950 ring-2 ring-rose-350 bg-rose-100/40 shadow-md font-black'
+                                         : 'border-rose-450 text-white ring-2 ring-rose-450/40 bg-[#29111c] shadow-[0_0_15px_rgba(255,0,122,0.45)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-rose-300 text-rose-905 bg-rose-50/25 font-bold hover:bg-rose-100/30'
+                                         : 'border-rose-500/20 text-rose-300 font-bold bg-rose-500/5 hover:bg-rose-500/10';
+                                     }
+                                   } else if (level === 'clash_half') {
+                                     animStyleClass = isLight ? "bazi-pulse-clash-half-light" : "bazi-pulse-clash-half-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-orange-550 text-orange-950 ring-2 ring-orange-355 bg-orange-100/40 shadow-md font-black'
+                                         : 'border-orange-400 text-white ring-2 ring-orange-450/40 bg-[#351a0b] shadow-[0_0_15px_rgba(249,115,22,0.45)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-orange-300 text-orange-900 bg-orange-50/19 font-bold hover:bg-orange-100/30'
+                                         : 'border-orange-500/20 text-orange-300 font-bold bg-orange-500/5 hover:bg-orange-500/10';
+                                     }
+                                   } else if (level === 'clash_remote') {
+                                     animStyleClass = isLight ? "bazi-pulse-clash-remote-light" : "bazi-pulse-clash-remote-dark";
+                                     if (isItemActive) {
+                                       buttonStyleClass = isLight
+                                         ? 'border-fuchsia-550 text-fuchsia-950 ring-2 ring-fuchsia-350 bg-fuchsia-100/40 shadow-md font-black'
+                                         : 'border-[#d946ef] text-white ring-2 ring-fuchsia-450/40 bg-[#2a1130] shadow-[0_0_15px_rgba(217,70,239,0.45)] font-black';
+                                     } else {
+                                       buttonStyleClass = isLight
+                                         ? 'border-fuchsia-300 text-fuchsia-900 bg-fuchsia-50/25 font-bold hover:bg-[#fdf4ff]'
+                                         : 'border-fuchsia-500/20 text-fuchsia-300 font-bold bg-fuchsia-500/5 hover:bg-fuchsia-500/10';
+                                     }
+                                   } else {
+                                     buttonStyleClass = isLight
+                                       ? 'border-[#cbd5e1] text-slate-700 bg-transparent hover:bg-slate-50/30'
+                                       : 'border-white/5 text-white/50 bg-transparent hover:bg-white/5';
+                                   }
+                                 } else {
+                                   if (isItemActive) {
+                                     buttonStyleClass = isLight
+                                       ? 'bg-indigo-50/50 border-indigo-400/80 shadow-sm ring-1 ring-indigo-400/20 text-slate-900 font-bold'
+                                       : 'bg-[#2b2c4e] border-neon-cyan/50 shadow-lg ring-1 ring-neon-cyan/10 ring-offset-black/20 text-white';
+                                   } else {
+                                     buttonStyleClass = isLight
+                                       ? 'bg-slate-50/60 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-100/50'
+                                       : 'bg-black/35 border-white/5 text-white/70 hover:border-white/15 hover:bg-white/5';
+                                   } }
+
+                                const isLongBranches = item.branches.length > 6 || lang !== 'KO';
+                                const fontSizeClass = isLongBranches
+                                  ? "text-[9.5px] sm:text-[10px]"
+                                  : "text-[10.5px] sm:text-xs";
+
+                                return (
+                                  <button
+                                    key={idx}
+                                    id={`bazi-guide-sub-${idx}`}
+                                    onClick={() => setActiveSubIndex(idx)}
+                                    className={`p-3 rounded-xl border text-left flex flex-col gap-1.5 min-w-0 select-none transition-all duration-300 active:scale-[0.98] cursor-pointer w-full overflow-hidden ${buttonStyleClass} ${animStyleClass}`}
+                                  >
+                                    <div className="flex items-center justify-between w-full gap-1">
+                                      <span className={`${fontSizeClass} font-gothic flex flex-wrap items-center gap-x-0.5 gap-y-0.5 leading-tight uppercase flex-1 break-normal`}>
+                                        {renderFormattedBranches(item.branches, lang, isLight)}
+                                      </span>
+                                      {matchStrength && (() => {
+                                        const badgeText = lang === 'KO' ? matchStrength.labelKo : matchStrength.labelEn;
+                                        const badgeColorClass = matchStrength.badgeClass;
+
+                                        return (
+                                          <span className={`text-[8px] font-black tracking-normal px-1 py-0.5 rounded flex items-center gap-x-0.5 whitespace-nowrap scale-90 ${badgeColorClass}`}>
+                                            <span className="text-[7px]">✦</span>
+                                            <span>{badgeText}</span>
+                                          </span>
+                                        );
+                                      })()}
+                                    </div>
+                                    <span className={`text-[10px] font-black tracking-tight block ${
+                                      isItemActive 
+                                        ? (isLight ? 'text-indigo-750 font-black' : 'text-neon-cyan') 
+                                        : (isLight ? 'text-slate-400' : 'text-white/40')
+                                    }`}>
+                                      {lang === 'KO' ? item.resultKo : item.resultEn}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {/* Advanced Multiple Interactions Breakdown 옮겨옴 */}
+                            {activeUserMatch && activeUserMatch.allMatches && activeUserMatch.allMatches.length > 1 && (
+                              <div className={`p-3.5 rounded-xl border space-y-3 transition-all duration-300 mt-4 shadow-sm ${
+                                isLight 
+                                  ? 'bg-slate-50 border-slate-200' 
+                                  : 'bg-[#18181b]/98 border-zinc-800 shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
+                              }`}>
+                                <div className="text-[10px] font-extrabold uppercase tracking-wider opacity-90 flex items-center gap-1">
+                                  <span>🔗</span>
+                                  <span className={isLight ? 'text-slate-800' : 'text-zinc-200'}>
+                                    {lang === 'KO' 
+                                      ? `복합 작용 발생 (${activeUserMatch.allMatches.length}개의 중첩 관계 발견)` 
+                                      : `Complex Multi-Overlap Detected (${activeUserMatch.allMatches.length} Relations)`}
+                                  </span>
+                                </div>
+                                
+                                <div className="space-y-2 text-[10.5px]">
+                                  {activeUserMatch.allMatches.map((m: any, mIdx: number) => {
+                                    const mPillars = m.pillarIndices || [];
+                                    const locTxt = mPillars.map((pIdx: number) => {
+                                      const pName = getPillarNameLocal(pIdx, lang);
+                                      const pMean = getPillarMeaningLocal(pIdx, lang);
+                                      return `${pName}(${pMean})`;
+                                    }).join(' ↔ ');
+                                    
+                                    let relationName = "";
+                                    let relationDescKo = "";
+                                    let relationDescEn = "";
+                                    
+                                    if (m.type === '복음') {
+                                      relationName = lang === 'KO' ? '복음 (기둥 중복)' : 'Pillar Duplication (Bok-eum)';
+                                      relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '동일 기운의 중공/중복으로 행동 정체나 고도 집중 성찰 주기가 발현됩니다.';
+                                      relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Same pillar energy duplicates, causing potential stagnation or amplified focus.';
+                                    } else if (m.type === '지지충') {
+                                                    relationName = lang === 'KO' ? '정면 지지충' : 'Direct Branch Clash';
+                                                    relationDescKo = '인접 지지의 충돌로 즉각적이고 과감한 환경 변화나 인생의 강한 역동성을 개척합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Direct close collision driving instant, catalytic resets and powerful environmental expansion.';
+                                                  } else if (m.type === '격충') {
+                                                    relationName = lang === 'KO' ? '건너뛴 격충' : 'Separated Branch Clash';
+                                                    relationDescKo = '기둥을 건너뛴 마찰로, 간헐적인 심리적 긴장감 및 예리하고 정밀한 보완 능력을 기릅니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Collision across one pillar triggering alert situational awareness and precise detail planning.';
+                                                  } else if (m.type === '원충') {
+                                                    relationName = lang === 'KO' ? '원격 원충' : 'Remote Branch Clash';
+                                                    relationDescKo = '원거리 간접 충돌로, 실생활 변동보다는 철학적 깊이와 성찰 안목을 키워줍니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Remote spaced clash granting subtle caution, artistic wisdom, and background prudence.';
+                                                  } else if (m.type === '반합') {
+                                                    relationName = lang === 'KO' ? '지합 반합' : 'Half Triad Combination';
+                                                    relationDescKo = '핵심 오행을 포함한 결속으로, 힘차게 돌아가는 엔진 축처럼 기능적 협률을 생산합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Powerful partial triad producing stable functional cooperation and dynamic action.';
+                                                  } else if (m.type === '삼합') {
+                                                    relationName = lang === 'KO' ? '삼합 완성' : 'Full Triad Combination';
+                                                    relationDescKo = '세 지지의 완전한 목적 연대로, 사회적 큰 성취와 단단한 공동체 비전을 제시합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Complete strategic alliance creating high collaborative success and shared milestones.';
+                                                  } else if (m.type === '방합') {
+                                                    relationName = lang === 'KO' ? '계절 방합' : 'Directional Season Union';
+                                                    relationDescKo = '가문 계절 무리의 강력한 세력으로, 독보적인 영역 주도권과 동맹력을 가져옵니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Seasonal coalition yielding unshakeable field mastery and robust, family-level bonds.';
+                                                  } else if (m.type === '준방합') {
+                                                    relationName = lang === 'KO' ? '준방합 형성' : 'Semi-Directional Union';
+                                                    relationDescKo = '계절의 준합화로 은근한 카르텔적 유대감과 든든한 배경 우군을 구축합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Partial seasonal harmony that builds background stability and supportive backings.';
+                                                  } else if (m.type === '육합') {
+                                                    relationName = lang === 'KO' ? '친밀 육합' : 'Six Affectionate Combo';
+                                                    relationDescKo = '일대일의 긴밀한 사적 연합으로, 돈독한 상호 신뢰와 안락한 지지력입니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Close-knit private combination delivering trustworthy emotional and material support.';
+                                                  } else if (m.type === '삼형' || m.type === '반형' || m.type === '자형' || m.type === '상형') {
+                                                    relationName = lang === 'KO' ? `형살 조율 (${m.type})` : `Correction Punishment (${m.type})`;
+                                                    relationDescKo = '서로 제어하고 깎는 교정력으로, 완벽주의 검증을 거쳐 일류 기질의 칼 끝을 연마합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Surgical reshaping force which fertilizes professional mastership through strict auditing.';
+                                                  } else {
+                                                    relationName = m.type;
+                                                    relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : '';
+                                                  }
+ 
+                                                  return (
+                                                    <div 
+                                                      key={mIdx} 
+                                                      className={`p-2.5 rounded-lg border leading-relaxed ${
+                                                        isLight 
+                                                          ? 'bg-white border-slate-150 text-slate-800' 
+                                                          : 'bg-[#18181b]/50 border-zinc-800 text-zinc-300'
+                                                      }`}
+                                                    >
+                                                      <div className="flex items-center justify-between gap-1 mb-1">
+                                                        <span className="font-semibold flex items-center gap-1 shrink-0">
+                                                          <span className="text-[8px]">🔸</span>
+                                                          <span>{relationName}</span>
+                                                        </span>
+                                                        <span className={`text-[8.5px] font-black opacity-80 uppercase px-1.5 py-0.2 rounded shrink-0 ${
+                                                          m.severity === 'full' 
+                                                            ? 'bg-rose-455/10 text-rose-600 dark:text-rose-400' 
+                                                            : (m.severity === 'half' ? 'bg-orange-455/10 text-orange-600 dark:text-orange-400' : 'bg-fuchsia-455/10 text-fuchsia-600 dark:text-fuchsia-400')
+                                                        }`}>
+                                                          {m.severity}
+                                                        </span>
+                                                      </div>
+                                                      <div className="font-mono text-[9px] opacity-70 font-semibold mb-1">
+                                                        {locTxt}
+                                                      </div>
+                                                      <p className="text-[10px] leading-relaxed opacity-90 font-light pl-2 border-l border-slate-200 dark:border-zinc-800">
+                                                        {lang === 'KO' ? relationDescKo : relationDescEn}
+                                                      </p>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+ 
+                                              {/* Advanced Synthesis of Multiple Conflicts/Unions */}
+                                              <div className="space-y-1">
+                                                <button
+                                                  onClick={() => setGuideInsightCollapsed(!guideInsightCollapsed)}
+                                                  className={`w-full p-2.5 px-3 rounded-lg border text-xs leading-relaxed flex items-center justify-between transition-all duration-200 hover:scale-[0.99] active:scale-[0.98] cursor-pointer ${
+                                                    isLight 
+                                                      ? 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-slate-800 shadow-sm' 
+                                                      : 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/15 text-zinc-200'
+                                                  }`}
+                                                >
+                                                  <span className="font-bold flex items-center gap-1.5 text-[10.5px] text-amber-600 dark:text-amber-400">
+                                                    <span>💎</span>
+                                                    <span>
+                                                      {lang === 'KO' ? '복합 사주 엣지케이스 정밀 해독' : 'Multiple Overlap Deep Interpretation'}
+                                                    </span>
+                                                  </span>
+                                                  <span className="text-[9px] flex items-center gap-1 opacity-70 font-bold uppercase tracking-wider">
+                                                    <span>{lang === 'KO' ? (guideInsightCollapsed ? '자세히보기' : '접기') : (guideInsightCollapsed ? 'Expand' : 'Collapse')}</span>
+                                                    <span className={`transform transition-transform duration-200 inline-block text-[7px] ${guideInsightCollapsed ? '' : 'rotate-90'}`}>▶</span>
+                                                  </span>
+                                                </button>
+
+                                                {!guideInsightCollapsed && (
+                                                  <div className={`p-3 rounded-lg border text-xs leading-relaxed transition-all duration-300 mt-1 ${
+                                                    isLight 
+                                                      ? 'bg-amber-550/[0.02] border-amber-500/15 text-slate-800' 
+                                                      : 'bg-amber-550/[0.02] border border-amber-500/10 text-zinc-200'
+                                                  }`}>
+                                                    <p className="text-[10px] leading-relaxed opacity-95 whitespace-pre-line font-light">
+                                                      {lang === 'KO' ? (
+                                                        guideRelTab === 'clash' ? (
+                                                          '당신의 명식에는 단일한 부딪침을 넘어 다중 충돌(쟁충/첩충)이 흐르고 있습니다. 자수와 다수의 오화가 얽히는 경우처럼, 하나의 구심점이 다각도에서 인장력을 받아 "지속적인 환경 쇄신과 심장 발전기 구동" 상태가 됩니다.\n\n정면 충돌(지지충)은 일상 속 직접적인 돌파와 위기극복으로 나타나며, 건너뛴 충돌(격충)은 한 템포 간격을 둔 전략적 긴장감과 보완설계 능력을 드높여, 당신에게 탁월한 생존 위기관리력과 매력적인 승부사 안목을 동시에 선사합니다.'
+                                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
+                                                          '사주 원국 내에 복수의 합이 다각적으로 결합하는 다중 결속(정합/쟁합) 구조입니다. 이는 단순히 하나의 관계나 단일 목적에 얽매이지 않고, 한편으로는 일관된 협업을 도모하면서(삼합/방합) 다른 한편으로는 정서적인 연합이나 유연한 거래망(육합)을 입체적으로 가동할 수 있는 탁월한 네트워크 역량 및 대인관계 지평이 열려있음을 증명합니다.'
+                                                        ) : guideRelTab === 'punish' ? (
+                                                          '형살과 복음 등의 조율 장치가 다중으로 맞물려 있어 인생에 매우 정밀한 성찰 교정 능력이 작동하고 있습니다. 이 복합적인 압박감은 당신을 주도면밀함의 한계치까지 밀어붙여 세무, 기술, 엔지니어링, 설계, 의료 등 남들이 함부로 감내할 수 없는 고도의 난제 해결 역량을 완벽하게 단련시키는 극단적인 프로페셔널의 밑거름이 됩니다.'
+                                                        ) : (
+                                                          '서로 교차하는 복합적 균열과 보정 지대입니다. 인생 행보 중 예기치 못한 작은 변동이나 조정 사항이 나타날 수 있지만, 오히려 그 미세한 균열을 꼼꼼하게 메우는 보완 설비, 감사, 교정, 기록 보정 능력이 남들보다 압도적으로 발달하여 장기적인 리스크 관리 능력에서 절대 우위를 선점합니다.'
+                                                        )
+                                                      ) : (
+                                                        guideRelTab === 'clash' ? (
+                                                          'Your chart carries multiple co-existing clashes (contested/overlapping clashes). This acts as a continuous paradigm-shift engine where a direct clash provides instant breakthroughs while separated clashes grant long-term strategic anticipation, building supreme resilience and outstanding crisis-resolution mastery.'
+                                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
+                                                          'Having multiple co-existing combinations indicates a multi-perspective collaborative potential. Instead of being bound to a single domain, your capabilities are diversified to navigate robust professional alliances (triads/seasonal) as well as cozy personal networking agreements with incredible emotional intelligence.'
+                                                        ) : guideRelTab === 'punish' ? (
+                                                          'Co-existing punishments create multiple deep layers of quality-control and auditing consciousness. It refines your performance until you construct flawless masterpieces in legal, surgery, high-precision engineering, or forensic debugging.'
+                                                        ) : (
+                                                          'The multi-frictional adjustment enables you to foresee microscopic system discrepancies, rendering you an exceptionally sharp risk auditor and troubleshooter who turns potential errors into robust systems.'
+                                                        )
+                                                      )}
+                                                    </p>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        {/* Right Panel: Interactive slider detail explanation card */}
+                                        <div className="lg:col-span-7 h-full">
+                                      <AnimatePresence mode="wait">
+                                        <motion.div
+                                          key={`${guideRelTab}-${safeActiveIndex}`}
+                                          initial={{ opacity: 0, x: 8 }}
+                                          animate={{ opacity: 1, x: 0 }}
+                                          exit={{ opacity: 0, x: -8 }}
+                                          transition={{ duration: 0.22 }}
+                                          className="text-[11.5px] leading-relaxed pr-1 space-y-3"
+                                        >
+                                          <p className={isLight ? 'text-slate-700 font-medium' : 'text-white/80'}>
+                                            {lang === 'KO' ? activeItem.detailKo : activeItem.detailEn}
+                                          </p>
+
+                                          {(() => {
+                                            const activeUserMatch = getUserInteractionMatch(guideRelTab, activeItem.branches);
+                                            if (!activeUserMatch) return null;
+
+                                            const matchStrength = getInteractionStrength(activeUserMatch);
+                                            if (!matchStrength) return null;
+
+                                            const level = matchStrength.level;
+
+                                            let containerClass = "";
+                                            let pulseDescClass = "";
+                                            let strengthBadgeTxt = "";
+                                            let detailTxtKo = "";
+                                            let detailTxtEn = "";
+
+                                            const isHyeong = guideRelTab === 'punish' || activeUserMatch.type.includes('형');
+                                            const isPa = guideRelTab === 'destroy' || activeUserMatch.type === '파';
+                                            const isHae = guideRelTab === 'harm' || activeUserMatch.type === '해';
+                                            const isClash = guideRelTab === 'clash' || activeUserMatch.type.includes('충');
+
+                                            const hanjaToKoMap: Record<string, string> = {
+                                              '子': '자', '丑': '축', '寅': '인', '卯': '묘', '辰': '진', '巳': '사',
+                                              '午': '오', '未': '미', '申': '신', '酉': '유', '戌': '술', '亥': '해'
+                                            };
+                                            const branchOrder = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+                                            const sortedBranches = [...(activeUserMatch.branches || [])].sort((a, b) => branchOrder.indexOf(a) - branchOrder.indexOf(b));
+                                            const matchedBranchesKo = sortedBranches.map((b: string) => hanjaToKoMap[b] || b).join('');
+                                            
+                                            let actualName = "";
+                                            if (isClash) actualName = matchedBranchesKo ? `${matchedBranchesKo}충` : "자오충";
+                                            else if (isHyeong) actualName = matchedBranchesKo ? `${matchedBranchesKo}형살` : "인사형살";
+                                            else if (isPa) actualName = matchedBranchesKo ? `${matchedBranchesKo}파` : "자유파";
+                                            else if (isHae) actualName = matchedBranchesKo ? `${matchedBranchesKo}해` : "지미해";
+
+                                            if (level === 'full') {
+                                              pulseDescClass = "desc-glow-full";
+                                              containerClass = isLight 
+                                                ? 'bg-amber-500/5 border-amber-400 text-amber-950 shadow-[0_3px_12px_rgba(245,158,11,0.15)]' 
+                                                : 'bg-[#2d1d0c] border-amber-500/45 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.25)]';
+                                              strengthBadgeTxt = lang === 'KO' ? '합 완성' : 'Full Combination';
+                                              detailTxtKo = '두 글자 혹은 세 글자의 조화가 완벽하게 결합되었습니다. 이로 인해 사주의 주된 기류가 이 주파수로 정렬되어, 견고한 동맹적 가치, 사회적 목적 완수, 일관된 방향성 및 뚜렷한 리더십이 탄탄한 근간을 이루며 작동하고 있습니다.';
+                                              detailTxtEn = 'The complete combination exists in your chart, aligning your path with strong collaborative values, solid goals, and consistent leadership.';
+                                            } else if (level === 'half') {
+                                              pulseDescClass = "desc-glow-half";
+                                              containerClass = isLight 
+                                                ? 'bg-sky-500/5 border-sky-350 text-sky-950 shadow-[0_3px_12px_rgba(14,165,233,0.15)]' 
+                                                : 'bg-[#0f243a] border-sky-400/45 text-cyan-200 shadow-[0_0_15px_rgba(0,191,255,0.2)]';
+                                              strengthBadgeTxt = lang === 'KO' ? '반합 형성' : 'Half Combination';
+                                              detailTxtKo = '합의 핵심 왕지(왕을 상징하는 자오묘유)를 포함한 두 글자가 결합하여 엔진 축이 힘차게 돌아가고 있습니다. 향후 대운이나 세운에서 나머지 한 글자가 더해지면 강력하고 폭발적인 기세의 창조적 행보와 시너지가 전면에 펼쳐지게 됩니다.';
+                                              detailTxtEn = 'Crucial partial combination is active. When the complementing element arrives in transits, highly vibrant expansion and opportunities will be unlocked.';
+                                            } else if (level === 'remote') {
+                                              pulseDescClass = "desc-glow-half";
+                                              containerClass = isLight 
+                                                ? 'bg-violet-500/5 border-violet-300 text-violet-950 shadow-[0_3px_12px_rgba(139,92,246,0.12)]' 
+                                                : 'bg-[#1e1338] border-violet-500/40 text-violet-205 shadow-[0_0_12px_rgba(139,92,246,0.15)]';
+                                              strengthBadgeTxt = lang === 'KO' ? '원격합 거동' : 'Remote Combination';
+                                              detailTxtKo = '합을 구성하는 글자들이 멀리 떨어져서(년지와 시지 등) 성립하는 원격 합입니다. 정면에서 직접 끌어당기기보다는 보이지 않는 온화한 연대감, 사색적 성찰감, 또는 시간이 흐른 뒤 비로소 구현되는 은근한 소통 창구로 조화롭게 기능합니다.';
+                                              detailTxtEn = 'The combination is spaced apart, manifesting as a subtle background cohesion, reflective long-term vision, or pleasant long-distance support.';
+                                            } else if (level === 'clash_full') {
+                                              pulseDescClass = "desc-glow-present";
+                                              containerClass = isLight 
+                                                ? 'bg-rose-500/5 border-rose-400 text-rose-950 shadow-[0_3px_12px_rgba(244,63,94,0.18)]' 
+                                                : 'bg-[#2d121f] border-rose-500/45 text-rose-200 shadow-[0_0_15px_rgba(255,0,122,0.25)]';
+                                              
+                                              if (isClash) {
+                                                strengthBadgeTxt = lang === 'KO' ? '정면 충(완전)' : 'Direct Close Clash';
+                                                detailTxtKo = `가장 인접한 두 기둥의 지지가 서로를 정면으로 충돌(${actualName})하여 충살의 격렬한 변동성이 직접 가동 중입니다. 이 강한 마찰은 매너리즘(성장 정체)을 깨고 삶을 새롭게 변화시키는 "강력한 원동력(발전기)"이 되어 남다른 기획력과 과감한 결단력을 선사합니다.`;
+                                                detailTxtEn = 'Dynamic direct clash is active within adjacent pillars. This creates a relentless cycle of self-improvement, crisp adaptability, and pioneering initiatives.';
+                                              } else if (isHyeong) {
+                                                strengthBadgeTxt = lang === 'KO' ? '형살 가동(완전)' : 'Active Punishment';
+                                                detailTxtKo = `사주원국에서 강력하게 매칭된 형살(${actualName})의 압박과 조율 능력이 직접 작동하고 있습니다. 이 날카로운 설계 도면을 깎고 다듬는 과정에서 아무나 가질 수 없는 고도의 전문성(의료/보건, 법조/수사, 정밀 엔지니어링, 설계 편집 등)을 확보하여 압도적인 해결사로서 세상을 이끌어갑니다.`;
+                                                detailTxtEn = 'The comprehensive, active force of Punishment is processed, polishing your expertise in legal, medical, surgical, structural, or precise engineering fields.';
+                                              } else if (isPa) {
+                                                strengthBadgeTxt = lang === 'KO' ? '파살 조율(강)' : 'Strong Destruction';
+                                                detailTxtKo = `미세한 조정과 수정을 상징하는 파살(${actualName})이 강력히 발현되어 있습니다. 미처 완성되지 않은 아이디어의 틈새를 정교하게 메우고 결점을 제거하는 디버깅 역량, 리모델링, 기성 부품을 맞춤 성형하는 유연한 트러블슈팅 능력의 절정을 선사합니다.`;
+                                                detailTxtEn = 'The sharp destructive adjustment is highly active, reinforcing your ability to inspect, repair, debug, and remodel existing ideas.';
+                                              } else if (isHae) {
+                                                strengthBadgeTxt = lang === 'KO' ? '해살 방어(강)' : 'Strong Harm Barrier';
+                                                detailTxtKo = `방해 요소나 대인관계의 피로감을 다스리는 해살(${actualName})의 주파수가 위치합니다. 이를 통해 사람 간의 보이지 않는 선을 분명히 그어 내면의 영역을 수호하는 조밀함이 가동되며, 법적 문서나 계약서의 은밀한 위험요소를 잡아내는 완벽주의적 안목이 대단히 명확해집니다.`;
+                                                detailTxtEn = 'Harm boundaries are highly active, helping you define emotional barriers and identify hidden legal or contractual details with high scrutiny.';
+                                              } else {
+                                                strengthBadgeTxt = lang === 'KO' ? '조율 작용 가동' : 'Active Adjuster';
+                                                detailTxtKo = '사주 내 긴장감을 해소하고 새로운 발판을 마련하는 심부 조율 주파수가 작동 중입니다. 미세 교정 및 균형 조정을 통해 삶의 품질을 우수하게 끌어올려 줍니다.';
+                                                detailTxtEn = 'The inner adjustment functions actively to fine-tune your path and system stability.';
+                                              }
+                                            } else if (level === 'clash_half') {
+                                              pulseDescClass = "desc-glow-present";
+                                              containerClass = isLight 
+                                                ? 'bg-orange-500/5 border-orange-400 text-orange-950 shadow-[0_3px_12px_rgba(249,115,22,0.15)]' 
+                                                : 'bg-[#351909] border-orange-500/45 text-orange-200 shadow-[0_0_12px_rgba(249,115,22,0.2)]';
+                                              
+                                              if (isClash) {
+                                                strengthBadgeTxt = lang === 'KO' ? '격충 마찰' : 'Separated Friction';
+                                                detailTxtKo = `한 기둥을 건너뛰어 성립한 격충(${actualName}) 또는 중간 수준의 마찰입니다. 끊임없는 직접 부딪침보다는 긴장감이 내포된 정밀 조정 능력으로 발현되며, 이로써 고유의 문제해결 능력, 전문 제어력, 엄밀한 리스크 관리를 고도화시킵니다.`;
+                                                detailTxtEn = 'Moderate friction operates through spanned pillars, building sharp situational awareness, systemic regulation, and exceptional crisis-resolution mastery.';
+                                              } else if (isHyeong) {
+                                                strengthBadgeTxt = lang === 'KO' ? '형살 조율' : 'Moderate Punishment';
+                                                detailTxtKo = `일부 지지가 맞춰져 성립한 형살(${actualName})의 조율 주파수가 감지됩니다. 주변 환경이나 기성 규격의 문제점을 예리하게 포착해내어 가장 효율적이고 완벽한 상태로 교정, 편집, 개혁해내는 탁월한 솔루션 제공 인프라를 마련해 줍니다.`;
+                                                detailTxtEn = 'The partial force of Punishment is processed, offering sharp problem-solving skills, structural revisions, and precise design capability.';
+                                              } else if (isPa) {
+                                                strengthBadgeTxt = lang === 'KO' ? '파살 조율' : 'Moderate Destruction';
+                                                detailTxtKo = `기 흘러가는 과정에 얽힌 파살(${actualName})의 보정 기능이 작동하고 있습니다. 타성적으로 유지되던 계약이나 시스템의 맹점을 찾아내 개선하며, 완고함을 탈피하여 끊임없는 자기 쇄신과 융통성 있는 대안을 제시하는 지혜를 심어줍니다.`;
+                                                detailTxtEn = 'Subtle destructions operate as a corrective mechanism, highlighting system loopholes to support smooth and proactive upgrades.';
+                                              } else if (isHae) {
+                                                strengthBadgeTxt = lang === 'KO' ? '해살 조율' : 'Moderate Harm Adjust';
+                                                detailTxtKo = `영역 간의 경계를 짓는 해살(${actualName})의 정진력이 흐릅니다. 섣부른 감정 투자로 인한 심리적 소모를 사전에 지혜롭게 예방하고, 상대의 숨은 의도를 기민하게 간파함으로써 나를 지키는 냉철하며 합리적인 처세의 무기를 가집니다.`;
+                                                detailTxtEn = 'The protective alert of Harm is processed, enabling intuitive defense against unexpected personal drain or subtle relational conflicts.';
+                                              } else {
+                                                strengthBadgeTxt = lang === 'KO' ? '중간 마찰 조율' : 'Moderate Friction';
+                                                detailTxtKo = '인접하지 않은 두 글자가 만나는 중간 수준의 보정 과정입니다. 삶의 다양한 가능성을 실현하기 위해 조심스럽게 영역을 점검하고 보정해 가는 안락한 힘을 마련해 줍니다.';
+                                                detailTxtEn = 'Moderate distant friction operates as a stable calibration force across your life.';
+                                              }
+                                            } else { // clash_remote or general punish/pa/hae
+                                              pulseDescClass = "desc-glow-present";
+                                              containerClass = isLight 
+                                                ? 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200' 
+                                                : 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200';
+                                              
+                                              if (isClash) {
+                                                strengthBadgeTxt = lang === 'KO' ? '원격충 조율' : 'Remote Friction';
+                                                detailTxtKo = `사주 원국 양 극단(년지와 시지 등)에 위치하여 간접적으로 작용하는 원격충(${actualName})입니다. 현실에서의 물리적인 갈등이나 급변함은 최소화되나, 내면에 예술적인 정밀함, 신중한 판단력, 그리고 시간의 흐름을 기다릴 줄 아는 성숙한 지혜의 자양분이 됩니다.`;
+                                                detailTxtEn = 'Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.';
+                                              } else if (isHyeong) {
+                                                strengthBadgeTxt = lang === 'KO' ? '원격 형살' : 'Remote Punishment';
+                                                detailTxtKo = `멀리 떨어져서 작용하는 원격 형살(${actualName})입니다. 실생활의 극단적 압박이나 제약보다는, 법과 원칙을 준수하려는 투철한 도덕성, 보이지 않는 규격이나 수치의 불균형을 미리 감지하여 사고를 방지해주는 예방적 직관력으로 가치있게 승화됩니다.`;
+                                                detailTxtEn = 'Quiet remote hyeong presents low pressure but triggers inner professional discipline, self-regulation, and preventive instincts.';
+                                              } else if (isPa) {
+                                                strengthBadgeTxt = lang === 'KO' ? '원격 파살' : 'Remote Destruction';
+                                                detailTxtKo = `두 기둥 건너 원격으로 위치한 보정용 파살(${actualName})입니다. 일상적 성취에 큰 방해를 주지 않으면서도, 예술 분야나 학술 연구에서의 예리한 디테일 수정 능력, 교정적 심미안의 주춧돌을 이루어 나갑니다.`;
+                                                detailTxtEn = 'Remote spaced destruction grants gentle warning signs to carry out precise quality control in artistic or scholarly work.';
+                                              } else if (isHae) {
+                                                strengthBadgeTxt = lang === 'KO' ? '원격 해살' : 'Remote Harm';
+                                                detailTxtKo = `멀리 배치되어 영속적 간섭이 크지 않은 원격 해살(${actualName})입니다. 대인 계약 시 약간의 신중함을 더하는 윤리적 안전벨트로 유익하게 승화되며, 인생을 한층 사색적이고 깊이 있는 시각으로 가다듬어 성장을 유도합니다.`;
+                                                detailTxtEn = 'Remote harm functions as a gentle reflective cushion, encouraging you to analyze deep intentions in contract/cooperation details.';
+                                              } else {
+                                                strengthBadgeTxt = lang === 'KO' ? '원격 형해파 조율' : 'Remote Friction / Adjuster';
+                                                detailTxtKo = '사주 양 극단에 존재하여 실제 생활 충돌은 미미한 형/충/파/해 입니다. 삶에 부정적 영향은 사실상 없으며, 예술가적 깊이, 은은한 학구열, 비상한 경각심 등 내면적 지혜와 철학적 각성 효과로 유익하게 승화되어 작용합니다.';
+                                                detailTxtEn = 'Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.';
+                                              }
+                                            }
+
+                                            return (
+                                              <div className="space-y-3 mt-3">
+                                                <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 backdrop-blur-sm transition-all duration-300 ${containerClass} ${pulseDescClass}`}>
+                                                  <span className="text-base mt-1 flex animate-bounce shrink-0 select-none">✨</span>
+                                                  <div className="flex-1 space-y-1">
+                                                    <div className="text-xs font-black flex flex-wrap items-center gap-1.5 uppercase tracking-wide">
+                                                      <span>
+                                                        {lang === 'KO' 
+                                                          ? '내 사주 원국에 실제 존재' 
+                                                          : 'Present in your BaZi Chart'}
+                                                      </span>
+                                                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${matchStrength.badgeClass}`}>
+                                                        {strengthBadgeTxt}
+                                                      </span>
+                                                    </div>
+                                                    <p className="text-[11px] leading-relaxed opacity-95">
+                                                      {lang === 'KO' ? detailTxtKo : detailTxtEn}
+                                                    </p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+                                        </motion.div>
+                                      </AnimatePresence>
+                                    </div>
+
+                              {/* Footer: Bottom dot sliders and navigation buttons */}
+                              <div className={`flex items-center justify-between border-t pt-3 mt-4 ${
+                                isLight ? 'border-slate-200' : 'border-white/5'
+                              }`}>
+                                
+                                {/* Dots indicator */}
+                                <div className="flex items-center gap-1">
+                                  {currentCategoryItems.map((_, dotIdx) => {
+                                    const isDotActive = dotIdx === safeActiveIndex;
+                                    return (
+                                      <button
+                                        key={dotIdx}
+                                        onClick={() => setActiveSubIndex(dotIdx)}
+                                        className={`h-1.5 transition-all duration-350 cursor-pointer ${
+                                          isDotActive 
+                                            ? (isLight ? 'w-4 rounded-full bg-indigo-600' : 'w-4 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(34,211,238,0.5)]') 
+                                            : (isLight ? 'w-1.5 rounded-full bg-slate-300 hover:bg-slate-400' : 'w-1.5 rounded-full bg-white/15 hover:bg-white/30')
+                                        }`}
+                                        title={`Go to slide ${dotIdx + 1}`}
+                                      />
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Slider Navigation Arrows at the Bottom for both Mobile and Desktop */}
+                                <div className="flex items-center gap-1">
+                                  <button 
+                                    onClick={handlePrevItem}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-lg border text-base font-bold cursor-pointer transition-all active:scale-90 ${
+                                      isLight
+                                        ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100 hover:text-slate-950 shadow-sm active:bg-slate-100'
+                                        : 'bg-black/40 border-white/10 text-white/60 hover:bg-white/5 hover:text-white active:bg-white/5'
+                                    }`}
+                                    title="Previous"
+                                  >
+                                    ‹
+                                  </button>
+                                  <button 
+                                    onClick={handleNextItem}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-lg border text-base font-bold cursor-pointer transition-all active:scale-90 ${
+                                      isLight
+                                        ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100 hover:text-slate-950 shadow-sm active:bg-slate-100'
+                                        : 'bg-black/40 border-white/10 text-white/60 hover:bg-white/5 hover:text-white active:bg-white/5'
+                                    }`}
+                                    title="Next"
+                                  >
+                                    ›
+                                  </button>
+                                </div>
+
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
               <div className="space-y-4">
                 <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">4</span>
-                  {lang === 'KO' ? '오행과 글자의 물상 (Metaphors of Elements)' : 'Metaphors of the Five Elements'}
-                </h4>
-                <p className="text-sm leading-relaxed text-white/70 mb-4">
-                  {lang === 'KO' ? 
-                    '사주의 글자들은 단순한 기호가 아니라 자연의 모습(물상)과 직업/환경(업상)을 나타내는 상징입니다. 같은 쇠(金)라도 모양과 쓰임새가 다릅니다.' : 
-                    'The characters in BaZi are not just symbols but represent natural imagery (Metaphors) and occupational traits. Even within the same Metal (金) element, the shape and use differ.'}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-black/30 border border-[#00ea5e]/30 rounded-xl space-y-2">
-                    <div className="flex items-center gap-2 text-[#00ea5e] font-bold">
-                      <span className="text-xl">🌱</span> {lang === 'KO' ? '목 (Wood): 생명력, 기획' : 'Wood (木): Vitality, Planning'}
-                    </div>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
-                      {lang === 'KO' ? (
-                        <>
-                          <li><strong className="text-white">갑(甲)/인(寅)</strong>: 하늘을 뚫고 솟는 거목. <span className="opacity-80">기획, 건축, 수직적 리더십</span></li>
-                          <li><strong className="text-white">을(乙)/묘(卯)</strong>: 끈질긴 생명력의 화초. <span className="opacity-80">교육, 기획, 유연한 네트워킹</span></li>
-                        </>
-                      ) : (
-                        <>
-                          <li><strong className="text-white">Gap(甲) / In(寅)</strong>: Tall tree piercing the sky. <span className="opacity-80">Planning, architecture, vertical leadership</span></li>
-                          <li><strong className="text-white">Eul(乙) / Myo(卯)</strong>: Flower/grass with tenacious vitality. <span className="opacity-80">Education, networking, flexible adaptation</span></li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-black/30 border border-[#ff4747]/30 rounded-xl space-y-2">
-                    <div className="flex items-center gap-2 text-[#ff4747] font-bold">
-                      <span className="text-xl">🔥</span> {lang === 'KO' ? '화 (Fire): 확산, 표현' : 'Fire (火): Expansion, Expression'}
-                    </div>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
-                      {lang === 'KO' ? (
-                        <>
-                          <li><strong className="text-white">병(丙)/사(巳)</strong>: 만물을 비추는 태양, 공적인 열기. <span className="opacity-80">방송, 언론, 화려한 리더십</span></li>
-                          <li><strong className="text-white">정(丁)/오(午)</strong>: 세밀하고 집중된 열성, 등대. <span className="opacity-80">연구, IT, 종교, 철학</span></li>
-                        </>
-                      ) : (
-                        <>
-                          <li><strong className="text-white">Byeong(丙) / Sa(巳)</strong>: Sun shining on all things, public heat. <span className="opacity-80">Broadcasting, media, flashy leadership</span></li>
-                          <li><strong className="text-white">Jeong(丁) / O(午)</strong>: Detailed and focused heat, lighthouse. <span className="opacity-80">Research, IT, religion, philosophy</span></li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-black/30 border border-[#f5b800]/30 rounded-xl space-y-2">
-                    <div className="flex items-center gap-2 text-[#f5b800] font-bold">
-                      <span className="text-xl">🪨</span> {lang === 'KO' ? '토 (Earth): 중재, 조절' : 'Earth (土): Mediation, Storage'}
-                    </div>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
-                      {lang === 'KO' ? (
-                        <>
-                          <li><strong className="text-white">무(戊)</strong>: 모든 것을 품는 광활한 산. <span className="opacity-80">부동산, 무역, 포용력</span></li>
-                          <li><strong className="text-white">기(己)</strong>: 실속 있는 경작지, 정원. <span className="opacity-80">세밀한 관리, 농업, 보육</span></li>
-                          <li className="text-[10px] text-white/50">※ 지지(진술축미)는 각 계절의 환절기로 저장과 전환을 담당합니다.</li>
-                        </>
-                      ) : (
-                        <>
-                          <li><strong className="text-white">Mu(戊)</strong>: Vast mountain embracing everything. <span className="opacity-80">Real estate, trade, tolerance</span></li>
-                          <li><strong className="text-white">Gi(己)</strong>: Practical farmland, garden. <span className="opacity-80">Detailed management, agriculture, nurturing</span></li>
-                          <li className="text-[10px] text-white/50">※ The Earth branches (Jin, Sul, Chuk, Mi) act as seasonal transitions, handling storage and transformation.</li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-black/30 border border-[#d8d8d8]/30 rounded-xl space-y-2">
-                    <div className="flex items-center gap-2 text-[#d8d8d8] font-bold">
-                      <span className="text-xl">⚔️</span> {lang === 'KO' ? '금 (Metal): 분별, 수확' : 'Metal (金): Decision, Harvest'}
-                    </div>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
-                      {lang === 'KO' ? (
-                        <>
-                          <li><strong className="text-white">경(庚)/신(申)</strong>: 가공되지 않은 바위나 무쇠. <span className="opacity-80">군경, 검찰, 중공업, 큰 결단</span></li>
-                          <li><strong className="text-white">신(辛)/유(酉)</strong>: 예리한 칼날, 정밀하게 세공된 보석. <span className="opacity-80">금융, 의료(수술), 정밀가공, 예민함</span></li>
-                        </>
-                      ) : (
-                        <>
-                          <li><strong className="text-white">Gyeong(庚) / Sin(申)</strong>: Unprocessed rock or raw iron. <span className="opacity-80">Military/police, heavy industry, major decisions</span></li>
-                          <li><strong className="text-white">Shin(辛) / Yu(酉)</strong>: Sharp blade, finely crafted jewelry. <span className="opacity-80">Finance, medical (surgery), precision processing, sensitivity</span></li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-black/30 border border-[#00bfff]/30 rounded-xl space-y-2 sm:col-span-2">
-                    <div className="flex items-center gap-2 text-[#00bfff] font-bold">
-                      <span className="text-xl">💧</span> {lang === 'KO' ? '수 (Water): 지혜, 흐름' : 'Water (수): Wisdom, Flow'}
-                    </div>
-                    <ul className="text-xs text-white/70 space-y-1 list-disc list-inside">
-                      {lang === 'KO' ? (
-                        <>
-                          <li><strong className="text-white">임(壬)/해(亥)</strong>: 대륙을 가로지르는 큰 강물, 바다. <span className="opacity-80">해운, 유통, 외교, 거대한 구상</span></li>
-                          <li><strong className="text-white">계(癸)/자(子)</strong>: 스며드는 비, 맑은 샘물, 정보. <span className="opacity-80">아이디어 기획, 철학, 내면적 사유</span></li>
-                        </>
-                      ) : (
-                        <>
-                          <li><strong className="text-white">Im(壬) / Hae(亥)</strong>: Large river crossing the continent, ocean. <span className="opacity-80">Shipping, distribution, diplomacy, grand ideas</span></li>
-                          <li><strong className="text-white">Gye(癸) / Ja(子)</strong>: Seeping rain, clear spring water, information. <span className="opacity-80">Idea planning, philosophy, introspective thinking</span></li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">5</span>
+                  <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">6</span>
                   {lang === 'KO' ? '마음의 10가지 가면: 십성 (The 10 Masks of Mind)' : 'The Ten Gods: 10 Masks of Mind'}
                 </h4>
                 <p className="text-sm leading-relaxed text-white/80">
