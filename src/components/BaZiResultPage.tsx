@@ -5575,189 +5575,81 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               })}
                             </div>
 
-                            {/* Advanced Multiple Interactions Breakdown 옮겨옴 */}
+                            {/* Advanced Synthesis of Multiple Conflicts/Unions (Moved to Left Panel) */}
                             {activeUserMatch && activeUserMatch.allMatches && activeUserMatch.allMatches.length > 1 && (
-                              <div className={`p-3.5 rounded-xl border space-y-3 transition-all duration-300 mt-4 shadow-sm ${
-                                isLight 
-                                  ? 'bg-slate-50 border-slate-200' 
-                                  : 'bg-[#18181b]/98 border-zinc-800 shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
-                              }`}>
-                                <div className="text-[10px] font-extrabold uppercase tracking-wider opacity-90 flex items-center gap-1">
-                                  <span>🔗</span>
-                                  <span className={isLight ? 'text-slate-800' : 'text-zinc-200'}>
-                                    {lang === 'KO' 
-                                      ? `복합 작용 발생 (${activeUserMatch.allMatches.length}개의 중첩 관계 발견)` 
-                                      : `Complex Multi-Overlap Detected (${activeUserMatch.allMatches.length} Relations)`}
+                              <div className="space-y-1 mt-4">
+                                <button
+                                  onClick={() => setGuideInsightCollapsed(!guideInsightCollapsed)}
+                                  className={`w-full p-2.5 px-3 rounded-lg border text-xs leading-relaxed flex items-center justify-between transition-all duration-200 hover:scale-[0.99] active:scale-[0.98] cursor-pointer ${
+                                    isLight 
+                                      ? 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-slate-800 shadow-sm' 
+                                      : 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/15 text-zinc-200'
+                                  }`}
+                                >
+                                  <span className="font-bold flex items-center gap-1.5 text-[10.5px] text-amber-600 dark:text-amber-400">
+                                    <span>💎</span>
+                                    <span>
+                                      {lang === 'KO' ? '복합 사주 엣지케이스 정밀 해독' : 'Multiple Overlap Deep Interpretation'}
+                                    </span>
                                   </span>
-                                </div>
-                                
-                                <div className="space-y-2 text-[10.5px]">
-                                  {activeUserMatch.allMatches.map((m: any, mIdx: number) => {
-                                    const mPillars = m.pillarIndices || [];
-                                    const locTxt = mPillars.map((pIdx: number) => {
-                                      const pName = getPillarNameLocal(pIdx, lang);
-                                      const pMean = getPillarMeaningLocal(pIdx, lang);
-                                      return `${pName}(${pMean})`;
-                                    }).join(' ↔ ');
-                                    
-                                    let relationName = "";
-                                    let relationDescKo = "";
-                                    let relationDescEn = "";
-                                    
-                                    if (m.type === '복음') {
-                                      relationName = lang === 'KO' ? '복음 (기둥 중복)' : 'Pillar Duplication (Bok-eum)';
-                                      relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '동일 기운의 중공/중복으로 행동 정체나 고도 집중 성찰 주기가 발현됩니다.';
-                                      relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Same pillar energy duplicates, causing potential stagnation or amplified focus.';
-                                    } else if (m.type === '지지충') {
-                                                    relationName = lang === 'KO' ? '정면 지지충' : 'Direct Branch Clash';
-                                                    relationDescKo = '인접 지지의 충돌로 즉각적이고 과감한 환경 변화나 인생의 강한 역동성을 개척합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Direct close collision driving instant, catalytic resets and powerful environmental expansion.';
-                                                  } else if (m.type === '격충') {
-                                                    relationName = lang === 'KO' ? '건너뛴 격충' : 'Separated Branch Clash';
-                                                    relationDescKo = '기둥을 건너뛴 마찰로, 간헐적인 심리적 긴장감 및 예리하고 정밀한 보완 능력을 기릅니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Collision across one pillar triggering alert situational awareness and precise detail planning.';
-                                                  } else if (m.type === '원충') {
-                                                    relationName = lang === 'KO' ? '원격 원충' : 'Remote Branch Clash';
-                                                    relationDescKo = '원거리 간접 충돌로, 실생활 변동보다는 철학적 깊이와 성찰 안목을 키워줍니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Remote spaced clash granting subtle caution, artistic wisdom, and background prudence.';
-                                                  } else if (m.type === '반합') {
-                                                    relationName = lang === 'KO' ? '지합 반합' : 'Half Triad Combination';
-                                                    relationDescKo = '핵심 오행을 포함한 결속으로, 힘차게 돌아가는 엔진 축처럼 기능적 협률을 생산합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Powerful partial triad producing stable functional cooperation and dynamic action.';
-                                                  } else if (m.type === '삼합') {
-                                                    relationName = lang === 'KO' ? '삼합 완성' : 'Full Triad Combination';
-                                                    relationDescKo = '세 지지의 완전한 목적 연대로, 사회적 큰 성취와 단단한 공동체 비전을 제시합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Complete strategic alliance creating high collaborative success and shared milestones.';
-                                                  } else if (m.type === '방합') {
-                                                    relationName = lang === 'KO' ? '계절 방합' : 'Directional Season Union';
-                                                    relationDescKo = '가문 계절 무리의 강력한 세력으로, 독보적인 영역 주도권과 동맹력을 가져옵니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Seasonal coalition yielding unshakeable field mastery and robust, family-level bonds.';
-                                                  } else if (m.type === '준방합') {
-                                                    relationName = lang === 'KO' ? '준방합 형성' : 'Semi-Directional Union';
-                                                    relationDescKo = '계절의 준합화로 은근한 카르텔적 유대감과 든든한 배경 우군을 구축합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Partial seasonal harmony that builds background stability and supportive backings.';
-                                                  } else if (m.type === '육합') {
-                                                    relationName = lang === 'KO' ? '친밀 육합' : 'Six Affectionate Combo';
-                                                    relationDescKo = '일대일의 긴밀한 사적 연합으로, 돈독한 상호 신뢰와 안락한 지지력입니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Close-knit private combination delivering trustworthy emotional and material support.';
-                                                  } else if (m.type === '삼형' || m.type === '반형' || m.type === '자형' || m.type === '상형') {
-                                                    relationName = lang === 'KO' ? `형살 조율 (${m.type})` : `Correction Punishment (${m.type})`;
-                                                    relationDescKo = '서로 제어하고 깎는 교정력으로, 완벽주의 검증을 거쳐 일류 기질의 칼 끝을 연마합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Surgical reshaping force which fertilizes professional mastership through strict auditing.';
-                                                  } else {
-                                                    relationName = m.type;
-                                                    relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : '';
-                                                  }
- 
-                                                  return (
-                                                    <div 
-                                                      key={mIdx} 
-                                                      className={`p-2.5 rounded-lg border leading-relaxed ${
-                                                        isLight 
-                                                          ? 'bg-white border-slate-150 text-slate-800' 
-                                                          : 'bg-[#18181b]/50 border-zinc-800 text-zinc-300'
-                                                      }`}
-                                                    >
-                                                      <div className="flex items-center justify-between gap-1 mb-1">
-                                                        <span className="font-semibold flex items-center gap-1 shrink-0">
-                                                          <span className="text-[8px]">🔸</span>
-                                                          <span>{relationName}</span>
-                                                        </span>
-                                                        <span className={`text-[8.5px] font-black opacity-80 uppercase px-1.5 py-0.2 rounded shrink-0 ${
-                                                          m.severity === 'full' 
-                                                            ? 'bg-rose-455/10 text-rose-600 dark:text-rose-400' 
-                                                            : (m.severity === 'half' ? 'bg-orange-455/10 text-orange-600 dark:text-orange-400' : 'bg-fuchsia-455/10 text-fuchsia-600 dark:text-fuchsia-400')
-                                                        }`}>
-                                                          {m.severity}
-                                                        </span>
-                                                      </div>
-                                                      <div className="font-mono text-[9px] opacity-70 font-semibold mb-1">
-                                                        {locTxt}
-                                                      </div>
-                                                      <p className="text-[10px] leading-relaxed opacity-90 font-light pl-2 border-l border-slate-200 dark:border-zinc-800">
-                                                        {lang === 'KO' ? relationDescKo : relationDescEn}
-                                                      </p>
-                                                    </div>
-                                                  );
-                                                })}
-                                              </div>
- 
-                                              {/* Advanced Synthesis of Multiple Conflicts/Unions */}
-                                              <div className="space-y-1">
-                                                <button
-                                                  onClick={() => setGuideInsightCollapsed(!guideInsightCollapsed)}
-                                                  className={`w-full p-2.5 px-3 rounded-lg border text-xs leading-relaxed flex items-center justify-between transition-all duration-200 hover:scale-[0.99] active:scale-[0.98] cursor-pointer ${
-                                                    isLight 
-                                                      ? 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-slate-800 shadow-sm' 
-                                                      : 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/15 text-zinc-200'
-                                                  }`}
-                                                >
-                                                  <span className="font-bold flex items-center gap-1.5 text-[10.5px] text-amber-600 dark:text-amber-400">
-                                                    <span>💎</span>
-                                                    <span>
-                                                      {lang === 'KO' ? '복합 사주 엣지케이스 정밀 해독' : 'Multiple Overlap Deep Interpretation'}
-                                                    </span>
-                                                  </span>
-                                                  <span className="text-[9px] flex items-center gap-1 opacity-70 font-bold uppercase tracking-wider">
-                                                    <span>{lang === 'KO' ? (guideInsightCollapsed ? '자세히보기' : '접기') : (guideInsightCollapsed ? 'Expand' : 'Collapse')}</span>
-                                                    <span className={`transform transition-transform duration-200 inline-block text-[7px] ${guideInsightCollapsed ? '' : 'rotate-90'}`}>▶</span>
-                                                  </span>
-                                                </button>
+                                  <span className="text-[9px] flex items-center gap-1 opacity-70 font-bold uppercase tracking-wider">
+                                    <span>{lang === 'KO' ? (guideInsightCollapsed ? '자세히보기' : '접기') : (guideInsightCollapsed ? 'Expand' : 'Collapse')}</span>
+                                    <span className={`transform transition-transform duration-200 inline-block text-[7px] ${guideInsightCollapsed ? '' : 'rotate-90'}`}>▶</span>
+                                  </span>
+                                </button>
 
-                                                {!guideInsightCollapsed && (
-                                                  <div className={`p-3 rounded-lg border text-xs leading-relaxed transition-all duration-300 mt-1 ${
-                                                    isLight 
-                                                      ? 'bg-amber-550/[0.02] border-amber-500/15 text-slate-800' 
-                                                      : 'bg-amber-550/[0.02] border border-amber-500/10 text-zinc-200'
-                                                  }`}>
-                                                    <p className="text-[10px] leading-relaxed opacity-95 whitespace-pre-line font-light">
-                                                      {lang === 'KO' ? (
-                                                        guideRelTab === 'clash' ? (
-                                                          '당신의 명식에는 단일한 부딪침을 넘어 다중 충돌(쟁충/첩충)이 흐르고 있습니다. 자수와 다수의 오화가 얽히는 경우처럼, 하나의 구심점이 다각도에서 인장력을 받아 "지속적인 환경 쇄신과 심장 발전기 구동" 상태가 됩니다.\n\n정면 충돌(지지충)은 일상 속 직접적인 돌파와 위기극복으로 나타나며, 건너뛴 충돌(격충)은 한 템포 간격을 둔 전략적 긴장감과 보완설계 능력을 드높여, 당신에게 탁월한 생존 위기관리력과 매력적인 승부사 안목을 동시에 선사합니다.'
-                                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
-                                                          '사주 원국 내에 복수의 합이 다각적으로 결합하는 다중 결속(정합/쟁합) 구조입니다. 이는 단순히 하나의 관계나 단일 목적에 얽매이지 않고, 한편으로는 일관된 협업을 도모하면서(삼합/방합) 다른 한편으로는 정서적인 연합이나 유연한 거래망(육합)을 입체적으로 가동할 수 있는 탁월한 네트워크 역량 및 대인관계 지평이 열려있음을 증명합니다.'
-                                                        ) : guideRelTab === 'punish' ? (
-                                                          '형살과 복음 등의 조율 장치가 다중으로 맞물려 있어 인생에 매우 정밀한 성찰 교정 능력이 작동하고 있습니다. 이 복합적인 압박감은 당신을 주도면밀함의 한계치까지 밀어붙여 세무, 기술, 엔지니어링, 설계, 의료 등 남들이 함부로 감내할 수 없는 고도의 난제 해결 역량을 완벽하게 단련시키는 극단적인 프로페셔널의 밑거름이 됩니다.'
-                                                        ) : (
-                                                          '서로 교차하는 복합적 균열과 보정 지대입니다. 인생 행보 중 예기치 못한 작은 변동이나 조정 사항이 나타날 수 있지만, 오히려 그 미세한 균열을 꼼꼼하게 메우는 보완 설비, 감사, 교정, 기록 보정 능력이 남들보다 압도적으로 발달하여 장기적인 리스크 관리 능력에서 절대 우위를 선점합니다.'
-                                                        )
-                                                      ) : (
-                                                        guideRelTab === 'clash' ? (
-                                                          'Your chart carries multiple co-existing clashes (contested/overlapping clashes). This acts as a continuous paradigm-shift engine where a direct clash provides instant breakthroughs while separated clashes grant long-term strategic anticipation, building supreme resilience and outstanding crisis-resolution mastery.'
-                                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
-                                                          'Having multiple co-existing combinations indicates a multi-perspective collaborative potential. Instead of being bound to a single domain, your capabilities are diversified to navigate robust professional alliances (triads/seasonal) as well as cozy personal networking agreements with incredible emotional intelligence.'
-                                                        ) : guideRelTab === 'punish' ? (
-                                                          'Co-existing punishments create multiple deep layers of quality-control and auditing consciousness. It refines your performance until you construct flawless masterpieces in legal, surgery, high-precision engineering, or forensic debugging.'
-                                                        ) : (
-                                                          'The multi-frictional adjustment enables you to foresee microscopic system discrepancies, rendering you an exceptionally sharp risk auditor and troubleshooter who turns potential errors into robust systems.'
-                                                        )
-                                                      )}
-                                                    </p>
-                                                  </div>
-                                                )}
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
+                                {!guideInsightCollapsed && (
+                                  <div className={`p-3 rounded-lg border text-xs leading-relaxed transition-all duration-300 mt-1 ${
+                                    isLight 
+                                      ? 'bg-amber-550/[0.02] border-amber-500/15 text-slate-800' 
+                                      : 'bg-amber-550/[0.02] border border-amber-500/10 text-zinc-200'
+                                  }`}>
+                                    <p className="text-[10px] leading-relaxed opacity-95 whitespace-pre-line font-light">
+                                      {lang === 'KO' ? (
+                                        guideRelTab === 'clash' ? (
+                                          '당신의 명식에는 단일한 부딪침을 넘어 다중 충돌(쟁충/첩충)이 흐르고 있습니다. 자수와 다수의 오화가 얽히는 경우처럼, 하나의 구심점이 다각도에서 인장력을 받아 "지속적인 환경 쇄신과 심장 발전기 구동" 상태가 됩니다.\n\n정면 충돌(지지충)은 일상 속 직접적인 돌파와 위기극복으로 나타나며, 건너뛴 충돌(격충)은 한 템포 간격을 둔 전략적 긴장감과 보완설계 능력을 드높여, 당신에게 탁월한 생존 위기관리력과 매력적인 승부사 안목을 동시에 선사합니다.'
+                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
+                                          '사주 원국 내에 복수의 합이 다각적으로 결합하는 다중 결속(정합/쟁합) 구조입니다. 이는 단순히 하나의 관계나 단일 목적에 얽매이지 않고, 한편으로는 일관된 협업을 도모하면서(삼합/방합) 다른 한편으로는 정서적인 연합이나 유연한 거래망(육합)을 입체적으로 가동할 수 있는 탁월한 네트워크 역량 및 대인관계 지평이 열려있음을 증명합니다.'
+                                        ) : guideRelTab === 'punish' ? (
+                                          '형살과 복음 등의 조율 장치가 다중으로 맞물려 있어 인생에 매우 정밀한 성찰 교정 능력이 작동하고 있습니다. 이 복합적인 압박감은 당신을 주도면밀함의 한계치까지 밀어붙여 세무, 기술, 엔지니어링, 설계, 의료 등 남들이 함부로 감내할 수 없는 고도의 난제 해결 역량을 완벽하게 단련시키는 극단적인 프로페셔널의 밑거름이 됩니다.'
+                                        ) : (
+                                          '서로 교차하는 복합적 균열과 보정 지대입니다. 인생 행보 중 예기치 못한 작은 변동이나 조정 사항이 나타날 수 있지만, 오히려 그 미세한 균열을 꼼꼼하게 메우는 보완 설비, 감사, 교정, 기록 보정 능력이 남들보다 압도적으로 발달하여 장기적인 리스크 관리 능력에서 절대 우위를 선점합니다.'
+                                        )
+                                      ) : (
+                                        guideRelTab === 'clash' ? (
+                                          'Your chart carries multiple co-existing clashes (contested/overlapping clashes). This acts as a continuous paradigm-shift engine where a direct clash provides instant breakthroughs while separated clashes grant long-term strategic anticipation, building supreme resilience and outstanding crisis-resolution mastery.'
+                                        ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
+                                          'Having multiple co-existing combinations indicates a multi-perspective collaborative potential. Instead of being bound to a single domain, your capabilities are diversified to navigate robust professional alliances (triads/seasonal) as well as cozy personal networking agreements with incredible emotional intelligence.'
+                                        ) : guideRelTab === 'punish' ? (
+                                          'Co-existing punishments create multiple deep layers of quality-control and auditing consciousness. It refines your performance until you construct flawless masterpieces in legal, surgery, high-precision engineering, or forensic debugging.'
+                                        ) : (
+                                          'The multi-frictional adjustment enables you to foresee microscopic system discrepancies, rendering you an exceptionally sharp risk auditor and troubleshooter who turns potential errors into robust systems.'
+                                        )
+                                      )}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
 
-                                        {/* Right Panel: Interactive slider detail explanation card */}
-                                        <div className="lg:col-span-7 h-full">
-                                      <AnimatePresence mode="wait">
-                                        <motion.div
-                                          key={`${guideRelTab}-${safeActiveIndex}`}
-                                          initial={{ opacity: 0, x: 8 }}
-                                          animate={{ opacity: 1, x: 0 }}
-                                          exit={{ opacity: 0, x: -8 }}
-                                          transition={{ duration: 0.22 }}
-                                          className="text-[11.5px] leading-relaxed pr-1 space-y-3"
-                                        >
-                                          <p className={isLight ? 'text-slate-700 font-medium' : 'text-white/80'}>
-                                            {lang === 'KO' ? activeItem.detailKo : activeItem.detailEn}
-                                          </p>
+                          {/* Right Panel: Interactive slider detail explanation card */}
+                          <div className="lg:col-span-7 h-full">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={`${guideRelTab}-${safeActiveIndex}`}
+                            initial={{ opacity: 0, x: 8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            transition={{ duration: 0.22 }}
+                            className="text-[11.5px] leading-relaxed pr-1 space-y-3"
+                          >
+                            <p className={isLight ? 'text-slate-700 font-medium' : 'text-white/80'}>
+                              {lang === 'KO' ? activeItem.detailKo : activeItem.detailEn}
+                            </p>
 
-                                          {(() => {
-                                            const activeUserMatch = getUserInteractionMatch(guideRelTab, activeItem.branches);
+                            {(() => {
+                              const activeUserMatch = getUserInteractionMatch(guideRelTab, activeItem.branches);
                                             if (!activeUserMatch) return null;
 
                                             const matchStrength = getInteractionStrength(activeUserMatch);
@@ -5920,6 +5812,116 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                               </div>
                                             );
                                           })()}
+
+                                          {/* Advanced Multiple Interactions Breakdown (Moved to Right Panel inside motion.div) */}
+                                          {activeUserMatch && activeUserMatch.allMatches && activeUserMatch.allMatches.length > 1 && (
+                                            <div className={`p-3.5 rounded-xl border space-y-3 transition-all duration-300 mt-4 shadow-sm ${
+                                              isLight 
+                                                ? 'bg-slate-50 border-slate-200' 
+                                                : 'bg-[#18181b]/98 border-zinc-800 shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
+                                            }`}>
+                                              <div className="text-[10px] font-extrabold uppercase tracking-wider opacity-90 flex items-center gap-1">
+                                                <span>🔗</span>
+                                                <span className={isLight ? 'text-slate-800' : 'text-zinc-200'}>
+                                                  {lang === 'KO' 
+                                                    ? `복합 작용 발생 (${activeUserMatch.allMatches.length}개의 중첩 관계 발견)` 
+                                                    : `Complex Multi-Overlap Detected (${activeUserMatch.allMatches.length} Relations)`}
+                                                </span>
+                                              </div>
+                                              
+                                              <div className="space-y-2 text-[10.5px]">
+                                                {activeUserMatch.allMatches.map((m: any, mIdx: number) => {
+                                                  const mPillars = m.pillarIndices || [];
+                                                  const locTxt = mPillars.map((pIdx: number) => {
+                                                    const pName = getPillarNameLocal(pIdx, lang);
+                                                    const pMean = getPillarMeaningLocal(pIdx, lang);
+                                                    return `${pName}(${pMean})`;
+                                                  }).join(' ↔ ');
+                                                  
+                                                  let relationName = "";
+                                                  let relationDescKo = "";
+                                                  let relationDescEn = "";
+                                                  
+                                                  if (m.type === '복음') {
+                                                    relationName = lang === 'KO' ? '복음 (기둥 중복)' : 'Pillar Duplication (Bok-eum)';
+                                                    relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '동일 기운의 중공/중복으로 행동 정체나 고도 집중 성찰 주기가 발현됩니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Same pillar energy duplicates, causing potential stagnation or amplified focus.';
+                                                  } else if (m.type === '지지충') {
+                                                    relationName = lang === 'KO' ? '정면 지지충' : 'Direct Branch Clash';
+                                                    relationDescKo = '인접 지지의 충돌로 즉각적이고 과감한 환경 변화나 인생의 강한 역동성을 개척합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Direct close collision driving instant, catalytic resets and powerful environmental expansion.';
+                                                  } else if (m.type === '격충') {
+                                                    relationName = lang === 'KO' ? '건너뛴 격충' : 'Separated Branch Clash';
+                                                    relationDescKo = '기둥을 건너뛴 마찰로, 간헐적인 심리적 긴장감 및 예리하고 정밀한 보완 능력을 기릅니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Collision across one pillar triggering alert situational awareness and precise detail planning.';
+                                                  } else if (m.type === '원충') {
+                                                    relationName = lang === 'KO' ? '원격 원충' : 'Remote Branch Clash';
+                                                    relationDescKo = '원거리 간접 충돌로, 실생활 변동보다는 철학적 깊이와 성찰 안목을 키워줍니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Remote spaced clash granting subtle caution, artistic wisdom, and background prudence.';
+                                                  } else if (m.type === '반합') {
+                                                    relationName = lang === 'KO' ? '지합 반합' : 'Half Triad Combination';
+                                                    relationDescKo = '핵심 오행을 포함한 결속으로, 힘차게 돌아가는 엔진 축처럼 기능적 협률을 생산합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Powerful partial triad producing stable functional cooperation and dynamic action.';
+                                                  } else if (m.type === '삼합') {
+                                                    relationName = lang === 'KO' ? '삼합 완성' : 'Full Triad Combination';
+                                                    relationDescKo = '세 지지의 완전한 목적 연대로, 사회적 큰 성취와 단단한 공동체 비전을 제시합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Complete strategic alliance creating high collaborative success and shared milestones.';
+                                                  } else if (m.type === '방합') {
+                                                    relationName = lang === 'KO' ? '계절 방합' : 'Directional Season Union';
+                                                    relationDescKo = '가문 계절 무리의 강력한 세력으로, 독보적인 영역 주도권과 동맹력을 가져옵니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Seasonal coalition yielding unshakeable field mastery and robust, family-level bonds.';
+                                                  } else if (m.type === '준방합') {
+                                                    relationName = lang === 'KO' ? '준방합 형성' : 'Semi-Directional Union';
+                                                    relationDescKo = '계절의 준합화로 은근한 카르텔적 유대감과 든든한 배경 우군을 구축합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Partial seasonal harmony that builds background stability and supportive backings.';
+                                                  } else if (m.type === '육합') {
+                                                    relationName = lang === 'KO' ? '친밀 육합' : 'Six Affectionate Combo';
+                                                    relationDescKo = '일대일의 긴밀한 사적 연합으로, 돈독한 상호 신뢰와 안락한 지지력입니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Close-knit private combination delivering trustworthy emotional and material support.';
+                                                  } else if (m.type === '삼형' || m.type === '반형' || m.type === '자형' || m.type === '상형') {
+                                                    relationName = lang === 'KO' ? `형살 조율 (${m.type})` : `Correction Punishment (${m.type})`;
+                                                    relationDescKo = '서로 제어하고 깎는 교정력으로, 완벽주의 검증을 거쳐 일류 기질의 칼 끝을 연마합니다.';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Surgical reshaping force which fertilizes professional mastership through strict auditing.';
+                                                  } else {
+                                                    relationName = m.type;
+                                                    relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '';
+                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : '';
+                                                  }
+
+                                                  return (
+                                                    <div 
+                                                      key={mIdx} 
+                                                      className={`p-2.5 rounded-lg border leading-relaxed ${
+                                                        isLight 
+                                                          ? 'bg-white border-slate-150 text-slate-800' 
+                                                          : 'bg-[#18181b]/50 border-zinc-800 text-zinc-300'
+                                                      }`}
+                                                    >
+                                                      <div className="flex items-center justify-between gap-1 mb-1">
+                                                        <span className="font-semibold flex items-center gap-1 shrink-0">
+                                                          <span className="text-[8px]">🔸</span>
+                                                          <span>{relationName}</span>
+                                                        </span>
+                                                        <span className={`text-[8.5px] font-black opacity-80 uppercase px-1.5 py-0.2 rounded shrink-0 ${
+                                                          m.severity === 'full' 
+                                                            ? 'bg-rose-455/10 text-rose-600 dark:text-rose-400' 
+                                                            : (m.severity === 'half' ? 'bg-orange-455/10 text-orange-600 dark:text-orange-400' : 'bg-fuchsia-455/10 text-fuchsia-600 dark:text-fuchsia-400')
+                                                        }`}>
+                                                          {m.severity}
+                                                        </span>
+                                                      </div>
+                                                      <div className="font-mono text-[9px] opacity-70 font-semibold mb-1">
+                                                        {locTxt}
+                                                      </div>
+                                                      <p className="text-[10px] leading-relaxed opacity-90 font-light pl-2 border-l border-slate-200 dark:border-zinc-800">
+                                                        {lang === 'KO' ? relationDescKo : relationDescEn}
+                                                      </p>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
+                                          )}
                                         </motion.div>
                                       </AnimatePresence>
                                     </div>
