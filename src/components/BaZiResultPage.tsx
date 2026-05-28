@@ -38,6 +38,7 @@ import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-servi
 import { generateCycleVibe, CycleVibeResult } from '../services/cycle-vibe-service';
 import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
+import { TEN_GOD_DESCRIPTIONS } from '../constants/tenGodDescriptions';
 import { useTheme } from '../contexts/ThemeContext';
 
 const ILJU_BACKGROUND_IMAGES: Record<string, { base: string, detailed: string }> = {
@@ -1779,7 +1780,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return stages.legacy;
   };
 
-  const PolarityIcon = ({ polarity, size = 10, className = "" }: { polarity: number, size?: number, className?: string }) => {
+  const PolarityIcon = ({ polarity, size = 10, className = "", char }: { polarity: number, size?: number, className?: string, char?: string }) => {
     if (polarity === 1) return <Sun size={size} className={`text-amber-400 drop-shadow-[0_0_2px_rgba(251,191,36,0.2)] ${className}`} strokeWidth={2.5} />;
     return <Moon size={size} className={`text-sky-300 drop-shadow-[0_0_2px_rgba(125,211,252,0.2)] ${className}`} strokeWidth={2.5} />;
   };
@@ -3026,7 +3027,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         }`}
                         title={lang === 'KO' ? (pillar.branchPolarity === 1 ? '양(陽)' : '음(陰)') : (pillar.branchPolarity === 1 ? 'Yang (+)' : 'Yin (-)')}
                       >
-                        <PolarityIcon polarity={pillar.branchPolarity} size={11} className="sm:scale-110" />
+                        <PolarityIcon polarity={pillar.branchPolarity} char={pillar.branch} size={11} className="sm:scale-110" />
                       </div>
                     )}
                     <div className="absolute top-1.5 sm:top-2.5 left-0 right-0 px-6 flex justify-center">
@@ -4129,7 +4130,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             </div>
                           </div>
                         </div>
-
                         {/* 합형충파해 */}
                         <div className="space-y-4">
                           <BaziTooltip content={BAZI_MAPPING.tooltips.interactions} lang={lang}>
@@ -4940,6 +4940,95 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                  </div>
                </div>
 
+
+
+                        {/* 대운과 세운의 작용 가이드 및 동적 해설 */}
+                        <div className="space-y-4 mb-8">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="h-[1px] w-8 bg-neon-purple/50"></div>
+                            <h4 className="text-sm font-display font-medium text-neon-purple uppercase tracking-[0.2em]">{lang === 'KO' ? '대운·세운 (Cycle & Se-woon)' : 'Life Cycle & Se-woon'}</h4>
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-neon-purple/20 to-transparent"></div>
+                          </div>
+                          
+                          <div className={`p-4 sm:p-5 rounded-xl space-y-4 border leading-relaxed text-sm sm:text-base mb-6 ${isLight ? 'bg-indigo-50/50 border-indigo-100/50 text-slate-700' : 'bg-[#0f0f1b]/80 border-white/10 text-white/90 shadow-[0_0_15px_rgba(188,0,255,0.1)]'}`}>
+                            {lang === 'KO' ? (
+                              <div className="space-y-4 text-sm leading-relaxed">
+                                <p><strong className="text-neon-purple">대운(大運)</strong>은 10년 단위로 흐르는 거대한 계절입니다. 삶의 거시적 환경과 방향을 결정하는 밑바탕으로, 원국에 미치는 영향의 깊이와 지속성이 가장 강력합니다.</p>
+                                <p><strong className="text-neon-pink">세운(歲運)</strong>은 1년 단위로 찾아오는 날씨입니다. 대운이라는 환경 위에서 실제 사건을 촉발하는 열쇠로, 체감되는 구체적 변화는 세운을 통해 드러납니다.</p>
+                                <p><strong>천간</strong>은 드러나는 방향과 명분, <strong>지지</strong>는 실질적인 힘과 뿌리입니다.</p>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                                  <div className={`p-3 rounded-lg border ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-black/40 border-white/5'}`}>
+                                    <div className="font-bold mb-2 text-neon-cyan flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-neon-cyan/50"></span>대운 천간 & 지지</div>
+                                    <ul className="list-disc pl-5 space-y-1.5 text-[13px] opacity-90">
+                                      <li><strong>천간:</strong> 10년간 추구할 방향·명분</li>
+                                      <li><strong>지지:</strong> 삶의 기반을 바꾸는 실질 에너지</li>
+                                    </ul>
+                                  </div>
+                                  <div className={`p-3 rounded-lg border ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-black/40 border-white/5'}`}>
+                                    <div className="font-bold mb-2 text-neon-pink flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-neon-pink/50"></span>세운 천간 & 지지</div>
+                                    <ul className="list-disc pl-5 space-y-1.5 text-[13px] opacity-90">
+                                      <li><strong>천간:</strong> 사건의 인과·계기</li>
+                                      <li><strong>지지:</strong> 사건의 결과·실체</li>
+                                    </ul>
+                                  </div>
+                                </div>
+                                <div className={`text-xs p-3 rounded-lg font-medium text-center border mt-2 ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-white/50'}`}>
+                                  힘의 크기 순서: 대운 지지 <span className="opacity-50">→</span> 대운 천간 <span className="opacity-50">→</span> 세운 지지 <span className="opacity-50">→</span> 세운 천간
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-4 text-sm leading-relaxed">
+                                <p><strong className="text-neon-purple">Grand Cycle (Life Season)</strong> acts as the macro environment lasting 10 years, exerting the most profound and sustained influence on your destiny chart.</p>
+                                <p><strong className="text-neon-pink">Annual Cycle (Se-Un)</strong> is the specific 'weather' of the year, triggering concrete events within your current life season.</p>
+                                <p><strong>Stems</strong> represent the apparent direction and rationale, while <strong>Branches</strong> manifest practical impact and foundation.</p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* 동적 해설: 대운/세운 천간/지지 십성 해설 */}
+                          {currentAnnualPillar && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                              {[
+                                { pos: '대운천간', char: currentCycle.stem, tenGodKo: currentCycle.stemTenGodKo, tenGodEn: currentCycle.stemTenGodEn, type: '대운', descKo: '10년간 추구할 방향·명분', descEn: 'Direction & Purpose for 10 years', color: 'text-neon-cyan', bg: isLight ? 'bg-cyan-50/50 border-cyan-100 shadow-sm' : 'bg-cyan-900/10 border-cyan-500/20 shadow-[0_0_10px_rgba(0,242,255,0.05)]' },
+                                { pos: '대운지지', char: currentCycle.branch, tenGodKo: currentCycle.branchTenGodKo, tenGodEn: currentCycle.branchTenGodEn, type: '대운', descKo: '삶의 기반을 바꾸는 실질 에너지', descEn: 'Practical energy shifting life foundation', color: 'text-neon-cyan', bg: isLight ? 'bg-cyan-50/50 border-cyan-100 shadow-sm' : 'bg-cyan-900/10 border-cyan-500/20 shadow-[0_0_10px_rgba(0,242,255,0.05)]' },
+                                { pos: '세운천간', char: currentAnnualPillar.stem, tenGodKo: currentAnnualPillar.stemTenGodKo, tenGodEn: currentAnnualPillar.stemTenGodEn, type: '세운', descKo: '올해 사건의 인과·계기', descEn: 'Cause & Trigger of this year', color: 'text-neon-pink', bg: isLight ? 'bg-pink-50/50 border-pink-100 shadow-sm' : 'bg-pink-900/10 border-pink-500/20 shadow-[0_0_10px_rgba(255,0,128,0.05)]' },
+                                { pos: '세운지지', char: currentAnnualPillar.branch, tenGodKo: currentAnnualPillar.branchTenGodKo, tenGodEn: currentAnnualPillar.branchTenGodEn, type: '세운', descKo: '올해 사건의 결과·실체', descEn: 'Result & Reality of this year', color: 'text-neon-pink', bg: isLight ? 'bg-pink-50/50 border-pink-100 shadow-sm' : 'bg-pink-900/10 border-pink-500/20 shadow-[0_0_10px_rgba(255,0,128,0.05)]' }
+                              ].map((item, idx) => {
+                                 // Get text from TEN_GOD_DESCRIPTIONS
+                                 const tenGodClean = item.tenGodKo.replace(/편인|정인|편관|정관|편재|정재|비견|겁재|식신|상관/, (match) => match).substring(0, 2); 
+                                 
+                                 const textObjRaw = (TEN_GOD_DESCRIPTIONS[dayMaster]?.[item.pos]?.[tenGodClean] 
+                                      || TEN_GOD_DESCRIPTIONS['공통']?.[item.pos]?.[tenGodClean] 
+                                      || { ko: "해설 준비 중입니다.", en: "Description coming soon." });
+                                      
+                                 const displayDesc = typeof textObjRaw === 'string' ? textObjRaw : (lang === 'KO' ? textObjRaw.ko : (textObjRaw.en || textObjRaw.ko));
+                                 const posLabel = lang === 'KO' ? item.pos : (item.pos.includes('대운') ? (item.pos.includes('천간') ? 'Cycle Stem' : 'Cycle Branch') : (item.pos.includes('천간') ? 'Annual Stem' : 'Annual Branch'));
+                                 
+                                 return (
+                                    <div key={idx} className={`p-4 sm:p-5 rounded-xl border ${item.bg}`}>
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isLight ? 'bg-white shadow' : 'bg-black/50 text-white/90'}`}>
+                                          {posLabel}
+                                        </span>
+                                        <span className={`font-bold text-base ${item.color}`}>
+                                            {item.char} ({lang === 'KO' ? item.tenGodKo : item.tenGodEn})
+                                        </span>
+                                      </div>
+                                      <div className={`text-[12px] font-medium opacity-70 mb-3`}>
+                                        — {lang === 'KO' ? item.descKo : item.descEn}
+                                      </div>
+                                      <div className={`text-sm sm:text-[15px] leading-relaxed break-keep ${isLight ? 'text-slate-700' : 'text-white/80'}`}>
+                                        {displayDesc}
+                                      </div>
+                                    </div>
+                                 );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        
                {/* Sub-section 1: Branch Interactivity */}
                 {(() => {
                   const baziBranchData: Record<string, { hanja: string; en: string; colorLight: string; colorDark: string; elementKo: string; elementEn: string }> = {

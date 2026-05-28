@@ -2,29 +2,20 @@ import { calculateRealBaZi } from './services/bazi-service';
 
 const input = {
   calendarType: 'solar' as const,
-  birthDate: '1993-08-03',
-  birthTime: '10:53',
+  birthDate: '1994-04-13',
+  birthTime: '23:18',
   isTimeUnknown: false,
-  gender: 'female' as const,
+  gender: 'male' as const,
   name: '사용자',
-  city: 'Singapore'
+  city: 'Seoul'
 };
 
-const result = calculateRealBaZi(input, 1.3521, 103.8198, 'KO'); // Singapore Latitude & Longitude
-import { generateCycleVibe } from './services/cycle-vibe-service';
+const result = calculateRealBaZi(input, 37.5665, 126.9780, 'KO'); 
+import { generateCoreRemedy, generateCycleVibe } from './services/cycle-vibe-service';
 
-console.log("=== PILLARS ===");
-result.pillars.forEach(p => {
-  console.log(`${p.title}: ${p.hanja} (${p.stemKoreanName} / ${p.branchKoreanName}) [${p.element}]`);
-});
-
-console.log("\n=== Day Master ===");
-console.log(result.pillars[1].stem);
-
-import { generateCoreRemedy } from './services/cycle-vibe-service';
 console.log("\n=== CORE REMEDY KO ===");
 console.log(generateCoreRemedy(result.analysis, 'KO'));
 
-console.log("\n=== Special Patterns (귀격 및 특수 패턴) ===");
-console.log(result.analysis.specialPatterns);
-
+console.log("\n=== CYCLE VIBE GENERAL MAIN (Includes remedy?) ===");
+const cycleResult = generateCycleVibe(result, 'KO', 'Tester', 'male', 'Seoul', { martialStatus: 'single', hasChildren: false });
+console.log(cycleResult.themeAnalyses['general'].main.includes("개운법"));

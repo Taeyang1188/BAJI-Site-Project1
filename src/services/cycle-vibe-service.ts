@@ -24,10 +24,17 @@ export function generateCoreRemedy(analysis: any, lang: Language): string {
     const yongshin = analysis && analysis.yongshinDetail;
     if (!yongshin || !yongshin.primary || !yongshin.giShin) return "";
 
-    const heeElement = yongshin.primary.element;
-    const heeGod = yongshin.primary.god ? yongshin.primary.god.split("(")[0].trim().split(",")[0].trim() : "";
-    const giElement = yongshin.giShin.element;
-    const giGod = yongshin.giShin.god ? yongshin.giShin.god.split("(")[0].trim().split(",")[0].trim() : "";
+    let heeElement = yongshin.primary.element;
+    if (heeElement && heeElement.includes("/")) {
+        heeElement = yongshin.heeShin?.element || heeElement.split("/")[0].trim();
+    }
+    const heeGod = yongshin.primary.god ? yongshin.primary.god.split("(")[0].trim().split("/")[0].trim().split(",")[0].trim() : "";
+    
+    let giElement = yongshin.giShin.element;
+    if (giElement && giElement.includes("/")) {
+        giElement = yongshin.guShin?.element || giElement.split("/")[0].trim();
+    }
+    const giGod = yongshin.giShin.god ? yongshin.giShin.god.split("(")[0].trim().split("/")[0].trim().split(",")[0].trim() : "";
 
     const elementToKoRaw: Record<string, string> = {
         "Wood": "목(木)", "Fire": "화(火)", "Earth": "토(土)", "Metal": "금(金)", "Water": "수(水)"
