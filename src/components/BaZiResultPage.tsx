@@ -740,9 +740,26 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const t = TRANSLATIONS[lang].result as any;
   const [guideSelectedPillar, setGuideSelectedPillar] = React.useState<'Year' | 'Month' | 'Day' | 'Hour'>('Day');
   const [hoveredHiddenStem, setHoveredHiddenStem] = React.useState<{pillarIdx: number, hsIdx: number, hs: string, connectedStems: string[], isDestroyed?: boolean} | null>(null);
-  const [guideRelTab, setGuideRelTab] = React.useState<'samhap' | 'banghap' | 'yukhap' | 'clash' | 'punish' | 'destroy' | 'harm'>('clash');
+  const [guideRelTab, setGuideRelTab] = React.useState<'samhap' | 'banghap' | 'yukhap' | 'clash' | 'punish' | 'destroy' | 'harm'>('samhap');
   const [activeSubIndex, setActiveSubIndex] = React.useState<number>(0);
   const [guideInsightCollapsed, setGuideInsightCollapsed] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    if (!result) return;
+    const samhapBranches = ['해묘미(亥卯未)', '인오술(寅午戌)', '사유축(巳酉丑)', '신자진(申子辰)'];
+    let foundIdx = -1;
+    for (let i = 0; i < samhapBranches.length; i++) {
+      if (getUserInteractionMatch('samhap', samhapBranches[i])) {
+        foundIdx = i;
+        break;
+      }
+    }
+    if (foundIdx !== -1) {
+      setActiveSubIndex(foundIdx);
+    } else {
+      setActiveSubIndex(0);
+    }
+  }, [result]);
 
   const dayMasterDetails = result?.analysis?.dayMasterStrength?.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
   const isDayMasterRooted = !!(dayMasterDetails && dayMasterDetails.roots && dayMasterDetails.roots.some((rt: any) => !rt.isDestroyed));
@@ -5283,6 +5300,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     { id: 'harm', labelKo: '해 (害)', labelEn: 'Harm', themeColor: 'text-indigo-600 dark:text-[#818cf8]', colorClass: 'border-indigo-500/20' },
                   ] as const;
 
+                  const selectGuideTab = (tabId: 'samhap' | 'banghap' | 'yukhap' | 'clash' | 'punish' | 'destroy' | 'harm') => {
+                    setGuideRelTab(tabId);
+                    const catItems = relationCategories[tabId]?.items || [];
+                    let foundIdx = -1;
+                    for (let i = 0; i < catItems.length; i++) {
+                      const item = catItems[i];
+                      const userMatch = getUserInteractionMatch(tabId, item.branches);
+                      if (userMatch) {
+                        foundIdx = i;
+                        break;
+                      }
+                    }
+                    if (foundIdx !== -1) {
+                      setActiveSubIndex(foundIdx);
+                    } else {
+                      setActiveSubIndex(0);
+                    }
+                  };
+
                   const currentCategory = relationCategories[guideRelTab] || relationCategories.clash;
                   const currentCategoryItems = currentCategory.items;
                   const safeActiveIndex = activeSubIndex >= currentCategoryItems.length ? 0 : activeSubIndex;
@@ -5290,13 +5326,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   const activeUserMatch = activeItem ? getUserInteractionMatch(guideRelTab, activeItem.branches) : null;
 
                   const handlePrevItem = () => {
-                    const len = currentCategoryItems.length;
-                    setActiveSubIndex((safeActiveIndex - 1 + len) % len);
+                    const currentIndex = tabsConf.findIndex(t => t.id === guideRelTab);
+                    const prevIndex = (currentIndex - 1 + tabsConf.length) % tabsConf.length;
+                    const prevTabId = tabsConf[prevIndex].id;
+                    selectGuideTab(prevTabId);
                   };
 
                   const handleNextItem = () => {
-                    const len = currentCategoryItems.length;
-                    setActiveSubIndex((safeActiveIndex + 1) % len);
+                    const currentIndex = tabsConf.findIndex(t => t.id === guideRelTab);
+                    const nextIndex = (currentIndex + 1) % tabsConf.length;
+                    const nextTabId = tabsConf[nextIndex].id;
+                    selectGuideTab(nextTabId);
                   };
 
                   return (
@@ -5310,8 +5350,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               key={tab.id}
                               id={`bazi-guide-tab-${tab.id}`}
                               onClick={() => {
-                                setGuideRelTab(tab.id);
-                                setActiveSubIndex(0);
+                                selectGuideTab(tab.id);
                               }}
                               className={`px-3 py-2 text-xs font-bold rounded-lg shrink-0 transition-all duration-300 active:scale-95 flex items-center gap-1 cursor-pointer border ${
                                 isActive 

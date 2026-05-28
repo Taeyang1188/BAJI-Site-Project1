@@ -2,15 +2,15 @@ import { calculateRealBaZi } from './services/bazi-service';
 
 const input = {
   calendarType: 'solar' as const,
-  birthDate: '1990-11-16',
-  birthTime: '14:00',
+  birthDate: '1993-08-03',
+  birthTime: '10:53',
   isTimeUnknown: false,
   gender: 'female' as const,
   name: '사용자',
-  city: 'Seoul'
+  city: 'Singapore'
 };
 
-const result = calculateRealBaZi(input, 37.5665, 126.9780, 'KO'); // Seoul Latitude & Longitude
+const result = calculateRealBaZi(input, 1.3521, 103.8198, 'KO'); // Singapore Latitude & Longitude
 import { generateCycleVibe } from './services/cycle-vibe-service';
 
 console.log("=== PILLARS ===");

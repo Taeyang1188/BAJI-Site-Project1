@@ -173,6 +173,7 @@ export interface BaZiResult {
   currentYearPillar?: any;
   timeCorrectionMessages?: string[];
   analysis?: {
+    dayMaster?: string;
     geJu: string;
     yongShen: string;
     gender?: string;
