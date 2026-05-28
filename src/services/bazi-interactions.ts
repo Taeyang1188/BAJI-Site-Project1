@@ -597,3 +597,84 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
 
   return { interactions, conflicts };
 }
+
+export function analyzeInteractionsDynamic(natalBranches: string[], daewunBranch: string, seunBranch: string) {
+  const dynamicInteractions: any[] = [];
+  
+  // Define interaction pairs
+  const wonJinPairs = [['子', '未'], ['丑', '午'], ['寅', '酉'], ['卯', '申'], ['辰', '亥'], ['巳', '戌']];
+  const guiMenPairs = [['子', '酉'], ['丑', '午'], ['寅', '未'], ['卯', '申'], ['辰', '亥'], ['巳', '戌']];
+  const chungPairs: Record<string, string> = { '子': '午', '丑': '未', '寅': '申', '卯': '酉', '辰': '戌', '巳': '亥', '午': '子', '未': '丑', '申': '寅', '酉': '卯', '戌': '辰', '亥': '巳' };
+  const hapPairs: Record<string, string> = { '子': '丑', '丑': '子', '寅': '亥', '亥': '寅', '卯': '戌', '戌': '卯', '辰': '酉', '酉': '辰', '巳': '申', '申': '巳', '午': '未', '未': '午' };
+  const hyeongPairs = [['寅', '巳'], ['巳', '申'], ['申', '寅'], ['丑', '戌'], ['戌', '未'], ['未', '丑'], ['辰', '辰'], ['午', '午'], ['酉', '酉'], ['亥', '亥']];
+  const paPairs: Record<string, string> = { '子': '酉', '酉': '子', '午': '卯', '卯': '午', '巳': '申', '申': '巳', '寅': '亥', '亥': '寅', '辰': '丑', '丑': '辰', '戌': '未', '未': '戌' };
+  const haePairs: Record<string, string> = { '子': '未', '未': '子', '丑': '午', '午': '丑', '寅': '巳', '巳': '寅', '卯': '辰', '辰': '卯', '申': '亥', '亥': '申', '酉': '戌', '戌': '酉' };
+
+  const checkInteractions = (cycleBranch: string, type: string) => {
+    natalBranches.forEach((nb, index) => {
+      let isMatch = false;
+      let interactionType = "";
+
+      if (wonJinPairs.some(p => (p[0] === nb && p[1] === cycleBranch) || (p[1] === nb && p[0] === cycleBranch))) {
+        interactionType = "원진"; isMatch = true;
+      }
+      if (guiMenPairs.some(p => (p[0] === nb && p[1] === cycleBranch) || (p[1] === nb && p[0] === cycleBranch))) {
+        interactionType = interactionType ? interactionType + "/귀문" : "귀문"; isMatch = true;
+      }
+      if (chungPairs[nb] === cycleBranch) {
+        interactionType = "충"; isMatch = true;
+      }
+      if (hapPairs[nb] === cycleBranch) {
+        interactionType = "육합"; isMatch = true;
+      }
+      if (hyeongPairs.some(p => (p[0] === nb && p[1] === cycleBranch) || (p[1] === nb && p[0] === cycleBranch))) {
+        interactionType = "형"; isMatch = true;
+      }
+      if (paPairs[nb] === cycleBranch) {
+        interactionType = "파"; isMatch = true;
+      }
+      if (haePairs[nb] === cycleBranch) {
+        interactionType = "해"; isMatch = true;
+      }
+
+      if (isMatch && interactionType) {
+        dynamicInteractions.push({
+          cycle: type,
+          cycleBranch,
+          natalBranch: nb,
+          natalIndex: index,
+          interactionType
+        });
+      }
+    });
+
+    // Check interaction between daewun and seun
+    if (type === 'seun' && daewunBranch) {
+       let isMatch = false;
+       let interactionType = "";
+       if (wonJinPairs.some(p => (p[0] === daewunBranch && p[1] === cycleBranch) || (p[1] === daewunBranch && p[0] === cycleBranch))) interactionType = "원진";
+       if (guiMenPairs.some(p => (p[0] === daewunBranch && p[1] === cycleBranch) || (p[1] === daewunBranch && p[0] === cycleBranch))) interactionType = interactionType ? interactionType + "/귀문" : "귀문";
+       if (chungPairs[daewunBranch] === cycleBranch) interactionType = "충";
+       if (hapPairs[daewunBranch] === cycleBranch) interactionType = "육합";
+       if (hyeongPairs.some(p => (p[0] === daewunBranch && p[1] === cycleBranch) || (p[1] === daewunBranch && p[0] === cycleBranch))) interactionType = "형";
+       if (paPairs[daewunBranch] === cycleBranch) interactionType = "파";
+       if (haePairs[daewunBranch] === cycleBranch) interactionType = "해";
+       
+       if (interactionType) {
+         dynamicInteractions.push({
+           cycle: 'daewun x seun',
+           cycleBranch,
+           natalBranch: daewunBranch,
+           natalIndex: -1,
+           interactionType
+         });
+       }
+    }
+  };
+
+  if (daewunBranch) checkInteractions(daewunBranch, "daewun");
+  if (seunBranch) checkInteractions(seunBranch, "seun");
+
+  return dynamicInteractions;
+}
+

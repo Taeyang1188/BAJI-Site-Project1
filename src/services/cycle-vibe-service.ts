@@ -4,8 +4,10 @@ import { ELEMENT_COLORS, ELEMENT_DESCRIPTIONS } from '../constants';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 import { Solar } from 'lunar-typescript';
 import { buildBaziMatrix } from './bazi-matrix-builder';
+import { analyzeInteractionsDynamic } from './bazi-interactions';
 
 function getJosa(name: string, josaType: '은는' | '이가' | '을를'): string {
+
   if (!name) return '';
   const charCode = name.charCodeAt(name.length - 1);
   if (charCode < 0xAC00 || charCode > 0xD7A3) return name + (josaType === '은는' ? '는' : josaType === '이가' ? '가' : '를'); 
@@ -1004,8 +1006,56 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       }
     }
     
+    // Dynamic Interactions Logic (Common for both paths)
+    let dynamicInteractionText = '';
+    const allBranches = result.pillars.map((p: any) => p.branch);
+    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch);
+    if (dynamicInteractions.length > 0) {
+      const koNotes: string[] = [];
+      const enNotes: string[] = [];
+
+      dynamicInteractions.forEach(int => {
+        const type = int.interactionType;
+        const target = int.cycle === 'daewun x seun' ? '대운과 세운 사이' : (int.cycle === 'daewun' ? '사주 원국과 대운' : '사주 원국과 세운');
+        const targetEn = int.cycle === 'daewun x seun' ? 'between Daewun and Seun' : (int.cycle === 'daewun' ? 'between Natal Chart and Daewun' : 'between Natal Chart and Seun');
+        
+        let descKo = ''; let descEn = '';
+        if (type.includes('귀문') && type.includes('원진')) {
+          descKo = `${target}에 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
+          descEn = `A strong sensitivity and unconscious obsession (Wonjin/Gwimun) marks the link ${targetEn}. Avoid self-destructive perfectionism or resentment by actively seeking objective feedback.`;
+        } else if (type.includes('귀문')) {
+          descKo = `${target}에 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
+          descEn = `Intuition and extreme sensitivity (Gwimun) peak ${targetEn}. Sublimating this sensitivity into artistic inspiration or fine technical skills will produce unmatched results.`;
+        } else if (type.includes('원진')) {
+          descKo = `${target}에 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
+          descEn = `Unexplained friction and resentment (Wonjin) easily occur ${targetEn}. Treat unexpected delays not as roadblocks, but as refinement processes.`;
+        } else if (type.includes('육합')) {
+          descKo = `${target}이 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
+          descEn = `The connection ${targetEn} softly bonds (Six Combination), welcoming new relationships or unexpected allies. It brings emotional stability.`;
+        } else if (type.includes('형')) {
+          descKo = `${target}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
+          descEn = `Punitive, reconstructive energy (Hyeong) operates ${targetEn}. Be extremely careful that your perfectionism does not sabotage a completed project.`;
+        } else if (type.includes('충')) {
+          descKo = `${target}에 강한 충돌과 변화(지지충)의 역동성이 발생해. 막혀있던 상황이 급변하거나 예기치 않은 이동수가 따를 수 있으니 유연하게 대처해봐.`;
+          descEn = `Fierce clash dynamics ${targetEn} force drastic change. Prepare for sudden shifts or relocation by remaining highly adaptable.`;
+        } else if (type.includes('파') || type.includes('해')) {
+          descKo = `${target}에 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
+          descEn = `Minor misalignments or hidden harms (Pa/Hae) emerge ${targetEn}. Meticulously check relationship dynamics and contract details.`;
+        }
+
+        if (descKo && !koNotes.includes(`- ${descKo}`)) koNotes.push(`- ${descKo}`);
+        if (descEn && !enNotes.includes(`- ${descEn}`)) enNotes.push(`- ${descEn}`);
+      });
+
+      if (lang === 'KO' && koNotes.length > 0) {
+         dynamicInteractionText = `\n\n📌 [ 운명의 변곡점: 역학(Dynamics) 분석 ]\n${koNotes.join('\n')}`;
+      } else if (lang !== 'KO' && enNotes.length > 0) {
+         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]\n${enNotes.join('\n')}`;
+      }
+    }
+
     const coreRemedy = generateCoreRemedy(analysis, lang);
-    main += `${comboInsight}\n\n${detailedEffect}${peerRivalryWarning}${coreRemedy}`;
+    main += `${comboInsight}\n\n${detailedEffect}${dynamicInteractionText}${peerRivalryWarning}${coreRemedy}`;
   } else {
     // --- Companion (비겁) overload & JaeSeong (재성) presence check ---
     const biGyeopRatio = (tenGodsRatio['비겁(Companion/Sibling)'] as number) || 
@@ -1027,7 +1077,54 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       }
     }
 
-    // No combo logic
+    // Dynamic Interactions Logic (Common for both paths)
+    let dynamicInteractionText = '';
+    const allBranches = result.pillars.map((p: any) => p.branch);
+    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch);
+    if (dynamicInteractions.length > 0) {
+      const koNotes: string[] = [];
+      const enNotes: string[] = [];
+
+      dynamicInteractions.forEach(int => {
+        const type = int.interactionType;
+        const target = int.cycle === 'daewun x seun' ? '대운과 세운 사이' : (int.cycle === 'daewun' ? '사주 원국과 대운' : '사주 원국과 세운');
+        const targetEn = int.cycle === 'daewun x seun' ? 'between Daewun and Seun' : (int.cycle === 'daewun' ? 'between Natal Chart and Daewun' : 'between Natal Chart and Seun');
+        
+        let descKo = ''; let descEn = '';
+        if (type.includes('귀문') && type.includes('원진')) {
+          descKo = `${target}에 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
+          descEn = `A strong sensitivity and unconscious obsession (Wonjin/Gwimun) marks the link ${targetEn}. Avoid self-destructive perfectionism or resentment by actively seeking objective feedback.`;
+        } else if (type.includes('귀문')) {
+          descKo = `${target}에 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
+          descEn = `Intuition and extreme sensitivity (Gwimun) peak ${targetEn}. Sublimating this sensitivity into artistic inspiration or fine technical skills will produce unmatched results.`;
+        } else if (type.includes('원진')) {
+          descKo = `${target}에 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
+          descEn = `Unexplained friction and resentment (Wonjin) easily occur ${targetEn}. Treat unexpected delays not as roadblocks, but as refinement processes.`;
+        } else if (type.includes('육합')) {
+          descKo = `${target}이 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
+          descEn = `The connection ${targetEn} softly bonds (Six Combination), welcoming new relationships or unexpected allies. It brings emotional stability.`;
+        } else if (type.includes('형')) {
+          descKo = `${target}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
+          descEn = `Punitive, reconstructive energy (Hyeong) operates ${targetEn}. Be extremely careful that your perfectionism does not sabotage a completed project.`;
+        } else if (type.includes('충')) {
+          descKo = `${target}에 강한 충돌과 변화(지지충)의 역동성이 발생해. 막혀있던 상황이 급변하거나 예기치 않은 이동수가 따를 수 있으니 유연하게 대처해봐.`;
+          descEn = `Fierce clash dynamics ${targetEn} force drastic change. Prepare for sudden shifts or relocation by remaining highly adaptable.`;
+        } else if (type.includes('파') || type.includes('해')) {
+          descKo = `${target}에 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
+          descEn = `Minor misalignments or hidden harms (Pa/Hae) emerge ${targetEn}. Meticulously check relationship dynamics and contract details.`;
+        }
+
+        if (descKo && !koNotes.includes(`- ${descKo}`)) koNotes.push(`- ${descKo}`);
+        if (descEn && !enNotes.includes(`- ${descEn}`)) enNotes.push(`- ${descEn}`);
+      });
+
+      if (lang === 'KO' && koNotes.length > 0) {
+         dynamicInteractionText = `\n\n📌 [ 운명의 변곡점: 역학(Dynamics) 분석 ]\n${koNotes.join('\n')}`;
+      } else if (lang !== 'KO' && enNotes.length > 0) {
+         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]\n${enNotes.join('\n')}`;
+      }
+    }
+
     if (lang === 'KO') {
       const dominantLuckElement = daewunElement;
       const elementAdvice: Record<string, string> = {
@@ -1049,7 +1146,8 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       };
       main += elementAdviceEn[dominantLuckElement] || `A subtle cycle providing smooth stimulation without rocking Bazi's core equilibrium. `;
     }
-    main += `${peerRivalryWarning}${generateCoreRemedy(analysis, lang)}`;
+
+    main += `${dynamicInteractionText}${peerRivalryWarning}${generateCoreRemedy(analysis, lang)}`;
   }
 
   // 6. Luck Score (Already computed above)
