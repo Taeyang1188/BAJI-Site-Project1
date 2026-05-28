@@ -174,30 +174,30 @@ export function generateCoreRemedy(analysis: any, lang: Language): string {
     if (lang === "KO") {
         // Mode 1: Siksang Overload or Jong-Ah (식상용신 또는 식상과다)
         if (siksangPct >= 35 || structTitle.includes("종아")) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국을 가득 채운 강력한 ${siksangCombo.ko}의 분출력 때문에, 머릿속에 수만 가지 매력적인 기획과 표현 욕구를 품어두면서도 한 줄기의 결과물(${jaeseongCombo.ko})로 매끄럽게 마무리지어 매각하지 못해 문득 가벼운 정서적 번아웃이나 잔재주 섞인 허탈감에 빠지기 쉬운 상태야.\n\n이 시기엔 가만히 앉아서 요행을 바라거나 망상에만 머물러선 곤란해. 내면의 화산 같은 표현력과 기획 감각(식상)을 단순히 혼자 노는 동굴에 썩혀두지 말고, **글, 디자인, 소리, 기술처럼 눈에 보이는 독립된 물질적 결과물로 어떻게든 다듬어 세상에 통하게 매치시키는 아웃풋 승화법(식상생재)**을 기치로 걸어봐. 내 재능이 실재하는 가치이자 주체적인 쓸모로 번역되어 순환될 때, 영혼의 지독한 갑갑함이 마법처럼 씻겨 내려갈 테니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국을 꽉 채우고 있는 강력한 ${siksangCombo.ko}의 기운 때문에, 머릿속에는 반짝이는 아이디어와 표현 욕구가 넘쳐나는데 정작 확실한 결과물(${jaeseongCombo.ko})로 매듭짓지 못해서 묘한 허탈감이나 번아웃에 빠지기 쉬운 상태야.\n\n이런 때 혼자만의 생각에 갇혀 있거나 완벽주의에 빠져 있으면 곤란해. 내면에서 소용돌이치는 기획력과 재능(식상)을 그냥 썩혀두지 말고, **글이든 디자인이든 기술이든 일단 눈에 보이는 결과물로 뽑아내서 세상과 부딪혀봐(식상생재).** 네 머릿속 상상이 현실 세계의 뚜렷한 가치로 바뀌는 순간, 그동안 꽉 막혀 있던 답답함이 마법처럼 시원하게 뚫릴 테니까.`;
         }
         // Mode 2: Jaeseong Overload or Jong-Jae (재성용신 또는 재성과다)
         if (jaeseongPct >= 35 || structTitle.includes("종재")) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 끊임없이 계산을 강요하는 ${jaeseongCombo.ko}의 지배력 때문에, 눈앞의 쓸모와 단기적인 이익, 가성비에 촉이 곤두서며 매 순간 손익 계산에 뇌가 터질 듯 과적되어 일찌감치 정서적 영양이 메마르고 지독한 육체적 과로에 노출되기 쉬운 상태야.\n\n이 시기에는 주머니 사정이나 가쁜 현실에만 집착하여 스스로를 들들 볶지 않는 게 개운의 첫 단추야. **길게 내다보고 나를 탄탄하게 받쳐줄 학문적 깊이, 지격 면허, 무형의 사유 자산(${inseongCombo.ko})을 은밀히 축적하거나 장기적인 비즈니스 룰을 디자인(식상생재)**하여 무대 뒤의 진짜 지배자로 우뚝 서봐. 내실을 도모하고 가치 수확의 판을 설계할 때 비로소 진정한 거부의 여유를 쥐게 될 거야.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 끊임없이 계산기를 두드리게 만드는 ${jaeseongCombo.ko}의 기운이 너무 강해서, 당장의 이익이나 가성비에만 신경이 곤두서기 쉬워. 매 순간 손익을 따지느라 뇌가 과열되다 보니, 정서적으로 훌쩍 메마르거나 징글징글한 과로에 시달리기도 하는 상태지.\n\n이럴 때는 눈앞의 현실이나 주머니 사정에 너무 연연하면서 스스로를 타이트하게 옭아매지 않는 게 제일 중요해. **조급함을 버리고, 앞으로 널 든든하게 받쳐줄 전문 지식이나 자격증, 흔들리지 않는 내공(${inseongCombo.ko})을 탄탄히 다져봐.** 아니면 장기적으로 수익이 저절로 굴러가는 판을 짜는 설계자(식상생재)가 되어보는 거야. 조급함을 내려놓고 너만의 단단한 내실을 다질 때 비로소 찐 부자의 여유마저 거머쥘 수 있을 거야.`;
         }
         // Mode 3: Gwanseong Overload or Jong-Sal (관성용신 또는 관성과다)
         if (gwanseongPct >= 35 || structTitle.includes("종살") || structTitle.includes("종관")) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 한 치의 누설을 허용치 않는 ${gwanseongCombo.ko}의 무거운 수직적 압박감 때문에, 타인의 시선과 규율, 보이지 않는 셀프 통제선 안으로 스스로를 과도하게 밀어 넣어 온몸의 날 선 감각이 뻣뻣이 경직되고 강박적인 과호흡에 질식당하기 쉬운 상태야.\n\n억압된 껍질 안에 갇혀서 지쳐 쓰러지지 말고, **타인에게 반박당하지 않을 강력한 무형의 지적 자산과 전문 자격(${inseongCombo.ko})을 취득해 법과 규칙의 핵심 키맨으로 조직을 장악(관인상생)**하거나, **나만의 날카로운 아웃풋과 표현력(${siksangCombo.ko})의 카타르시스로 그 단단한 룰을 속 시원히 깨부수어 기치를 드높이는 승화법**을 설계해봐. 통제권을 수동적으로 휘둘리는 게 아니라 내가 게임 체인저가 되어 판을 쥐어야만 비로소 완전한 리더로 거듭날 수 있어.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 한 치의 틈도 허용하지 않는 ${gwanseongCombo.ko}의 묵직한 압박감이 자리하고 있어. 타인의 시선과 규율, 보이지 않는 통제선 안으로 스스로를 너무 강박적으로 밀어 넣다 보니 몸과 마음이 경직되고 숨 막히기 쉬운 상태지.\n\n억압된 틀 안에 갇혀 지치기보다는, **누구도 반박할 수 없는 강력한 전문 지식과 자격(${inseongCombo.ko})을 갖춰 조직의 핵심 키맨으로 판을 장악(관인상생)**해보는 건 어떨까? 아니면 **너만의 날카로운 통찰과 표현력(${siksangCombo.ko})으로 기존의 단단한 룰을 속 시원하게 깨부수며 너만의 세계를 구축**해보는 것도 좋은 전략이야. 남이 만든 룰에 수동적으로 끌려다닐 게 아니라, 네가 직접 주도권을 쥐고 판을 흔드는 게임 체인저가 될 때 비로소 진정한 리더로 거듭날 수 있을 거야.`;
         }
         // Mode 4: Bigyeop Overload or Jeon-Wang (비겁용신 또는 비겁과다)
         if (bigyeopPct >= 40 || structTitle.includes("종강") || structTitle.includes("종왕")) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 우주라도 다 뚫어버릴 듯 팽창해 가는 ${bigyeopCombo.ko}의 강력한 에고 때문에, 타인의 진심 가득한 피드백을 본능적으로 거부해 사서 고독에 파묻히거나 주변과의 소모적인 기싸움, 자강두천식 감정 다툼에 내 진짜 보물인 에너지와 정서(${jaeseongCombo.ko})를 불태워 탕진하기 쉬운 상태야.\n\n주변 경쟁자들과 소소한 무대를 두고 자존심 개싸움을 벌이며 푼돈과 건강을 잃지 않는 게 최고 개운의 비밀이야. **내가 애초에 세상의 압도적 거목이자 독보적 룰메이커임을 의연히 인정하고, 그 한계 없는 주체성의 불꽃을 온 인류 단위의 거대한 문명 기획이나 거시적 예술 도전(${siksangCombo.ko}설기)으로 대방출**해봐. 내 프라이드를 소모적 다툼이 아니라 전무후무한 개척자의 독보적 아이콘으로 승화하는 고난도 번역이 발현될 때 진짜 천군만마를 품에 안게 되니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 보면 네 사주 원국에 주체할 수 없을 만큼 강력한 ${bigyeopCombo.ko}의 기운(에고)이 팽창하고 있어. 그러다 보니 주변의 조언마저 잔소리로 튕겨내고 스스로 고독을 자처하거나, 굳이 안 해도 될 소모적인 기싸움을 하다가 진짜 챙겨야 할 실속(${jaeseongCombo.ko})과 에너지만 훌쩍 털어버리기 쉬운 상태지.\n\n좁은 우물 안에서 누가 잘났네 하며 자존심 싸움에 에너지를 빼앗기지 않는 게 지금 제일 필요한 자세야. **스스로가 이미 누구와도 비교할 수 없는 독보적인 존재임을 쿨하게 인정하고, 넘쳐나는 에너지를 스케일 큰 목표나 폭발적인 창작 활동(${siksangCombo.ko}설기)에 시원하게 쏟아부어봐.** 흔해 빠진 자존심 싸움 대신, 아무도 흉내 낼 수 없는 개척자가 될 때 비로소 진짜 천군만마를 얻게 될 거야.`;
         }
         // Mode 5: Inseong Overload (인성과다)
         if (inseongPct >= 40) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국을 가득 고이 채운 깊고 광대한 ${inseongCombo.ko}의 지적 사유와 직관력 때문에, 머리와 상상 속에서는 이미 전 우주의 완벽한 해독과 혁명을 끝냈으면서도 정작 현실의 육체는 차디찬 문 밖 한 발자국을 넘지 못하는 지독한 고결성 무기력과 지적 환멸감에 질식하기 쉬운 상태야.\n\n완벽하게 고인 사유의 성 안에 평생 망상을 찌며 갇혀 지내는 영혼의 탈옥을 감행해야 해. **설령 설익은 미완성의 작품이더라도 두 발로 질질 끌며 일단 비장하게 문밖으로 아웃풋(${siksangCombo.ko})을 기워 뱉어 내거나, 세속의 지극히 작고 어찌 보면 속물적인 자잘한 화폐 교환 감각(${jaeseongCombo.ko})과 직접 온몸으로 부딪혀보는 것**이 지상 최강의 개운요법이야. 머릿속 완벽을 찢고 현실의 투박한 쓸모로 내 생각을 당장 번역해 굴릴 때 비로소 우주 정복이 실체적인 삶으로 뒤집어질 테니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 보면 파고들고 생각하는 ${inseongCombo.ko}의 기운이 너무 강해서, 머릿속으로는 남들이 범접 못 할 완벽한 성을 쌓아두고도 정작 현실에서는 행동으로 옮기지 못해 지독한 무기력함이나 환멸감에 빠지기 쉬워.\n\n이제 완벽주의에 갇힌 그 견고한 생각의 성에서 과감하게 탈출해야 할 때야. **100% 완벽하게 준비되지 않았더라도 일단 거칠게라도 너의 생각이나 결과물(${siksangCombo.ko})을 세상 밖으로 끄집어내봐.** 때로는 조금은 세속적이고 현실적인 이익(${jaeseongCombo.ko})을 좇으며 몸으로 부딪혀보는 것도 큰 도움이 돼. 머릿속의 그 막연하고 완벽한 청사진을, 다듬어지지 투박하더라도 현실에서 당장 써먹을 수 있는 결과물로 바꿀 때 비로소 네 진짜 역량이 폭발하게 될 거야.`;
         }
 
         // Standard Balance Fallback
         if (giRatio >= 25) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에서 너무 과열되어 제어되지 않는 ${giCombo} 기운 때문에 ${edgyGiDescMap[mappedGi]} 있어. 이 답답한 과포화 상태에 시원하게 찬물이라도 부으려면 어떻게든 ${heeCombo}의 기운을 영혼까지 끌어다 쓰는 수밖에 없지.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 보면 사주 원국에서 과열되어 겉도는 ${giCombo} 기운 때문에 ${edgyGiDescMap[mappedGi]} 경향이 커. 답답하게 꽉 막힌 이 굴레에서 시원하게 벗어나려면, 억지로라도 ${heeCombo}의 에너지를 곁에 두고 팍팍 써먹어야 해.\n\n가만히 앉아서 상황이 나아지길 기다릴 때는 아니야. 의식적으로라도 ${edgyHeeActionMap[mappedHee]} 쪽으로 액션을 취해봐. 그게 팍팍한 현실을 단숨에 돌파할 수 있는 가장 확실하고 현실적인 타개책이니까.`;
         } else {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 사주 원국에 ${giCombo} 기운이 희박한 빈틈으로 자리하고 있어, 현대 사회의 바쁜 흐름과 일시적인 내적 단절 속에서 자칫 나도 모르게 이 기운의 역효과에 휩쓸려 ${edgyGiDescMap[mappedGi]} 쉬운 심리적 함정이 도사리고 있어. 온 세상이 물질적 집착과 쓸모에 목을 매며 사람을 지치고 조급하게 만드는 시대잖아. 이처럼 흐릿한 에너지의 기조에 은연중 에너지를 뺏기지 말고, 가장 든든하고 강력한 무기 역할을 해줄 ${heeCombo}의 기운을 확실히 깨워서 주체적으로 써먹어야 할 때야.\n\n이 시기엔 가만히 앉아서 좋은 날 오길 바란다고 될 일이 아니야. ${edgyHeeActionMap[mappedHee]} 쪽으로 방향을 틀어봐. 그게 지금 이 퍽퍽한 현실에서 당장 써먹을 수 있는 가장 뼈때리는 개운법이니까.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 사주 원국에 ${giCombo} 기운이 텅 비어있다 보니, 자칫 나도 모르게 주변 상황에 휩쓸려 ${edgyGiDescMap[mappedGi]} 함정에 빠지기 쉬워. 다들 너무 바쁘게 이리저리 휘둘리는 시기잖아. 이렇게 은연중에 기를 뺏기지 말고, 지금 너에게 가장 확실한 무기가 되어 줄 ${heeCombo}의 기운을 꼭 쥐고 적극적으로 써먹어야 해.\n\n그냥 가만히 앉아서 좋은 흐름이 오기만을 바라고 있으면 안 돼. 의식적으로라도 ${edgyHeeActionMap[mappedHee]} 쪽으로 액션을 취해봐. 그게 답답한 현실을 시원하게 뚫고 멱살 캐리할 수 있는 가장 확실한 돌파구니까.`;
         }
     } else {
         // Mode 1: Siksang Overload or Jong-Ah (식상용신 또는 식상과다)
@@ -1014,33 +1014,68 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       const koNotes: string[] = [];
       const enNotes: string[] = [];
 
-      dynamicInteractions.forEach(int => {
+      const groupedInteractions = Object.values(dynamicInteractions.reduce((acc: any, int: any) => {
+        const key = `${int.interactionType}-${int.cycle}-${int.cycleBranch}`;
+        if (!acc[key]) acc[key] = { ...int, natalIndices: [], natalBranches: [] };
+        if (int.cycle !== 'daewun x seun') {
+          if (!acc[key].natalIndices.includes(int.natalIndex)) {
+              acc[key].natalIndices.push(int.natalIndex);
+              acc[key].natalBranches.push(int.natalBranch);
+          }
+        }
+        return acc;
+      }, {}));
+
+      groupedInteractions.forEach((int: any) => {
         const type = int.interactionType;
-        const target = int.cycle === 'daewun x seun' ? '대운과 세운 사이' : (int.cycle === 'daewun' ? '사주 원국과 대운' : '사주 원국과 세운');
-        const targetEn = int.cycle === 'daewun x seun' ? 'between Daewun and Seun' : (int.cycle === 'daewun' ? 'between Natal Chart and Daewun' : 'between Natal Chart and Seun');
+        const getBranchNameKO = (indices: number[]) => indices.map(idx => ["년지", "월지", "일지", "시지"][idx] || "지표").join(', ');
+        const getBranchNameEN = (indices: number[]) => indices.map(idx => ["Year", "Month", "Day", "Hour"][idx] || "Branch").join(', ');
         
+        const formatB = (branch: string) => {
+          if(!branch) return '';
+          const el = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.element || "Wood";
+          const color = typeof ELEMENT_COLORS !== 'undefined' ? 
+            (ELEMENT_COLORS[el as keyof typeof ELEMENT_COLORS] || "#FFFFFF") : 
+            (el === 'Wood' ? '#10B981' : el === 'Fire' ? '#EF4444' : el === 'Earth' ? '#F59E0B' : el === 'Metal' ? '#9CA3AF' : '#3B82F6');
+          
+          let koName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
+          
+          return `[${color}:${koName}(${branch})]`;
+        };
+
+        const formTitleKO = int.cycle === 'daewun x seun' 
+           ? `대운 ${formatB(int.natalBranch)}와(과) 세운 ${formatB(int.cycleBranch)}`
+           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 대운 ${formatB(int.cycleBranch)}`
+                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 세운 ${formatB(int.cycleBranch)}`);
+                                     
+        const formTitleEN = int.cycle === 'daewun x seun'
+           ? `Life Season ${formatB(int.natalBranch)} and Annual ${formatB(int.cycleBranch)}`
+           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Life Season ${formatB(int.cycleBranch)}`
+                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Annual ${formatB(int.cycleBranch)}`);
+
         let descKo = ''; let descEn = '';
+
         if (type.includes('귀문') && type.includes('원진')) {
-          descKo = `${target}에 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
-          descEn = `A strong sensitivity and unconscious obsession (Wonjin/Gwimun) marks the link ${targetEn}. Avoid self-destructive perfectionism or resentment by actively seeking objective feedback.`;
+          descKo = `${formTitleKO}이(가) 만나 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
+          descEn = `${formTitleEN} create a strong sensitivity and unconscious obsession [tooltip:Resentment/Ghost Gate|원진/귀문살. 예민함, 직관력, 집착, 원망 등을 의미합니다.|Wonjin/Gwimun. Indicates high sensitivity, intuition, obsession, or resentment.]. Avoid self-destructive perfectionism or resentment.`;
         } else if (type.includes('귀문')) {
-          descKo = `${target}에 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
-          descEn = `Intuition and extreme sensitivity (Gwimun) peak ${targetEn}. Sublimating this sensitivity into artistic inspiration or fine technical skills will produce unmatched results.`;
+          descKo = `${formTitleKO}이(가) 만나 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
+          descEn = `${formTitleEN} peak intuition and extreme sensitivity [tooltip:Ghost Gate|귀문관살. 뛰어난 직관력과 예술적 영감, 혹은 극심한 예민함을 의미합니다.|Gwimun. Indicates brilliant intuition, artistic inspiration, or extreme emotional sensitivity.]. Sublimating this sensitivity pays off.`;
         } else if (type.includes('원진')) {
-          descKo = `${target}에 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
-          descEn = `Unexplained friction and resentment (Wonjin) easily occur ${targetEn}. Treat unexpected delays not as roadblocks, but as refinement processes.`;
+          descKo = `${formTitleKO}이(가) 만나 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
+          descEn = `${formTitleEN} easily cause unexplained friction and resentment [tooltip:Resentment|원진살. 이유 없는 갈등, 미움, 혹은 섬세한 감수성을 의미합니다.|Wonjin. Indicates unexplained friction, animosity, or delicate sensibility.]. Treat unexpected delays as refinement processes.`;
         } else if (type.includes('육합')) {
-          descKo = `${target}이 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
-          descEn = `The connection ${targetEn} softly bonds (Six Combination), welcoming new relationships or unexpected allies. It brings emotional stability.`;
+          descKo = `${formTitleKO}이(가) 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
+          descEn = `${formTitleEN} softly bond [tooltip:Combination|육합. 다정하고 부드러운 화합과 결속을 의미합니다.|Yuk-hap (Six Combination). Indicates a soft, affectionate bond and harmony.], welcoming new relationships or unexpected allies. It brings emotional stability.`;
         } else if (type.includes('형')) {
-          descKo = `${target}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
-          descEn = `Punitive, reconstructive energy (Hyeong) operates ${targetEn}. Be extremely careful that your perfectionism does not sabotage a completed project.`;
+          descKo = `${formTitleKO}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
+          descEn = `${formTitleEN} trigger punitive, reconstructive energy [tooltip:Punishment|형살. 조정, 수술, 법적 문제 혹은 완벽주의적 자기 검열을 의미합니다.|Hyeong (Punishment). Indicates adjustment, surgery, legal matters, or perfectionistic self-censorship.]. Be cautious of self-sabotage.`;
         } else if (type.includes('충')) {
-          descKo = `${target}에 강한 충돌과 변화(지지충)의 역동성이 발생해. 막혀있던 상황이 급변하거나 예기치 않은 이동수가 따를 수 있으니 유연하게 대처해봐.`;
-          descEn = `Fierce clash dynamics ${targetEn} force drastic change. Prepare for sudden shifts or relocation by remaining highly adaptable.`;
+          descKo = `${formTitleKO}이(가) 강하게 충돌(충살)하며 역동적인 전개가 예상돼. 급격한 변화를 두려워하지 말고 돌파해.`;
+          descEn = `${formTitleEN} clash fiercely [tooltip:Clash|충살. 강한 충돌, 이동, 역동적인 변화와 발전을 의미합니다.|Clash. Indicates strong impact, movement, dynamic change, and breakthrough.], dismantling the old to build new order. Embrace dynamic changes.`;
         } else if (type.includes('파') || type.includes('해')) {
-          descKo = `${target}에 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
-          descEn = `Minor misalignments or hidden harms (Pa/Hae) emerge ${targetEn}. Meticulously check relationship dynamics and contract details.`;
+          descKo = `${formTitleKO}이(가) 만나 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
+          descEn = `${formTitleEN} encounter minor misalignments or hidden harms [tooltip:Destruction/Harm|파/해. 내부적인 조정, 사소한 엇갈림, 숨겨진 흠집을 의미합니다.|Pa/Hae (Destruction/Harm). Indicates internal adjustments, minor misalignments, or hidden flaws.]. Double-check your details.`;
         }
 
         if (descKo && !koNotes.includes(`- ${descKo}`)) koNotes.push(`- ${descKo}`);
@@ -1050,7 +1085,8 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       if (lang === 'KO' && koNotes.length > 0) {
          dynamicInteractionText = `\n\n📌 [ 운명의 변곡점: 역학(Dynamics) 분석 ]\n${koNotes.join('\n')}`;
       } else if (lang !== 'KO' && enNotes.length > 0) {
-         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]\n${enNotes.join('\n')}`;
+         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]
+${enNotes.join('\n')}`;
       }
     }
 
@@ -1085,33 +1121,68 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       const koNotes: string[] = [];
       const enNotes: string[] = [];
 
-      dynamicInteractions.forEach(int => {
+      const groupedInteractions = Object.values(dynamicInteractions.reduce((acc: any, int: any) => {
+        const key = `${int.interactionType}-${int.cycle}-${int.cycleBranch}`;
+        if (!acc[key]) acc[key] = { ...int, natalIndices: [], natalBranches: [] };
+        if (int.cycle !== 'daewun x seun') {
+          if (!acc[key].natalIndices.includes(int.natalIndex)) {
+              acc[key].natalIndices.push(int.natalIndex);
+              acc[key].natalBranches.push(int.natalBranch);
+          }
+        }
+        return acc;
+      }, {}));
+
+      groupedInteractions.forEach((int: any) => {
         const type = int.interactionType;
-        const target = int.cycle === 'daewun x seun' ? '대운과 세운 사이' : (int.cycle === 'daewun' ? '사주 원국과 대운' : '사주 원국과 세운');
-        const targetEn = int.cycle === 'daewun x seun' ? 'between Daewun and Seun' : (int.cycle === 'daewun' ? 'between Natal Chart and Daewun' : 'between Natal Chart and Seun');
+        const getBranchNameKO = (indices: number[]) => indices.map(idx => ["년지", "월지", "일지", "시지"][idx] || "지표").join(', ');
+        const getBranchNameEN = (indices: number[]) => indices.map(idx => ["Year", "Month", "Day", "Hour"][idx] || "Branch").join(', ');
         
+        const formatB = (branch: string) => {
+          if(!branch) return '';
+          const el = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.element || "Wood";
+          const color = typeof ELEMENT_COLORS !== 'undefined' ? 
+            (ELEMENT_COLORS[el as keyof typeof ELEMENT_COLORS] || "#FFFFFF") : 
+            (el === 'Wood' ? '#10B981' : el === 'Fire' ? '#EF4444' : el === 'Earth' ? '#F59E0B' : el === 'Metal' ? '#9CA3AF' : '#3B82F6');
+          
+          let koName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
+          
+          return `[${color}:${koName}(${branch})]`;
+        };
+
+        const formTitleKO = int.cycle === 'daewun x seun' 
+           ? `대운 ${formatB(int.natalBranch)}와(과) 세운 ${formatB(int.cycleBranch)}`
+           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 대운 ${formatB(int.cycleBranch)}`
+                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 세운 ${formatB(int.cycleBranch)}`);
+                                     
+        const formTitleEN = int.cycle === 'daewun x seun'
+           ? `Life Season ${formatB(int.natalBranch)} and Annual ${formatB(int.cycleBranch)}`
+           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Life Season ${formatB(int.cycleBranch)}`
+                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Annual ${formatB(int.cycleBranch)}`);
+
         let descKo = ''; let descEn = '';
+
         if (type.includes('귀문') && type.includes('원진')) {
-          descKo = `${target}에 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
-          descEn = `A strong sensitivity and unconscious obsession (Wonjin/Gwimun) marks the link ${targetEn}. Avoid self-destructive perfectionism or resentment by actively seeking objective feedback.`;
+          descKo = `${formTitleKO}이(가) 만나 강력한 예민함과 무의식적 집착(원진/귀문)이 형성되고 있어. 주관적인 원망이나 과도한 완벽주의로 스스로를 갉아먹지 않도록 객관적인 피드백을 수용하는 연습이 필요해.`;
+          descEn = `${formTitleEN} create a strong sensitivity and unconscious obsession [tooltip:Resentment/Ghost Gate|원진/귀문살. 예민함, 직관력, 집착, 원망 등을 의미합니다.|Wonjin/Gwimun. Indicates high sensitivity, intuition, obsession, or resentment.]. Avoid self-destructive perfectionism or resentment.`;
         } else if (type.includes('귀문')) {
-          descKo = `${target}에 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
-          descEn = `Intuition and extreme sensitivity (Gwimun) peak ${targetEn}. Sublimating this sensitivity into artistic inspiration or fine technical skills will produce unmatched results.`;
+          descKo = `${formTitleKO}이(가) 만나 직관력과 예민함(귀문관살)이 고조되는 흐름이야. 이 예민함을 예술적 영감이나 정교한 기술로 승화시키면 독보적인 아웃풋이 나올 수 있어.`;
+          descEn = `${formTitleEN} peak intuition and extreme sensitivity [tooltip:Ghost Gate|귀문관살. 뛰어난 직관력과 예술적 영감, 혹은 극심한 예민함을 의미합니다.|Gwimun. Indicates brilliant intuition, artistic inspiration, or extreme emotional sensitivity.]. Sublimating this sensitivity pays off.`;
         } else if (type.includes('원진')) {
-          descKo = `${target}에 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
-          descEn = `Unexplained friction and resentment (Wonjin) easily occur ${targetEn}. Treat unexpected delays not as roadblocks, but as refinement processes.`;
+          descKo = `${formTitleKO}이(가) 만나 이유 없는 미움과 갈등(원진살)이 발생하기 쉬운 때야. 상황이 예상대로 흐르지 않아도, 이를 방해가 아닌 정교화 과정으로 받아들이는 마음가짐이 핵심이야.`;
+          descEn = `${formTitleEN} easily cause unexplained friction and resentment [tooltip:Resentment|원진살. 이유 없는 갈등, 미움, 혹은 섬세한 감수성을 의미합니다.|Wonjin. Indicates unexplained friction, animosity, or delicate sensibility.]. Treat unexpected delays as refinement processes.`;
         } else if (type.includes('육합')) {
-          descKo = `${target}이 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
-          descEn = `The connection ${targetEn} softly bonds (Six Combination), welcoming new relationships or unexpected allies. It brings emotional stability.`;
+          descKo = `${formTitleKO}이(가) 부드럽게 결합(육합)하며 새로운 관계나 뜻밖의 조력자가 등장할 수 있어. 정서적 안정감이 더해지는 긍정적인 신호야.`;
+          descEn = `${formTitleEN} softly bond [tooltip:Combination|육합. 다정하고 부드러운 화합과 결속을 의미합니다.|Yuk-hap (Six Combination). Indicates a soft, affectionate bond and harmony.], welcoming new relationships or unexpected allies. It brings emotional stability.`;
         } else if (type.includes('형')) {
-          descKo = `${target}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
-          descEn = `Punitive, reconstructive energy (Hyeong) operates ${targetEn}. Be extremely careful that your perfectionism does not sabotage a completed project.`;
+          descKo = `${formTitleKO}에 스스로 볶아치는 에너지나 조율, 수술, 법적 요소(형살)가 작용해. 완벽주의 때문에 다 된 밥을 스스로 엎어버리는 습관을 각별히 주의해야 해.`;
+          descEn = `${formTitleEN} trigger punitive, reconstructive energy [tooltip:Punishment|형살. 조정, 수술, 법적 문제 혹은 완벽주의적 자기 검열을 의미합니다.|Hyeong (Punishment). Indicates adjustment, surgery, legal matters, or perfectionistic self-censorship.]. Be cautious of self-sabotage.`;
         } else if (type.includes('충')) {
-          descKo = `${target}에 강한 충돌과 변화(지지충)의 역동성이 발생해. 막혀있던 상황이 급변하거나 예기치 않은 이동수가 따를 수 있으니 유연하게 대처해봐.`;
-          descEn = `Fierce clash dynamics ${targetEn} force drastic change. Prepare for sudden shifts or relocation by remaining highly adaptable.`;
+          descKo = `${formTitleKO}이(가) 강하게 충돌(충살)하며 역동적인 전개가 예상돼. 급격한 변화를 두려워하지 말고 돌파해.`;
+          descEn = `${formTitleEN} clash fiercely [tooltip:Clash|충살. 강한 충돌, 이동, 역동적인 변화와 발전을 의미합니다.|Clash. Indicates strong impact, movement, dynamic change, and breakthrough.], dismantling the old to build new order. Embrace dynamic changes.`;
         } else if (type.includes('파') || type.includes('해')) {
-          descKo = `${target}에 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
-          descEn = `Minor misalignments or hidden harms (Pa/Hae) emerge ${targetEn}. Meticulously check relationship dynamics and contract details.`;
+          descKo = `${formTitleKO}이(가) 만나 사소한 엇갈림이나 내부적인 조정(파/해)이 생길 수 있어. 인간관계나 계약에 있어 꼼꼼한 확인이 필요한 시기야.`;
+          descEn = `${formTitleEN} encounter minor misalignments or hidden harms [tooltip:Destruction/Harm|파/해. 내부적인 조정, 사소한 엇갈림, 숨겨진 흠집을 의미합니다.|Pa/Hae (Destruction/Harm). Indicates internal adjustments, minor misalignments, or hidden flaws.]. Double-check your details.`;
         }
 
         if (descKo && !koNotes.includes(`- ${descKo}`)) koNotes.push(`- ${descKo}`);
@@ -1121,7 +1192,8 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
       if (lang === 'KO' && koNotes.length > 0) {
          dynamicInteractionText = `\n\n📌 [ 운명의 변곡점: 역학(Dynamics) 분석 ]\n${koNotes.join('\n')}`;
       } else if (lang !== 'KO' && enNotes.length > 0) {
-         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]\n${enNotes.join('\n')}`;
+         dynamicInteractionText = `\n\n📌 [ Destiny Turning Point: Dynamics Analysis ]
+${enNotes.join('\n')}`;
       }
     }
 
@@ -1800,7 +1872,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
     const branchColor = getElementColorHex(branchEl);
 
     const daewunLabelKO = `${currentCycle.age}세-${currentCycle.age + 9}세 대운([${stemColor}:${currentCycle.stem}][${branchColor}:${currentCycle.branch}])`;
-    const daewunLabelEN = `Ages ${currentCycle.age}-${currentCycle.age + 9} Daewun ([${stemColor}:${currentCycle.stem}][${branchColor}:${currentCycle.branch}])`;
+    const daewunLabelEN = `Ages ${currentCycle.age}-${currentCycle.age + 9} Life Seasons ([${stemColor}:${currentCycle.stem}][${branchColor}:${currentCycle.branch}])`;
 
     if (daewunScore >= 70) {
       report += lang === 'KO' 

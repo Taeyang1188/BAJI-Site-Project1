@@ -546,7 +546,7 @@ export function detectShinsal(stems: string[], branches: string[], yearStem: str
 
   if (!inChart) {
     note = `공망에 해당하는 글자(${gongmangBranches.join(', ')})가 사주 원국에 없으므로 실질적인 공망의 피해나 영향이 거의 없어. 다만, 대운이나 세운에서 이 글자가 들어올 때는 해당 시기에 일시적인 지연이나 채워지지 않는 갈증을 느낄 수 있어.`;
-    noteEn = `The Void branches (${gongmangBranches.join(', ')}) are not present in your natal chart, so their practical negative impact is minimal. However, when these branches appear in your Grand Cycle (Daewun) or Annual Cycle (Sewun), you may experience temporary delays or a sense of unfulfillment during that period.`;
+    noteEn = `The Void branches (${gongmangBranches.join(', ')}) are not present in your natal chart, so their practical negative impact is minimal. However, when these branches appear in your Life Seasons or Annual Alignment, you may experience temporary delays or a sense of unfulfillment during that period.`;
   } else {
     note = `사주 원국의 ${affectedPillars.join(', ')}에 공망이 있어 해당 궁성이나 십성의 기운이 약화되거나 채워지지 않는 갈증을 느낄 수 있어.`;
     noteEn = `The Void branches affect your ${affectedPillars.join(', ')}, which may weaken the energy of those pillars or create a sense of unfulfillment in related aspects of life.`;
