@@ -465,7 +465,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
   });
 
   // d. 복음 (Bok-eum)
-  const uniqueBranches = Array.from(new Set(branches));
+  const uniqueBranches = Array.from(new Set(branches)).filter(b => b !== 'X');
   uniqueBranches.forEach(b => {
     const indices: number[] = [];
     branches.forEach((branch, idx) => {
@@ -598,7 +598,7 @@ export function calculateInteractions(stems: string[], branches: string[], pilla
   return { interactions, conflicts };
 }
 
-export function analyzeInteractionsDynamic(natalBranches: string[], daewunBranch: string, seunBranch: string) {
+export function analyzeInteractionsDynamic(natalBranches: string[], daewunBranch: string, seunBranch: string, isTimeUnknown?: boolean) {
   const dynamicInteractions: any[] = [];
   
   // Define interaction pairs
@@ -612,6 +612,8 @@ export function analyzeInteractionsDynamic(natalBranches: string[], daewunBranch
 
   const checkInteractions = (cycleBranch: string, type: string) => {
     natalBranches.forEach((nb, index) => {
+      if (isTimeUnknown && index === 0) return; // Skip hour branch if time is unknown
+      if (nb === 'X') return;
       let isMatch = false;
       let interactionType = "";
 

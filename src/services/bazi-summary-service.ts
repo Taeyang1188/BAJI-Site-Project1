@@ -513,121 +513,121 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     "인성": {
       ko: {
         description: isStrongDM 
-          ? `단단한 주관을 뒷받침할 객관적인 지식과 명확한 자격을 갖출 때 개운의 기회가 열려.`
-          : `학문이나 전문 분야 깊이 몰입하며, 내 능력을 증명서나 탄탄한 라이선스로 축적하는 게 중요해.`,
+          ? `내안의 강한 주관을 지혜롭게 뒷받침할 수 있도록, 객관적인 지식과 깊이 있는 성찰을 조화롭게 채워가는 시기입니다.`
+          : `학문이나 전문 분야에 깊이 몰입하며, 내외면을 차분하게 지탱해줄 라이선스나 가치 있는 배움을 정성껏 축적하기 좋은 때입니다.`,
         practicalAdvice: isStrongDM
-          ? `공인된 자격증이나 공식적 지표로 나만의 스택을 말끔히 증명해봐.`
-          : `외부의 과도한 약속을 줄이고 나만의 배움 공간에서 에너지를 확실하게 충전하자.`,
+          ? `신뢰도 높은 연구나 배움을 통해 한층 더 공인되고 전문적인 깊이를 지혜롭게 갖추어 보세요.`
+          : `외부 활동에 내 에너지를 낭비하지 마시고, 조용한 서재를 지어 독서하거나 무언가를 배우는 시간을 편안히 늘려보세요.`,
         luckyHabit: isStrongDM
-          ? `매일 30분, 트렌디한 기술문서나 가치 있는 칼럼 정독`
-          : `중요한 선택 직전에 신뢰도 높은 서적이나 노트를 꺼내 일차 확인`
+          ? `매일 아침 차분히 계획을 마주하고, 일상의 사소한 우선순위들부터 미루지 않고 이행하기`
+          : `하루를 마감하며 내적인 일정을 기록하고, 조용히 책을 읽거나 일기장을 기록하는 고요한 시간 갖기`
       },
       en: {
         description: isStrongDM
-          ? `Balance your strong character with formal credentials and objective facts to secure authority.`
-          : `Protect your energy with formal certifications and specialized study to build your defensive armor.`,
+          ? `A refined period to support your solid inner convictions with objective knowledge and reflective learning.`
+          : `An excellent season to immerse yourself in study and accumulate valuable knowledge that serves as a foundation for your future designs.`,
         practicalAdvice: isStrongDM
-          ? `Claim industry-standard certificates to solidify your existing authority.`
-          : `Step back from exhausting social schedules to study and recharge in peace.`,
+          ? `Expand your professional expertise and solidify your academic or technical depth with structured learning.`
+          : `Instead of overextending your energy in social interactions, allocate calm moments to quiet study and self-reflection.`,
         luckyHabit: isStrongDM
-          ? `Spend 30 minutes reading structured manuals or analytical documents.`
-          : `Always check trusted records or guidelines before critical choices.`
+          ? `Review your core daily schedules calmly each morning, executing essential tasks in order without delay.`
+          : `Dedicating a peaceful space in the evening to journal or read a thoughtful book.`
       }
     },
     "비겁": {
       ko: {
         description: !isStrongDM
-          ? `타인의 잔소리나 쓸데없는 시선을 칼같이 차단하고, 나의 주체적인 의사 결정을 1순위로 지켜.`
-          : `무리한 독고다이 돌파보다는, 끈끈한 의리를 공유할 알짜배기 동맹을 통해 힘을 크게 확장하자.`,
+          ? `타인의 참견이나 외부의 불필요한 요구에 흘들리지 마시고, 내 삶의 주권적 가치관과 주도적인 결정을 평온하게 지켜가야 하는 흐름입니다.`
+          : `모든 과업을 홀로 감당하며 지치는 것보다는, 뜻이 맞고 끈끈한 가치관을 공유하는 신뢰 어린 조력자 동료들과 조화롭게 소통할 때 성장의 깊이가 커집니다.`,
         practicalAdvice: !isStrongDM
-          ? `남의 동의를 넙죽 구하려 하지 말고 독자적인 주관으로 프로젝트를 끌어 봐.`
-          : `나와 철학이 맞닿은 핵심 조력자와 단합을 일구어 전술 미팅을 추진해봐.`,
+          ? `모든 결정에서 무의식적으로 타인의 승인이나 합의를 갈구하기보다는, 스스로 정립한 곧은 기준을 온전히 신뢰해 보세요.`
+          : `오랜 지지나 두터운 우정을 나눌 소중할 지인들과 진솔한 티타임을 가지며 마음의 유대감을 깊이 다져보세요.`,
         luckyHabit: !isStrongDM
-          ? `아침마다 거울을 보며 '내 삶의 주도권은 내가 쥔다' 확인`
-          : `평소 곁을 든든히 지켜준 찐 동지에게 기분 좋은 가벼운 커피 한 잔`
+          ? `아침을 시작하며 내 일과와 삶의 진정한 주권과 최종 선택권이 오롯이 나에게 있음을 담담히 되새기기`
+          : `평소 묵묵히 나를 격려하고 지탱해 주는 가족이나 절친한 동료에게 따뜻한 진심과 가벼운 감사의 소품 선물하기`
       },
       en: {
         description: !isStrongDM
-          ? `Ignore gossip and set strict boundaries to secure your status as the main character.`
-          : `Do not run completely solo; collaborate with high-trust alliances to expand your reach.`,
+          ? `A healthy period to establish calm boundaries, prioritizing your own values and independent decisions instead of seeking outside approval.`
+          : `Rather than carrying every burden alone to physical exhaustion, seek out trustworthy allies to build meaningful solutions together.`,
         practicalAdvice: !isStrongDM
-          ? `Stop seeking permission. Choose your milestone and advance independently.`
-          : `Have a highly targeted tactical chat with a proven, supportive ally.`,
+          ? `Trust your own structured frameworks rather than looking for immediate appreciation or consensus from your peers.`
+          : `Create comfortable, conversational moments with loyal mentors to strengthen your social anchors.`,
         luckyHabit: !isStrongDM
-          ? `Repeat to yourself: 'I set the rules and the timing' each morning.`
-          : `Drop a small note of appreciation to a trusted friend who keeps you grounded.`
+          ? `Gently declare your own autonomy over your agenda as you begin each workday.`
+          : `Express quiet gratitude with a warm message to those who always keep you anchored and supported.`
       }
     },
     "식상": {
       ko: {
         description: isStrongDM
-          ? `마음에만 담아둔 아이디어들을 신속하게 결과물로 배포하거나, 창조적 예술로 마음껏 쏟아내.`
-          : `결과의 실질적 흑적에 과몰입하지 말고, 순수히 가볍고 재미있는 오락이나 취미로 에너지를 발산해.`,
+          ? `마음속 깊이 오랫동안 축적해 온 독창적인 아이디어와 세밀한 계획을 현실 세계에 아낌없이 투영하고 적극적으로 표출해야 할 때입니다.`
+          : `거창한 사회적 눈높이나 외부의 날카로운 성취 지표에서 가벼운 마음으로 걸어 나와, 순수한 나의 즐거움과 무해한 취미 활동에 안식을 부여해 보세요.`,
         practicalAdvice: isStrongDM
-          ? `너무 다듬기만 하려 마라. 거친 드래프트라도 우선 대중에 릴리즈 할 때 행운이 와.`
-          : `외부 평가에서 완전히 해방되는 흥미 위주의 놀이 공간이나 프로젝트를 만지작거려 봐.`,
+          ? `고치고 수정하는 완벽주의에 갇히기보다는, 작은 결과물이라도 용기 있게 무대 위로 올려 직접 펼쳐 보이며 첫발을 때어보세요.`
+          : `물질적인 보상이나 거창한 실익에만 얽매이지 않고, 내면의 호기심과 영감이 조화롭게 일깨워지는 따뜻한 순간을 충분히 즐겨보세요.`,
         luckyHabit: isStrongDM
-          ? `아이디어가 스칠 때 지체 없이 곧장 메모하거나 소박한 테스트 실행하기`
-          : `책상 구석이나 편안한 노트에 아무 눈치 없이 가볍고 발랄한 위트 낙서하기`
+          ? `흥미로운 지점이나 직관적인 아이디어가 떠오른 즉시 메모장에 따뜻한 문장으로 부드럽게 기록해 두기`
+          : `어떤 사회적 목적도 두지 않고 편안한 노트 위에 낙서하듯 흘려 쓴 상상을 즐겨보기`
       },
       en: {
         description: isStrongDM
-          ? `Unleash your built-up drive into external outputs, sharp designs, and direct action immediately.`
-          : `Let go of hyper-competitive scores; allow your creative hobbies to act as a fun relief valve.`,
+          ? `A vibrant time to let your unique inspirations, talents, and hidden strategies manifest into practical creative output.`
+          : `A pleasant season to step back from heavy performance metrics and allow your creative side to roam freely through personal hobbies.`,
         practicalAdvice: isStrongDM
-          ? `Stop over-polishing. Publicly launch your draft or prototype right away.`
-          : `Engage in casual, creative activities completely free from serious metric targets.`,
+          ? `Avoid get bogged down in endless editing; launching your thoughts into the world is key to capturing current opportunities.`
+          : `Let go of standard outcome-based measurements and spend quality time on creative pursuits that genuinely refresh you.`,
         luckyHabit: isStrongDM
-          ? `Take an immediate, brief kinetic action the second inspiration strikes.`
-          : `Doodle or scribble concepts with full imaginative liberty in simple notebooks.`
+          ? `Make a quick note or doodle in your pocket notebook the moment an inspiring pattern captures your attention.`
+          : `Enjoy private, off-grid hours to jot down your imaginative daydreams without self-censoring.`
       }
     },
     "재성": {
       ko: {
         description: isStrongDM
-          ? `막연한 계획보단 명확한 수익, 세밀한 자급 구조와 구체적 숫자를 기준 삼아 가치를 통제해.`
-          : `무리한 확장으로 리스크를 키우지 말고, 확실히 내가 통제 가능한 안전한 영역만 다스리는 게 길해.`,
+          ? `흘러가는 생각들을 객관적으로 관조하고 현실의 명확한 흐름과 유한한 삶의 자원들을 질서 정연하게 조율해 나가기에 좋은 운세입니다.`
+          : `불필요한 외부의 유혹에 흘들리지 마시고, 내가 확실하고 차분하게 통제할 수 있는 정돈된 영역부터 착실하게 정리하는 지혜가 빛납니다.`,
         practicalAdvice: isStrongDM
-          ? `추상적인 환상을 끄고 실제 지출 구조나 계약 조건, 구체적 비용 통계를 꼼꼼히 정리해.`
-          : `무리하게 눈먼 소문에 흔들리지 말고, 수익성이 확실한 탄탄한 소수 옵션에 전념해.`,
+          ? `나의 가까운 일정을 담백하게 정비해 보고, 삶의 지출 현황이나 자산의 자원 배분을 부담 없이 편안하게 조율해 보세요.`
+          : `구체적이지 않은 조언이나 풍문에 휘둘리지 마시고, 소박하더라도 오랜 세월 검증된 탄탄한 일상의 기반부터 차분히 강화해 보세요.`,
         luckyHabit: isStrongDM
-          ? `주말에 자산 장부를 검토하고 낭비 요인을 시원하게 정리하기`
-          : `보수성 높은 알짜배기 예적금이나 안전 자산 기조를 살포시 체킹하기`
+          ? `주말마다 손때 묻은 작업대나 거실을 정리하며, 불필요한 잔짐들과 낡은 요소들을 마음에 서서히 걷어내기`
+          : `일상을 정교하게 살아가며 가벼운 금전 흐름만을 간략히 정돈하고, 합리적이고 안전한 생활 기준 확립하기`
       },
       en: {
         description: isStrongDM
-          ? `Ground your big concepts with real numbers, clear conversion metrics, and solid financial checks.`
-          : `Avoid speculative bubbles; protect your ground by managing only what you strictly control.`,
+          ? `A structured season to calibrate your resources, refine your long-term budgets, and manage your commitments cleanly.`
+          : `An insightful period to focus on securing what you can comfortably execute rather than reaching too far.`,
         practicalAdvice: isStrongDM
-          ? `Clean up loose financial details, re-examine contracts, and verify exact profit structures.`
-          : `Invest and commit only in low-risk, proven assets with steady margin structures.`,
+          ? `Tidy up your calendar and spend some time restructuring your goals and finances with ease.`
+          : `Decline speculative, high-octane calls that raise your stress, dedicating attention to solid foundations.`,
         luckyHabit: isStrongDM
-          ? `Analyze your subscriptions and balance your sheets every weekend.`
-          : `Formulate a quiet, safety-first layout to keep your liquid assets firmly secure.`
+          ? `Tidy your physical room and declutter redundant elements to bring clarity to your inner peace.`
+          : `Review your basic expenditures and establish pleasant, secure habits that feel comfortable.`
       }
     },
     "관성": {
       ko: {
         description: isStrongDM
-          ? `넘치는 개성을 신뢰도 높은 인프라나 커뮤니티 규칙, 공적인 약속에 동조시켜 명예를 배가시켜.`
-          : `공적 무게에 질질 끌려다니는 과노동을 멈추고, 건강한 생활 약속과 칼종료 루틴으로 평화를 찾아.`,
+          ? `나만의 깊은 전문성을 사회적인 화합의 약속과 신뢰받는 원칙에 아름답게 조율하여, 명예로운 가치를 공고히 쌓아 올릴 징조입니다.`
+          : `남들이 부과하는 지나치게 무거운 도덕적 의무에 마음 상하지 마시고, 나만을 위한 명확한 한계를 설정해 온전한 충전을 가지는 것이 절실합니다.`,
         practicalAdvice: isStrongDM
-          ? `자유로운 돌발 행동을 일시 멈추고 약속한 규칙을 차분히 솔선수범하도록 해봐.`
-          : `부담스러운 기대를 정중하게 닫고, 나의 가동 범위를 확실하게 구획하여 울타리를 세워.`,
+          ? `지나친 즉흥적 충동보다는 이미 확립된 단단한 규범과 신중한 지혜를 바탕으로 차분하게 상황을 이끌어 보세요.`
+          : `과도하게 넘치는 부탁이나 감당하기 어려운 경계를 다정하게 밀어두고, 나의 건강한 하루를 온전히 존중하여 깊이 충전해 보세요.`,
         luckyHabit: isStrongDM
-          ? `오늘 세운 일정과 업무 규칙을 깔끔하고 오차 없이 끝내는 루틴`
-          : `퇴근 후 일과 가정을 완벽히 단절하는 명확한 자기 정비 시스템 칼이행`
+          ? `매일 아침 하루의 일정을 반듯하게 구성하고, 핵심 목표를 향해 흐트러짐 없이 나아가기`
+          : `정규 일과의 종료 시간에 맞추어 불필요한 알림을 완전히 꺼두고, 나만의 안전하고 완전한 마음의 안식 즐기기`
       },
       en: {
         description: isStrongDM
-          ? `Channel your independence into community standards and consistent pledges to score major respect.`
-          : `Do not assume endless chores; set hard boundaries and rely on rigorous daily cut-offs.`,
+          ? `Align your private expertise with social standards and high-trust rules to elevate your professional reputation.`
+          : `Do not let social expectations drain you; establish clear boundaries and honor your need for rest.`,
         practicalAdvice: isStrongDM
-          ? `Lead by absolute discipline and systematic commitment rather than impulsive jumps.`
-          : `Politely decline overhead work requests. Mark a clear line around your core services.`,
+          ? `Practice disciplined self-regulation and lead by quiet example within your community.`
+          : `Politely decline overhead requests and set clear boundaries to safeguard your creative energy.`,
         luckyHabit: isStrongDM
-          ? `Complete your targeted agenda exactly according to the lock-step planner.`
-          : `Turn off work networks at a set time to preserve your private living space.`
+          ? `Review your structured routine and complete your core priorities strictly on schedule.`
+          : `Unplug from social and professional notifications at a set hour to enjoy pure personal rest.`
       }
     }
   };
@@ -642,24 +642,24 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
   // Lucky Items
   const luckyItemsMap: Record<string, { name: string, description: string }[]> = {
     "Wood": [
-      { name: lang === 'KO' ? "초록색 식물" : "Green Plant", description: lang === 'KO' ? "성장판 자극하는 초록 에너지를 곁에 둬봐. (물 주는 건 잊지 말기!)" : "Keep that green energy close to stimulate growth. (Don't forget to water it, though!)" },
-      { name: lang === 'KO' ? "나무 재질 펜" : "Wooden Pen", description: lang === 'KO' ? "내 안의 창의력을 깨울 마법의 지팡이야. 아날로그 감성은 덤!" : "A magic wand to wake up your inner creative genius. Analog vibes included." }
+      { name: lang === 'KO' ? "싱그러운 식물" : "Fresh Plant", description: lang === 'KO' ? "생동감 넘치는 초록빛 생명력을 가까이 두어 일상에 평온과 은근한 성장의 에너지를 채워 보세요." : "Keep a touch of nature nearby to foster calm focus and continuous inner growth." },
+      { name: lang === 'KO' ? "우드 라이팅 펜" : "Wooden Pen", description: lang === 'KO' ? "자연의 부드러움을 가진 필기구로 가벼운 단상이나 하루의 정제된 계획들을 진솔하게 기록해 보세요." : "Use a wooden writing tool to reflectively capture your daily plans with a calm touch." }
     ],
     "Fire": [
-      { name: lang === 'KO' ? "붉은색 지갑" : "Red Wallet", description: lang === 'KO' ? "재물을 끌어당기는 자석! 열정 만수르를 위한 핫한 아이템이야." : "A literal magnet for wealth. A hot item for your passionate era." },
-      { name: lang === 'KO' ? "향수" : "Signature Scent", description: lang === 'KO' ? "세상의 주인공이 된 것 같은 아우라를 선사해. 향기로 압도해봐." : "Gives you that 'main character' aura. Overwhelm them with your vibe." }
+      { name: lang === 'KO' ? "붉은 톤의 소품" : "Warm Accent Wallet", description: lang === 'KO' ? "활력 넘치는 붉은빛의 따뜻함을 곁에 두어 긍정의 기운과 당당한 자존감을 은근히 깨워 보세요." : "Incorporate warm, red accents to invite optimistic energy and subtle confidence into your workspace." },
+      { name: lang === 'KO' ? "정갈한 향수" : "Signature Scent", description: lang === 'KO' ? "마음을 명징하게 해줄 은은하고 맑은 향기를 통해 정돈된 매력과 깊이를 편안하게 전해해 보세요." : "Wear a calm signature scent that conveys your elegant presence and poised character." }
     ],
     "Earth": [
-      { name: lang === 'KO' ? "황토색 머그컵" : "Earthy Mug", description: lang === 'KO' ? "내 멘탈을 잡아줄 든든한 버팀목! 따뜻한 차 한 잔으로 평온을 찾아봐." : "A solid anchor for your mental health. Find your zen with a warm cup of tea." },
-      { name: lang === 'KO' ? "가죽 지갑" : "Leather Wallet", description: lang === 'KO' ? "통장 잔고를 지켜줄 든든한 가드! 재물을 담아두는 튼튼한 대지야." : "A heavy-duty guard for your bank balance. Solid ground to hold your bag." }
+      { name: lang === 'KO' ? "도자기 머그컵" : "Ceramic Mug", description: lang === 'KO' ? "흙의 차분한 온기를 간직한 컵으로 따뜻한 물을 차례로 나누며 마음의 든든한 평온을 겪어 보세요." : "Use a ceramic cup to enjoy a warm beverage, restoring your focus and grounded stillness during a draft." },
+      { name: lang === 'KO' ? "가죽 액세서리" : "Leather Card Case", description: lang === 'KO' ? "견고하게 마감된 질감의 상자나 홀더로 나의 가치와 리소스들을 흔들림 없이 수호해 보세요." : "Choose high-quality, durable leather accessories to help manage and organize your essentials cleanly." }
     ],
     "Metal": [
-      { name: lang === 'KO' ? "실버 액세서리" : "Silver Jewelry", description: lang === 'KO' ? "결단력 200% 충전! 우유부단함을 날려버릴 시크한 아이템이야." : "Decisiveness charged to 200%! A chic item to banish your indecision." },
-      { name: lang === 'KO' ? "화이트 셔츠" : "Crisp White Shirt", description: lang === 'KO' ? "복잡한 머릿속을 정리해줄 마법의 유니폼! 깔끔한 시작을 도와줘." : "A magic uniform to clear your cluttered mind. Perfect for a fresh start." }
+      { name: lang === 'KO' ? "실버 톤 액세서리" : "Silver-Tone Accent", description: lang === 'KO' ? "선명하고 정교한 금속재 실버 소품을 통해 일상의 우유부단함에서 벗어나 정연한 판단력을 세워 보세요." : "Add sleek silver-toned items to sharpen your focus and eliminate distracting background noises." },
+      { name: lang === 'KO' ? "클래식 화이트 셔츠" : "Crisp White Apparel", description: lang === 'KO' ? "정갈하고 깔끔한 복장을 갖추어 마음을 담백하게 가다듬고 세련된 태도로 일과를 가꾸어 가 보세요." : "Dress in clean white attire to clear complex thoughts and greet your goals with pure focus." }
     ],
     "Water": [
-      { name: lang === 'KO' ? "블루 텀블러" : "Blue Tumbler", description: lang === 'KO' ? "지혜가 샘솟는 블루 에너지! 유연한 사고를 돕는 필수템이야." : "Blue energy overflowing with wisdom. An absolute must-have for flexible thinking." },
-      { name: lang === 'KO' ? "검정색 다이어리" : "Black Journal", description: lang === 'KO' ? "유연한 대처 능력을 기록해봐. 당신의 지혜를 담는 보물상자야." : "Write down your big brain moments. A treasure chest for your wisdom." }
+      { name: lang === 'KO' ? "딥 블루 텀블러" : "Deep Blue Tumbler", description: lang === 'KO' ? "깊고 유연한 푸른빛 물병으로 지친 일상을 깨우며, 막힘없이 조화로운 지혜를 지켜가 보세요." : "Hydrate with a deep blue bottle to welcome clear thoughts and a flexible, refreshing demeanor." },
+      { name: lang === 'KO' ? "클래식 다이어리" : "Timeless Journal", description: lang === 'KO' ? "단정하게 정돈된 어둠을 닮은 지면 위에 성찰 가득한 깨달음을 묵묵하고 세밀하게 담아 보세요." : "Keep a classic dark journal to document your daily insights and wisdom over seasons." }
     ]
   };
 

@@ -630,7 +630,7 @@ export default function App() {
               >
                 <div className="flex items-center gap-1.5">
                   <span>{userInput.birthDate}</span>
-                  <span>{userInput.birthTime}</span>
+                  <span>{userInput.isTimeUnknown ? (lang === 'KO' ? '시간모름' : 'Time Unknown') : userInput.birthTime}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   {userInput.calendarType && (

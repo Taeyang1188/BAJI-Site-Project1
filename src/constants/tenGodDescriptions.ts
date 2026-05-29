@@ -1,4 +1,4 @@
-export const TEN_GOD_DESCRIPTIONS: Record<string, Partial<Record<string, Partial<Record<string, string>>>>> = {
+export const TEN_GOD_DESCRIPTIONS: Record<string, Partial<Record<string, Partial<Record<string, { ko: string; en: string }>>>>> = {
   공통: {
     대운천간: {
       비견: { ko: "사회적으로 자신의 주관과 정체성을 확립해 나가는 시기입니다. 타인에게 끌려가지 않고 독립적인 목표를 세우며, 새로운 동료나 인맥과 뜻을 맞출 기회가 늘어납니다.", en: "A period of establishing your independence and identity socially. You set independent goals without being swayed by others, and opportunities to align with new colleagues or networks increase." },

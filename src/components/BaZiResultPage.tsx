@@ -31,7 +31,8 @@ import {
   ChevronRight,
   AlertTriangle,
   Shield,
-  Image
+  Image,
+  Link
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
@@ -572,6 +573,7 @@ const parseColorBracketsToHtml = (text: string): string => {
   result = result.replace(/\[([^:\]]+):([^\]]+)\]/g, (match, color, content) => {
     return `<span style="color: ${color}; font-weight: bold;">${content}</span>`;
   });
+  result = result.replace(/\n/g, '<br />');
   return result;
 };
 
@@ -630,6 +632,7 @@ const BaziTooltip = ({
   };
 
   const handleInteraction = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (!isTouch) {
       if (isVisible) {
@@ -641,6 +644,7 @@ const BaziTooltip = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
     if (timerRef.current) clearTimeout(timerRef.current);
     updatePosition();
     setIsVisible((prev) => !prev);
@@ -1088,6 +1092,41 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     }
     return () => clearTimeout(timer);
   }, [showVibeTooltip]);
+
+  React.useEffect(() => {
+    if (showGuideDetailModal) {
+      setTimeout(() => {
+        let targetId = '';
+        if (guideStep >= 1 && guideStep <= 4) {
+          targetId = 'guide-section-tree';
+        } else if (guideStep === 5) {
+          targetId = 'guide-section-jijangan';
+        } else if (guideStep === 6) {
+          targetId = 'guide-section-tengods';
+        } else if (guideStep === 7) {
+          targetId = 'guide-section-daewun';
+        }
+        
+        if (targetId) {
+          const element = document.getElementById(targetId);
+          if (element) {
+            const scrollContainer = element.closest('.overflow-y-auto');
+            if (scrollContainer) {
+              const containerRect = scrollContainer.getBoundingClientRect();
+              const elementRect = element.getBoundingClientRect();
+              const relativeTop = elementRect.top - containerRect.top + scrollContainer.scrollTop;
+              scrollContainer.scrollTo({
+                top: relativeTop - 16,
+                behavior: 'smooth'
+              });
+            } else {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        }
+      }, 150);
+    }
+  }, [showGuideDetailModal, guideStep]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [showDailyVibe, setShowDailyVibe] = useState(false);
   const [vibePhase, setVibePhase] = useState<'intro' | 'question' | 'analysis'>('intro');
@@ -1785,6 +1824,84 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return <Moon size={size} className={`text-sky-300 drop-shadow-[0_0_2px_rgba(125,211,252,0.2)] ${className}`} strokeWidth={2.5} />;
   };
 
+  const getPillarInteractionsTooltipContent = (stem: string, branch: string) => {
+    const stemInteractions = getCycleInteractions(stem, true);
+    const branchInteractions = getCycleInteractions(branch, false);
+
+    const getPillarNameKO = (idx: number, isStem: boolean) => ["년간", "월간", "일간", "시간"][idx] || (isStem ? "천간" : "지지");
+    const getPillarNameEN = (idx: number, isStem: boolean) => ["Year Stem", "Month Stem", "Day Stem", "Hour Stem"][idx] || (isStem ? "Stem" : "Branch");
+    const getPillarNameKOBranch = (idx: number) => ["연지", "월지", "일지", "시지"][idx] || "지지";
+    const getPillarNameENBranch = (idx: number) => ["Year Branch", "Month Branch", "Day Branch", "Hour Branch"][idx] || "Branch";
+
+    const stemCharName = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.ko || stem;
+    const branchCharName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
+    const stemCharNameEn = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.en || stem;
+    const branchCharNameEn = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.en || branch;
+
+    const stemElementColor = ELEMENT_COLORS[BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+    const branchElementColor = ELEMENT_COLORS[BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+
+    let koList: string[] = [];
+    let enList: string[] = [];
+
+    // Stem
+    if (stemInteractions.length > 0) {
+      const stemLinesKO: string[] = [];
+      const stemLinesEN: string[] = [];
+      
+      stemInteractions.forEach(item => {
+        if (item.isSpecial) {
+          stemLinesKO.push(`- **${item.nameKo}**`);
+          stemLinesEN.push(`- **${item.nameEn}**`);
+        } else {
+          const targetChar = result?.pillars?.[item.pIndex]?.stem || '';
+          const targetColor = ELEMENT_COLORS[BAZI_MAPPING.stems[targetChar as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+          const targetPillar = getPillarNameKO(item.pIndex, true);
+          const targetPillarEn = getPillarNameEN(item.pIndex, true);
+          
+          stemLinesKO.push(`- ${targetPillar} [${targetColor}:${targetChar}]와(과) **${item.nameKo}**`);
+          stemLinesEN.push(`- **${item.nameEn}** with ${targetPillarEn} [${targetColor}:${targetChar}]`);
+        }
+      });
+      koList.push(`[${stemElementColor}:천간 ${stemCharName}(${stem})]:\n${stemLinesKO.join('\n')}`);
+      enList.push(`[${stemElementColor}:Stem ${stemCharNameEn}(${stem})]:\n${stemLinesEN.join('\n')}`);
+    } else {
+      koList.push(`[${stemElementColor}:천간 ${stemCharName}(${stem})]: 없음`);
+      enList.push(`[${stemElementColor}:Stem ${stemCharNameEn}(${stem})]: None`);
+    }
+
+    // Branch
+    if (branchInteractions.length > 0) {
+      const branchLinesKO: string[] = [];
+      const branchLinesEN: string[] = [];
+      
+      branchInteractions.forEach(item => {
+        if (item.isSpecial) {
+          branchLinesKO.push(`- **${item.nameKo}**`);
+          branchLinesEN.push(`- **${item.nameEn}**`);
+        } else {
+          const targetChar = result?.pillars?.[item.pIndex]?.branch || '';
+          const targetColor = ELEMENT_COLORS[BAZI_MAPPING.branches[targetChar as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+          const targetPillar = getPillarNameKOBranch(item.pIndex);
+          const targetPillarEn = getPillarNameENBranch(item.pIndex);
+          
+          branchLinesKO.push(`- ${targetPillar} [${targetColor}:${targetChar}]와(과) **${item.nameKo}**`);
+          branchLinesEN.push(`- **${item.nameEn}** with ${targetPillarEn} [${targetColor}:${targetChar}]`);
+        }
+      });
+      koList.push(`[${branchElementColor}:지지 ${branchCharName}(${branch})]:\n${branchLinesKO.join('\n')}`);
+      enList.push(`[${branchElementColor}:Branch ${branchCharNameEn}(${branch})]:\n${branchLinesEN.join('\n')}`);
+    } else {
+      koList.push(`[${branchElementColor}:지지 ${branchCharName}(${branch})]: 없음`);
+      enList.push(`[${branchElementColor}:Branch ${branchCharNameEn}(${branch})]: None`);
+    }
+
+    return {
+      ko: `**📊 연관 합형충파해 분석 (Interactions)**\n\n${koList.join('\n\n')}`,
+      en: `**📊 Associated Interactions**\n\n${enList.join('\n\n')}`
+    };
+  };
+
   const getCycleInteractions = (targetChar: string, isStem: boolean) => {
     if (!result?.pillars) return [];
     
@@ -1874,11 +1991,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return unique;
   };
 
-  const RenderCycleChar = ({ char, isStem }: { char: string, isStem: boolean }) => {
+  const RenderCycleChar = ({ char, isStem, hideUnderline = false, hideTooltip = false }: { char: string, isStem: boolean, hideUnderline?: boolean, hideTooltip?: boolean }) => {
     const interactions = getCycleInteractions(char, isStem);
     const content = renderPillarText(isStem ? 'stem' : 'branch', char);
-    if (!interactions.length) {
-        return <>{content}</>;
+    if (hideUnderline || hideTooltip || !interactions.length) {
+        return (
+           <span className={`relative inline-block transition-all duration-300 mx-0.5 ${lang === 'EN' ? 'whitespace-normal text-center break-words' : 'whitespace-nowrap'}`}>
+             <span className="relative z-10 block font-bold">
+               {content}
+             </span>
+           </span>
+        );
     }
     
     const hasPos = interactions.some(i => i.isPos);
@@ -1924,7 +2047,54 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
     const tooltipKoList = [];
     const tooltipEnList = [];
-    for (const keyKo of Object.keys(grouped)) {
+    
+    // Sort keys by importance and influence:
+    // 1. Hap & Chung (합과 충) is the strongest.
+    // 2. Day (일) > Month (월) > Year (년) > Hour (시) is the order of pillars.
+    const sortedKeys = Object.keys(grouped).sort((keyA, keyB) => {
+        const gA = grouped[keyA];
+        const gB = grouped[keyB];
+
+        const nameA = gA.isSpecial ? (gA.specialNameKo || '') : keyA.split('-')[1] || '';
+        const nameB = gB.isSpecial ? (gB.specialNameKo || '') : keyB.split('-')[1] || '';
+
+        const hasHapChungA = gA.isSpecial || nameA.includes('합') || nameA.includes('충');
+        const hasHapChungB = gB.isSpecial || nameB.includes('합') || nameB.includes('충');
+
+        if (hasHapChungA !== hasHapChungB) {
+            return hasHapChungA ? -1 : 1;
+        }
+
+        const getPillarPrio = (idx: number) => {
+            if (idx === 1) return 4; // 일 (Day)
+            if (idx === 2) return 3; // 월 (Month)
+            if (idx === 3) return 2; // 년 (Year)
+            if (idx === 0) return 1; // 시 (Hour)
+            return 0;
+        };
+
+        const getMaxPillarPrio = (indices: number[]) => {
+            if (!indices || indices.length === 0) return 0;
+            return Math.max(...indices.map(getPillarPrio));
+        };
+
+        const prioA = getMaxPillarPrio(gA.pIndices);
+        const prioB = getMaxPillarPrio(gB.pIndices);
+
+        if (prioA !== prioB) {
+            return prioB - prioA;
+        }
+
+        const isHapA = nameA.includes('합');
+        const isHapB = nameB.includes('합');
+        if (isHapA !== isHapB) {
+            return isHapA ? -1 : 1;
+        }
+
+        return 0;
+    });
+
+    for (const keyKo of sortedKeys) {
         const g = grouped[keyKo];
         
         if (g.isSpecial) {
@@ -1971,11 +2141,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     
     return (
         <BaziTooltip content={{ ko: tooltipKo, en: tooltipEn }} lang={lang}>
-           <span className={`relative inline-block cursor-help group transition-all duration-300 mx-0.5 whitespace-nowrap ${shadowClass}`}>
+           <span className={`relative inline-block cursor-help group transition-all duration-300 mx-0.5 ${lang === 'EN' ? 'whitespace-normal text-center break-words' : 'whitespace-nowrap'} ${shadowClass}`}>
              <span className="relative z-10 transition-transform duration-300 block group-hover:-translate-y-[1px]">
                {content}
              </span>
-             <span className={`absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-[60%] h-[1.5px] rounded-full opacity-60 group-hover:opacity-100 group-hover:w-[90%] transition-all duration-300 ${lineClass} animate-pulse`} />
+             {!hideUnderline && (
+               <span className={`absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-[60%] h-[1.5px] rounded-full opacity-60 group-hover:opacity-100 group-hover:w-[90%] transition-all duration-300 ${lineClass} animate-pulse`} />
+             )}
            </span>
         </BaziTooltip>
     );
@@ -2788,7 +2960,15 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             </span>
                           )}
                           {guideStep === 6 && '나와 타인이 맺는 관계방식을 10가지 역할로 나눈 심리/행동 패턴입니다. 당신이 세상을 살아가는 무기이자 가면입니다.'}
-                          {guideStep === 7 && '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요.'}
+                          {guideStep === 7 && (
+                            <span className="block space-y-2">
+                              <span>계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요.</span>
+                              <span className={`block text-[11px] leading-relaxed p-2.5 rounded-xl border font-sans font-medium space-y-1 ${theme === 'light' ? 'bg-amber-50/50 text-amber-900 border-amber-200/60' : 'bg-neon-cyan/5 text-neon-cyan/90 border-neon-cyan/25'}`}>
+                                <strong className={`font-bold block text-xs ${theme === 'light' ? 'text-amber-800' : 'text-white'}`}>🔗 Tip. 합형충파해(Interactions) 확인하는 법</strong>
+                                <span>각 대운/세운 카드 우측 상단 고리 모양의 체인(🔗) 아이콘에 마우스를 올리거나(모바일 터치) 하시면, 해당 대운/세운이 내 사주 원국과 어떤 결속(합)이나 조율(충) 등의 역동적인 관계를 맺는지 팝업 해설로 바로 알 수 있습니다!</span>
+                              </span>
+                            </span>
+                          )}
                         </>
                       ) : (
                         <>
@@ -2819,17 +2999,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               {presentRootTags.size > 0 && (
                                 <span className={`text-[10px] sm:text-[11px] p-1.5 rounded break-keep flex flex-wrap gap-x-2 gap-y-1 mt-1 ${theme === 'light' ? 'bg-slate-50 text-slate-700 border border-slate-200' : 'bg-white/5 text-white/80 border border-white/10'}`}>
                                   {presentRootTags.has('MAIN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>MAIN:</span> Core strength directly rooted to its own Heavenly Stem. </span>}
-                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>Year/Month/DM/Hour:</span> Strong Main-Qi root connecting directly to the designated Heavenly Stem. </span>}
+                                  {presentRootTags.has('E-MN') && <span><span className={`font-bold ${theme === 'light' ? 'text-rose-600' : 'text-neon-pink'}`}>Y/M/D/H:</span> Strong Main-Qi root connecting directly to the designated Heavenly Stem. </span>}
                                   {presentRootTags.has('GEN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>GEN:</span> Supportive potential feeding its own Heavenly Stem. </span>}
-                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>Year-GN/Month-GN/DM-GN/Hour-GN:</span> Generative support feeding and empowering the designated Heavenly Stem. </span>}
+                                  {presentRootTags.has('E-GN') && <span><span className={`font-bold ${theme === 'light' ? 'text-amber-600' : 'text-yellow-400'}`}>Y-GN/M-GN/D-GN/H-GN:</span> Generative support feeding and empowering the designated Heavenly Stem. </span>}
                                   {presentRootTags.has('SUB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>SUB:</span> A highly flexible, resilient backup weapon for its own Heavenly Stem. </span>}
-                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>Year-SB/Month-SB/DM-SB/Hour-SB:</span> Resilient secondary/sub root backing up the designated Heavenly Stem.</span>}
+                                  {presentRootTags.has('E-SB') && <span><span className={`font-bold ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>Y-SB/M-SB/D-SB/H-SB:</span> Resilient secondary/sub root backing up the designated Heavenly Stem.</span>}
                                 </span>
                               )}
                             </span>
                           )}
                           {guideStep === 6 && 'Represents 10 psychological and behavioral patterns of how you relate to others. It is your weapon and mask in this world.'}
-                          {guideStep === 7 && 'Just like seasons change, this represents the shifting environment and theme you face every 10 years.'}
+                          {guideStep === 7 && (
+                            <span className="block space-y-2">
+                              <span>Just like seasons change, this represents the shifting environment and theme you face every 10 years.</span>
+                              <span className={`block text-[11px] leading-relaxed p-2.5 rounded-xl border font-sans font-medium space-y-1 ${theme === 'light' ? 'bg-amber-50/50 text-amber-900 border-amber-200/60' : 'bg-neon-cyan/5 text-neon-cyan/90 border-neon-cyan/25'}`}>
+                                <strong className={`font-bold block text-xs ${theme === 'light' ? 'text-amber-800' : 'text-white'}`}>🔗 Tip. Finding Interactions</strong>
+                                <span>Hover over (or tap on mobile) the chain (🔗) icon on the top-right of each season card to view popup descriptions of how that cycle interacts with your natal chart through dynamic combinations or clashes.</span>
+                              </span>
+                            </span>
+                          )}
                         </>
                       )}
                     </p>
@@ -3080,11 +3268,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   <div className={`text-[8.5px] sm:text-[10.5px] md:text-[12px] uppercase font-bold text-center ${guideStep === 5 ? 'text-neon-cyan' : 'text-white/30'}`}>
                     {lang === 'KO' ? '지장간' : 'Hidden'}
                   </div>
-                  <div className="flex flex-wrap justify-center gap-0.5 sm:gap-1">
+                  <div className="grid grid-cols-2 gap-1 w-full justify-items-center sm:flex sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-1.5">
                     {isUnknownPillar ? (
                       <div className="text-[9px] text-center text-white/20 my-2">?</div>
                     ) : (
                       hiddenStems.map((hs, idx) => {
+                        const isThirdOfThree = hiddenStems.length === 3 && idx === 2;
+                        const spansClass = isThirdOfThree ? "col-span-2 justify-self-center sm:col-span-1" : "";
                         const hsData = BAZI_MAPPING.stems?.[hs as keyof typeof BAZI_MAPPING.stems];
                         const hsTenGod = getDetailedTenGod(dayMaster, hs);
                         
@@ -3428,9 +3618,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 `;
 
                         const bestTagInfo = allRootedStems[0];
-                        const itemMinWidthClass = lang === 'KO' 
-                          ? 'min-w-[24px] sm:min-w-[32px] md:min-w-[42px]' 
-                          : 'min-w-[32px] sm:min-w-[44px] md:min-w-[54px] lg:min-w-[62px]';
+                        const itemWidthClass = lang === 'KO' 
+                          ? 'w-full max-w-[34px] sm:max-w-[46px] md:max-w-[56px]' 
+                          : 'w-full max-w-[40px] sm:max-w-[54px] md:max-w-[64px] lg:max-w-[70px]';
 
                         return (
                           <BaziTooltip 
@@ -3457,7 +3647,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             }}
                           >
                             <div 
-                              className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemMinWidthClass} border transition-all duration-300 relative ${highlightClass}`}
+                              className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemWidthClass} border transition-all duration-300 relative ${highlightClass} ${spansClass}`}
                             >
                               {isDestroyed && (
                                 <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(239,68,68,0.5)]' : 'border-black shadow-[0_0_4px_rgba(239,68,68,0.8)]'} animate-pulse`} />
@@ -3514,10 +3704,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     : (bestTagInfo.pIdx === i 
                                         ? (bestTagInfo.type === 'main' ? 'MAIN' : bestTagInfo.type === 'sub_residual' ? 'SUB' : 'GEN')
                                         : (bestTagInfo.type === 'main' 
-                                            ? `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-MN` 
+                                            ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-MN` 
                                             : bestTagInfo.type === 'sub_residual' 
-                                              ? `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-SB` 
-                                              : `${bestTagInfo.pNameEn === 'DM' ? 'DM' : bestTagInfo.pNameEn}-GN`))
+                                              ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-SB` 
+                                              : `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-GN`))
                                   }
                                 </div>
                               )}
@@ -3572,7 +3762,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     </span>
                   </h4>
                   <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                    {lang === 'KO' ? '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요.' : 'Just like seasons change, this represents the shifting environment and theme you face every 10 years.'}
+                    {lang === 'KO' 
+                      ? '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요. (각 대운/세운 카드 우측 상단의 체인(🔗) 메뉴에 마우스를 올리면 내 사주 원국과의 합형충파해 작용을 바로 확인할 수 있습니다.)' 
+                      : 'Just like seasons change, this represents the shifting environment and theme you face every 10 years. (You can hover over the chain (🔗) icon on the top-right of each card to confirm dynamic combinations and clashes with your natal chart.)'}
                   </p>
                   <div className="flex gap-2 justify-end w-full">
                     <button onClick={() => setShowGuideDetailModal(true)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto">
@@ -3617,40 +3809,79 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   >
                     {renderTenGodLabel(cycle.stemTenGodKo, cycle.stemTenGodEn, cycle.stemPolarity)}
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setExpandedCycle(isExpanded ? null : actualIndex);
-                      setExpandedYear(null);
-                      setExpandedMonth(null);
-                    }}
-                    className={`w-full min-h-[104px] flex-1 rounded-xl transition-all flex flex-col items-center justify-start p-2 relative shadow-sm ${
-                      isCurrent 
-                        ? (theme === 'light' ? 'ring-2 ring-pink-400 bg-pink-50 shadow-[0_4px_12px_rgba(236,72,153,0.15)] z-10' : 'ring-2 ring-neon-pink bg-[#1a0515] border border-neon-pink/50 shadow-[0_0_20px_rgba(255,0,122,0.4)] z-10')
-                        : (theme === 'light' ? 'bg-white border border-slate-200 hover:bg-slate-50' : 'bg-black/80 border border-white/10 hover:bg-white/10')
-                    }`}
-                  >
-                    <div className={`text-[9px] sm:text-[10px] font-bold mb-1 uppercase leading-[1.1] text-center px-0.5 min-h-[22px] flex items-center justify-center ${isCurrent ? (theme === 'light' ? 'text-pink-600' : 'text-neon-pink') : (theme === 'light' ? 'text-slate-400' : 'text-white/40')}`}>
-                      {getLifeStage(cycle.age)}
-                    </div>
-                    <div className={`text-sm font-bold mb-1.5 ${isCurrent ? (theme === 'light' ? 'text-slate-900' : 'text-white') : (theme === 'light' ? 'text-slate-800' : 'text-white')}`}>{cycle.age}</div>
-                    <div 
-                      className="text-[10px] md:text-xs font-gothic leading-tight text-center mb-0.5"
-                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                    >
-                      <RenderCycleChar char={cycle.stem} isStem={true} />
-                    </div>
-                    <div 
-                      className="text-[10px] md:text-xs font-gothic leading-tight text-center opacity-80"
-                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                    >
-                      <RenderCycleChar char={cycle.branch} isStem={false} />
-                    </div>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#0B0416] rounded-full p-0.5">
-                      {isExpanded ? <ChevronUp className="w-3 h-3 text-neon-pink" /> : <ChevronDown className="w-3 h-3 text-white/20" />}
-                    </div>
-                  </motion.button>
+                  {(() => {
+                    const stemInts = getCycleInteractions(cycle.stem, true);
+                    const branchInts = getCycleInteractions(cycle.branch, false);
+                    const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
+                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(cycle.stem, cycle.branch) : { ko: '', en: '' };
+
+                    return (
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setExpandedCycle(isExpanded ? null : actualIndex);
+                          setExpandedYear(null);
+                          setExpandedMonth(null);
+                        }}
+                        className={`w-full min-h-[104px] flex-1 rounded-xl transition-all flex flex-col items-center justify-start pt-2 px-1.5 pb-4 relative shadow-sm cursor-pointer select-none ${
+                          isCurrent 
+                            ? (theme === 'light' ? 'ring-2 ring-pink-400 bg-pink-50 shadow-[0_4px_12px_rgba(236,72,153,0.15)] z-10' : 'ring-2 ring-neon-pink bg-[#1a0515] border border-neon-pink/50 shadow-[0_0_20px_rgba(255,0,122,0.4)] z-10')
+                            : (theme === 'light' ? 'bg-white border border-slate-200 hover:bg-slate-50' : 'bg-black/80 border border-white/10 hover:bg-white/10')
+                        }`}
+                      >
+                        {hasInteractions && (
+                          <div 
+                            className="absolute -top-1.5 -right-1.5 z-30" 
+                            onClick={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
+                          >
+                            <BaziTooltip content={tooltipContent} lang={lang}>
+                              <motion.div 
+                                whileHover={{ scale: 1.25 }}
+                                whileTap={{ scale: 0.9 }}
+                                className={`p-1 rounded-full transition-all duration-300 cursor-pointer ${
+                                  theme === 'light'
+                                    ? 'bg-purple-100 border border-purple-200 text-purple-600 hover:bg-purple-200'
+                                    : 'bg-purple-950/50 border border-purple-500/40 text-purple-400 hover:text-purple-300 hover:bg-purple-900/60 shadow-[0_0_6px_rgba(168,85,247,0.3)]'
+                                }`}
+                              >
+                                <Link className="w-2.5 h-2.5" />
+                              </motion.div>
+                            </BaziTooltip>
+                          </div>
+                        )}
+
+                        <div className={`text-[9px] sm:text-[10px] font-bold mb-0.5 uppercase leading-[1.1] text-center px-0.5 flex items-center justify-center ${isCurrent ? (theme === 'light' ? 'text-pink-600' : 'text-neon-pink') : (theme === 'light' ? 'text-slate-400' : 'text-white/40')}`}>
+                           {getLifeStage(cycle.age)}
+                        </div>
+                        <div className={`text-xs sm:text-sm font-bold mb-0.5 ${isCurrent ? (theme === 'light' ? 'text-slate-900' : 'text-white') : (theme === 'light' ? 'text-slate-800' : 'text-white')}`}>{cycle.age}</div>
+                        <div 
+                          className={`font-gothic font-bold leading-none text-center ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] mb-1' : 'text-[14px] sm:text-[15px] md:text-[16px] mb-0.5'}`}
+                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                        >
+                          <RenderCycleChar char={cycle.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                        </div>
+                        <div 
+                          className={`font-gothic font-bold leading-none text-center opacity-90 ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] leading-tight' : 'text-[14px] sm:text-[15px] md:text-[16px] -mt-[1px]'}`}
+                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                        >
+                          <RenderCycleChar char={cycle.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                        </div>
+                        
+                        <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full p-0.5 border shadow-sm transition-all z-20 ${
+                          theme === 'light'
+                            ? 'bg-white border-slate-200 text-slate-400'
+                            : 'bg-[#0B0416] border-white/10 text-white/40'
+                        }`}>
+                          {isExpanded 
+                            ? <ChevronUp className={`w-3 h-3 ${theme === 'light' ? 'text-pink-500' : 'text-neon-pink'}`} /> 
+                            : <ChevronDown className="w-3 h-3 text-white/20" />
+                          }
+                        </div>
+                      </motion.div>
+                    );
+                  })()}
                   <div 
                     className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] mt-1.5" 
                     style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}
@@ -3691,42 +3922,81 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   else if (isCurrentYear) borderClass = 'border-neon-pink bg-neon-pink/5';
 
                   return (
-                    <div key={api} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
-                      <div className="text-[10px] font-mono text-white/40">{ap.year}</div>
+                    <div key={api} className="flex flex-col items-center space-y-1 w-20 flex-shrink-0">
+                      <div className="text-xs sm:text-[13px] font-mono font-bold text-white/60">{ap.year}</div>
                       <div 
-                        className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] w-full" 
+                        className="text-[11px] sm:text-[12px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] w-full" 
                         style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}
                       >
                         {renderTenGodLabel(ap.stemTenGodKo, ap.stemTenGodEn, ap.stemPolarity)}
                       </div>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          setExpandedYear(isYearExpanded ? null : api);
-                          setExpandedMonth(null);
-                        }}
-                        className={`w-full bg-white/5 rounded-lg p-2 flex flex-col items-center border transition-all relative ${borderClass}`}
-                      >
-                        <div className="text-xs font-bold text-white mb-1">{ap.age}</div>
-                        <div 
-                          className="text-[10px] font-gothic font-bold text-center"
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                        >
-                          <RenderCycleChar char={ap.stem} isStem={true} />
-                        </div>
-                        <div 
-                          className="text-[10px] font-gothic text-center opacity-70"
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                        >
-                          <RenderCycleChar char={ap.branch} isStem={false} />
-                        </div>
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                          {isYearExpanded ? <ChevronUp className="w-2 h-2 text-neon-cyan" /> : <ChevronDown className="w-2 h-2 text-white/20" />}
-                        </div>
-                      </motion.button>
+                      {(() => {
+                        const stemInts = getCycleInteractions(ap.stem, true);
+                        const branchInts = getCycleInteractions(ap.branch, false);
+                        const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
+                        const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(ap.stem, ap.branch) : { ko: '', en: '' };
+
+                        return (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                              setExpandedYear(isYearExpanded ? null : api);
+                              setExpandedMonth(null);
+                            }}
+                            className={`w-full bg-white/5 rounded-xl p-3 flex flex-col items-center border transition-all relative min-h-[92px] justify-center cursor-pointer select-none ${borderClass}`}
+                          >
+                            {hasInteractions && (
+                              <div 
+                                className="absolute -top-1.5 -right-1.5 z-30" 
+                                onClick={(e) => e.stopPropagation()}
+                                onTouchStart={(e) => e.stopPropagation()}
+                              >
+                                <BaziTooltip content={tooltipContent} lang={lang}>
+                                  <motion.div 
+                                    whileHover={{ scale: 1.25 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    className={`p-0.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                      theme === 'light'
+                                        ? 'bg-purple-100 border border-purple-200 text-purple-600 hover:bg-purple-200'
+                                        : 'bg-purple-950/50 border border-purple-500/40 text-purple-400 hover:text-purple-300 hover:bg-purple-900/60 shadow-[0_0_6px_rgba(168,85,247,0.3)]'
+                                    }`}
+                                  >
+                                    <Link className="w-2 h-2" />
+                                  </motion.div>
+                                </BaziTooltip>
+                              </div>
+                            )}
+
+                            <div className={`text-[13px] font-bold mb-0.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{ap.age}</div>
+                            <div 
+                              className={`font-gothic font-bold text-center leading-tight ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs mb-0.5' : 'text-[13px] sm:text-[14px]'}`}
+                              style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                            >
+                              <RenderCycleChar char={ap.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                            </div>
+                            <div 
+                              className={`font-gothic font-bold text-center leading-tight opacity-90 ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs' : 'text-[13px] sm:text-[14px]'}`}
+                              style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                            >
+                              <RenderCycleChar char={ap.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                            </div>
+
+                            <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full p-0.5 border shadow-sm transition-all z-20 ${
+                              theme === 'light'
+                                ? 'bg-white border-slate-200 text-slate-400'
+                                : 'bg-[#0B0416] border-white/10 text-white/40'
+                            }`}>
+                              {isYearExpanded 
+                                ? <ChevronUp className={`w-2.5 h-2.5 ${theme === 'light' ? 'text-indigo-500' : 'text-neon-cyan'}`} /> 
+                                : <ChevronDown className="w-2.5 h-2.5 text-white/20" />
+                              }
+                            </div>
+                          </motion.div>
+                        );
+                      })()}
                       <div 
-                        className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] w-full" 
+                        className="text-[11px] sm:text-[12px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] w-full" 
                         style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}
                       >
                         {renderTenGodLabel(ap.branchTenGodKo, ap.branchTenGodEn, ap.branchPolarity)}
@@ -3770,28 +4040,67 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 <PolarityIcon polarity={m.stemPolarity} size={6} />
                                 {lang === 'KO' ? m.stemTenGodKo : m.stemTenGodEn}
                               </div>
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setExpandedMonth(isMonthExpanded ? null : mi)}
-                                className={`w-full bg-white/5 rounded-lg p-3 flex flex-col items-center border transition-all min-h-[70px] justify-center relative ${borderClass}`}
-                              >
-                                <div 
-                                  className="text-[10px] font-gothic font-bold text-center"
-                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                >
-                                  <RenderCycleChar char={m.stem} isStem={true} />
-                                </div>
-                                <div 
-                                  className="text-[10px] font-gothic text-center opacity-70"
-                                  style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                >
-                                  <RenderCycleChar char={m.branch} isStem={false} />
-                                </div>
-                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                                  {isMonthExpanded ? <ChevronUp className="w-2 h-2 text-neon-pink" /> : <ChevronDown className="w-2 h-2 text-white/20" />}
-                                </div>
-                              </motion.button>
+                              {(() => {
+                                const stemInts = getCycleInteractions(m.stem, true);
+                                const branchInts = getCycleInteractions(m.branch, false);
+                                const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
+                                const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(m.stem, m.branch) : { ko: '', en: '' };
+
+                                return (
+                                  <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setExpandedMonth(isMonthExpanded ? null : mi)}
+                                    className={`w-full bg-white/5 rounded-lg p-3 flex flex-col items-center border transition-all min-h-[70px] justify-center relative cursor-pointer select-none ${borderClass}`}
+                                  >
+                                    {hasInteractions && (
+                                      <div 
+                                        className="absolute -top-1.5 -right-1.5 z-30" 
+                                        onClick={(e) => e.stopPropagation()}
+                                        onTouchStart={(e) => e.stopPropagation()}
+                                      >
+                                        <BaziTooltip content={tooltipContent} lang={lang}>
+                                          <motion.div 
+                                            whileHover={{ scale: 1.25 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className={`p-0.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                              theme === 'light'
+                                                ? 'bg-purple-100 border border-purple-200 text-purple-600 hover:bg-purple-200'
+                                                : 'bg-purple-950/50 border border-purple-500/40 text-purple-400 hover:text-purple-300 hover:bg-purple-900/60 shadow-[0_0_6px_rgba(168,85,247,0.3)]'
+                                            }`}
+                                          >
+                                            <Link className="w-2 h-2" />
+                                          </motion.div>
+                                        </BaziTooltip>
+                                      </div>
+                                    )}
+
+                                    <div 
+                                      className="text-[10px] font-gothic font-bold text-center"
+                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[m.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                    >
+                                      <RenderCycleChar char={m.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                                    </div>
+                                    <div 
+                                      className="text-[10px] font-gothic text-center opacity-70"
+                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                    >
+                                      <RenderCycleChar char={m.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                                    </div>
+
+                                    <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full p-0.5 border shadow-sm transition-all z-20 ${
+                                      theme === 'light'
+                                        ? 'bg-white border-slate-200 text-slate-400'
+                                        : 'bg-[#0B0416] border-white/10 text-white/40'
+                                    }`}>
+                                      {isMonthExpanded 
+                                        ? <ChevronUp className={`w-2.5 h-2.5 ${theme === 'light' ? 'text-pink-500' : 'text-neon-pink'}`} /> 
+                                        : <ChevronDown className="w-2.5 h-2.5 text-white/20" />
+                                      }
+                                    </div>
+                                  </motion.div>
+                                );
+                              })()}
                               <div className="text-[9px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[m.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                                 <PolarityIcon polarity={m.branchPolarity} size={6} />
                                 {lang === 'KO' ? m.branchTenGodKo : m.branchTenGodEn}
@@ -3829,25 +4138,56 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     <PolarityIcon polarity={d.stemPolarity} size={5} />
                                     {lang === 'KO' ? d.stemTenGodKo : d.stemTenGodEn}
                                   </div>
-                                  <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setSelectedDay(isDaySelected ? null : di)}
-                                    className={`w-full bg-white/5 rounded-lg p-2 flex flex-col items-center border transition-all ${borderClass}`}
-                                  >
-                                    <div 
-                                      className="text-[10px] font-gothic font-bold text-center"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                    >
-                                      <RenderCycleChar char={d.stem} isStem={true} />
-                                    </div>
-                                    <div 
-                                      className="text-[10px] font-gothic text-center opacity-70"
-                                      style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                                    >
-                                      <RenderCycleChar char={d.branch} isStem={false} />
-                                    </div>
-                                  </motion.button>
+                                  {(() => {
+                                    const stemInts = getCycleInteractions(d.stem, true);
+                                    const branchInts = getCycleInteractions(d.branch, false);
+                                    const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
+                                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(d.stem, d.branch) : { ko: '', en: '' };
+
+                                    return (
+                                      <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => setSelectedDay(isDaySelected ? null : di)}
+                                        className={`w-full bg-white/5 rounded-lg p-2 flex flex-col items-center border transition-all relative cursor-pointer select-none ${borderClass}`}
+                                      >
+                                        {hasInteractions && (
+                                          <div 
+                                            className="absolute -top-1.5 -right-1.5 z-30" 
+                                            onClick={(e) => e.stopPropagation()}
+                                            onTouchStart={(e) => e.stopPropagation()}
+                                          >
+                                            <BaziTooltip content={tooltipContent} lang={lang}>
+                                              <motion.div 
+                                                whileHover={{ scale: 1.25 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                className={`p-0.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                                  theme === 'light'
+                                                    ? 'bg-purple-100 border border-purple-200 text-purple-600 hover:bg-purple-200'
+                                                    : 'bg-purple-950/50 border border-purple-500/40 text-purple-400 hover:text-purple-300 hover:bg-purple-900/60 shadow-[0_0_6px_rgba(168,85,247,0.3)]'
+                                                }`}
+                                              >
+                                                <Link className="w-1.5 h-1.5" />
+                                              </motion.div>
+                                            </BaziTooltip>
+                                          </div>
+                                        )}
+
+                                        <div 
+                                          className="text-[10px] font-gothic font-bold text-center"
+                                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                        >
+                                          <RenderCycleChar char={d.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                                        </div>
+                                        <div 
+                                          className="text-[10px] font-gothic text-center opacity-70"
+                                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                                        >
+                                          <RenderCycleChar char={d.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                                        </div>
+                                      </motion.div>
+                                    );
+                                  })()}
                                   <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[d.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] }}>
                                     <PolarityIcon polarity={d.branchPolarity} size={5} />
                                     {lang === 'KO' ? d.branchTenGodKo : d.branchTenGodEn}
@@ -4580,7 +4920,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             <div className="p-6 overflow-y-auto space-y-8 no-scrollbar">
 
               <div className="space-y-4">
-                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 id="guide-section-tree" className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">1</span>
                   {lang === 'KO' ? '생태계적 관점: 사주나무 (Cosmic Tree)' : 'Ecological View: The Cosmic Tree'}
                 </h4>
@@ -4688,7 +5028,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               </div>
 
               <div className="space-y-4">
-                <h4 className={`text-lg font-bold flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                <h4 id="guide-section-jijangan" className={`text-lg font-bold flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm">2</span>
                   {lang === 'KO' ? '땅 속에 감춰진 씨앗: 지장간' : 'Hidden Seeds: Ji-Jang-Gan'}
                 </h4>
@@ -4834,15 +5174,15 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                        <ul className="text-xs sm:text-sm text-white/80 space-y-3 list-none pl-1 font-sans">
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '본기' : 'MAIN'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '본기(Main) 뿌리: 제자리 천간에 직접 직결된 기운. 외부 기둥과 연결될 경우 해당 천간 배지(일간, 시간, 월간, 연간)로 교체되어 발현 범위를 표시합니다.' : 'Main Root: Directly connected core energy. When linked to other pillars, it dynamically shows the specific stem name (DM, Hour, Month, Year).'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '본기(Main) 뿌리: 제자리 천간에 직접 직결된 기운. 외부 기둥과 연결될 경우 해당 천간 배지(일간, 시간, 월간, 연간)로 교체되어 발현 범위를 표시합니다.' : 'Main Root: Directly connected core energy. When linked to other pillars, it dynamically shows the specific stem initial (Y, M, D, H).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '중여' : 'SUB'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '중여(Sub) 뿌리: 상황에 따라 유연하게 꺼내는 보완 기운. 외부 기둥과 연결될 경우 접미사 "중"과 조합(일중, 시중, 월중, 연중)되어 표시됩니다.' : 'Sub Root: A flexible secondary/sub-Qi backup root. When connected to other pillars, it is displayed with the "-SB" suffix (DM-SB, Hour-SB, Month-SB, Year-SB).'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '중여(Sub) 뿌리: 상황에 따라 유연하게 꺼내는 보완 기운. 외부 기둥과 연결될 경우 접미사 "중"과 조합(일중, 시중, 월중, 연중)되어 표시됩니다.' : 'Sub Root: A flexible secondary/sub-Qi backup root. When connected to other pillars, it is displayed with the "-SB" suffix (D-SB, H-SB, M-SB, Y-SB).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '생조' : 'GEN'}</span>
-                           <span className="leading-snug">{lang === 'KO' ? '생조(Generative) 지지: 오행 간 상생으로 끊임없이 기운을 공급하는 원조력. 외부 글자와 상생 시에는 접미사 "생"과 조합(일생, 시생, 월생, 연생)되어 표시됩니다.' : 'Generative Support: Energy supplying support through mutual generation. When supporting other pillars, it is displayed with the "-GN" suffix (DM-GN, Hour-GN, Month-GN, Year-GN).'}</span>
+                           <span className="leading-snug">{lang === 'KO' ? '생조(Generative) 지지: 오행 간 상생으로 끊임없이 기운을 공급하는 원조력. 외부 글자와 상생 시에는 접미사 "생"과 조합(일생, 시생, 월생, 연생)되어 표시됩니다.' : 'Generative Support: Energy supplying support through mutual generation. When supporting other pillars, it is displayed with the "-GN" suffix (D-GN, H-GN, M-GN, Y-GN).'}</span>
                          </li>
                          <li className="flex items-start gap-2">
                            <span className="text-[10px] sm:text-[11px] p-1 rounded font-bold bg-slate-500/20 text-slate-400 border border-slate-500/30 whitespace-nowrap mt-0.5">{lang === 'KO' ? '미통근' : 'NONE'}</span>
@@ -4854,7 +5194,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                </div>
 
               <div className="space-y-4">
-                <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 id="guide-section-daewun" className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-sm">3</span>
                   {lang === 'KO' ? '시간의 파도: 대운 (Life Seasons)' : 'Life Seasons'}
                 </h4>
@@ -5976,314 +6316,236 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                             {(() => {
                               const activeUserMatch = getUserInteractionMatch(guideRelTab, activeItem.branches);
-                                            if (!activeUserMatch) return null;
+                              if (!activeUserMatch) return null;
 
-                                            const matchStrength = getInteractionStrength(activeUserMatch);
-                                            if (!matchStrength) return null;
+                              const matchStrength = getInteractionStrength(activeUserMatch);
+                              if (!matchStrength) return null;
 
-                                            const level = matchStrength.level;
+                              const level = matchStrength.level;
 
-                                            let containerClass = "";
-                                            let pulseDescClass = "";
-                                            let strengthBadgeTxt = "";
-                                            let detailTxtKo = "";
-                                            let detailTxtEn = "";
+                              let containerClass = "";
+                              let pulseDescClass = "";
+                              let strengthBadgeTxt = "";
+                              let detailTxtKo = "";
+                              let detailTxtEn = "";
 
-                                            const isHyeong = guideRelTab === 'punish' || activeUserMatch.type.includes('형');
-                                            const isPa = guideRelTab === 'destroy' || activeUserMatch.type === '파';
-                                            const isHae = guideRelTab === 'harm' || activeUserMatch.type === '해';
-                                            const isClash = guideRelTab === 'clash' || activeUserMatch.type.includes('충');
+                              const isClash = guideRelTab === 'clash';
+                              const isHyeong = guideRelTab === 'punish';
+                              const isPa = guideRelTab === 'destroy';
+                              const isHae = guideRelTab === 'harm';
 
-                                            const hanjaToKoMap: Record<string, string> = {
-                                              '子': '자', '丑': '축', '寅': '인', '卯': '묘', '辰': '진', '巳': '사',
-                                              '午': '오', '未': '미', '申': '신', '酉': '유', '戌': '술', '亥': '해'
-                                            };
-                                            const branchOrder = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-                                            const sortedBranches = [...(activeUserMatch.branches || [])].sort((a, b) => branchOrder.indexOf(a) - branchOrder.indexOf(b));
-                                            const matchedBranchesKo = sortedBranches.map((b: string) => hanjaToKoMap[b] || b).join('');
-                                            
-                                            let actualName = "";
-                                            if (isClash) actualName = matchedBranchesKo ? `${matchedBranchesKo}충` : "자오충";
-                                            else if (isHyeong) actualName = matchedBranchesKo ? `${matchedBranchesKo}형살` : "인사형살";
-                                            else if (isPa) actualName = matchedBranchesKo ? `${matchedBranchesKo}파` : "자유파";
-                                            else if (isHae) actualName = matchedBranchesKo ? `${matchedBranchesKo}해` : "지미해";
+                              const pIndices = activeUserMatch.pillarIndices || [];
+                              const remoteBranchesStr = pIndices.map((pIdx: number) => {
+                                const pName = getPillarNameLocal(pIdx, lang);
+                                const pMean = getPillarMeaningLocal(pIdx, lang);
+                                return `${pName}(${pMean})`;
+                              }).join(' ↔ ');
 
-                                            let remoteBranchesStr = "년지와 시지 등";
-                                            let remoteBranchesStrEn = "Year and Hour branches etc.";
-                                            if (activeUserMatch.branches && activeUserMatch.pillarIndices && activeUserMatch.pillarIndices.length > 0) {
-                                                const pillarNamesKo = ["년지", "월지", "일지", "시지"];
-                                                const pillarNamesEn = ["Year", "Month", "Day", "Hour"];
-                                                
-                                                // Group duplicate branches
-                                                const branchMap = new Map();
-                                                activeUserMatch.pillarIndices.forEach((pIdx, i) => {
-                                                    let b = activeUserMatch.branches[i] || activeUserMatch.branches[activeUserMatch.branches.length - 1];
-                                                    const safeIdx = pIdx >= 0 && pIdx <= 3 ? pIdx : 0;
-                                                    if (!branchMap.has(b)) {
-                                                        branchMap.set(b, []);
-                                                    }
-                                                    branchMap.get(b).push(pillarNamesKo[safeIdx]);
-                                                });
-                                                
-                                                const formattedBranchesKo = [];
-                                                for (let [b, names] of branchMap.entries()) {
-                                                    const el = BAZI_MAPPING.branches[b]?.element || "Wood";
-                                                    const color = typeof ELEMENT_COLORS !== 'undefined' ? (ELEMENT_COLORS[el] || "#FFFFFF") : "#FFFFFF";
-                                                    let name = BAZI_MAPPING.branches[b]?.ko || b;
-                                                    if (name.length > 1) name = name.substring(0, 1);
-                                                    const nameStr = names.join("·"); 
-                                                    formattedBranchesKo.push(`${nameStr}의 [${color}:${name}(${b})]`);
-                                                }
-                                                remoteBranchesStr = formattedBranchesKo.join(" + ");
-                                                
-                                                // Handle English
-                                                const branchMapEn = new Map();
-                                                activeUserMatch.pillarIndices.forEach((pIdx, i) => {
-                                                    let b = activeUserMatch.branches[i] || activeUserMatch.branches[activeUserMatch.branches.length - 1];
-                                                    const safeIdx = pIdx >= 0 && pIdx <= 3 ? pIdx : 0;
-                                                    if (!branchMapEn.has(b)) {
-                                                        branchMapEn.set(b, []);
-                                                    }
-                                                    branchMapEn.get(b).push(pillarNamesEn[safeIdx]);
-                                                });
-                                                const formattedBranchesEn = [];
-                                                for (let [b, names] of branchMapEn.entries()) {
-                                                    const el = BAZI_MAPPING.branches[b]?.element || "Wood";
-                                                    const color = typeof ELEMENT_COLORS !== 'undefined' ? (ELEMENT_COLORS[el] || "#FFFFFF") : "#FFFFFF";
-                                                    let name = BAZI_MAPPING.branches[b]?.en?.split(" ")[0] || b;
-                                                    const nameStr = names.join("/");
-                                                    formattedBranchesEn.push(`${nameStr} [${color}:${name}(${b})]`);
-                                                }
-                                                remoteBranchesStrEn = formattedBranchesEn.join(" + ");
-                                            } else if (activeUserMatch.stems && activeUserMatch.pillarIndices && activeUserMatch.pillarIndices.length > 0) {
-                                                const pillarNamesKo = ["년간", "월간", "일간", "시간"];
-                                                const pillarNamesEn = ["Year Stem", "Month Stem", "Day Stem", "Hour Stem"];
-                                                
-                                                const stemMap = new Map();
-                                                activeUserMatch.pillarIndices.forEach((pIdx, i) => {
-                                                    let s = activeUserMatch.stems[i] || activeUserMatch.stems[activeUserMatch.stems.length - 1];
-                                                    const safeIdx = pIdx >= 0 && pIdx <= 3 ? pIdx : 0;
-                                                    if (!stemMap.has(s)) {
-                                                        stemMap.set(s, []);
-                                                    }
-                                                    stemMap.get(s).push(pillarNamesKo[safeIdx]);
-                                                });
-                                                const formattedStemsKo = [];
-                                                for (let [s, names] of stemMap.entries()) {
-                                                    const el = BAZI_MAPPING.stems[s]?.element || "Wood";
-                                                    const color = typeof ELEMENT_COLORS !== 'undefined' ? (ELEMENT_COLORS[el] || "#FFFFFF") : "#FFFFFF";
-                                                    let name = BAZI_MAPPING.stems[s]?.ko || s;
-                                                    if (name.length > 1) name = name.substring(0, 1);
-                                                    const nameStr = names.join("·");
-                                                    formattedStemsKo.push(`${nameStr}의 [${color}:${name}(${s})]`);
-                                                }
-                                                remoteBranchesStr = formattedStemsKo.join(" + ");
-                                                
-                                                const stemMapEn = new Map();
-                                                activeUserMatch.pillarIndices.forEach((pIdx, i) => {
-                                                    let s = activeUserMatch.stems[i] || activeUserMatch.stems[activeUserMatch.stems.length - 1];
-                                                    const safeIdx = pIdx >= 0 && pIdx <= 3 ? pIdx : 0;
-                                                    if (!stemMapEn.has(s)) {
-                                                        stemMapEn.set(s, []);
-                                                    }
-                                                    stemMapEn.get(s).push(pillarNamesEn[safeIdx]);
-                                                });
-                                                const formattedStemsEn = [];
-                                                for (let [s, names] of stemMapEn.entries()) {
-                                                    const el = BAZI_MAPPING.stems[s]?.element || "Wood";
-                                                    const color = typeof ELEMENT_COLORS !== 'undefined' ? (ELEMENT_COLORS[el] || "#FFFFFF") : "#FFFFFF";
-                                                    let name = BAZI_MAPPING.stems[s]?.en?.split(" ")[0] || s;
-                                                    const nameStr = names.join("/");
-                                                    formattedStemsEn.push(`${nameStr} [${color}:${name}(${s})]`);
-                                                }
-                                                remoteBranchesStrEn = formattedStemsEn.join(" + ");
-                                            }
+                              const remoteBranchesStrEn = pIndices.map((pIdx: number) => {
+                                const pName = getPillarNameLocal(pIdx, 'EN');
+                                const pMean = getPillarMeaningLocal(pIdx, 'EN');
+                                return `${pName} (${pMean})`;
+                              }).join(' ↔ ');
 
-                                            if (level === 'full') {
-                                              pulseDescClass = "desc-glow-full";
-                                              containerClass = isLight 
-                                                ? 'bg-amber-500/5 border-amber-400 text-amber-950 shadow-[0_3px_12px_rgba(245,158,11,0.15)]' 
-                                                : 'bg-[#2d1d0c] border-amber-500/45 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.25)]';
-                                              strengthBadgeTxt = lang === 'KO' ? '합 완성' : 'Full Combination';
-                                              detailTxtKo = `두 글자 혹은 세 글자의 조화(${remoteBranchesStr})가 완벽하게 결합되었습니다. 이로 인해 사주의 주된 기류가 이 주파수로 정렬되어, 견고한 동맹적 가치, 사회적 목적 완수, 일관된 방향성 및 뚜렷한 리더십이 탄탄한 근간을 이루며 작동하고 있습니다.`;
-                                              detailTxtEn = `The complete combination (${remoteBranchesStrEn}) exists in your chart, aligning your path with strong collaborative values, solid goals, and consistent leadership.`;
-                                            } else if (level === 'half') {
-                                              pulseDescClass = "desc-glow-half";
-                                              containerClass = isLight 
-                                                ? 'bg-sky-500/5 border-sky-350 text-sky-950 shadow-[0_3px_12px_rgba(14,165,233,0.15)]' 
-                                                : 'bg-[#0f243a] border-sky-400/45 text-cyan-200 shadow-[0_0_15px_rgba(0,191,255,0.2)]';
-                                              strengthBadgeTxt = lang === 'KO' ? '반합 형성' : 'Half Combination';
-                                              detailTxtKo = `합의 핵심 왕지(왕을 상징하는 자오묘유)를 포함한 두 글자(${remoteBranchesStr})가 결합하여 엔진 축이 힘차게 돌아가고 있습니다. 향후 대운이나 세운에서 나머지 한 글자가 더해지면 강력하고 폭발적인 기세의 창조적 행보와 시너지가 전면에 펼쳐지게 됩니다.`;
-                                              detailTxtEn = `Crucial partial combination (${remoteBranchesStrEn}) is active. When the complementing element arrives in transits, highly vibrant expansion and opportunities will be unlocked.`;
-                                            } else if (level === 'remote') {
-                                              pulseDescClass = "desc-glow-half";
-                                              containerClass = isLight 
-                                                ? 'bg-violet-500/5 border-violet-300 text-violet-950 shadow-[0_3px_12px_rgba(139,92,246,0.12)]' 
-                                                : 'bg-[#1e1338] border-violet-500/40 text-violet-205 shadow-[0_0_12px_rgba(139,92,246,0.15)]';
-                                              strengthBadgeTxt = lang === 'KO' ? '원격합 거동' : 'Remote Combination';
-                                              
-                                              
-                                              
+                              const actualName = lang === 'KO' ? activeItem.resultKo : activeItem.resultEn;
+                              const actualNameEn = activeItem.resultEn;
 
-                                              detailTxtKo = `합을 구성하는 글자들이 멀리 떨어져서(${remoteBranchesStr}) 성립하는 원격 합입니다. 정면에서 직접 끌어당기기보다는 보이지 않는 온화한 연대감, 사색적 성찰감, 또는 시간이 흐른 뒤 비로소 구현되는 은근한 소통 창구로 조화롭게 기능합니다.`;
-                                              detailTxtEn = `The combination is spaced apart (${remoteBranchesStrEn}), manifesting as a subtle background cohesion, reflective long-term vision, or pleasant long-distance support.`;
-                                            } else if (level === 'clash_full') {
-                                              pulseDescClass = "desc-glow-present";
-                                              containerClass = isLight 
-                                                ? 'bg-rose-500/5 border-rose-400 text-rose-950 shadow-[0_3px_12px_rgba(244,63,94,0.18)]' 
-                                                : 'bg-[#2d121f] border-rose-500/45 text-rose-200 shadow-[0_0_15px_rgba(255,0,122,0.25)]';
-                                              
-                                              if (isClash) {
-                                                strengthBadgeTxt = lang === 'KO' ? '정면 충(완전)' : 'Direct Close Clash';
-                                                detailTxtKo = `가장 인접한 두 기둥의 지지(${remoteBranchesStr})가 서로를 정면으로 충돌(${actualName})하여 충살의 격렬한 변동성이 직접 가동 중입니다. 이 강한 마찰은 매너리즘(성장 정체)을 깨고 삶을 새롭게 변화시키는 "강력한 원동력(발전기)"이 되어 남다른 기획력과 과감한 결단력을 선사합니다.`;
-                                                detailTxtEn = 'Dynamic direct clash is active within adjacent pillars. This creates a relentless cycle of self-improvement, crisp adaptability, and pioneering initiatives.';
-                                              } else if (isHyeong) {
-                                                strengthBadgeTxt = lang === 'KO' ? '형살 가동(완전)' : 'Active Punishment';
-                                                detailTxtKo = `사주원국에서 강력하게 매칭된 형살(${remoteBranchesStr}, ${actualName})의 압박과 조율 능력이 직접 작동하고 있습니다. 이 날카로운 설계 도면을 깎고 다듬는 과정에서 아무나 가질 수 없는 고도의 전문성(의료/보건, 법조/수사, 정밀 엔지니어링, 설계 편집 등)을 확보하여 압도적인 해결사로서 세상을 이끌어갑니다.`;
-                                                detailTxtEn = 'The comprehensive, active force of Punishment is processed, polishing your expertise in legal, medical, surgical, structural, or precise engineering fields.';
-                                              } else if (isPa) {
-                                                strengthBadgeTxt = lang === 'KO' ? '파살 조율(강)' : 'Strong Destruction';
-                                                detailTxtKo = `미세한 조정과 수정을 상징하는 파살(${remoteBranchesStr}, ${actualName})이 강력히 발현되어 있습니다. 미처 완성되지 않은 아이디어의 틈새를 정교하게 메우고 결점을 제거하는 디버깅 역량, 리모델링, 기성 부품을 맞춤 성형하는 유연한 트러블슈팅 능력의 절정을 선사합니다.`;
-                                                detailTxtEn = 'The sharp destructive adjustment is highly active, reinforcing your ability to inspect, repair, debug, and remodel existing ideas.';
-                                              } else if (isHae) {
-                                                strengthBadgeTxt = lang === 'KO' ? '해살 방어(강)' : 'Strong Harm Barrier';
-                                                detailTxtKo = `방해 요소나 대인관계의 피로감을 다스리는 해살(${remoteBranchesStr}, ${actualName})의 주파수가 위치합니다. 이를 통해 사람 간의 보이지 않는 선을 분명히 그어 내면의 영역을 수호하는 조밀함이 가동되며, 법적 문서나 계약서의 은밀한 위험요소를 잡아내는 완벽주의적 안목이 대단히 명확해집니다.`;
-                                                detailTxtEn = 'Harm boundaries are highly active, helping you define emotional barriers and identify hidden legal or contractual details with high scrutiny.';
-                                              } else {
-                                                strengthBadgeTxt = lang === 'KO' ? '조율 작용 가동' : 'Active Adjuster';
-                                                detailTxtKo = '사주 내 긴장감을 해소하고 새로운 발판을 마련하는 심부 조율 주파수가 작동 중입니다. 미세 교정 및 균형 조정을 통해 삶의 품질을 우수하게 끌어올려 줍니다.';
-                                                detailTxtEn = 'The inner adjustment functions actively to fine-tune your path and system stability.';
-                                              }
-                                            } else if (level === 'clash_half') {
-                                              pulseDescClass = "desc-glow-present";
-                                              containerClass = isLight 
-                                                ? 'bg-orange-500/5 border-orange-400 text-orange-950 shadow-[0_3px_12px_rgba(249,115,22,0.15)]' 
-                                                : 'bg-[#351909] border-orange-500/45 text-orange-200 shadow-[0_0_12px_rgba(249,115,22,0.2)]';
-                                              
-                                              if (isClash) {
-                                                strengthBadgeTxt = lang === 'KO' ? '격충 마찰' : 'Separated Friction';
-                                                detailTxtKo = `한 기둥을 건너뛰어 성립한 격충(${remoteBranchesStr}, ${actualName}) 또는 중간 수준의 마찰입니다. 끊임없는 직접 부딪침보다는 긴장감이 내포된 정밀 조정 능력으로 발현되며, 이로써 고유의 문제해결 능력, 전문 제어력, 엄밀한 리스크 관리를 고도화시킵니다.`;
-                                                detailTxtEn = 'Moderate friction operates through spanned pillars, building sharp situational awareness, systemic regulation, and exceptional crisis-resolution mastery.';
-                                              } else if (isHyeong) {
-                                                strengthBadgeTxt = lang === 'KO' ? '형살 조율' : 'Moderate Punishment';
-                                                detailTxtKo = `일부 지지가 맞춰져 성립한 형살(${remoteBranchesStr}, ${actualName})의 조율 주파수가 감지됩니다. 주변 환경이나 기성 규격의 문제점을 예리하게 포착해내어 가장 효율적이고 완벽한 상태로 교정, 편집, 개혁해내는 탁월한 솔루션 제공 인프라를 마련해 줍니다.`;
-                                                detailTxtEn = 'The partial force of Punishment is processed, offering sharp problem-solving skills, structural revisions, and precise design capability.';
-                                              } else if (isPa) {
-                                                strengthBadgeTxt = lang === 'KO' ? '파살 조율' : 'Moderate Destruction';
-                                                detailTxtKo = `기 흘러가는 과정에 얽힌 파살(${remoteBranchesStr}, ${actualName})의 보정 기능이 작동하고 있습니다. 타성적으로 유지되던 계약이나 시스템의 맹점을 찾아내 개선하며, 완고함을 탈피하여 끊임없는 자기 쇄신과 융통성 있는 대안을 제시하는 지혜를 심어줍니다.`;
-                                                detailTxtEn = 'Subtle destructions operate as a corrective mechanism, highlighting system loopholes to support smooth and proactive upgrades.';
-                                              } else if (isHae) {
-                                                strengthBadgeTxt = lang === 'KO' ? '해살 조율' : 'Moderate Harm Adjust';
-                                                detailTxtKo = `영역 간의 경계를 짓는 해살(${remoteBranchesStr}, ${actualName})의 정진력이 흐릅니다. 섣부른 감정 투자로 인한 심리적 소모를 사전에 지혜롭게 예방하고, 상대의 숨은 의도를 기민하게 간파함으로써 나를 지키는 냉철하며 합리적인 처세의 무기를 가집니다.`;
-                                                detailTxtEn = 'The protective alert of Harm is processed, enabling intuitive defense against unexpected personal drain or subtle relational conflicts.';
-                                              } else {
-                                                strengthBadgeTxt = lang === 'KO' ? '중간 마찰 조율' : 'Moderate Friction';
-                                                detailTxtKo = '인접하지 않은 두 글자가 만나는 중간 수준의 보정 과정입니다. 삶의 다양한 가능성을 실현하기 위해 조심스럽게 영역을 점검하고 보정해 가는 안락한 힘을 마련해 줍니다.';
-                                                detailTxtEn = 'Moderate distant friction operates as a stable calibration force across your life.';
-                                              }
-                                            } else { // clash_remote or general punish/pa/hae
-                                              pulseDescClass = "desc-glow-present";
-                                              containerClass = isLight 
-                                                ? 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200' 
-                                                : 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200';
-                                              
-                                              if (isClash) {
-                                                strengthBadgeTxt = lang === 'KO' ? '원격충 조율' : 'Remote Friction';
-                                                detailTxtKo = `사주 원국 양 극단(${remoteBranchesStr})에 위치하여 간접적으로 작용하는 원격충(${actualName})입니다. 현실에서의 물리적인 갈등이나 급변함은 최소화되나, 내면에 예술적인 정밀함, 신중한 판단력, 그리고 시간의 흐름을 기다릴 줄 아는 성숙한 지혜의 자양분이 됩니다.`;
-                                                detailTxtEn = 'Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.';
-                                              } else if (isHyeong) {
-                                                strengthBadgeTxt = lang === 'KO' ? '원격 형살' : 'Remote Punishment';
-                                                detailTxtKo = `멀리 떨어져서 작용하는 원격 형살(${remoteBranchesStr}, ${actualName})입니다. 실생활의 극단적 압박이나 제약보다는, 법과 원칙을 준수하려는 투철한 도덕성, 보이지 않는 규격이나 수치의 불균형을 미리 감지하여 사고를 방지해주는 예방적 직관력으로 가치있게 승화됩니다.`;
-                                                detailTxtEn = 'Quiet remote hyeong presents low pressure but triggers inner professional discipline, self-regulation, and preventive instincts.';
-                                              } else if (isPa) {
-                                                strengthBadgeTxt = lang === 'KO' ? '원격 파살' : 'Remote Destruction';
-                                                detailTxtKo = `두 기둥 건너 원격으로 위치한 보정용 파살(${remoteBranchesStr}, ${actualName})입니다. 일상적 성취에 큰 방해를 주지 않으면서도, 예술 분야나 학술 연구에서의 예리한 디테일 수정 능력, 교정적 심미안의 주춧돌을 이루어 나갑니다.`;
-                                                detailTxtEn = 'Remote spaced destruction grants gentle warning signs to carry out precise quality control in artistic or scholarly work.';
-                                              } else if (isHae) {
-                                                strengthBadgeTxt = lang === 'KO' ? '원격 해살' : 'Remote Harm';
-                                                detailTxtKo = `멀리 배치되어 영속적 간섭이 크지 않은 원격 해살(${actualName})입니다. 대인 계약 시 약간의 신중함을 더하는 윤리적 안전벨트로 유익하게 승화되며, 인생을 한층 사색적이고 깊이 있는 시각으로 가다듬어 성장을 유도합니다.`;
-                                                detailTxtEn = 'Remote harm functions as a gentle reflective cushion, encouraging you to analyze deep intentions in contract/cooperation details.';
-                                              } else {
-                                                strengthBadgeTxt = lang === 'KO' ? '원격 형해파 조율' : 'Remote Friction / Adjuster';
-                                                detailTxtKo = '사주 양 극단에 존재하여 실제 생활 충돌은 미미한 형/충/파/해 입니다. 삶에 부정적 영향은 사실상 없으며, 예술가적 깊이, 은은한 학구열, 비상한 경각심 등 내면적 지혜와 철학적 각성 효과로 유익하게 승화되어 작용합니다.';
-                                                detailTxtEn = 'Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.';
-                                              }
-                                            }
+                              // stems in chart
+                              const stems = result?.pillars?.map((p: any) => p.stem) || [];
+                              const stemElements = stems.map(s => BAZI_MAPPING.stems?.[s as keyof typeof BAZI_MAPPING.stems]?.element || '');
+                              const hasFireStem = stemElements.includes('Fire');
+                              const hasWaterStem = stemElements.includes('Water');
+                              const hasMetalStem = stemElements.includes('Metal');
 
+                              if (level === 'full') {
+                                pulseDescClass = "desc-glow-full";
+                                containerClass = isLight 
+                                  ? 'bg-amber-500/5 border-amber-400 text-amber-950 shadow-[0_3px_12px_rgba(245,158,11,0.15)] font-bold' 
+                                  : 'bg-[#1e1302] border-amber-500/40 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.25)] font-bold';
+                                
+                                strengthBadgeTxt = lang === 'KO' ? '완전 활성화(초강력)' : 'Active (Strong)';
+                                detailTxtKo = `당신의 명식 내부에서 인접한 두 기둥 사이에 가장 강력하고 완전한 온전한 결합이 이루어졌습니다. 두 글자 간의 상호작용이 인생 전체에 걸쳐 지배적이며 압도적인 테마로 직접 가동됩니다.`;
+                                detailTxtEn = `A complete close interaction is fully formed and loaded, acting as a highly prominent and central psychological driver in your chart.`;
+                              } else if (level === 'half') {
+                                pulseDescClass = "desc-glow-half";
+                                containerClass = isLight 
+                                  ? 'bg-sky-500/5 border-sky-400 text-sky-950 shadow-[0_3px_12px_rgba(14,165,233,0.15)] font-bold' 
+                                  : 'bg-[#091a27] border-sky-500/40 text-sky-200 shadow-[0_0_12px_rgba(14,165,233,0.2)] font-bold';
+                                
+                                strengthBadgeTxt = lang === 'KO' ? '부분적 결합 가동(강)' : 'Semi-Active';
+                                detailTxtKo = `사주 원국 내에 부분적(반합, 가합 등)으로 결속되어 완벽한 결합을 지원할 준비가 끝난 주파수입니다. 상황이나 대운/세운 등 새로운 인연의 유입에 따라 폭발적인 힘으로 전환될 가능성을 가집니다.`;
+                                detailTxtEn = `A semi-active connection is established in your chart. This relationship carries vibrant readiness to spark into full activation upon receiving temporal triggers.`;
+                              } else if (level === 'remote') {
+                                pulseDescClass = "desc-glow-present";
+                                containerClass = isLight 
+                                  ? 'bg-violet-500/5 border-violet-400 text-violet-950 shadow-[0_3px_12px_rgba(139,92,246,0.15)] text-xs' 
+                                  : 'bg-[#120a1f] border-violet-500/40 text-violet-200 shadow-[0_0_12px_rgba(139,92,246,0.2)] text-xs';
+                                
+                                if (isClash) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격충 조율' : 'Remote Clash';
+                                  detailTxtKo = `사주 원국 양 극단(${remoteBranchesStr})에 위치하여 간접적으로 작용하는 원격충(${actualName})입니다. 현실에서의 물리적인 갈등이나 급변함은 최소화되나, 내면에 예술적인 정밀함, 신중한 판단력, 그리고 시간의 흐름을 기다릴 줄 아는 성숙한 지혜의 자양분이 됩니다.`;
+                                  detailTxtEn = `Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.`;
+                                } else if (isHyeong) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 형살' : 'Remote Punishment';
+                                  detailTxtKo = `멀리 떨어져서 작용하는 원격 형살(${remoteBranchesStr}, ${actualName})입니다. 실생활의 직접 조율 마찰보다는 미학적/정신적 성찰, 그리고 점진적 조절 능력을 키워줍니다.`;
+                                  detailTxtEn = `Remote punishment operates quietly at a distance, refining your inner discipline and strategic patience rather than causing active friction.`;
+                                } else if (isPa) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 파살' : 'Remote Destruction';
+                                  detailTxtKo = `보이지 않는 먼 거리에서 작용하는 원격 파살(${remoteBranchesStr}, ${actualName})입니다. 은근한 틈새를 정돈하며 사소한 오점이나 사각지대를 수시로 조용하게 보완해 가는 힘을 줍니다.`;
+                                  detailTxtEn = `Remote destruction works slowly in the background, offering subtle, precise corrective opportunities over time.`;
+                                } else if (isHae) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 해살' : 'Remote Harm';
+                                  detailTxtKo = `원거리에서 조율하는 원격 해살(${remoteBranchesStr}, ${actualName})입니다. 불필요한 감정 자극 없이 담백하고 이성적인 대인관계의 안정 거리를 유지하는 방어기제로 작동합니다.`;
+                                  detailTxtEn = `Remote harm acts as a protective boundary, helping you maintain healthy, objective personal distances.`;
+                                } else {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 마찰 조율' : 'Remote Friction';
+                                  detailTxtKo = `원거리 지지 간의 완만한 마찰 관계를 조화롭게 다듬습니다.`;
+                                  detailTxtEn = `Gently calibrates the remote relational tension across the chart.`;
+                                }
+                              } else if (level === 'clash_full') {
+                                pulseDescClass = "desc-glow-full";
+                                containerClass = isLight 
+                                  ? 'bg-rose-500/5 border-rose-400 text-rose-950 shadow-[0_3px_12px_rgba(244,63,94,0.15)]' 
+                                  : 'bg-[#210915] border-rose-500/45 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.25)]';
+                                
+                                if (isClash) {
+                                  strengthBadgeTxt = lang === 'KO' ? '정면충돌 작용(초강력)' : 'Direct Class Collision';
+                                  detailTxtKo = `인접한 사주 기둥 사이에서 직접적이고 강력한 정면충(${remoteBranchesStr}, ${actualName})이 전면 가동 중입니다. 인생 전반에 걸쳐 고여있는 고정관념을 일거에 깨부수는 파괴적 개혁, 혁신, 급진적인 패러다임 리셋을 통한 눈부신 기회 창출을 이끕니다.`;
+                                  detailTxtEn = `A direct, heavy branch collision (${remoteBranchesStrEn}) is fully active. This supreme tension demands and grants swift, dramatic transformations, letting you break through stagnant limits.`;
+                                } else if (isHyeong) {
+                                  if (activeUserMatch.type === '삼형') {
+                                    strengthBadgeTxt = lang === 'KO' ? '삼형살 가동(초강력)' : 'Complete Tri-Punishment';
+                                    detailTxtKo = `사주 원국에 3개의 지지(${remoteBranchesStr})가 완벽히 모여 거대한 ${actualName}이 완성되었습니다. 거침없는 에너지가 정밀한 제어망을 통과하며, 생살여탈을 쥐는 권력, 사람을 살리는 의료, 혹은 극도로 고도화된 정밀 엔지니어링/법조 분야에서 범접할 수 없는 카리스마와 탁월한 대업을 이룩할 폭발력을 선사합니다.`;
+                                    detailTxtEn = `A complete Tri-Punishment (${remoteBranchesStrEn}) is locked into your destiny. This overwhelming energy grants you immense charisma and unparalleled mastery in high-stakes fields like legal, life-saving medical, or supreme structural engineering.`;
+                                  } else {
+                                    strengthBadgeTxt = lang === 'KO' ? '형살 가동(완전)' : 'Active Punishment';
+                                    detailTxtKo = `사주원국에서 강력하게 매칭된 형살(${remoteBranchesStr}, ${actualName})의 압박과 조율 능력이 직접 작동하고 있습니다. 이 날카로운 설계 도면을 깎고 다듬는 과정에서 아무나 가질 수 없는 고도의 전문성(의료/보건, 법조/수사, 정밀 엔지니어링, 설계 편집 등)을 확보하여 압도적인 해결사로서 세상을 이끌어갑니다.`;
+                                    detailTxtEn = `The comprehensive, active force of Punishment is processed, polishing your expertise in legal, medical, surgical, structural, or precise engineering fields.`;
+                                  }
+                                } else if (isPa) {
+                                  strengthBadgeTxt = lang === 'KO' ? '파살 조율(강)' : 'Strong Destruction';
+                                  detailTxtKo = `미세한 조정과 수정을 상징하는 파살(${remoteBranchesStr}, ${actualName})이 강력히 발현되어 있습니다. 미처 완성되지 않은 아이디어의 틈새를 정교하게 메우고 결점을 제거하는 디버깅 역량, 리모델링, 기성 부품을 맞춤 성형하는 유연한 트러블슈팅 능력의 절정을 선사합니다.`;
+                                  detailTxtEn = `The sharp destructive adjustment is highly active, reinforcing your ability to inspect, repair, debug, and remodel existing ideas.`;
+                                } else if (isHae) {
+                                  strengthBadgeTxt = lang === 'KO' ? '해살 방어(강)' : 'Strong Harm Barrier';
+                                  detailTxtKo = `방해 요소나 대인관계의 피로감을 다스리는 해살(${remoteBranchesStr}, ${actualName})의 주파수가 위치합니다. 이를 통해 사람 간의 보이지 않는 선을 분명히 그어 내면의 영역을 수호하는 조밀함이 가동되며, 법적 문서나 계약서의 은밀한 위험요소를 잡아내는 완벽주의적 안목이 대단히 명확해집니다.`;
+                                  detailTxtEn = `Harm boundaries are highly active, helping you define emotional barriers and identify hidden legal or contractual details with high scrutiny.`;
+                                } else {
+                                  strengthBadgeTxt = lang === 'KO' ? '조율 작용 가동' : 'Active Adjuster';
+                                  detailTxtKo = `사주 내 긴장감을 해소하고 새로운 발판을 마련하는 심부 조율 주파수가 작동 중입니다. 미세 교정 및 균형 조정을 통해 삶의 품질을 우수하게 끌어올려 줍니다.`;
+                                  detailTxtEn = `The inner adjustment functions actively to fine-tune your path and system stability.`;
+                                }
+                              } else if (level === 'clash_half') {
+                                pulseDescClass = "desc-glow-present";
+                                containerClass = isLight 
+                                  ? 'bg-orange-500/5 border-orange-400 text-orange-950 shadow-[0_3px_12px_rgba(249,115,22,0.15)]' 
+                                  : 'bg-[#351909] border-orange-500/45 text-orange-200 shadow-[0_0_12px_rgba(249,115,22,0.2)]';
+                                
+                                if (isClash) {
+                                  strengthBadgeTxt = lang === 'KO' ? '격충 마찰' : 'Separated Friction';
+                                  detailTxtKo = `한 기둥을 건너뛰어 성립한 격충(${remoteBranchesStr}, ${actualName}) 또는 중간 수준의 마찰입니다. 끊임없는 직접 부딪침보다는 긴장감이 내포된 정밀 조정 능력으로 발현되며, 이로써 고유의 문제해결 능력, 전문 제어력, 엄밀한 리스크 관리를 고도화시킵니다.`;
+                                  detailTxtEn = `Moderate friction operates through spanned pillars, building sharp situational awareness, systemic regulation, and exceptional crisis-resolution mastery.`;
+                                } else if (isHyeong) {
+                                  strengthBadgeTxt = lang === 'KO' ? '형살 조율' : 'Moderate Punishment';
+                                  detailTxtKo = `일부 지지가 맞춰져 성립한 형살(${remoteBranchesStr}, ${actualName})의 조율 주파수가 감지됩니다. 주변 환경이나 기성 규격의 문제점을 예리하게 포착해내어 가장 효율적이고 완벽한 상태로 교정, 편집, 개혁해내는 탁월한 솔루션 제공 인프라를 마련해 줍니다.`;
+                                  detailTxtEn = `The partial force of Punishment is processed, offering sharp problem-solving skills, structural revisions, and precise design capability.`;
+                                } else if (isPa) {
+                                  strengthBadgeTxt = lang === 'KO' ? '파살 조율' : 'Moderate Destruction';
+                                  detailTxtKo = `기 흘러가는 과정에 얽힌 파살(${remoteBranchesStr}, ${actualName})의 보정 기능이 작동하고 있습니다. 타성적으로 유지되던 계약이나 시스템의 맹점을 찾아내 개선하며, 완고함을 탈피하여 끊임없는 자기 쇄신과 융통성 있는 대안을 제시하는 지혜를 심어줍니다.`;
+                                  detailTxtEn = `Subtle destructions operate as a corrective mechanism, highlighting system loopholes to support smooth and proactive upgrades.`;
+                                } else if (isHae) {
+                                  strengthBadgeTxt = lang === 'KO' ? '해살 조율' : 'Moderate Harm Adjust';
+                                  detailTxtKo = `영역 간의 경계를 짓는 해살(${remoteBranchesStr}, ${actualName})의 정진력이 흐릅니다. 섣부른 감정 투자로 인한 심리적 소모를 사전에 지혜롭게 예방하고, 상대의 숨은 의도를 기민하게 간파함으로써 나를 지키는 냉철하며 합리적인 처세의 무기를 가집니다.`;
+                                  detailTxtEn = `The protective alert of Harm is processed, enabling intuitive defense against unexpected personal drain or subtle relational conflicts.`;
+                                } else {
+                                  strengthBadgeTxt = lang === 'KO' ? '중간 마찰 조율' : 'Moderate Friction';
+                                  detailTxtKo = `인접하지 않은 두 글자가 만나는 중간 수준의 보정 과정입니다. 삶의 다양한 가능성을 실현하기 위해 조심스럽게 영역을 점검하고 보정해 가는 안락한 힘을 마련해 줍니다.`;
+                                  detailTxtEn = `Moderate distant friction operates as a stable calibration force across your life.`;
+                                }
+                              } else { // clash_remote or general punish/pa/hae
+                                pulseDescClass = "desc-glow-present";
+                                containerClass = isLight 
+                                  ? 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200 shadow-sm' 
+                                  : 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200';
+                                
+                                if (isClash) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격충 조율' : 'Remote Clash';
+                                  detailTxtKo = `사주 원국 양 극단(${remoteBranchesStr})에 위치하여 간접적으로 작용하는 원격충(${actualName})입니다. 현실에서의 물리적인 갈등이나 급변함은 최소화되나, 내면에 예술적인 정밀함, 신중한 판단력, 그리고 시간의 흐름을 기다릴 줄 아는 성숙한 지혜의 자양분이 됩니다.`;
+                                  detailTxtEn = `Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.`;
+                                } else if (isHyeong) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 형살' : 'Remote Punishment';
+                                  detailTxtKo = `멀리 떨어져서 작용하는 원격 형살(${remoteBranchesStr}, ${actualName})입니다. 실생활의 직접 조율 마찰보다는 미학적/정신적 성찰, 그리고 점진적 조절 능력을 키워줍니다.`;
+                                  detailTxtEn = `Remote punishment operates quietly at a distance, refining your inner discipline and strategic patience rather than causing active friction.`;
+                                } else if (isPa) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 파살' : 'Remote Destruction';
+                                  detailTxtKo = `보이지 않는 먼 거리에서 작용하는 원격 파살(${remoteBranchesStr}, ${actualName})입니다. 은근한 틈새를 정돈하며 사소한 오점이나 사각지대를 수시로 조용하게 보완해 가는 힘을 줍니다.`;
+                                  detailTxtEn = `Remote destruction works slowly in the background, offering subtle, precise corrective opportunities over time.`;
+                                } else if (isHae) {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 해살' : 'Remote Harm';
+                                  detailTxtKo = `원거리에서 조율하는 원격 해살(${remoteBranchesStr}, ${actualName})입니다. 불필요한 감정 자극 없이 담백하고 이성적인 대인관계의 안정 거리를 유지하는 방어기제로 작동합니다.`;
+                                  detailTxtEn = `Remote harm acts as a protective boundary, helping you maintain healthy, objective personal distances.`;
+                                } else {
+                                  strengthBadgeTxt = lang === 'KO' ? '원격 마찰 조율' : 'Remote Friction';
+                                  detailTxtKo = `원거리 지지 간의 완만한 마찰 관계를 조화롭게 다듬습니다.`;
+                                  detailTxtEn = `Gently calibrates the remote relational tension across the chart.`;
+                                }
+                              }
 
-                                            // Dynamic overrides for specific combinations based on chart environment
-                                            if (activeUserMatch && activeUserMatch.branches) {
-                                                const bStr = [...activeUserMatch.branches].sort().join('');
-                                                const chartStems = (result.pillars || []).map((p: any) => p.stem);
-                                                const chartBranches = (result.pillars || []).map((p: any) => p.branch);
-                                                const hasWaterStem = chartStems.some(s => s === '壬' || s === '癸');
-                                                const hasFireStemOrBranch = chartStems.some(s => s === '丙' || s === '丁') || chartBranches.filter(b => b === '午' || b === '巳').length > 1;
-                                                const hasFire = hasFireStemOrBranch; 
-                                                const hasMetalStem = chartStems.some(s => s === '庚' || s === '辛');
-                                                const hasFireStem = chartStems.some(s => s === '丙' || s === '丁');
+                              // 특수 결합 보정 규칙 (사신합, 묘술합, 진유합 등)
+                              const bStr = activeUserMatch.branches ? activeUserMatch.branches.join('') : '';
+                              if (bStr) {
+                                if ((bStr === '巳申' || bStr === '申巳') && activeUserMatch.type === '육합') {
+                                  if (hasFireStem && !hasWaterStem) {
+                                    const shinTenGodObj = getDetailedTenGod(dayMaster, '庚');
+                                    const shinTenGod = lang === 'KO' ? shinTenGodObj.ko : shinTenGodObj.en;
+                                    detailTxtKo = `사신합(${remoteBranchesStr})은 고열의 기운(巳)과 정밀 금속(申)의 만남입니다. 천간에 화(火)가 강하게 내리쬐고 이의 폭주를 막을 수(수)가 결여되어, 합화(융합)의 긍정적 성취보다는 온전히 조율되지 못하고 형살(刑殺)의 역동이 거세게 드러납니다. 금(金) 기운이 다치기 쉬우니, 신금(申金)의 십성인 ${shinTenGod} 영역(건강, 재물, 대인관계 등)에서 무리한 제어나 충돌 사고를 주의해야 합니다.`;
+                                    detailTxtEn = `Due to the lack of Water and strong Fire, the Si-Shen combination (${remoteBranchesStrEn}) breaks and turns into a Punishment (Hyeong), potentially damaging the Metal element. Exercise caution in the areas represented by ${shinTenGod}.`;
+                                  } else {
+                                    detailTxtKo = `육합, 형, 파가 얽힌 사신(${remoteBranchesStr})은 환경에 따라 수(수)나 금(金)으로 주도권이 변하며, 합(융합)과 형(갈등 및 재조립)을 오갑니다. 상황 변화에 따른 극적인 리모델링이나 패러다임 전환의 역동성을 지닙니다.`;
+                                    detailTxtEn = `The Si-Shen relationship (${remoteBranchesStrEn}) fluctuates between fusion and friction depending on the environment, creating dynamic cycles of breaking and remaking.`;
+                                  }
+                                } else if ((bStr === '卯戌' || bStr === '戌卯') && activeUserMatch.type === '육합') {
+                                  if (hasFireStem) {
+                                    detailTxtKo = `묘술합(${remoteBranchesStr})은 천간에 화(火) 기운이 있어 불꽃으로 변하는 합화가 원활합니다. 예술적 열정이나 학문적 이상이 화려하게 만개하는 긍정적인 발현을 이룹니다.`;
+                                    detailTxtEn = `The Mao-Xu combination (${remoteBranchesStrEn}) smoothly transforms into Fire, igniting artistic passion and academic ideals.`;
+                                  } else {
+                                    detailTxtKo = `화(火) 기운이 다소 부족한 묘술합(${remoteBranchesStr})으로, 완전한 융합보다는 목(木)과 토(土)의 은근한 견제와 속을 알 수 없는 미묘한 끌림이 지속되는 형태를 띱니다.`;
+                                    detailTxtEn = `Without sufficient Fire stems, the Mao-Xu combination (${remoteBranchesStrEn}) acts as a mysterious attraction rather than a full transformation, maintaining subtle friction.`;
+                                  }
+                                } else if ((bStr === '辰酉' || bStr === '酉辰') && activeUserMatch.type === '육합') {
+                                  if (hasMetalStem) {
+                                    detailTxtKo = `진유합(${remoteBranchesStr})은 천간의 금(金) 기운을 받아 예리하고 단단한 속성으로 완벽히 변모합니다. 매우 견고한 카르텔적 의리와 전문적인 비즈니스 계약이 빈틈없이 성사됩니다.`;
+                                    detailTxtEn = `The Chen-You combination (${remoteBranchesStrEn}) transforms perfectly into Metal, ensuring highly robust cartels and tight professional agreements.`;
+                                  } else {
+                                    detailTxtKo = `진유합(${remoteBranchesStr})은 든든히 밀어주는 조력자적 화합으로, 금(金)기가 폭발하기보다는 안정적인 습토(辰)가 보석(酉)을 묵묵히 생조하고 보호하는 형태로 나타납니다.`;
+                                    detailTxtEn = `The Chen-You combination (${remoteBranchesStrEn}) provides reliable, stable support where the moist earth gently nurtures and protects the precious metal.`;
+                                  }
+                                }
+                              }
 
-                                                if ((bStr === '巳申' || bStr === '申巳') && activeUserMatch.type === '육합') {
-                                                    let shinTenGod = "금(金) 십성";
-                                                    activeUserMatch.branches.forEach((b: string, i: number) => {
-                                                        if (b === '申') {
-                                                            const pIdx = activeUserMatch.pillarIndices[i];
-                                                            shinTenGod = result.pillars[pIdx]?.branchTenGodKo || "비견";
-                                                        }
-                                                    });
-
-                                                    if (hasWaterStem) {
-                                                        detailTxtKo = `사신합(${remoteBranchesStr})은 천간에 수(水) 기운이 떠 있어 온전한 합화(合化) 작용이 일어납니다. 수 기운 본연의 유연함과 통찰력이 강화되며, 사(巳)와 신(申)이 매끄럽게 연대하여 맹렬하면서도 단합된 사회적 성취를 이루어냅니다.`;
-                                                        detailTxtEn = `The Si-Shen combination (${remoteBranchesStrEn}) successfully transforms into Water due to the presence of Water stems, leading to smooth collaboration and strong bonding.`;
-                                                    } else if (!hasWaterStem && hasFire) {
-                                                        detailTxtKo = `물(水)이 없고 불(火)이 강한 환경으로 인해, 사신합(${remoteBranchesStr})의 합이 온전치 못하고 형살(刑殺)의 역동이 거세게 드러납니다. 금(金) 기운이 다치기 쉬우니, 신금(申金)의 십성인 ${shinTenGod} 영역(건강, 재물, 대인관계 등)에서 무리한 제어나 충돌 사고를 주의해야 합니다.`;
-                                                        detailTxtEn = `Due to the lack of Water and strong Fire, the Si-Shen combination (${remoteBranchesStrEn}) breaks and turns into a Punishment (Hyeong), potentially damaging the Metal element. Exercise caution in the areas represented by ${shinTenGod}.`;
-                                                    } else {
-                                                        detailTxtKo = `육합, 형, 파가 얽힌 사신(${remoteBranchesStr})은 환경에 따라 수(水)나 금(金)으로 주도권이 변하며, 합(융합)과 형(갈등 및 재조립)을 오갑니다. 상황 변화에 따른 극적인 리모델링이나 패러다임 전환의 역동성을 지닙니다.`;
-                                                        detailTxtEn = `The Si-Shen relationship (${remoteBranchesStrEn}) fluctuates between fusion and friction depending on the environment, creating dynamic cycles of breaking and remaking.`;
-                                                    }
-                                                } else if ((bStr === '卯戌' || bStr === '戌卯') && activeUserMatch.type === '육합') {
-                                                    if (hasFireStem) {
-                                                        detailTxtKo = `묘술합(${remoteBranchesStr})은 천간에 화(火) 기운이 있어 불꽃으로 변하는 합화가 원활합니다. 예술적 열정이나 학문적 이상이 화려하게 만개하는 긍정적인 발현을 이룹니다.`;
-                                                        detailTxtEn = `The Mao-Xu combination (${remoteBranchesStrEn}) smoothly transforms into Fire, igniting artistic passion and academic ideals.`;
-                                                    } else {
-                                                        detailTxtKo = `화(火) 기운이 다소 부족한 묘술합(${remoteBranchesStr})으로, 완전한 융합보다는 목(木)과 토(土)의 은근한 견제와 속을 알 수 없는 미묘한 끌림이 지속되는 형태를 띱니다.`;
-                                                        detailTxtEn = `Without sufficient Fire stems, the Mao-Xu combination (${remoteBranchesStrEn}) acts as a mysterious attraction rather than a full transformation, maintaining subtle friction.`;
-                                                    }
-                                                } else if ((bStr === '辰酉' || bStr === '酉辰') && activeUserMatch.type === '육합') {
-                                                    if (hasMetalStem) {
-                                                        detailTxtKo = `진유합(${remoteBranchesStr})은 천간의 금(金) 기운을 받아 예리하고 단단한 속성으로 완벽히 변모합니다. 매우 견고한 카르텔적 의리와 전문적인 비즈니스 계약이 빈틈없이 성사됩니다.`;
-                                                        detailTxtEn = `The Chen-You combination (${remoteBranchesStrEn}) transforms perfectly into Metal, ensuring highly robust cartels and tight professional agreements.`;
-                                                    } else {
-                                                        detailTxtKo = `진유합(${remoteBranchesStr})은 든든히 밀어주는 조력자적 화합으로, 금(金)기가 폭발하기보다는 안정적인 습토(辰)가 보석(酉)을 묵묵히 생조하고 보호하는 형태로 나타납니다.`;
-                                                        detailTxtEn = `The Chen-You combination (${remoteBranchesStrEn}) provides reliable, stable support where the moist earth gently nurtures and protects the precious metal.`;
-                                                    }
-                                                }
-                                            }
-
-                                            return (
-                                              <div className="space-y-3 mt-3">
-
-                                                <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 backdrop-blur-sm transition-all duration-300 ${containerClass} ${pulseDescClass}`}>
-                                                  <span className="text-base mt-1 flex animate-bounce shrink-0 select-none">✨</span>
-                                                  <div className="flex-1 space-y-1">
-                                                    <div className="text-xs font-black flex flex-wrap items-center gap-1.5 uppercase tracking-wide">
-                                                      <span>
-                                                        {lang === 'KO' 
-                                                          ? '내 사주 원국에 실제 존재' 
-                                                          : 'Present in your BaZi Chart'}
-                                                      </span>
-                                                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${matchStrength.badgeClass}`}>
-                                                        {strengthBadgeTxt}
-                                                      </span>
-                                                    </div>
-                                                    <p className="text-[11px] leading-relaxed opacity-95">
-                                                      {lang === 'KO' ? <ParsedText text={detailTxtKo} lang={lang} /> : <ParsedText text={detailTxtEn} lang={lang} />}
-                                                    </p>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            );
-                                          })()}
+                              return (
+                                <div className="space-y-3 mt-3">
+                                  <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 backdrop-blur-sm transition-all duration-300 ${containerClass} ${pulseDescClass}`}>
+                                    <span className="text-base mt-1 flex animate-bounce shrink-0 select-none">✨</span>
+                                    <div className="flex-1 space-y-1">
+                                      <div className="text-xs font-black flex flex-wrap items-center gap-1.5 uppercase tracking-wide">
+                                        <span>
+                                          {lang === 'KO' 
+                                            ? '내 사주 원국에 실제 존재' 
+                                            : 'Present in your BaZi Chart'}
+                                        </span>
+                                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${matchStrength.badgeClass}`}>
+                                          {strengthBadgeTxt}
+                                        </span>
+                                      </div>
+                                      <p className="text-[11px] leading-relaxed opacity-95">
+                                        {lang === 'KO' ? <ParsedText text={detailTxtKo} lang={lang} /> : <ParsedText text={detailTxtEn} lang={lang} />}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
 
                                           {/* Advanced Multiple Interactions Breakdown (Moved to Right Panel inside motion.div) */}
                                           {activeUserMatch && activeUserMatch.allMatches && activeUserMatch.allMatches.length > 1 && (
@@ -6456,9 +6718,232 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       );
                     })()}
 
-              <div className="space-y-4">
+              {/* 4. 오행 생극제화 관계 가이드 섹션 */}
+              <div id="five-elements-guide-section" className="space-y-4 pt-6 mt-6 border-t border-white/10">
                 <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">6</span>
+                  <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">4</span>
+                  {lang === 'KO' ? '대자연의 조화: 오행의 생극제화(生剋制化)' : 'Cosmic Balance: Mutual Generation & Overcoming'}
+                </h4>
+                <p className="text-sm leading-relaxed text-white/80">
+                  {lang === 'KO' ? 
+                    '우주와 삶은 오행의 순환 속에 있습니다. 상생(相生)은 기운을 키우고 흘러가게 돕는 힘이며, 상극(相剋)은 기운을 제어하여 균형을 잡아주는 힘입니다. 이것이 서로 조화를 이루는 과정이 생극제화(生剋制化)입니다.' : 
+                    'The cosmic nature operates through the cycle of five elements. Sheng (Mutual Generation) is the force that nourishes and flows, while Ke (Mutual Overcoming) is the governing force that maintains balance through control.'}
+                </p>
+
+                <FiveElementsDiagram lang={lang} isLight={isLight} />
+
+                {(() => {
+                  const elementsCycle = [
+                    {
+                      element: 'Wood',
+                      labelKo: '木 (목·Wood)',
+                      labelEn: 'Wood (木)',
+                      icon: '🌱',
+                      color: ELEMENT_COLORS.Wood,
+                      shengOut: { element: 'Fire', icon: '🔥', labelKo: '火 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '木生火 (목생화)', phraseEn: 'Wood feeds Fire', descKo: '나무가 자신을 태워 불꽃을 피움', descEn: 'Wood burns to sustain Fire.' },
+                      shengIn: { element: 'Water', icon: '💧', labelKo: '水 (수·Water)', labelEn: 'Water (水)', phraseKo: '水生木 (수생목)', phraseEn: 'Water grows Wood', descKo: '생명수가 나무뿌리를 적셔 길러냄', descEn: 'Water flows to dynamic roots, nurturing Wood.' },
+                      keOut: { element: 'Earth', icon: '🏔️', labelKo: '土 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '木剋土 (목극토)', phraseEn: 'Wood parts Earth', descKo: '나무뿌리가 흙을 움켜쥐고 고정함', descEn: 'Wood parts and restrains Earth with roots.' },
+                      keIn: { element: 'Metal', icon: '⚔️', labelKo: '金 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '金剋木 (금극목)', phraseEn: 'Metal cuts Wood', descKo: '금속 도구가 뻗어나간 가지를 쳐냄', descEn: 'Metal axes chop overgrown Wood.' },
+                    },
+                    {
+                      element: 'Fire',
+                      labelKo: '火 (화·Fire)',
+                      labelEn: 'Fire (火)',
+                      icon: '🔥',
+                      color: ELEMENT_COLORS.Fire,
+                      shengOut: { element: 'Earth', icon: '🏔️', labelKo: '土 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '화생토 (화생토)', phraseEn: 'Fire forms Earth', descKo: '불이 탄 재가 다시 흙을 비옥하게 함', descEn: 'Fire turns to rich ash, enriching Earth.' },
+                      shengIn: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (木)', phraseKo: '목생화 (목생화)', phraseEn: 'Wood feeds Fire', descKo: '나무가 땔감이 되어 찬란히 빛나게 함', descEn: 'Wood burns to sustain Fire.' },
+                      keOut: { element: 'Metal', icon: '⚔️', labelKo: '金 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '화극금 (화극금)', phraseEn: 'Fire melts Metal', descKo: '뜨거운 불꽃이 금속 원석을 제련함', descEn: 'Fire melts raw Metal to forge useful tools.' },
+                      keIn: { element: 'Water', icon: '💧', labelKo: '水 (수·Water)', labelEn: 'Water (水)', phraseKo: '수극화 (水剋火)', phraseEn: 'Water tames Fire', descKo: '시원한 물줄기가 뜨거운 불길을 조율함', descEn: 'Water extinguishes rising flames of Fire.' },
+                    },
+                    {
+                      element: 'Earth',
+                      labelKo: '土 (토·Earth)',
+                      labelEn: 'Earth (土)',
+                      icon: '🏔️',
+                      color: ELEMENT_COLORS.Earth,
+                      shengOut: { element: 'Metal', icon: '⚔️', labelKo: '金 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '토생금 (토생금)', phraseEn: 'Earth forms Metal', descKo: '단단한 대지 속에 광물을 품어 길러냄', descEn: 'Earth forms precious Minerals and Metals.' },
+                      shengIn: { element: 'Fire', icon: '🔥', labelKo: '火 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '화생토 (화생토)', phraseEn: 'Fire forms Earth', descKo: '뜨겁게 타오른 재가 흙을 윤택하게 함', descEn: 'Fire turns to rich ash, enriching Earth.' },
+                      keOut: { element: 'Water', icon: '💧', labelKo: '水 (수·Water)', labelEn: 'Water (수)', phraseKo: '토극수 (토극수)', phraseEn: 'Earth dams Water', descKo: '견고한 대지가 굽이치는 물줄기를 가둠', descEn: 'Earth dams up, absorbs, and directs Water.' },
+                      keIn: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '목극토 (목극토)', phraseEn: 'Wood parts Earth', descKo: '단단한 나무뿌리가 흙을 관통해 누름', descEn: 'Wood parts and restrains Earth with roots.' },
+                    },
+                    {
+                      element: 'Metal',
+                      labelKo: '金 (금·Metal)',
+                      labelEn: 'Metal (金)',
+                      icon: '⚔️',
+                      color: ELEMENT_COLORS.Metal,
+                      shengOut: { element: 'Water', icon: '💧', labelKo: '수 (수·Water)', labelEn: 'Water (수)', phraseKo: '금생수 (금생수)', phraseEn: 'Metal condenses Water', descKo: '정제된 금속 표면에 이슬(물)이 맺힘', descEn: 'Metal cools to condense clean dew.' },
+                      shengIn: { element: 'Earth', icon: '🏔️', labelKo: '土 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '토생금 (토생금)', phraseEn: 'Earth forms Metal', descKo: '흙 속의 풍부한 무기물이 원석을 벼려냄', descEn: 'Earth compresses and forms precious Metals.' },
+                      keOut: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '금극목 (금극목)', phraseEn: 'Metal cuts Wood', descKo: '예리한 날이 우거진 가지를 극제하여 정돈함', descEn: 'Metal axes chop and sculpt overgrown Wood.' },
+                      keIn: { element: 'Fire', icon: '🔥', labelKo: '火 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '화극금 (화극금)', phraseEn: 'Fire melts Metal', descKo: '용광로의 화기가 견고한 금속 구조를 교정함', descEn: 'Fire melts raw Metal to reshape its physical form.' },
+                    },
+                    {
+                      element: 'Water',
+                      labelKo: '水 (수·Water)',
+                      labelEn: 'Water (수)',
+                      icon: '💧',
+                      color: ELEMENT_COLORS.Water,
+                      shengOut: { element: 'Wood', icon: '🌱', labelKo: '목 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '수생목 (수생목)', phraseEn: 'Water grows Wood', descKo: '흘려보내듯 자비로운 물길이 나무를 키움', descEn: 'Water flows to dynamic roots, nurturing Wood.' },
+                      shengIn: { element: 'Metal', icon: '⚔️', labelKo: '금 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '금생수 (금생수)', phraseEn: 'Metal condenses Water', descKo: '시원하고 차가운 암반을 거쳐 맑은 샘물이 흘러나옴', descEn: 'Metal cools to condense clean dew.' },
+                      keOut: { element: 'Fire', icon: '🔥', labelKo: '화 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '수극화 (수극화)', phraseEn: 'Water tames Fire', descKo: '유연한 물이 치성하게 번져가는 불을 가라앉힘', descEn: 'Water extinguishes rising flames of Fire.' },
+                      keIn: { element: 'Earth', icon: '🏔️', labelKo: '토 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '토극수 (토극수)', phraseEn: 'Earth dams Water', descKo: '묵묵한 대지와 제방이 세찬 강줄기를 붙잡음', descEn: 'Earth dams up, absorbs, and directs Water.' },
+                    }
+                  ];
+
+                  const RenderElementBadge = ({ info }: { info: any }) => {
+                    const badgeColor = ELEMENT_COLORS[info.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+                    return (
+                      <div className="flex flex-col items-center text-center p-2 rounded-xl transition-all duration-300 hover:bg-white/5 select-none h-full justify-center font-sans">
+                        <div 
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold border"
+                          style={{
+                            backgroundColor: badgeColor + '12',
+                            borderColor: badgeColor + '30',
+                            color: badgeColor
+                          }}
+                        >
+                          <span>{info.icon}</span>
+                          <span>{lang === 'KO' ? info.phraseKo : info.phraseEn}</span>
+                        </div>
+                        <p className={`mt-1.5 text-[10px] sm:text-[11px] leading-relaxed max-w-[150px] font-medium ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                          {lang === 'KO' ? info.descKo : info.descEn}
+                        </p>
+                      </div>
+                    );
+                  };
+
+                  return (
+                    <div className="mt-4 font-sans">
+                      <div className={`overflow-hidden rounded-2xl border transition-all duration-300 ${
+                        isLight
+                          ? 'bg-slate-50/50 border-slate-200/80 shadow-sm'
+                          : 'bg-zinc-950/20 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.4)] backdrop-blur-md'
+                      }`}>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse text-left text-xs min-w-[760px]">
+                            <thead>
+                              <tr className={`border-b ${isLight ? 'border-slate-200 bg-slate-100/50' : 'border-white/10 bg-white/5'}`}>
+                                <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-slate-600' : 'text-zinc-400'}`} style={{ width: '12%' }}>
+                                  {lang === 'KO' ? '기준 오행' : 'Base Element'}
+                                </th>
+                                <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`} style={{ width: '22%' }}>
+                                  {lang === 'KO' ? '상생: 내가 생(生)함 [출력]' : 'Sheng-Out: Generates'}
+                                </th>
+                                <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`} style={{ width: '22%' }}>
+                                  {lang === 'KO' ? '상생: 나를 생(生)함 [입력]' : 'Sheng-In: Nourished By'}
+                                </th>
+                                <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-rose-700' : 'text-rose-400'}`} style={{ width: '22%' }}>
+                                  {lang === 'KO' ? '상극: 내가 극(剋)함 [제어]' : 'Ke-Out: Controls'}
+                                </th>
+                                <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-rose-700' : 'text-rose-400'}`} style={{ width: '22%' }}>
+                                  {lang === 'KO' ? '상극: 나를 극(剋)함 [피극]' : 'Ke-In: Controlled By'}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className={`divide-y ${isLight ? 'divide-slate-200/80' : 'divide-white/10'}`}>
+                              {elementsCycle.map((item, idx) => (
+                                <tr 
+                                  key={idx} 
+                                  className={`transition-colors ${
+                                    isLight ? 'hover:bg-slate-100/45' : 'hover:bg-white/[0.015]'
+                                  }`}
+                                >
+                                  {/* 기준 오행 */}
+                                  <td className={`py-4 px-3 text-center border-r border-dashed ${isLight ? 'border-slate-200 bg-slate-50/20' : 'border-white/5 bg-white/[0.005]'}`}>
+                                    <div className="flex flex-col items-center justify-center min-w-[70px]">
+                                      <div 
+                                        className="w-11 h-11 rounded-full flex flex-col items-center justify-center border font-black select-none transition-all duration-300 hover:scale-105"
+                                        style={{ 
+                                          backgroundColor: item.color + '18',
+                                          borderColor: item.color + '88',
+                                          color: item.color,
+                                          boxShadow: `0 0 15px ${item.color}25`
+                                        }}
+                                      >
+                                        <span className="text-base leading-none -mb-0.5">{item.icon}</span>
+                                        <span className="text-[10px] font-black leading-none uppercase tracking-tighter col-span-1">
+                                          {lang === 'KO' ? item.labelKo.split(' ')[0] : item.labelEn.split(' ')[0]}
+                                        </span>
+                                      </div>
+                                      <span className={`text-[10px] font-bold mt-1.5 ${isLight ? 'text-slate-500' : 'text-zinc-500'}`}>
+                                        {lang === 'KO' ? item.labelKo : item.labelEn}
+                                      </span>
+                                    </div>
+                                  </td>
+
+                                  {/* 생출 */}
+                                  <td className={`py-3 px-1 border-r border-dashed ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
+                                    <RenderElementBadge info={item.shengOut} />
+                                  </td>
+
+                                  {/* 생입 */}
+                                  <td className={`py-3 px-1 border-r border-dashed ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
+                                    <RenderElementBadge info={item.shengIn} />
+                                  </td>
+
+                                  {/* 극출 */}
+                                  <td className={`py-3 px-1 border-r border-dashed ${isLight ? 'border-slate-200' : 'border-white/5'}`}>
+                                    <RenderElementBadge info={item.keOut} />
+                                  </td>
+
+                                  {/* 극입 */}
+                                  <td className="py-3 px-1">
+                                    <RenderElementBadge info={item.keIn} />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Table Bottom Quick Legend */}
+                        <div className={`p-3 text-[10.5px] border-t flex flex-wrap gap-x-4 gap-y-1.5 items-center justify-center ${
+                          isLight ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-white/[0.01] border-white/10 text-zinc-500'
+                        }`}>
+                          <span className="font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            {lang === 'KO' ? '상생(相生): 기운을 듬뿍 실어주고 북돋아주는 관계' : 'Sheng: Generation & Nourishing Relationship'}
+                          </span>
+                          <span className="font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                            {lang === 'KO' ? '상극(相剋): 기운을 제어하여 흐트러짐 없게 조율하는 관계' : 'Ke: Control & Directing Relationship'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* 제장제화(制化) 설명 */}
+                <div className={`p-4 rounded-xl border leading-relaxed text-xs sm:text-sm ${
+                  isLight ? 'bg-slate-100/80 border-slate-200 text-slate-800' : 'bg-white/5 border-white/10 text-white/50'
+                }`}>
+                  <h6 className={`font-bold mb-2 flex items-center gap-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                    💡 {lang === 'KO' ? '생극제화(生剋制化)의 진실: 모든 기운은 필요합니다' : 'The Truth of Sheng-Ke-Hua: Every Force is Vital'}
+                  </h6>
+                  <p className="leading-relaxed opacity-95">
+                    {lang === 'KO' ? (
+                      <>
+                        명리학에서 상생은 무조건 착하고 좋으며 상극은 파괴적이고 나쁘다는 식의 이분법적 오해는 절대적 오해입니다. 
+                        생(生)하는 힘만 있고 극(剋)하는 통제력이 없다면 과잉되어 결국 자라지 못하거나 붕괴하게 됩니다. 
+                        반대로 지나친 극(剋)만 존재하면 기가 위축되고 파괴되나, 적절히 생(生)과 극(剋)이 맞물릴 때 비로소 사회적 자제력과 삶의 세련된 조절능력이 균형을 이룹니다. 
+                        이러한 자연의 기묘한 역동성을 이해할 때 내 사주 원국의 각 오행 성향을 온전히 조화롭게 활용할 수 있는 내면의 열쇠를 얻게 됩니다.
+                      </>
+                    ) : (
+                      <>
+                        In genuine BaZi, it is a grand misconception to classify generation (Sheng) as unconditionally good and overcoming (Ke) as bad. 
+                        Without Sheng, nothing grows. Without Ke (control), there is infinite growth leading to catastrophic decay. 
+                        When generation and restraint interact dynamically (Sheng-Ke-Hua), true psychological mastery and profound balance emerge.
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-6 mt-6 border-t border-white/10">
+                <h4 id="guide-section-tengods" className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">5</span>
                   {lang === 'KO' ? '마음의 10가지 가면: 십성 (The 10 Masks of Mind)' : 'The Ten Gods: 10 Masks of Mind'}
                 </h4>
                 <p className="text-sm leading-relaxed text-white/80">
@@ -7326,5 +7811,414 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
         </motion.div>
       </div>
     </motion.div>
+  );
+};
+
+const FiveElementsDiagram = ({ lang, isLight }: { lang: 'KO' | 'EN'; isLight: boolean }) => {
+  const [hovered, setHovered] = React.useState<string | null>(null);
+  
+  // 5대 원소의 중심 좌표와 설정
+  const cx = 250;
+  const cy = 200;
+  const rPosition = 125; // 배치 반경 (외곽 화살표를 위해 크기 조절)
+  const rBadge = 34;    // 개별 원소 원의 반경
+  
+  // Element 정보 정의
+  const elements = [
+    { id: 'Fire', ko: '화', en: 'Fire', han: '火', emoji: '🔥', angle: -90, color: ELEMENT_COLORS.Fire, nextId: 'Earth', keId: 'Metal', descKo: '뜨겁게 타오르는 불씨. 열정, 발산, 추진력을 상징합니다.', descEn: 'Passionate bright flame. Symbol of energy, expression and warmth.' },
+    { id: 'Earth', ko: '토', en: 'Earth', han: '土', emoji: '🏔️', angle: -18, color: ELEMENT_COLORS.Earth, nextId: 'Metal', keId: 'Water', descKo: '묵묵히 품어주는 대지. 수용, 중재, 포용력을 상징합니다.', descEn: 'Mother nature, soil, foundation. Symbol of stability and balancing.' },
+    { id: 'Metal', ko: '금', en: 'Metal', han: '金', emoji: '⚔️', angle: 54, color: ELEMENT_COLORS.Metal, nextId: 'Water', keId: 'Wood', descKo: '단단하고 날카로운 광물. 정밀, 결단, 결실의 기운입니다.', descEn: 'Forged steel, gems, minerals. Symbol of clarity, structure and decision.' },
+    { id: 'Water', ko: '수', en: 'Water', han: '水', emoji: '💧', angle: 126, color: ELEMENT_COLORS.Water, nextId: 'Wood', keId: 'Fire', descKo: '유연하게 흘러가는 생명수. 지혜, 침잠, 응집을 나타냅니다.', descEn: 'Flowing clear water, depths. Symbol of intelligence, mystery and storage.' },
+    { id: 'Wood', ko: '목', en: 'Wood', han: '木', emoji: '🌱', angle: 198, color: ELEMENT_COLORS.Wood, nextId: 'Fire', keId: 'Earth', descKo: '하늘을 향해 뻗어가는 새싹. 성장, 생명력, 기획력을 상징합니다.', descEn: 'Sprouting new seedling, tree. Symbol of growth, life-force and begin.' },
+  ];
+
+  // 각 원소의 좌표 계산
+  const coords = elements.reduce((acc, el) => {
+    const rad = (el.angle * Math.PI) / 180;
+    acc[el.id] = {
+      x: cx + rPosition * Math.cos(rad),
+      y: cy + rPosition * Math.sin(rad),
+    };
+    return acc;
+  }, {} as Record<string, { x: number; y: number }>);
+
+  // 상생(Sheng) 연결선 데이터 준비 (M x1 y1 A r r 0 0 1 x2 y2)
+  const shengArcs = elements.map((el, index) => {
+    const nextEl = elements[(index + 1) % 5];
+    
+    // 시작과 끝 각도 (라디안 단위)
+    const radStart = ((el.angle + 20) * Math.PI) / 180;
+    const radEnd = ((nextEl.angle - 20) * Math.PI) / 180;
+    
+    // 외곽에 호를 그리므로 반경을 rPosition + 12 정도로 세팅
+    const rArc = rPosition + 14;
+    const sx = cx + rArc * Math.cos(radStart);
+    const sy = cy + rArc * Math.sin(radStart);
+    const ex = cx + rArc * Math.cos(radEnd);
+    const ey = cy + rArc * Math.sin(radEnd);
+    
+    // 텍스트 위치 계산 (중간 지점 바깥쪽)
+    const radMid = (((el.angle + nextEl.angle) / 2) * Math.PI) / 180;
+    // Wood -> Fire 은 각도가 198에서 -90이므로 보정 필요
+    let compensatedRadMid = radMid;
+    if (el.id === 'Wood' && nextEl.id === 'Fire') {
+      compensatedRadMid = (((198 + 270) / 2) * Math.PI) / 180;
+    }
+    const tx = cx + (rArc + 12) * Math.cos(compensatedRadMid);
+    const ty = cy + (rArc + 12) * Math.sin(compensatedRadMid);
+    
+    const isRelated = hovered === el.id || hovered === nextEl.id;
+
+    return {
+      source: el.id,
+      target: nextEl.id,
+      path: `M ${sx} ${sy} A ${rArc} ${rArc} 0 0 1 ${ex} ${ey}`,
+      tx,
+      ty,
+      isRelated,
+      color: el.color,
+    };
+  });
+
+  // 상극(Ke) 연결선 데이터 준비 (Straight lines forming a star)
+  const keLines = elements.map((el) => {
+    const targetEl = elements.find(item => item.id === el.keId)!;
+    const pA = coords[el.id];
+    const pB = coords[targetEl.id];
+    
+    // 벡터 계산하여 노드의 외곽선 밖에서 시작하도록 조절
+    const dx = pB.x - pA.x;
+    const dy = pB.y - pA.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / dist;
+    const uy = dy / dist;
+    
+    // 시작점 (Node A 외곽)
+    const sx = pA.x + ux * rBadge;
+    const sy = pA.y + uy * rBadge;
+    // 끝점 (Node B 외곽 - 화살표 자리를 위해 조금 넉넉히)
+    const ex = pB.x - ux * (rBadge + 10);
+    const ey = pB.y - uy * (rBadge + 10);
+    
+    const isRelated = hovered === el.id || hovered === targetEl.id;
+
+    return {
+      source: el.id,
+      target: targetEl.id,
+      sx, sy, ex, ey,
+      isRelated
+    };
+  });
+
+  // 호버 중인 정보 텍스트 결정
+  const activeDetail = elements.find(el => el.id === hovered);
+
+  return (
+    <div className={`p-5 rounded-2xl border transition-all duration-300 font-sans flex flex-col items-center w-full ${
+      isLight 
+        ? 'bg-slate-50/70 border-slate-200/80 shadow-sm' 
+        : 'bg-zinc-950/30 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] backdrop-blur-md'
+    }`}>
+      {/* 타이틀 및 가이드 범례 */}
+      <div className="w-full text-center mb-2">
+        <h5 className={`text-base font-bold flex items-center justify-center gap-1.5 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+          🌐 {lang === 'KO' ? '오행 상생 상극도 (五行 相生相剋圖)' : 'Five Elements Sheng & Ke Cycles'}
+        </h5>
+        <p className={`text-xs mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+          {lang === 'KO' ? '각 오행 위에 마우스를 올려 상생과 상극 관계의 흐름을 확인해 보세요.' : 'Hover over elements to trace and visualize interaction dynamics.'}
+        </p>
+      </div>
+
+      <div className="relative w-full max-w-[480px] flex flex-col items-center">
+        {/* SVG 영역 */}
+        <svg viewBox="0 0 500 420" className="w-full h-auto overflow-visible select-none">
+          <defs>
+            {/* 상생 화살표 마커 (녹색 계열) */}
+            <marker id="arrow-sheng" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10B981" />
+            </marker>
+            {/* 상극 화살표 마커 (적색 계열) */}
+            <marker id="arrow-ke" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#EF4444" />
+            </marker>
+            
+            {/* 활성화된 상생 화살표 마커 (강조용 녹색) */}
+            <marker id="arrow-sheng-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#34D399" />
+            </marker>
+            {/* 활성화된 상극 화살표 마커 (강조용 적색) */}
+            <marker id="arrow-ke-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#F87171" />
+            </marker>
+          </defs>
+
+          {/* 1. 배경 가이드 원 (상생 원궤도) */}
+          <circle cx={cx} cy={cy} r={rPosition} fill="none" stroke={isLight ? '#E2E8F0' : '#27272A'} strokeWidth="1" strokeDasharray="3 3" />
+
+          {/* 2. 상생(Sheng, 녹색 아크) 라인 그리기 */}
+          {shengArcs.map((arc, i) => {
+            const opacity = hovered ? (arc.isRelated ? 1.0 : 0.15) : 0.65;
+            const strokeColor = arc.isRelated ? '#34D399' : '#10B981';
+            const marker = arc.isRelated ? 'url(#arrow-sheng-active)' : 'url(#arrow-sheng)';
+            const strokeWidth = arc.isRelated ? 3 : 1.8;
+            
+            return (
+              <g key={`sheng-${i}`} style={{ transition: 'opacity 0.3s ease' }} opacity={opacity}>
+                <path
+                  d={arc.path}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  markerEnd={marker}
+                  className="transition-all"
+                  strokeDasharray={arc.isRelated ? '4 2' : 'none'}
+                />
+                {/* '생 (生)' 라벨 */}
+                <rect
+                  x={arc.tx - 18}
+                  y={arc.ty - 10}
+                  width="36"
+                  height="18"
+                  rx="6"
+                  fill={isLight ? '#E6F4EA' : '#0B2519'}
+                  stroke={arc.isRelated ? '#10B981' : 'transparent'}
+                  strokeWidth="0.8"
+                />
+                <text
+                  x={arc.tx}
+                  y={arc.ty + 3}
+                  textAnchor="middle"
+                  fill="#10B981"
+                  fontSize="9.5"
+                  fontWeight="black"
+                  className="font-sans"
+                >
+                  {lang === 'KO' ? '생 (生)' : 'Sheng'}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* 3. 상극(Ke, 적색 별모양 직선) 라인 그리기 */}
+          {keLines.map((ke, i) => {
+            const opacity = hovered ? (ke.isRelated ? 1.0 : 0.12) : 0.6;
+            const strokeColor = ke.isRelated ? '#F87171' : '#EF4444';
+            const marker = ke.isRelated ? 'url(#arrow-ke-active)' : 'url(#arrow-ke)';
+            const strokeWidth = ke.isRelated ? 2.5 : 1.5;
+
+            return (
+              <g key={`ke-${i}`} style={{ transition: 'opacity 0.3s ease' }} opacity={opacity}>
+                <line
+                  x1={ke.sx}
+                  y1={ke.sy}
+                  x2={ke.ex}
+                  y2={ke.ey}
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  markerEnd={marker}
+                  className="transition-all"
+                  strokeDasharray={ke.isRelated ? '3 1.5' : 'none'}
+                />
+              </g>
+            );
+          })}
+
+          {/* 4. 정중앙 '극 (剋)' 동그라미 배치 (상극도 중앙) */}
+          <g opacity={hovered ? 0.3 : 1} style={{ transition: 'opacity 0.3s' }}>
+            <circle
+              cx={cx}
+              cy={cy}
+              r="22"
+              fill={isLight ? '#FCE8E6' : '#2D1616'}
+              stroke="#EA4335"
+              strokeWidth="1.5"
+              style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.15))' }}
+            />
+            <text
+              x={cx}
+              y={cy + 4}
+              textAnchor="middle"
+              fill="#EA4335"
+              fontSize="12"
+              fontWeight="black"
+              className="font-sans"
+            >
+              {lang === 'KO' ? '극 (剋)' : 'Ke'}
+            </text>
+          </g>
+
+          {/* 5. 오행 원소 노드 렌더링 */}
+          {elements.map((el) => {
+            const pos = coords[el.id];
+            const isHovered = hovered === el.id;
+            const isScale = isHovered;
+            const opacity = hovered ? (isHovered ? 1 : 0.4) : 1;
+            
+            // 그라디언트 및 링 효과를 위한 개별 오행 컬러
+            const elementColor = el.color;
+
+            return (
+              <g
+                key={el.id}
+                transform={`translate(${pos.x}, ${pos.y})`}
+                className="cursor-pointer"
+                onMouseEnter={() => setHovered(el.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', opacity }}
+              >
+                {/* 빛나는 오프셋 배경 링 (호버시) */}
+                <circle
+                  cx="0"
+                  cy="0"
+                  r={rBadge + 6}
+                  fill="none"
+                  stroke={elementColor}
+                  strokeWidth={isScale ? 3 : 0}
+                  className="transition-all duration-300"
+                  opacity="0.35"
+                  strokeDasharray="4 2"
+                />
+
+                {/* 메인 배지 원 */}
+                <circle
+                  cx="0"
+                  cy="0"
+                  r={rBadge}
+                  fill={isLight ? '#FFFFFF' : '#18181B'}
+                  stroke={elementColor}
+                  strokeWidth="2.5"
+                  style={{
+                    filter: isHovered 
+                      ? `drop-shadow(0 0 12px ${elementColor}aa)` 
+                      : 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+                  }}
+                  className="transition-all duration-300"
+                />
+
+                {/* 이중 안쪽 얇은 선 */}
+                <circle
+                  cx="0"
+                  cy="0"
+                  r={rBadge - 4}
+                  fill="none"
+                  stroke={isLight ? '#F3F4F6' : '#27272A'}
+                  strokeWidth="1"
+                />
+
+                {/* 이모지 및 한자 */}
+                <text x="0" y="-4" textAnchor="middle" fontSize="17" className="select-none leading-none">
+                  {el.emoji}
+                </text>
+                <text
+                  x="0"
+                  y="16"
+                  textAnchor="middle"
+                  fill={isLight ? '#1F2937' : '#E4E4E7'}
+                  fontSize="12.5"
+                  fontWeight="900"
+                  className="font-sans tracking-wide"
+                >
+                  {el.han}
+                </text>
+
+                {/* 외곽 텍스트 라벨 (목/木, 화/火 등 - 위치 제어) */}
+                {(() => {
+                  let labelOffset: { dx: number; dy: number; anchor: 'start' | 'middle' | 'end' } = { dx: 0, dy: 0, anchor: 'middle' };
+                  if (el.id === 'Fire') { labelOffset = { dx: 0, dy: -(rBadge + 14), anchor: 'middle' }; }
+                  else if (el.id === 'Earth') { labelOffset = { dx: rBadge + 14, dy: 5, anchor: 'start' }; }
+                  else if (el.id === 'Metal') { labelOffset = { dx: rBadge, dy: rBadge + 4, anchor: 'start' }; }
+                  else if (el.id === 'Water') { labelOffset = { dx: -rBadge, dy: rBadge + 4, anchor: 'end' }; }
+                  else if (el.id === 'Wood') { labelOffset = { dx: -(rBadge + 14), dy: 5, anchor: 'end' }; }
+
+                  return (
+                    <g transform={`translate(${labelOffset.dx}, ${labelOffset.dy})`}>
+                      <text
+                        x="0"
+                        y="0"
+                        textAnchor={labelOffset.anchor}
+                        fill={isLight ? '#111827' : '#FFFFFF'}
+                        fontSize="12"
+                        fontWeight="black"
+                        className="font-sans"
+                      >
+                        {lang === 'KO' ? `${el.ko} (${el.han})` : `${el.en}`}
+                      </text>
+                      {/* 서브텍스트 한글/영어 */}
+                      <text
+                        x="0"
+                        y="12"
+                        textAnchor={labelOffset.anchor}
+                        fill={isLight ? '#6B7280' : '#A1A1AA'}
+                        fontSize="9.5"
+                        fontWeight="bold"
+                        className="font-mono tracking-tighter"
+                      >
+                        {lang === 'KO' ? el.en : el.ko}
+                      </text>
+                    </g>
+                  );
+                })()}
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* 인터랙티브 말풍선 카드 설명란 (선택된 요소에 맞춰 정보 제공) */}
+        <div style={{ minHeight: '64px' }} className="w-full mt-2 transition-all duration-300">
+          {activeDetail ? (
+            <div 
+              className={`p-3 rounded-xl border text-xs leading-relaxed transition-all duration-300 ${isLight ? 'bg-white shadow' : 'bg-white/5 backdrop-blur-sm'}`}
+              style={{ borderColor: activeDetail.color + '60' }}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-sm mb-1" style={{ color: activeDetail.color }}>
+                <span>{activeDetail.emoji}</span>
+                <span>{lang === 'KO' ? `${activeDetail.ko}(${activeDetail.han}) 기운` : `${activeDetail.en} Energy`}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isLight ? 'bg-slate-100/80 text-slate-500' : 'bg-white/10 text-zinc-400'}`}>
+                  {lang === 'KO' ? '순환 중심' : 'Cycle Guide'}
+                </span>
+              </div>
+              <p className={isLight ? 'text-slate-600' : 'text-zinc-300'}>
+                {lang === 'KO' ? activeDetail.descKo : activeDetail.descEn}
+              </p>
+              
+              {/* 상생 상극 요약 칩 표시 */}
+              <div className="flex flex-wrap items-center gap-4 mt-2 pt-2 border-t border-dashed border-zinc-200/40">
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span className={`font-semibold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>상생:</span>
+                  <span className="font-bold flex items-center gap-0.5" style={{ color: activeDetail.color }}>
+                    {(() => {
+                      const sourceEl = activeDetail;
+                      const shengTarget = elements.find(item => item.id === sourceEl.nextId)!;
+                      return `${sourceEl.han} ➔ ${shengTarget.han}`;
+                    })()}
+                  </span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  <span className={`font-semibold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>상극:</span>
+                  <span className="font-bold flex items-center gap-0.5" style={{ color: activeDetail.color }}>
+                    {(() => {
+                      const sourceEl = activeDetail;
+                      const keTarget = elements.find(item => item.id === sourceEl.keId)!;
+                      return `${sourceEl.han} ➔ ${keTarget.han}`;
+                    })()}
+                  </span>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className={`p-4 rounded-xl border border-dashed text-center text-xs leading-relaxed ${
+              isLight ? 'border-slate-200 bg-slate-100/10 text-slate-400' : 'border-white/5 bg-white/[0.01] text-zinc-500'
+            }`}>
+              {lang === 'KO' 
+                ? '💡 오행의 특정 원소를 마우스로 가리키면 구체적인 상생(生)·상극(剋) 순환 흐름 카드가 활성화됩니다.'
+                : '💡 Hover over any element circle to unlock real-time generation and overcoming cycle details.'
+              }
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

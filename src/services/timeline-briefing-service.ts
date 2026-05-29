@@ -119,12 +119,16 @@ export function generateRelationshipDynamics(
     } else if (myFutureElements.includes('Fire') && (pStrongestEl === 'Water' || pStrongestEl === 'Metal')) {
         narrative.title = isKO ? "[조후 보완] 얼어붙은 현실에 뜬 태양" : "[Warmth] Sun Rising on Frozen Ground";
         narrative.psychology = isKO ? "날카롭거나 차가웠던 당신의 마음에 상대와 세상을 넉넉히 품을 수 있는 화(火)의 온기가 차오릅니다." : "Warmth fills your mind, shedding past sharp or cold energies.";
-        narrative.interaction = isKO ? `차가운 현실(금/수)에 치여 감정이 메말라가는 상대에게 당신은 가장 필요한 온기를 주는 '유일한 안식처'가 됩니다. 예전엔 당신이 냉정함에 상처를 받기도 했다면, 이제는 감정적으로 그를 단숨에 무장해제 시켜버리는 주도권을 쥡니다.` : `You become the emotional safe haven for your cold/realistic partner.`;
+        const partnerGender = partnerResult?.analysis?.gender || 'female';
+        const pronouns = partnerGender === 'female' ? '그녀를' : '그를';
+        narrative.interaction = isKO ? `차가운 현실(금/수)에 치여 감정이 메말라가는 상대에게 당신은 가장 필요한 온기를 주는 '유일한 안식처'가 됩니다. 예전엔 당신이 냉정함에 상처를 받기도 했다면, 이제는 감정적으로 ${pronouns} 단숨에 무장해제 시켜버리는 주도권을 쥡니다.` : `You become the emotional safe haven for your cold/realistic partner.`;
         narrative.intensity = 0.9;
     } else if (myFutureElements.includes('Metal') && pStrongestEl === 'Wood') {
         narrative.title = isKO ? "[전지(剪枝) 작용] 얽힌 가지를 쳐내는 해결사" : "[Pruning] The Clear Resolver";
         narrative.psychology = isKO ? "복잡했던 생각들이 예리한 금(金)의 기운을 만나 명확히 정리되며, 강단과 결단력이 생깁니다." : "Complex thoughts are cleared by sharp Metal energy; decisiveness takes holding.";
-        narrative.interaction = isKO ? `생각이 많고 뻗어나가기만 하는 압박감 속에 사는 상대(목)에게 당신은 눈앞을 맑게 해주는 '해결사'입니다. 예전엔 그의 복잡함에 당신마저 휩쓸렸다면, 이제는 확실한 선을 긋고 리드하게 됩니다.` : `You prune their overthinking Wood energy, providing clear direction.`;
+        const partnerGender = partnerResult?.analysis?.gender || 'female';
+        const pronouns = partnerGender === 'female' ? '그녀의' : '그의';
+        narrative.interaction = isKO ? `생각이 많고 뻗어나가기만 하는 압박감 속에 사는 상대(목)에게 당신은 눈앞을 맑게 해주는 '해결사'입니다. 예전엔 ${pronouns} 복잡함에 당신마저 휩쓸렸다면, 이제는 확실한 선을 긋고 리드하게 됩니다.` : `You prune their overthinking Wood energy, providing clear direction.`;
         narrative.intensity = 0.85;
     } else if (myFutureElements.includes('Earth') && pStrongestEl === 'Water') {
         narrative.title = isKO ? "[제방(堤防) 역할] 요동치는 감정의 방파제" : "[Breakwater] Shielding the Emotional Waves";

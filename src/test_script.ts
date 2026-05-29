@@ -17,5 +17,5 @@ console.log("\n=== CORE REMEDY KO ===");
 console.log(generateCoreRemedy(result.analysis, 'KO'));
 
 console.log("\n=== CYCLE VIBE GENERAL MAIN (Includes remedy?) ===");
-const cycleResult = generateCycleVibe(result, 'KO', 'Tester', 'male', 'Seoul', { martialStatus: 'single', hasChildren: false });
+const cycleResult = generateCycleVibe(result, 'KO', 'Tester', 'male', 'Seoul', { maritalStatus: 'single', hasChildren: false });
 console.log(cycleResult.themeAnalyses['general'].main.includes("개운법"));

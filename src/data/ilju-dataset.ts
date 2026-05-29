@@ -255,7 +255,7 @@ export const ILJU_DATASET: Record<string, any> = {
     compatibility_tags: { ideal_partner: ["Mok-saeng-hwa", "To-saeng-geum"], caution_partner: ["Myo-yu-chung"] },
     narrative_blocks: {
       default: {
-        ko: "아름답고 예민해 호감을 사지만, 감정의 기복이 극단적. 순간의 변덕으로 자기 자신마저 태워버리는 영섬한 미학입니다.",
+        ko: "아름답고 예민해 호감을 사지만, 감정의 기복이 극단적. 순간의 변덕으로 자기 자신마저 태워버리는 치명적이고 매혹적인 미학입니다.",
         en: "Beautiful and sensitive but riding extreme emotional shifts. A dangerous aesthetic that burns even itself out of momentary capriciousness.",
       },
       relationship: {
@@ -264,15 +264,15 @@ export const ILJU_DATASET: Record<string, any> = {
       },
       timing_modifiers: {
         wood: {
-          ko: "독초들이 엉겨붙어 달빛마저 치단합니다. 심해처럼 깊은 자폐적 우울이 자아를 가라앉힙니다.",
-          en: "Toxic weeds tangle madly, blocking out moonlight. Autistic depression deep as the abyss sinks the soul forever."
+          ko: "독초들이 엉겨붙어 달빛마저 차단합니다. 심해처럼 깊고 폐쇄적인 우울이 자아를 가라앉힙니다.",
+          en: "Toxic weeds tangle madly, blocking out moonlight. Closed-off depression deep as the abyss sinks the soul forever."
         },
         fire: {
           ko: "형광빛 독초가 발화하며 기괴한 춤을 춥니다. 통제력을 잃은 광기가 스스로를 매혹적인 매로 만듭니다.",
           en: "Neon toxic weeds spontaneously ignite. Madness outside control turns it into ashes in the most glamorous manner."
         },
         earth: {
-          ko: "흙더미가 여린 불꽃을 비참히 이매장합니다. 질식할 듯한 현실주의와 소모적 탐닉이 영혼을 찌그러뜨립니다.",
+          ko: "흙더미가 여린 불꽃을 비참히 매장합니다. 질식할 듯한 현실주의와 소모적 탐닉이 영혼을 찌그러뜨립니다.",
           en: "Suffocating soil mounds bury the fragile flame alive. Asphyxiating realism and consuming indulgence crumple the soul."
         },
         metal: {
@@ -1962,8 +1962,8 @@ export const ILJU_DATASET: Record<string, any> = {
           en: "A massive mud monolith skyrockets from the abyss to imprison the dragon. Cruel blood karma and a bleak revenge tragedy push the entire soul out of bounds."
         },
         metal: {
-          ko: "수천 톤급의 침몰선들이 해구 바닥으로 곤두박질치며 기괴한 무덤을 형성합니다. 비틀린 영적 자폐와 타락한 신비주의(인성)가 내면을 잠식합니다.",
-          en: "Thousands of tons of sunken warships crash into the trench binding a bizarre tomb. Twisted spiritual autism and corrupted mysticism fully devour the interior."
+          ko: "수천 톤급의 침몰선들이 해구 바닥으로 곤두박질치며 기괴한 무덤을 형성합니다. 비틀린 정신적 고립과 타락한 신비주의(인성)가 내면을 잠식합니다.",
+          en: "Thousands of tons of sunken warships crash into the trench binding a bizarre tomb. Twisted mental isolation and corrupted mysticism fully devour the interior."
         },
         water: {
           ko: "해구가 갈라지며 바닥이 안 보이는 칠흑의 싱크홀이 세상을 집어삼킵니다. 무법의 제왕을 자처하는 극단성의 팽창(비겁)이 모든 빛을 소거합니다.",
@@ -3959,8 +3959,8 @@ export const ILJU_DATASET: Record<string, any> = {
           en: "The diamond meets a sea of lava, beginning to violently contort. Societal yardsticks and ruthless oppression permanently seal the ego's windpipe."
         },
         earth: {
-          ko: "깊고 검은 진흙 수렁이 보석의 빛을 집어삼켜버립니다. 폐쇄형 자폐 증세와 고착된 아집 속에 완전히 매장된 고독입니다.",
-          en: "A deep, black mud swamp completely swallows the gem's light. An isolation entirely buried within closed-loop autistic tendencies and ossified stubbornness."
+          ko: "깊고 검은 진흙 수렁이 보석의 빛을 집어삼켜버립니다. 극단적인 폐쇄성과 고착된 아집 속에 완전히 매장된 고독입니다.",
+          en: "A deep, black mud swamp completely swallows the gem's light. An isolation entirely buried within extreme closed-mindedness and ossified stubbornness."
         },
         metal: {
           ko: "수백만 개의 얼음 조각이 공명을 일으키며 모든 소리를 찢어냅니다. 타락한 우월감과 피의 엘리트주의가 광신적인 살육극을 벌입니다.",

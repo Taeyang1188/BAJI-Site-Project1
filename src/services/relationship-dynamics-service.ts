@@ -249,8 +249,9 @@ export function calculateRelationshipDynamics(
         });
         gateBonus += 20;
     } else if (pHasSavior) {
+        const pronounGen = pGender === 'female' ? '그녀' : '그';
         gates.push({ 
-            name: isKO ? "🏆 [The Crown’s Savior: 당신이 그의 천을귀인]" : "🏆 [You are the Savior]", 
+            name: isKO ? `🏆 [The Crown’s Savior: 당신이 그의 천을귀인]`.replace('그의', `${pronounGen}의`) : "🏆 [You are the Savior]", 
             desc: isKO ? "당신은 상대방의 삶에 닥칠 재앙을 막아주는 천상적 방패이자 귀인입니다. 당신의 넉넉한 기운이 상대의 격을 높여주고 위기에서 구해냅니다." : "You function as a heavenly shield for the partner, protecting them from disasters and elevating their status." 
         });
         gateBonus += 20;

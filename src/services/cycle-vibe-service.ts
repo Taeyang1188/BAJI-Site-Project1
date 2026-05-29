@@ -756,7 +756,8 @@ ${elementComment} ${balanceComment} [delay:1500]
     const matchedCityEn = Object.keys(CITY_META_TABLE).find(c => city && city.includes(c));
     if (matchedCityEn) {
       const meta = CITY_META_TABLE[matchedCityEn as keyof typeof CITY_META_TABLE];
-      enCityGreeting = `Born in ${city}? ${meta.enImpression} [delay:1000]
+      let enImpText = meta.enImpression.replace(/^([A-Za-z\sãáéíóúç]+)(\?|\.\.\.)\s*/i, '');
+      enCityGreeting = `Born in ${city}? ${enImpText} [delay:1000]
 
 Anyway.. `;
     } else if (city) {
@@ -1016,7 +1017,7 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
     // Dynamic Interactions Logic (Common for both paths)
     let dynamicInteractionText = '';
     const allBranches = result.pillars.map((p: any) => p.branch);
-    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch);
+    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch, result.isTimeUnknown);
     if (dynamicInteractions.length > 0) {
       const koNotes: string[] = [];
       const enNotes: string[] = [];
@@ -1038,27 +1039,29 @@ This cycle is a mix of your Life Season and the Annual alignment... [delay:1200]
         const getBranchNameKO = (indices: number[]) => indices.map(idx => ["년지", "월지", "일지", "시지"][idx] || "지표").join(', ');
         const getBranchNameEN = (indices: number[]) => indices.map(idx => ["Year", "Month", "Day", "Hour"][idx] || "Branch").join(', ');
         
-        const formatB = (branch: string) => {
+        const formatB = (branch: string, isEn: boolean = false) => {
           if(!branch) return '';
           const el = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.element || "Wood";
           const color = typeof ELEMENT_COLORS !== 'undefined' ? 
             (ELEMENT_COLORS[el as keyof typeof ELEMENT_COLORS] || "#FFFFFF") : 
             (el === 'Wood' ? '#10B981' : el === 'Fire' ? '#EF4444' : el === 'Earth' ? '#F59E0B' : el === 'Metal' ? '#9CA3AF' : '#3B82F6');
           
-          let koName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
+          let name = isEn 
+            ? (BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.en || branch)
+            : (BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch);
           
-          return `[${color}:${koName}(${branch})]`;
+          return `[${color}:${name}(${branch})]`;
         };
 
         const formTitleKO = int.cycle === 'daewun x seun' 
-           ? `대운 ${formatB(int.natalBranch)}와(과) 세운 ${formatB(int.cycleBranch)}`
-           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 대운 ${formatB(int.cycleBranch)}`
-                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 세운 ${formatB(int.cycleBranch)}`);
+           ? `대운 ${formatB(int.natalBranch, false)}와(과) 세운 ${formatB(int.cycleBranch, false)}`
+           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0], false)}와(과) 대운 ${formatB(int.cycleBranch, false)}`
+                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0], false)}와(과) 세운 ${formatB(int.cycleBranch, false)}`);
                                      
         const formTitleEN = int.cycle === 'daewun x seun'
-           ? `Life Season ${formatB(int.natalBranch)} and Annual ${formatB(int.cycleBranch)}`
-           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Life Season ${formatB(int.cycleBranch)}`
-                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Annual ${formatB(int.cycleBranch)}`);
+           ? `Life Season ${formatB(int.natalBranch, true)} and Annual ${formatB(int.cycleBranch, true)}`
+           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0], true)} and Life Season ${formatB(int.cycleBranch, true)}`
+                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0], true)} and Annual ${formatB(int.cycleBranch, true)}`);
 
         let descKo = ''; let descEn = '';
 
@@ -1123,7 +1126,7 @@ ${enNotes.join('\n')}`;
     // Dynamic Interactions Logic (Common for both paths)
     let dynamicInteractionText = '';
     const allBranches = result.pillars.map((p: any) => p.branch);
-    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch);
+    const dynamicInteractions = analyzeInteractionsDynamic(allBranches, daewunBranch, seunBranch, result.isTimeUnknown);
     if (dynamicInteractions.length > 0) {
       const koNotes: string[] = [];
       const enNotes: string[] = [];
@@ -1145,27 +1148,29 @@ ${enNotes.join('\n')}`;
         const getBranchNameKO = (indices: number[]) => indices.map(idx => ["년지", "월지", "일지", "시지"][idx] || "지표").join(', ');
         const getBranchNameEN = (indices: number[]) => indices.map(idx => ["Year", "Month", "Day", "Hour"][idx] || "Branch").join(', ');
         
-        const formatB = (branch: string) => {
+        const formatB = (branch: string, isEn: boolean = false) => {
           if(!branch) return '';
           const el = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.element || "Wood";
           const color = typeof ELEMENT_COLORS !== 'undefined' ? 
             (ELEMENT_COLORS[el as keyof typeof ELEMENT_COLORS] || "#FFFFFF") : 
             (el === 'Wood' ? '#10B981' : el === 'Fire' ? '#EF4444' : el === 'Earth' ? '#F59E0B' : el === 'Metal' ? '#9CA3AF' : '#3B82F6');
           
-          let koName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
+          let name = isEn 
+            ? (BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.en || branch)
+            : (BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch);
           
-          return `[${color}:${koName}(${branch})]`;
+          return `[${color}:${name}(${branch})]`;
         };
 
         const formTitleKO = int.cycle === 'daewun x seun' 
-           ? `대운 ${formatB(int.natalBranch)}와(과) 세운 ${formatB(int.cycleBranch)}`
-           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 대운 ${formatB(int.cycleBranch)}`
-                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0])}와(과) 세운 ${formatB(int.cycleBranch)}`);
+           ? `대운 ${formatB(int.natalBranch, false)}와(과) 세운 ${formatB(int.cycleBranch, false)}`
+           : (int.cycle === 'daewun' ? `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0], false)}와(과) 대운 ${formatB(int.cycleBranch, false)}`
+                                     : `사주 원국의 ${getBranchNameKO(int.natalIndices)} ${formatB(int.natalBranches[0], false)}와(과) 세운 ${formatB(int.cycleBranch, false)}`);
                                      
         const formTitleEN = int.cycle === 'daewun x seun'
-           ? `Life Season ${formatB(int.natalBranch)} and Annual ${formatB(int.cycleBranch)}`
-           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Life Season ${formatB(int.cycleBranch)}`
-                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0])} and Annual ${formatB(int.cycleBranch)}`);
+           ? `Life Season ${formatB(int.natalBranch, true)} and Annual ${formatB(int.cycleBranch, true)}`
+           : (int.cycle === 'daewun' ? `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0], true)} and Life Season ${formatB(int.cycleBranch, true)}`
+                                     : `Natal ${getBranchNameEN(int.natalIndices)} ${formatB(int.natalBranches[0], true)} and Annual ${formatB(int.cycleBranch, true)}`);
 
         let descKo = ''; let descEn = '';
 
