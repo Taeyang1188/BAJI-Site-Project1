@@ -7055,9 +7055,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   ))}
                 </div>
               </div>
-
-              {/* Spacer so the last section can scroll all the way to the top */}
-              <div className="h-[70vh] shrink-0" aria-hidden="true" />
             </div>
           </motion.div>
         </div>,
