@@ -7513,8 +7513,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         Sticky Bottom Action Bar 
         iOS Notch / Home Indicator 대응 
       */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] px-4 bg-gradient-to-t from-[#0B0118] via-[#0B0118]/90 to-transparent backdrop-blur-sm pointer-events-none flex justify-center">
-        <div className="w-full max-w-sm sm:max-w-md pointer-events-auto">
+      <div className={`fixed bottom-0 left-0 right-0 z-50 pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] px-4 bg-gradient-to-t from-[#0B0118] via-[#0B0118]/90 to-transparent backdrop-blur-sm pointer-events-none flex justify-center transition-all duration-300 ${guideStep > 0 ? 'opacity-0 translate-y-full' : 'opacity-100 translate-y-0'}`}>
+        <div className={`w-full max-w-sm sm:max-w-md ${guideStep > 0 ? 'pointer-events-none' : 'pointer-events-auto'}`}>
           <motion.button 
             animate={{ 
               boxShadow: ["0 0 10px rgba(255,0,122,0.4)", "0 0 25px rgba(255,0,122,0.8)", "0 0 10px rgba(255,0,122,0.4)"],
