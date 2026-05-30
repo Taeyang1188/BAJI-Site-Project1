@@ -573,7 +573,14 @@ const parseColorBracketsToHtml = (text: string): string => {
   result = result.replace(/\[([^:\]]+):([^\]]+)\]/g, (match, color, content) => {
     return `<span style="color: ${color}; font-weight: bold;">${content}</span>`;
   });
-  result = result.replace(/\n/g, '<br />');
+  
+  // Only skip <br/> insertion if it explicitly starts with <div (block elements)
+  // Inline elements like <strong> or <span> should retain <br /> for newlines.
+  if (result.trim().startsWith('<div')) {
+    result = result.replace(/\r?\n/g, ' ');
+  } else {
+    result = result.replace(/\n/g, '<br />');
+  }
   return result;
 };
 
@@ -599,13 +606,15 @@ const BaziTooltip = ({
   const updatePosition = () => {
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
-      const tooltipWidth = 300; // w-[300px] = 300px
+      const isMobile = typeof window !== 'undefined' ? window.innerWidth < 640 : false;
+      const tooltipWidth = isMobile ? 250 : 285;
       let left = rect.left + rect.width / 2 - tooltipWidth / 2;
       
-      // Boundary checks to keep tooltip within viewport
-      if (left < 10) left = 10;
-      if (left + tooltipWidth > window.innerWidth - 10) {
-        left = window.innerWidth - tooltipWidth - 10;
+      // Boundary checks to keep tooltip within viewport with safe margins
+      const margin = 8;
+      if (left < margin) left = margin;
+      if (left + tooltipWidth > window.innerWidth - margin) {
+        left = window.innerWidth - tooltipWidth - margin;
       }
 
       let top = rect.top - 8;
@@ -718,9 +727,9 @@ const BaziTooltip = ({
                 transform: position.placement === 'top' ? 'translateY(-100%)' : 'none',
                 zIndex: 9999 
               }}
-              className={`w-[300px] p-3 border rounded-lg shadow-2xl backdrop-blur-xl pointer-events-none transition-colors duration-300 ${
+              className={`w-[250px] sm:w-[285px] p-2.5 sm:p-3 border rounded-lg shadow-2xl backdrop-blur-xl pointer-events-none transition-colors duration-300 ${
                 isLight 
-                  ? 'bg-white/95 border-slate-200 text-slate-900 shadow-[0_10px_35px_rgba(0,0,0,0.12)]' 
+                  ? 'bg-white/95 border-slate-200 text-slate-900 shadow-[0_8px_25px_rgba(0,0,0,0.12)]' 
                   : 'bg-black/95 border-white/20 text-white/90 shadow-2xl'
               }`}
             >
@@ -748,6 +757,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [guideRelTab, setGuideRelTab] = React.useState<'samhap' | 'banghap' | 'yukhap' | 'clash' | 'punish' | 'destroy' | 'harm'>('samhap');
   const [activeSubIndex, setActiveSubIndex] = React.useState<number>(0);
   const [guideInsightCollapsed, setGuideInsightCollapsed] = React.useState<boolean>(true);
+
+  // Removed. Code moved down below state declarations.
 
   React.useEffect(() => {
     if (!result) return;
@@ -1076,6 +1087,33 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showHanja, setShowHanja] = useState(true);
   const [guideStep, setGuideStep] = useState(0); // 0: None, 1: Year, 2: Month, 3: Day, 4: Hour, 5: JiJangGan, 6: TenGods, 7: Daewun
+
+  // Auto-scroll logic for guide steps
+  const guideGridRef = React.useRef<HTMLDivElement>(null);
+  const tenGodsGridRef = React.useRef<HTMLDivElement>(null);
+  const lifeSeasonsRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (guideStep === 0) return;
+    
+    // Slight delay to ensure elements are rendered/uncollapsed properly before scrolling
+    const timer = setTimeout(() => {
+      let refToScroll: React.RefObject<HTMLDivElement> | null = null;
+      if (guideStep >= 1 && guideStep <= 5) refToScroll = guideGridRef;
+      else if (guideStep === 6) refToScroll = tenGodsGridRef;
+      else if (guideStep === 7) refToScroll = lifeSeasonsRef;
+
+      if (refToScroll?.current) {
+        // Calculate offset to place it beautifully (e.g. slightly above center)
+        const yOffset = -80; // Assuming fixed header offset
+        const y = refToScroll.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [guideStep]);
+
   const [showGuideDetailModal, setShowGuideDetailModal] = useState(false);
 
   const [showStrengthInfo, setShowStrengthInfo] = useState(false);
@@ -1851,23 +1889,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       
       stemInteractions.forEach(item => {
         if (item.isSpecial) {
-          stemLinesKO.push(`- **${item.nameKo}**`);
-          stemLinesEN.push(`- **${item.nameEn}**`);
+          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameKo}</strong></div>`);
+          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong></div>`);
         } else {
           const targetChar = result?.pillars?.[item.pIndex]?.stem || '';
           const targetColor = ELEMENT_COLORS[BAZI_MAPPING.stems[targetChar as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
           const targetPillar = getPillarNameKO(item.pIndex, true);
           const targetPillarEn = getPillarNameEN(item.pIndex, true);
           
-          stemLinesKO.push(`- ${targetPillar} [${targetColor}:${targetChar}]와(과) **${item.nameKo}**`);
-          stemLinesEN.push(`- **${item.nameEn}** with ${targetPillarEn} [${targetColor}:${targetChar}]`);
+          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${targetPillar} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span>와(과) <strong>${item.nameKo}</strong></div>`);
+          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> with ${targetPillarEn} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span></div>`);
         }
       });
-      koList.push(`[${stemElementColor}:천간 ${stemCharName}(${stem})]:\n${stemLinesKO.join('\n')}`);
-      enList.push(`[${stemElementColor}:Stem ${stemCharNameEn}(${stem})]:\n${stemLinesEN.join('\n')}`);
+      koList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${stemElementColor}; font-weight: bold;">천간 ${stemCharName}(${stem})</span>:</div> ${stemLinesKO.join('')}</div>`);
+      enList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${stemElementColor}; font-weight: bold;">Stem ${stemCharNameEn}(${stem})</span>:</div> ${stemLinesEN.join('')}</div>`);
     } else {
-      koList.push(`[${stemElementColor}:천간 ${stemCharName}(${stem})]: 없음`);
-      enList.push(`[${stemElementColor}:Stem ${stemCharNameEn}(${stem})]: None`);
+      koList.push(`<div class="mb-3"><span style="color: ${stemElementColor}; font-weight: bold;">천간 ${stemCharName}(${stem})</span>: 없음</div>`);
+      enList.push(`<div class="mb-3"><span style="color: ${stemElementColor}; font-weight: bold;">Stem ${stemCharNameEn}(${stem})</span>: None</div>`);
     }
 
     // Branch
@@ -1877,28 +1915,28 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       
       branchInteractions.forEach(item => {
         if (item.isSpecial) {
-          branchLinesKO.push(`- **${item.nameKo}**`);
-          branchLinesEN.push(`- **${item.nameEn}**`);
+          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameKo}</strong></div>`);
+          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong></div>`);
         } else {
           const targetChar = result?.pillars?.[item.pIndex]?.branch || '';
           const targetColor = ELEMENT_COLORS[BAZI_MAPPING.branches[targetChar as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
           const targetPillar = getPillarNameKOBranch(item.pIndex);
           const targetPillarEn = getPillarNameENBranch(item.pIndex);
           
-          branchLinesKO.push(`- ${targetPillar} [${targetColor}:${targetChar}]와(과) **${item.nameKo}**`);
-          branchLinesEN.push(`- **${item.nameEn}** with ${targetPillarEn} [${targetColor}:${targetChar}]`);
+          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${targetPillar} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span>와(과) <strong>${item.nameKo}</strong></div>`);
+          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> with ${targetPillarEn} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span></div>`);
         }
       });
-      koList.push(`[${branchElementColor}:지지 ${branchCharName}(${branch})]:\n${branchLinesKO.join('\n')}`);
-      enList.push(`[${branchElementColor}:Branch ${branchCharNameEn}(${branch})]:\n${branchLinesEN.join('\n')}`);
+      koList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${branchElementColor}; font-weight: bold;">지지 ${branchCharName}(${branch})</span>:</div> ${branchLinesKO.join('')}</div>`);
+      enList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${branchElementColor}; font-weight: bold;">Branch ${branchCharNameEn}(${branch})</span>:</div> ${branchLinesEN.join('')}</div>`);
     } else {
-      koList.push(`[${branchElementColor}:지지 ${branchCharName}(${branch})]: 없음`);
-      enList.push(`[${branchElementColor}:Branch ${branchCharNameEn}(${branch})]: None`);
+      koList.push(`<div class="mb-3"><span style="color: ${branchElementColor}; font-weight: bold;">지지 ${branchCharName}(${branch})</span>: 없음</div>`);
+      enList.push(`<div class="mb-3"><span style="color: ${branchElementColor}; font-weight: bold;">Branch ${branchCharNameEn}(${branch})</span>: None</div>`);
     }
 
     return {
-      ko: `**📊 연관 합형충파해 분석 (Interactions)**\n\n${koList.join('\n\n')}`,
-      en: `**📊 Associated Interactions**\n\n${enList.join('\n\n')}`
+      ko: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 연관 합형충파해 분석 (Interactions)</div>${koList.join('')}</div>`,
+      en: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 Associated Interactions</div>${enList.join('')}</div>`
     };
   };
 
@@ -2659,17 +2697,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     className="space-y-4"
                                   >
                                     <div className="flex items-center gap-3 mb-4">
-                                      <h3 className="text-xl sm:text-2xl font-bold text-purple-400 tracking-tight">[{parsedJson.theme}: 까르마의 흔적]</h3>
+                                      <h3 className="text-xl sm:text-2xl font-bold text-slate-400 tracking-tight">[{lang === 'KO' ? '어둠의 장막' : 'Dark Curtain'}]</h3>
                                     </div>
-                                    <div className="space-y-4">
-                                      {parsedJson.insights.map((insight: string, i: number) => (
-                                        <div key={i} className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-xl relative overflow-hidden group">
-                                          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                          <p className="text-sm font-display text-white/90 relative z-10 leading-relaxed">
-                                            {insight}
-                                          </p>
-                                        </div>
-                                      ))}
+                                    <div className="p-4 bg-slate-900/20 border border-slate-500/30 rounded-xl">
+                                      <p className="text-sm font-display text-white/90 leading-relaxed">
+                                        {mainText}
+                                      </p>
                                     </div>
                                   </motion.div>
                                 );
@@ -2777,7 +2810,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       )}
 
       {/* 8 Pillars Grid (4x2) */}
-      <div className="space-y-4 relative">
+      <div ref={guideGridRef} className="space-y-4 relative">
         {/* Guide UI Overlay & Popover */}
         <AnimatePresence>
           {guideStep > 0 && (
@@ -2796,15 +2829,15 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   key={guideStep}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className={`absolute left-0 right-0 z-[60] p-4 sm:p-6 rounded-2xl border border-neon-cyan/40 bg-goth-bg/95 shadow-[0_0_30px_rgba(0,242,255,0.3)] pointer-events-auto ${guideStep === 6 ? 'top-[0%] mt-8' : 'top-[100%] mt-4'} overflow-y-auto max-h-[80vh]`}
+                  className={`absolute left-0 right-0 z-[60] p-3 sm:p-5 rounded-2xl border border-neon-cyan/40 bg-goth-bg/95 shadow-[0_0_30px_rgba(0,242,255,0.3)] pointer-events-auto top-[100%] mt-4 overflow-y-auto max-h-[85vh] sm:max-h-[80vh]`}
                 >
-                <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50">
+                <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 flex-shrink-0 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50">
                   <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </button>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2 sm:gap-4 relative pr-6 sm:pr-8">
                   {guideStep === 6 && (
-                    <div className="w-full mb-2">
-                      <div className="flex flex-col gap-1.5">
+                    <div className="w-full mb-1">
+                      <div className="flex flex-col gap-1">
                         {[
                           { groupKo: '나침반', groupEn: 'Identity', color: 'var(--tengod-identity)', items: [
                             { nameKo: '비견', nameEn: 'Mirror', descKo: '주체성/독립심', descEn: 'Independence' },
@@ -2827,9 +2860,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             { nameKo: '편인', nameEn: 'Mystic', descKo: '직관/비판', descEn: 'Intuition/Critical' }
                           ]}
                         ].map((g, i) => (
-                          <div key={i} className="flex flex-row bg-white/5 border border-white/10 rounded-lg overflow-hidden h-10 sm:h-auto">
-                            <div className="w-16 sm:w-20 lg:w-24 flex-shrink-0 flex items-center justify-center border-r border-white/10" style={{ backgroundColor: `color-mix(in srgb, ${g.color} 20%, transparent)` }}>
-                              <span className="font-bold text-[9px] sm:text-[10px] tracking-widest text-center" style={{ color: g.color }}>
+                          <div key={i} className="flex flex-row bg-white/5 border border-white/10 rounded-lg overflow-hidden h-9 sm:h-auto">
+                            <div className="w-14 sm:w-20 lg:w-24 flex-shrink-0 flex items-center justify-center border-r border-white/10" style={{ backgroundColor: `color-mix(in srgb, ${g.color} 20%, transparent)` }}>
+                              <span className="font-bold text-[8.5px] sm:text-[10px] tracking-widest text-center" style={{ color: g.color }}>
                                 {lang === 'KO' ? g.groupKo : g.groupEn}
                               </span>
                             </div>
@@ -2883,27 +2916,27 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       </div>
                     </div>
                   )}
-                  <div className="flex flex-col sm:flex-row gap-4 items-start">
-                    <div className="w-12 h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)]">
-                      {guideStep === 1 && <span className="text-2xl" role="img" aria-label="roots">🌱</span>}
-                      {guideStep === 2 && <span className="text-2xl" role="img" aria-label="trunk">🪵</span>}
-                      {guideStep === 3 && <span className="text-2xl" role="img" aria-label="flower">🌸</span>}
-                      {guideStep === 4 && <span className="text-2xl" role="img" aria-label="fruit">🍏</span>}
-                      {guideStep === 5 && <span className="text-2xl" role="img" aria-label="hidden">✨</span>}
-                      {guideStep === 6 && <span className="text-2xl" role="img" aria-label="masks">🎭</span>}
-                      {guideStep === 7 && <span className="text-2xl" role="img" aria-label="seasons">🌤️</span>}
+                  <div className="flex flex-row gap-3 sm:gap-4 items-start">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)]">
+                      {guideStep === 1 && <span className="text-xl sm:text-2xl" role="img" aria-label="roots">🌱</span>}
+                      {guideStep === 2 && <span className="text-xl sm:text-2xl" role="img" aria-label="trunk">🪵</span>}
+                      {guideStep === 3 && <span className="text-xl sm:text-2xl" role="img" aria-label="flower">🌸</span>}
+                      {guideStep === 4 && <span className="text-xl sm:text-2xl" role="img" aria-label="fruit">🍏</span>}
+                      {guideStep === 5 && <span className="text-xl sm:text-2xl" role="img" aria-label="hidden">✨</span>}
+                      {guideStep === 6 && <span className="text-xl sm:text-2xl" role="img" aria-label="masks">🎭</span>}
+                      {guideStep === 7 && <span className="text-xl sm:text-2xl" role="img" aria-label="seasons">🌤️</span>}
                     </div>
                     <div className="flex-1">
-                    <h4 className="text-base sm:text-lg font-bold text-neon-cyan mb-1 flex items-center gap-2">
+                    <h4 className="text-[0.95rem] sm:text-lg font-bold text-neon-cyan mb-1.5 flex flex-wrap items-center gap-2">
                       {lang === 'KO' ? (
                         <>
-                          {guideStep === 1 && '연주 (Year Pillar) - 나의 뿌리와 조상'}
-                          {guideStep === 2 && '월주 (Month Pillar) - 환경과 부모님'}
-                          {guideStep === 3 && '일주 (Day Pillar) - 나 자신과 배우자'}
-                          {guideStep === 4 && '시주 (Hour Pillar) - 미래와 숨은 본능'}
-                          {guideStep === 5 && '지장간 (Hidden Stems) - 땅 속에 감춰진 잠재력'}
-                          {guideStep === 6 && '십성 (Ten Gods) - 나의 사회적 가면'}
-                          {guideStep === 7 && '대운 (Life Seasons) - 내게 주어진 10년의 테마'}
+                          {guideStep === 1 && '연주 - 나의 뿌리와 조상'}
+                          {guideStep === 2 && '월주 - 환경과 부모님'}
+                          {guideStep === 3 && '일주 - 나 자신과 배우자'}
+                          {guideStep === 4 && '시주 - 미래와 숨은 본능'}
+                          {guideStep === 5 && '지장간 - 땅 속에 감춰진 잠재력'}
+                          {guideStep === 6 && '십성 - 나의 사회적 가면'}
+                          {guideStep === 7 && '대운 - 내게 주어진 10년의 테마'}
                         </>
                       ) : (
                         <>
@@ -2916,7 +2949,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           {guideStep === 7 && 'Life Seasons - The 10-Year Theme'}
                         </>
                       )}
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-white/70 whitespace-nowrap">
+                      <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-white/70 whitespace-nowrap">
                         Step {guideStep} / 7
                       </span>
                     </h4>
@@ -3021,25 +3054,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         </>
                       )}
                     </p>
-                    <div className="flex gap-2 justify-end w-full">
-                      <button onClick={() => setShowGuideDetailModal(true)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto">
+                    <div className="flex gap-1.5 sm:gap-2 justify-end w-full pt-1 sm:pt-0">
+                      <button onClick={() => setShowGuideDetailModal(true)} className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto whitespace-nowrap">
                         <span className="flex items-center gap-1">
-                          <BookOpen className="w-4 h-4" />
+                          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           {lang === 'KO' ? '자세히 알아보기' : 'Learn More'}
                         </span>
                       </button>
                       {guideStep > 1 && (
-                        <button onClick={() => setGuideStep(p => p - 1)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                        <button onClick={() => setGuideStep(p => p - 1)} className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap">
                           {lang === 'KO' ? '이전' : 'Prev'}
                         </button>
                       )}
                       {guideStep < 7 ? (
-                        <button onClick={() => setGuideStep(p => p + 1)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 flex items-center justify-center transition-colors">
-                          {lang === 'KO' ? '다음' : 'Next'} <ChevronRight className="w-4 h-4 ml-1" />
+                        <button onClick={() => setGuideStep(p => p + 1)} className="px-3 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 flex items-center justify-center transition-colors whitespace-nowrap">
+                          {lang === 'KO' ? '다음' : 'Next'} <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1" />
                         </button>
                       ) : (
-                        <button onClick={() => setGuideStep(0)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors">
-                          {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-4 h-4 ml-1" />
+                        <button onClick={() => setGuideStep(0)} className="px-3 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors whitespace-nowrap">
+                          {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1" />
                         </button>
                       )}
                     </div>
@@ -3156,7 +3189,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           (pillar.title === 'Hour' ? 'Time Stem' : `${pillar.title} Stem`)}
                       </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-1.5 sm:pt-2.5 md:pt-3">
+                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-3.5 sm:pt-2.5 md:pt-3">
                       <div 
                         className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center py-1 ${isUnknownPillar ? 'text-white/30' : ''}`}
                         style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
@@ -3225,7 +3258,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           (pillar.title === 'Hour' ? 'Time Branch' : `${pillar.title} Branch`)}
                       </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-1.5 sm:pt-2.5 md:pt-3">
+                    <div className="flex flex-col items-center justify-center flex-grow w-full pt-3.5 sm:pt-2.5 md:pt-3">
                       <div 
                         className={`w-full text-base sm:text-xl md:text-3xl font-gothic leading-tight flex flex-col items-center justify-center py-1 ${isUnknownPillar ? 'text-white/30' : ''}`}
                         style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
@@ -3268,13 +3301,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   <div className={`text-[8.5px] sm:text-[10.5px] md:text-[12px] uppercase font-bold text-center ${guideStep === 5 ? 'text-neon-cyan' : 'text-white/30'}`}>
                     {lang === 'KO' ? '지장간' : 'Hidden'}
                   </div>
-                  <div className="grid grid-cols-2 gap-1 w-full justify-items-center sm:flex sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-1.5">
+                  <div className="flex flex-wrap justify-center items-center gap-1 w-full sm:flex-nowrap sm:gap-1.5">
                     {isUnknownPillar ? (
                       <div className="text-[9px] text-center text-white/20 my-2">?</div>
                     ) : (
                       hiddenStems.map((hs, idx) => {
                         const isThirdOfThree = hiddenStems.length === 3 && idx === 2;
-                        const spansClass = isThirdOfThree ? "col-span-2 justify-self-center sm:col-span-1" : "";
+                        const spansClass = isThirdOfThree ? "w-full" : "w-[45%]";
                         const hsData = BAZI_MAPPING.stems?.[hs as keyof typeof BAZI_MAPPING.stems];
                         const hsTenGod = getDetailedTenGod(dayMaster, hs);
                         
@@ -3339,30 +3372,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               : (isLight
                                 ? "ring-1 ring-blue-500/40 border-blue-500/40 shadow-[0_0_8px_rgba(37,99,235,0.1)] bg-[#eff6ff]"
                                 : "ring-1 ring-neon-cyan/40 border-neon-cyan/40 shadow-[0_0_8px_rgba(0,242,255,0.15)] bg-[#0a2325]");
-                          } else if (pillarRootInfo.type === 'sub_residual') {
-                            highlightClass = isDestroyed 
-                              ? (isLight
-                                ? "border-dashed border-red-400 bg-[#fff5f5] text-red-700"
-                                : "border-dashed border-red-500/40 bg-[#251515]")
-                              : isTwisted
-                              ? (isLight
-                                ? "border-dashed border-amber-400 bg-[#fffbf0] text-amber-750"
-                                : "border-dashed border-amber-500/40 bg-[#251d13]")
-                              : (isLight
-                                ? "border-dashed border-blue-300 bg-[#f8faff]"
-                                : "border-dashed border-neon-cyan/30 bg-[#162022]");
-                          } else if (pillarRootInfo.type === 'generation') {
-                            highlightClass = isDestroyed 
-                              ? (isLight
-                                ? "border-red-400 bg-[#fffafa] text-red-700"
-                                : "border-red-500/30 bg-[#201616]")
-                              : isTwisted
-                              ? (isLight
-                                ? "border-amber-400 bg-[#fffdf5] text-amber-700"
-                                : "border-amber-500/30 bg-[#201a15]")
-                              : (isLight
-                                ? "border-amber-300 bg-[#fffff8]"
-                                : "border-[#f5b800]/40 bg-[#1e1e17]");
                           }
                         }
 
@@ -3399,8 +3408,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               origRootTextKo = "천간이나 일간으로 직접 통근하지 않는 일반 수집 에너지였습니다.";
                             }
 
-                            conclusionTitle = `🚨 통근 파괴됨${rootTypeKo} (Clash)`;
-                            conclusionDesc = `<strong>상태:</strong> ${rootItem?.damages?.[0] || '직접적인 인접 지지충(地支衝)으로 인해 지장간 뿌리가 완전히 파괴되었습니다.'}<br/><span class="mt-2 block text-[10px] ${isLight ? 'text-red-750 border-t border-red-200' : 'text-red-200/60 border-t border-red-500/20'} pt-1.5 leading-relaxed"><strong>원래의 관계:</strong> ${origRootTextKo}</span>`;
+                            conclusionTitle = `🚨 통근 파괴됨${rootTypeKo}`;
+                            conclusionDesc = `<strong>상태:</strong> ${rootItem?.damages?.[0] || '충(衝)으로 인해 지장간 뿌리가 파괴되었습니다.'}<br/><span class="mt-1 block text-[9px] sm:text-[10px] ${isLight ? 'text-red-750 border-t border-red-200' : 'text-red-200/65 border-t border-red-500/10'} pt-1 leading-normal"><strong>원래 관계:</strong> ${origRootTextKo}</span>`;
                             conclusionColorClass = isLight ? "text-red-650" : "text-red-400";
                             conclusionBgClass = isLight ? "bg-red-50 border-red-200 text-red-900 font-medium" : "bg-red-950/30 border-red-900/40 text-red-100";
                           } else if (isTwisted) {
@@ -3422,16 +3431,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               origRootTextKo = "천간이나 일간을 향해 원활한 생조 보조 작용을 하고 있습니다.";
                             }
 
-                            conclusionTitle = `⚡ 형살 구속/비틀림${rootTypeKo}`;
-                            conclusionDesc = `<strong>상태:</strong> ${rootItem?.damages?.[0] || '인접 형살 작용으로 에너지가 예민하게 뒤틀려 조율 압박을 받고 있습니다.'}<br/><span class="mt-2 block text-[11px] ${isLight ? 'text-amber-800/95 border-t border-amber-200' : 'text-amber-200/80 border-t border-amber-500/20'} pt-1.5 leading-relaxed"><strong>통근 관계:</strong> ${origRootTextKo}</span>`;
+                            conclusionTitle = `⚡ 형살/비틀림${rootTypeKo}`;
+                            conclusionDesc = `<strong>상태:</strong> ${rootItem?.damages?.[0] || '형살 작용으로 에너지가 다소 뒤틀려 압박을 지닙니다.'}<br/><span class="mt-1 block text-[9.5px] ${isLight ? 'text-amber-800/95 border-t border-amber-200' : 'text-amber-200/70 border-t border-amber-500/10'} pt-1 leading-normal"><strong>통근 관계:</strong> ${origRootTextKo}</span>`;
                             conclusionColorClass = isLight ? "text-amber-600" : "text-amber-400";
                             conclusionBgClass = isLight ? "bg-amber-50 border-amber-200 text-amber-900 font-medium" : "bg-amber-950/20 border-amber-900/40 text-amber-100";
                           } else {
                             if (allRootedStems.length > 0) {
                               const bestRoot = allRootedStems[0];
-                              conclusionTitle = allRootedStems.length > 1 ? `✨ 다중 연계 [ ${bestRoot.short} 등 ]` : (bestRoot.pIdx === i ? `📍 기둥 연계 [ ${bestRoot.short} ]` : `🌟 외부 연계 [ ${bestRoot.short} ]`);
-                              const rootTexts = allRootedStems.map(r => `[${r.pNameKo}(${r.stem}) -> ${r.short}]`).join(', ');
-                              conclusionDesc = `다음 천간들과 연결되어 힘을 실어주고 있습니다:<br/><span class="text-[12px] font-bold mt-1 inline-block">${rootTexts}</span>`;
+                              conclusionTitle = allRootedStems.length > 1 ? `✨ 다중 연계 [${bestRoot.short} 등]` : (bestRoot.pIdx === i ? `📍 기둥 연계 [${bestRoot.short}]` : `🌟 외부 연계 [${bestRoot.short}]`);
+                              const rootTexts = allRootedStems.map(r => `[${r.pNameKo}(${r.stem}) ➔ ${r.short}]`).join(', ');
+                              conclusionDesc = `천간에 연결되어 힘을 보탭니다:<br/><span class="text-[10px] sm:text-[11px] font-black mt-0.5 inline-block">${rootTexts}</span>`;
                               
                               conclusionColorClass = bestRoot.type === 'main' 
                                 ? (isLight ? "text-rose-600 font-black" : "text-neon-pink") 
@@ -3471,8 +3480,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               origRootTextEn = "A floating resource energy without direct stem rooting.";
                             }
 
-                            conclusionTitle = `🚨 Root Shattered${rootTypeEn} (Clash)`;
-                            conclusionDesc = `<strong>Status:</strong> ${rootItem?.damagesEn?.[0] || 'Adjacent branch clash is active, completely shattering physical rooting stability.'}<br/><span class="mt-2 block text-[10px] ${isLight ? 'text-red-700/85 border-t border-red-200' : 'text-red-200/60 border-t border-red-500/20'} pt-1.5 leading-relaxed"><strong>Original Connection:</strong> ${origRootTextEn}</span>`;
+                            conclusionTitle = `🚨 Root Shattered${rootTypeEn}`;
+                            conclusionDesc = `<strong>Status:</strong> ${rootItem?.damagesEn?.[0] || 'Adjacent clash is shattering rooting stability.'}<br/><span class="mt-1 block text-[9.5px] ${isLight ? 'text-red-770/85 border-t border-red-200' : 'text-red-200/60 border-t border-red-500/10'} pt-1 leading-normal"><strong>Original Connection:</strong> ${origRootTextEn}</span>`;
                             conclusionColorClass = isLight ? "text-red-600 animate-pulse font-bold" : "text-red-400";
                             conclusionBgClass = isLight ? "bg-red-50 border-red-200 text-red-900" : "bg-red-950/30 border-red-900/40 text-red-100";
                           } else if (isTwisted) {
@@ -3494,16 +3503,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               origRootTextEn = "Provides pure supportive/generative assistance to the stem.";
                             }
 
-                            conclusionTitle = `⚡ Squeezed / Twisted${rootTypeEn}`;
-                            conclusionDesc = `<strong>Status:</strong> ${rootItem?.damagesEn?.[0] || 'Adjacent punishment is active: Root remains intact, but energy is squeezed and twisted roughly.'}<br/><span class="mt-2 block text-[11px] ${isLight ? 'text-amber-800/95 border-t border-amber-200' : 'text-amber-200/80 border-t border-amber-500/20'} pt-1.5 leading-relaxed"><strong>Root Connection:</strong> ${origRootTextEn}</span>`;
+                            conclusionTitle = `⚡ Squeezed/Twisted${rootTypeEn}`;
+                            conclusionDesc = `<strong>Status:</strong> ${rootItem?.damagesEn?.[0] || 'Adjacent punishment is twisting this energy.'}<br/><span class="mt-1 block text-[9.5px] ${isLight ? 'text-amber-800/95 border-t border-amber-200' : 'text-amber-200/70 border-t border-amber-500/10'} pt-1 leading-normal"><strong>Root Connection:</strong> ${origRootTextEn}</span>`;
                             conclusionColorClass = isLight ? "text-amber-600 font-bold" : "text-amber-400";
                             conclusionBgClass = isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-amber-950/20 border-amber-900/40 text-amber-100";
                           } else {
                             if (allRootedStems.length > 0) {
                               const bestRoot = allRootedStems[0];
-                              conclusionTitle = allRootedStems.length > 1 ? `✨ Multi Alignment [ ${bestRoot.short} ]` : (bestRoot.pIdx === i ? `📍 Pillar Alignment [ ${bestRoot.short} ]` : `🌟 External Alignment [ ${bestRoot.short} ]`);
-                              const rootTexts = allRootedStems.map(r => `[${r.pNameEn}(${r.stem}) -> ${r.short}]`).join(', ');
-                              conclusionDesc = `Provides power and grounds the following stems:<br/><span class="text-[12px] font-bold mt-1 inline-block">${rootTexts}</span>`;
+                              conclusionTitle = allRootedStems.length > 1 ? `✨ Multi Align [${bestRoot.short}]` : (bestRoot.pIdx === i ? `📍 Pillar Align [${bestRoot.short}]` : `🌟 External Align [${bestRoot.short}]`);
+                              const rootTexts = allRootedStems.map(r => `[${r.pNameEn}(${r.stem}) ➔ ${r.short}]`).join(', ');
+                              conclusionDesc = `Supports and grounds these stems:<br/><span class="text-[10px] sm:text-[11px] font-black mt-0.5 inline-block">${rootTexts}</span>`;
                               
                               conclusionColorClass = bestRoot.type === 'main' 
                                 ? (isLight ? "text-rose-600 font-black" : "text-neon-pink") 
@@ -3532,17 +3541,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           const combTitleBorder = isLight ? "border-slate-200" : "border-neon-cyan/20";
                           const combTitleClass = isLight ? "text-blue-600" : "text-neon-cyan";
                           combHtmlKo = `
-                            <div class="pt-1.5 border-t ${combTitleBorder} space-y-1">
-                              <div class="font-bold ${combTitleClass} flex items-center gap-1">🤝 삼합·방합·육합 지지 합화 지원:</div>
-                              <ul class="text-[10px] pl-2 list-disc list-inside space-y-0.5 leading-relaxed p-1.5 rounded-lg border ${combBg} font-sans">
+                            <div class="pt-1 sm:pt-1.5 border-t ${combTitleBorder} space-y-0.5 sm:space-y-1">
+                              <div class="font-bold ${combTitleClass} flex items-center gap-1 text-[10px] sm:text-[11px] leading-tight mt-0.5">🤝 삼합·방합·육합 지지 합화 지원:</div>
+                              <ul class="text-[9.5px] sm:text-[10px] pl-1.5 sm:pl-2 list-disc list-inside space-y-0.5 leading-normal sm:leading-relaxed p-1 sm:p-1.5 rounded-lg border ${combBg} font-sans">
                                 ${pRootDetails.combinations.map((c: any) => `<li>${c.ko}</li>`).join('')}
                               </ul>
                             </div>
                           `;
                           combHtmlEn = `
-                            <div class="pt-1.5 border-t ${combTitleBorder} space-y-1">
-                              <div class="font-bold ${combTitleClass} flex items-center gap-1">🤝 Active Branches Hap-hwa Support:</div>
-                              <ul class="text-[10px] pl-2 list-disc list-inside space-y-0.5 leading-relaxed p-1.5 rounded-lg border ${combBg} font-display">
+                            <div class="pt-1 sm:pt-1.5 border-t ${combTitleBorder} space-y-0.5 sm:space-y-1">
+                              <div class="font-bold ${combTitleClass} flex items-center gap-1 text-[10px] sm:text-[11px] leading-tight mt-0.5">🤝 Active Branches Hap-hwa Support:</div>
+                              <ul class="text-[9.5px] sm:text-[10px] pl-1.5 sm:pl-2 list-disc list-inside space-y-0.5 leading-normal sm:leading-relaxed p-1 sm:p-1.5 rounded-lg border ${combBg} font-display">
                                 ${pRootDetails.combinations.map((c: any) => `<li>${c.en}</li>`).join('')}
                               </ul>
                             </div>
@@ -3556,22 +3565,22 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         const polarityIconSvg = isYin ? moonSvg : sunSvg;
 
                         const tooltipContentKo = `
-<div class="space-y-2 text-xs ${isLight ? 'text-slate-900' : 'text-white/90'}">
-  <div class="pb-1 border-b ${isLight ? 'border-slate-200' : 'border-white/10'} flex justify-between items-center font-display">
-    <div class="flex items-center gap-1.5">
-      <span class="font-bold ${isLight ? 'text-slate-800' : 'text-neon-cyan'} text-sm">${hs} (${hsData?.ko || hs})</span>
-      <span class="flex items-center justify-center w-5 h-5 rounded-full border ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-black/20'} shadow-sm">${polarityIconSvg}</span>
+<div class="space-y-1 sm:space-y-2 text-xs ${isLight ? 'text-slate-900' : 'text-white/90'}">
+  <div class="pb-0.5 sm:pb-1 border-b ${isLight ? 'border-slate-200' : 'border-white/10'} flex justify-between items-center font-display">
+    <div class="flex items-center gap-1">
+      <span class="font-bold ${isLight ? 'text-slate-800' : 'text-neon-cyan'} text-[13px] sm:text-sm leading-none">${hs} (${hsData?.ko || hs})</span>
+      <span class="flex items-center justify-center w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full border ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-black/20'} shadow-sm">${polarityIconSvg}</span>
     </div>
-    <span class="text-[10px] ${isLight ? 'bg-slate-100' : 'bg-white/10'} px-1 py-0.5 rounded font-bold" style="color: ${getTenGodColor(hsTenGod.ko)}">${hsTenGod.ko}</span>
+    <span class="text-[9px] sm:text-[10px] ${isLight ? 'bg-slate-100' : 'bg-white/10'} px-1 py-0.5 rounded font-bold leading-none" style="color: ${getTenGodColor(hsTenGod.ko)}">${hsTenGod.ko}</span>
   </div>
-  <div class="flex items-center gap-1.5 py-0.5">
+  <div class="flex items-center gap-1 pt-0.5 pb-0.5 sm:pb-1 text-[10.5px] sm:text-xs">
     <span class="${isLight ? 'text-slate-500' : 'text-white/50'}">속성:</span>
     <span class="font-bold" style="color: ${colorHex}">${hsDataElementKo} (${hsData?.element})</span>
   </div>
   
-  <div class="pt-1.5 border-t ${isLight ? 'border-indigo-100' : 'border-white/10'} space-y-1">
-    <div class="font-bold text-[11.5px] tracking-tight ${conclusionColorClass} flex items-center gap-1">${conclusionTitle}</div>
-    <div class="pl-2 leading-relaxed text-[11px] p-2 rounded-lg border ${conclusionBgClass} font-sans">
+  <div class="pt-1 sm:pt-1.5 border-t ${isLight ? 'border-indigo-100' : 'border-white/10'} space-y-0.5 sm:space-y-1">
+    <div class="font-bold text-[11px] sm:text-[11.5px] tracking-tight ${conclusionColorClass} flex items-center gap-1">${conclusionTitle}</div>
+    <div class="pl-1.5 sm:pl-2 leading-snug sm:leading-relaxed text-[10px] sm:text-[11px] p-1 sm:p-2 rounded-lg border ${conclusionBgClass} font-sans">
       ${conclusionDesc}
     </div>
   </div>
@@ -3581,39 +3590,27 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 `;
 
                         const tooltipContentEn = `
-<div class="space-y-2 text-xs ${isLight ? 'text-slate-900' : 'text-white/90'}">
-  <div class="pb-1 border-b ${isLight ? 'border-slate-200' : 'border-white/10'} flex justify-between items-center font-display">
-    <div class="flex items-center gap-1.5">
-      <span class="font-bold ${isLight ? 'text-slate-800' : 'text-neon-cyan'} text-sm">${hs} (${hsNameEnBase})</span>
-      <span class="flex items-center justify-center w-5 h-5 rounded-full border ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-black/20'} shadow-sm">${polarityIconSvg}</span>
+<div class="space-y-1 sm:space-y-2 text-xs ${isLight ? 'text-slate-900' : 'text-white/90'}">
+  <div class="pb-0.5 sm:pb-1 border-b ${isLight ? 'border-slate-200' : 'border-white/10'} flex justify-between items-center font-display">
+    <div class="flex items-center gap-1">
+      <span class="font-bold ${isLight ? 'text-slate-800' : 'text-neon-cyan'} text-[13px] sm:text-sm leading-none">${hs} (${hsNameEnBase})</span>
+      <span class="flex items-center justify-center w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full border ${isLight ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-black/20'} shadow-sm">${polarityIconSvg}</span>
     </div>
-    <span class="text-[10px] ${isLight ? 'bg-slate-100' : 'bg-white/10'} px-1 py-0.5 rounded font-bold" style="color: ${getTenGodColor(hsTenGod.ko)}">${hsTenGod.en}</span>
+    <span class="text-[9px] sm:text-[10px] ${isLight ? 'bg-slate-100' : 'bg-white/10'} px-1 py-0.5 rounded font-bold leading-none" style="color: ${getTenGodColor(hsTenGod.ko)}">${hsTenGod.en}</span>
   </div>
-  <div class="flex items-center gap-1.5 py-0.5">
+  <div class="flex items-center gap-1 pt-0.5 pb-0.5 sm:pb-1 text-[10.5px] sm:text-xs">
     <span class="${isLight ? 'text-slate-500' : 'text-white/50'}">Element:</span>
     <span class="font-bold" style="color: ${colorHex}">${hsData?.element}</span>
   </div>
   
-  <div class="pt-1.5 border-t ${isLight ? 'border-indigo-100' : 'border-white/10'} space-y-1">
-    <div class="font-bold text-[11.5px] tracking-tight ${conclusionColorClass} flex items-center gap-1">${conclusionTitle}</div>
-    <div class="pl-2 leading-relaxed text-[11px] p-2 rounded-lg border ${conclusionBgClass} font-display">
+  <div class="pt-1 sm:pt-1.5 border-t ${isLight ? 'border-indigo-100' : 'border-white/10'} space-y-0.5 sm:space-y-1">
+    <div class="font-bold text-[11px] sm:text-[11.5px] tracking-tight ${conclusionColorClass} flex items-center gap-1">${conclusionTitle}</div>
+    <div class="pl-1.5 sm:pl-2 leading-snug sm:leading-relaxed text-[10px] sm:text-[11px] p-1 sm:p-2 rounded-lg border ${conclusionBgClass} font-display">
       ${conclusionDesc}
     </div>
   </div>
 
   ${!isDestroyed ? combHtmlEn : ''}
-
-  <div class="pt-2 border-t ${isLight ? 'border-indigo-100' : 'border-white/10'} text-[9px] ${isLight ? 'text-slate-500' : 'text-white/40'} font-mono leading-relaxed hidden">
-    <div class="font-bold ${isLight ? 'text-slate-700' : 'text-white/65'} text-[9.5px] mb-1">🏷️ Tag Legend Guide:</div>
-    <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">
-      <div>• <strong>main</strong>: Stem Main Root</div>
-      <div>• <strong>E-MN</strong>: DM Main Root</div>
-      <div>• <strong>sub</strong>: Stem Sub/Resi Root</div>
-      <div>• <strong>E-SB</strong>: DM Sub/Resi Root</div>
-      <div>• <strong>gen</strong>: Stem Nourish Support</div>
-      <div>• <strong>E-GN</strong>: DM Nourish Support</div>
-    </div>
-  </div>
 </div>
 `;
 
@@ -3623,106 +3620,110 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           : 'w-full max-w-[40px] sm:max-w-[54px] md:max-w-[64px] lg:max-w-[70px]';
 
                         return (
-                          <BaziTooltip 
-                            key={idx}
-                            content={{ ko: tooltipContentKo, en: tooltipContentEn }}
-                            lang={lang}
-                            onVisibleChange={(visible) => {
-                              if (visible) {
-                                setHoveredHiddenStem({
-                                  pillarIdx: i, 
-                                  hsIdx: idx, 
-                                  hs, 
-                                  connectedStems: allRootedStems.map(r => r.stem), 
-                                  isDestroyed
-                                });
-                              } else {
-                                setHoveredHiddenStem(prev => {
-                                  if (prev && prev.pillarIdx === i && prev.hsIdx === idx) {
-                                    return null;
-                                  }
-                                  return prev;
-                                });
-                              }
-                            }}
+                          <div 
+                            key={idx} 
+                            className={`${spansClass} flex justify-center sm:w-auto`}
                           >
-                            <div 
-                              className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemWidthClass} border transition-all duration-300 relative ${highlightClass} ${spansClass}`}
+                            <BaziTooltip 
+                              content={{ ko: tooltipContentKo, en: tooltipContentEn }}
+                              lang={lang}
+                              onVisibleChange={(visible) => {
+                                if (visible) {
+                                  setHoveredHiddenStem({
+                                    pillarIdx: i, 
+                                    hsIdx: idx, 
+                                    hs, 
+                                    connectedStems: allRootedStems.map(r => r.stem), 
+                                    isDestroyed
+                                  });
+                                } else {
+                                  setHoveredHiddenStem(prev => {
+                                    if (prev && prev.pillarIdx === i && prev.hsIdx === idx) {
+                                      return null;
+                                    }
+                                    return prev;
+                                  });
+                                }
+                              }}
                             >
-                              {isDestroyed && (
-                                <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(239,68,68,0.5)]' : 'border-black shadow-[0_0_4px_rgba(239,68,68,0.8)]'} animate-pulse`} />
-                              )}
-                              {isTwisted && (
-                                <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(245,158,11,0.5)]' : 'border-black shadow-[0_0_4px_rgba(245,158,11,0.8)]'} animate-pulse`} />
-                              )}
                               <div 
-                                className="text-[10px] sm:text-xs md:text-sm font-semibold mb-0.5 text-center px-0.5"
-                                style={{ color: colorHex }}
+                                className={`flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded ${itemWidthClass} border transition-all duration-300 relative ${highlightClass}`}
                               >
-                                {showHanja ? hs : (lang === 'KO' ? hsData?.ko : (hsNameEnBase.length <= 4 ? hsNameEnBase : (hsNameEnBase === 'Byeong' ? 'Byg.' : (hsNameEnBase === 'Gyeong' ? 'Gyg.' : (hsNameEnBase === 'Jeong' ? 'Jeg.' : hsNameEnBase.substring(0, 3) + '.')))))}
-                              </div>
-                              <div 
-                                className="text-[7.5px] sm:text-[9.5px] md:text-[11px] font-bold tracking-tighter opacity-70 animate-pulse duration-1000 mb-0.5 w-full text-center"
-                                style={{ color: getTenGodColor(hsTenGod.ko) }}
-                              >
-                                {lang === 'KO' ? (
-                                  hsTenGod.ko
-                                ) : (
-                                  <>
-                                    <span className="block sm:hidden text-[7.5px]">
-                                      {hsTenGod.en.substring(0, 3)}
-                                    </span>
-                                    <span className="hidden sm:block text-[8.5px] md:text-[10px] truncate w-full px-0.5">
-                                      {hsTenGod.en}
-                                    </span>
-                                  </>
+                                {isDestroyed && (
+                                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(239,68,68,0.5)]' : 'border-black shadow-[0_0_4px_rgba(239,68,68,0.8)]'} animate-pulse`} />
                                 )}
-                              </div>
-
-                              {/* Micro tag indicating the rooting relationship */}
-                              {bestTagInfo && (
-                                <div className={`mt-0.5 font-sans px-1 py-[3px] text-[6.5px] sm:text-[8.5px] md:text-[9.5px] leading-none rounded-[3px] font-extrabold pb-[2px] tracking-tighter ${
-                                  bestTagInfo.type === 'main' 
-                                    ? (isDamaged 
-                                        ? (isLight ? 'bg-amber-400 text-black shadow-sm' : 'bg-red-500/20 text-red-300 border border-red-500/30') 
-                                        : (isLight ? 'bg-amber-400 text-black shadow-sm' : 'bg-neon-cyan/25 text-neon-cyan border border-neon-cyan/30'))
-                                    : bestTagInfo.type === 'sub_residual'
-                                      ? (isDamaged 
-                                          ? (isLight ? 'bg-blue-400 text-black shadow-sm' : 'bg-red-500/10 text-red-400/80 border border-red-500/20') 
-                                          : (isLight ? 'bg-blue-400 text-black shadow-sm' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'))
-                                      : (isLight ? 'bg-emerald-400 text-black shadow-sm' : 'bg-amber-500/20 text-amber-300 border border-[#f5b800]/30')
-                                }`}>
-                                  {lang === 'KO' 
-                                    ? (bestTagInfo.pIdx === i 
-                                        ? (bestTagInfo.type === 'main' ? '본기' : bestTagInfo.type === 'sub_residual' ? '중여' : '생조')
-                                        : (bestTagInfo.type === 'main' 
-                                            ? bestTagInfo.pNameKo 
-                                            : bestTagInfo.type === 'sub_residual' 
-                                              ? (bestTagInfo.pNameKo.charAt(0) + '중') 
-                                              : (bestTagInfo.pNameKo.charAt(0) + '생'))
-                                      )
-                                    : (bestTagInfo.pIdx === i 
-                                        ? (bestTagInfo.type === 'main' ? 'MAIN' : bestTagInfo.type === 'sub_residual' ? 'SUB' : 'GEN')
-                                        : (bestTagInfo.type === 'main' 
-                                            ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-MN` 
-                                            : bestTagInfo.type === 'sub_residual' 
-                                              ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-SB` 
-                                              : `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-GN`))
-                                  }
-                                </div>
-                              )}
-                              
-                              {/* Visible placeholder or actual sub root */}
-                              {!bestTagInfo ? (
+                                {isTwisted && (
+                                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 border ${isLight ? 'border-white shadow-[0_0_4px_rgba(245,158,11,0.5)]' : 'border-black shadow-[0_0_4px_rgba(245,158,11,0.8)]'} animate-pulse`} />
+                                )}
                                 <div 
-                                  className="mt-0.5 font-sans px-1 py-[3px] text-[6.5px] sm:text-[8.5px] md:text-[9.5px] leading-none rounded-[3px] pb-[2px] tracking-tighter opacity-0 select-none pointer-events-none" 
-                                  aria-hidden="true"
+                                  className="text-[10px] sm:text-xs md:text-sm font-semibold mb-0.5 text-center px-0.5"
+                                  style={{ color: colorHex }}
                                 >
-                                  {lang === 'KO' ? '본기' : 'MAIN'}
+                                  {showHanja ? hs : (lang === 'KO' ? hsData?.ko : (hsNameEnBase.length <= 4 ? hsNameEnBase : (hsNameEnBase === 'Byeong' ? 'Byg.' : (hsNameEnBase === 'Gyeong' ? 'Gyg.' : (hsNameEnBase === 'Jeong' ? 'Jeg.' : hsNameEnBase.substring(0, 3) + '.')))))}
                                 </div>
-                              ) : null}
-                            </div>
-                          </BaziTooltip>
+                                <div 
+                                  className="text-[7.5px] sm:text-[9.5px] md:text-[11px] font-bold tracking-tighter opacity-70 animate-pulse duration-1000 mb-0.5 w-full text-center"
+                                  style={{ color: getTenGodColor(hsTenGod.ko) }}
+                                >
+                                  {lang === 'KO' ? (
+                                    hsTenGod.ko
+                                  ) : (
+                                    <>
+                                      <span className="block sm:hidden text-[7.5px]">
+                                        {hsTenGod.en.substring(0, 3)}
+                                      </span>
+                                      <span className="hidden sm:block text-[8.5px] md:text-[10px] truncate w-full px-0.5">
+                                        {hsTenGod.en}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+
+                                {/* Micro tag indicating the rooting relationship */}
+                                {bestTagInfo && (
+                                  <div className={`mt-0.5 font-sans px-1 py-[3px] text-[6.5px] sm:text-[8.5px] md:text-[9.5px] leading-none rounded-[3px] font-extrabold pb-[2px] tracking-tighter ${
+                                    bestTagInfo.type === 'main' 
+                                      ? (isDamaged 
+                                          ? (isLight ? 'bg-amber-400 text-black shadow-sm' : 'bg-red-500/20 text-red-300 border border-red-500/30') 
+                                          : (isLight ? 'bg-amber-400 text-black shadow-sm' : 'bg-neon-cyan/25 text-neon-cyan border border-neon-cyan/30'))
+                                      : bestTagInfo.type === 'sub_residual'
+                                        ? (isDamaged 
+                                            ? (isLight ? 'bg-blue-400 text-black shadow-sm' : 'bg-red-500/10 text-red-400/80 border border-red-500/20') 
+                                            : (isLight ? 'bg-blue-400 text-black shadow-sm' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'))
+                                        : (isLight ? 'bg-emerald-400 text-black shadow-sm' : 'bg-amber-500/20 text-amber-300 border border-[#f5b800]/30')
+                                  }`}>
+                                    {lang === 'KO' 
+                                      ? (bestTagInfo.pIdx === i 
+                                          ? (bestTagInfo.type === 'main' ? '본기' : bestTagInfo.type === 'sub_residual' ? '중여' : '생조')
+                                          : (bestTagInfo.type === 'main' 
+                                              ? bestTagInfo.pNameKo 
+                                              : bestTagInfo.type === 'sub_residual' 
+                                                ? (bestTagInfo.pNameKo.charAt(0) + '중') 
+                                                : (bestTagInfo.pNameKo.charAt(0) + '생'))
+                                        )
+                                      : (bestTagInfo.pIdx === i 
+                                          ? (bestTagInfo.type === 'main' ? 'MAIN' : bestTagInfo.type === 'sub_residual' ? 'SUB' : 'GEN')
+                                          : (bestTagInfo.type === 'main' 
+                                              ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-MN` 
+                                              : bestTagInfo.type === 'sub_residual' 
+                                                ? `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-SB` 
+                                                : `${bestTagInfo.pNameEn === 'Year' ? 'Y' : bestTagInfo.pNameEn === 'Month' ? 'M' : bestTagInfo.pNameEn === 'DM' ? 'D' : 'H'}-GN`))
+                                    }
+                                  </div>
+                                )}
+                                
+                                {/* Visible placeholder or actual sub root */}
+                                {!bestTagInfo ? (
+                                  <div 
+                                    className="mt-0.5 font-sans px-1 py-[3px] text-[6.5px] sm:text-[8.5px] md:text-[9.5px] leading-none rounded-[3px] pb-[2px] tracking-tighter opacity-0 select-none pointer-events-none" 
+                                    aria-hidden="true"
+                                  >
+                                    {lang === 'KO' ? '본기' : 'MAIN'}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </BaziTooltip>
+                          </div>
                         );
                       })
                     )}
@@ -3737,7 +3738,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
 
       {/* Grand Cycle Timeline */}
-      <div className={`space-y-6 transition-all duration-500 ease-in-out relative ${guideStep === 7 ? 'scale-105 z-50 p-4 bg-black/40 border border-neon-cyan/40 rounded-2xl shadow-[0_0_30px_rgba(0,242,255,0.2)]' : ''} ${guideStep > 0 && guideStep !== 7 ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'}`}>
+      <div ref={lifeSeasonsRef} className={`space-y-6 transition-all duration-500 ease-in-out relative ${guideStep === 7 ? 'scale-105 z-50 p-4 bg-black/40 border border-neon-cyan/40 rounded-2xl shadow-[0_0_30px_rgba(0,242,255,0.2)]' : ''} ${guideStep > 0 && guideStep !== 7 ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'}`}>
         <AnimatePresence>
           {guideStep === 7 && (
             <motion.div 
@@ -3766,18 +3767,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       ? '계절이 바뀌듯 10년 단위로 당신에게 펼쳐지는 환경과 무대입니다. 인생의 어떤 계절을 지나고 있는지 확인해보세요. (각 대운/세운 카드 우측 상단의 체인(🔗) 메뉴에 마우스를 올리면 내 사주 원국과의 합형충파해 작용을 바로 확인할 수 있습니다.)' 
                       : 'Just like seasons change, this represents the shifting environment and theme you face every 10 years. (You can hover over the chain (🔗) icon on the top-right of each card to confirm dynamic combinations and clashes with your natal chart.)'}
                   </p>
-                  <div className="flex gap-2 justify-end w-full">
-                    <button onClick={() => setShowGuideDetailModal(true)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto">
+                  <div className="flex gap-1.5 sm:gap-2 justify-end w-full pt-1 sm:pt-0">
+                    <button onClick={() => setShowGuideDetailModal(true)} className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded border border-white/20 text-white hover:bg-white/10 transition-colors mr-auto whitespace-nowrap">
                       <span className="flex items-center gap-1">
-                        <BookOpen className="w-4 h-4" />
+                        <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         {lang === 'KO' ? '자세히 알아보기' : 'Learn More'}
                       </span>
                     </button>
-                    <button onClick={() => setGuideStep(6)} className="px-4 py-2 text-xs sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                    <button onClick={() => setGuideStep(6)} className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded border border-white/20 text-white/70 hover:bg-white/10 hover:text-white transition-colors whitespace-nowrap">
                       {lang === 'KO' ? '이전' : 'Prev'}
                     </button>
-                    <button onClick={() => setGuideStep(0)} className="px-5 py-2 text-xs sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors">
-                      {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-4 h-4 ml-1" />
+                    <button onClick={() => setGuideStep(0)} className="px-3 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-sm rounded bg-neon-pink/20 border border-neon-pink text-neon-pink hover:bg-neon-pink/30 flex items-center justify-center transition-colors whitespace-nowrap">
+                      {lang === 'KO' ? '가이드 종료' : 'Finish Guide'} <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1" />
                     </button>
                   </div>
                 </div>
@@ -3824,7 +3825,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           setExpandedYear(null);
                           setExpandedMonth(null);
                         }}
-                        className={`w-full min-h-[104px] flex-1 rounded-xl transition-all flex flex-col items-center justify-start pt-2 px-1.5 pb-4 relative shadow-sm cursor-pointer select-none ${
+                        className={`w-full min-h-[95px] sm:min-h-[105px] flex-1 rounded-xl transition-all flex flex-col items-center justify-center p-2 relative shadow-sm cursor-pointer select-none ${
                           isCurrent 
                             ? (theme === 'light' ? 'ring-2 ring-pink-400 bg-pink-50 shadow-[0_4px_12px_rgba(236,72,153,0.15)] z-10' : 'ring-2 ring-neon-pink bg-[#1a0515] border border-neon-pink/50 shadow-[0_0_20px_rgba(255,0,122,0.4)] z-10')
                             : (theme === 'light' ? 'bg-white border border-slate-200 hover:bg-slate-50' : 'bg-black/80 border border-white/10 hover:bg-white/10')
@@ -3944,7 +3945,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               setExpandedYear(isYearExpanded ? null : api);
                               setExpandedMonth(null);
                             }}
-                            className={`w-full bg-white/5 rounded-xl p-3 flex flex-col items-center border transition-all relative min-h-[92px] justify-center cursor-pointer select-none ${borderClass}`}
+                            className={`w-full bg-white/5 rounded-xl p-2 flex flex-col items-center border transition-all relative min-h-[85px] justify-center cursor-pointer select-none ${borderClass}`}
                           >
                             {hasInteractions && (
                               <div 
@@ -4905,13 +4906,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="relative w-full max-w-4xl max-h-[90vh] bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl flex flex-col z-10"
           >
-            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20 rounded-t-2xl">
-              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan drop-shadow-[0_0_10px_rgba(188,0,255,0.3)]">
+            <div className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center bg-black/20 rounded-t-2xl gap-3">
+              <h3 className="text-[1.1rem] sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan drop-shadow-[0_0_10px_rgba(188,0,255,0.3)] whitespace-nowrap overflow-hidden text-ellipsis">
                 {lang === 'KO' ? '사주명리학의 우주적 시선' : 'Cosmic Perspective of BaZi'}
               </h3>
               <button 
                 onClick={() => setShowGuideDetailModal(false)}
-                className="text-white/50 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full"
+                className="text-white/50 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full flex-shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -5822,44 +5823,44 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           colorEn: 'text-[#00ea5e]',
                           detailKo: '육합, 형, 파가 얽힌 사신은 격정적 결성 뒤 한 번 완전히 뜯어고쳐 새로운 패러다임으로 업그레이드하는 극적 리모델링 가치를 내포합니다.',
                           detailEn: 'Contains multi-layered fusion, penalty, and fraction. Converts old systems entirely into state-of-the-art standards.'
-                        },
-                        {
-                          branches: '술미(戌未)',
-                          resultKo: '건토 버석거림 조절',
-                          resultEn: 'Dry Clay Fracture',
-                          colorKo: 'text-amber-750',
-                          colorEn: 'text-amber-400',
-                          detailKo: '가을 영토(술)와 뜨거운 모래밭(미)이 만나 뭉쳐지지 않고 버석거리며 갈라지는 틈입니다. 계약서의 특약 사항이나 겉핥기 협약의 공백을 정위합니다.',
-                          detailEn: 'Baked clay and warm desert dust colliding. Leads to re-checking safety clauses in loose partnerships.'
-                        }
-                      ]
-                    },
-                    harm: {
-                      titleKo: '해 (害) - 은밀한 정체/방해',
-                      titleEn: 'Harm (害) - Passive Friction',
-                      icon: '🛡️',
-                      borderClass: 'border-indigo-500/30',
-                      bgClass: 'bg-indigo-50/70 border-indigo-200/80 dark:border-indigo-500/20',
-                      badgeClass: 'text-indigo-805 bg-indigo-100/55',
-                      badgeDarkClass: 'text-indigo-400 bg-indigo-500/5',
-                      descKo: '합(끌림)을 뒤에서 훼방 놓는 성분으로, 진행이 다소 늦어지거나 인간관계 오해를 자아내며 속을 끓입니다. 정면승부보단 기민한 심리적 경계 정리가 요망됩니다.',
-                      descEn: 'Passive elements blocking cozy combinations, suggesting invisible delays or subtle psychological distances.',
-                      items: [
-                        {
-                          branches: '자미(子未)',
-                          resultKo: '탁수 원망 (정서 미묘 원망)',
-                          resultEn: 'Muddy Stream Friction',
-                          colorKo: 'text-purple-750',
-                          colorEn: 'text-purple-400',
-                          detailKo: '자수의 맑음과 미토의 건조함이 섞여 흙탕물을 형성하듯 미성숙한 원망심이 일어날 수 있습니다. 내면의 정서를 고요하게 관망하는 지혜가 필요합니다.',
-                          detailEn: 'Clean spring mixed with hot dust. Invites you to let emotional sediments settle naturally rather than reacting hastily.'
-                        },
-                        {
-                          branches: '축오(丑午)',
-                          resultKo: '탕화 가열 (내면 조급증 극복)',
-                          resultEn: 'Steam Engine Friction',
-                          colorKo: 'text-red-750',
-                          colorEn: 'text-red-400',
+                         },
+                         {
+                           branches: '술미(戌未)',
+                           resultKo: '건토 버석거림 조절',
+                           resultEn: 'Dry Clay Fracture',
+                           colorKo: 'text-amber-750',
+                           colorEn: 'text-amber-400',
+                           detailKo: '가을 영토(술)와 뜨거운 모래밭(미)이 만나 뭉쳐지지 않고 버석거리며 갈라지는 틈입니다. 계약서의 특약 사항이나 겉핥기 협약의 공백을 정위합니다.',
+                           detailEn: 'Baked clay and warm desert dust colliding. Leads to re-checking safety clauses in loose partnerships.'
+                         }
+                       ]
+                     },
+                     harm: {
+                       titleKo: '해 (害) - 은밀한 정체/방해',
+                       titleEn: 'Harm (害) - Passive Friction',
+                       icon: '🛡️',
+                       borderClass: 'border-indigo-500/30',
+                       bgClass: 'bg-indigo-50/70 border-indigo-200/80 dark:border-indigo-500/20',
+                       badgeClass: 'text-indigo-805 bg-indigo-100/55',
+                       badgeDarkClass: 'text-indigo-400 bg-indigo-500/5',
+                       descKo: '합(끌림)을 뒤에서 훼방 놓는 성분으로, 진행이 다소 늦어지거나 인간관계 오해를 자아내며 속을 끓입니다. 정면승부보단 기민한 심리적 경계 정리가 요망됩니다.',
+                       descEn: 'Passive elements blocking cozy combinations, suggesting invisible delays or subtle psychological distances.',
+                       items: [
+                         {
+                           branches: '자미(子未)',
+                           resultKo: '탁수 원망 (정서 미묘 원망)',
+                           resultEn: 'Muddy Stream Friction',
+                           colorKo: 'text-purple-750',
+                           colorEn: 'text-purple-400',
+                           detailKo: '자수의 맑음과 미토의 건조함이 섞여 흙탕물을 형성하듯 미성숙한 원망심이 일어날 수 있습니다. 내면의 정서를 고요하게 관망하는 지혜가 필요합니다.',
+                           detailEn: 'Clean spring mixed with hot dust. Invites you to let emotional sediments settle naturally rather than reacting hastily.'
+                         },
+                         {
+                           branches: '축오(丑午)',
+                           resultKo: '탕화 가열 (내면 조급증 극복)',
+                           resultEn: 'Steam Engine Friction',
+                           colorKo: 'text-red-750',
+                           colorEn: 'text-[#ff4747]',
                           detailKo: '얼음 땅(축)과 뜨거운 쇳물(오)이 만나 증기를 급작스럽게 뿜으며 내부 압력이 오르는 격입니다. 충동적 분노를 가라앉히고 우아하게 삭여 해결합니다.',
                           detailEn: 'Extreme hot and extreme cold touching. Generates internal thermal pressure, advising slow, conscious breathing and mindful meditation.'
                         },
@@ -6273,7 +6274,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     <p className="text-[10px] leading-relaxed opacity-95 whitespace-pre-line font-light">
                                       {lang === 'KO' ? (
                                         guideRelTab === 'clash' ? (
-                                          '당신의 명식에는 단일한 부딪침을 넘어 다중 충돌(쟁충/첩충)이 흐르고 있습니다. 자수와 다수의 오화가 얽히는 경우처럼, 하나의 구심점이 다각도에서 인장력을 받아 "지속적인 환경 쇄신과 심장 발전기 구동" 상태가 됩니다.\n\n정면 충돌(지지충)은 일상 속 직접적인 돌파와 위기극복으로 나타나며, 건너뛴 충돌(격충)은 한 템포 간격을 둔 전략적 긴장감과 보완설계 능력을 드높여, 당신에게 탁월한 생존 위기관리력과 매력적인 승부사 안목을 동시에 선사합니다.'
+                                          '당신의 명식에는 단일한 부딪침을 넘어 다중 충돌(쟁충/첩충)이 흐르고 있습니다. 자수와 다수의 오화가 얽히는 경우처럼, 하나의 구심점이 다각도에서 인장력을 받아 "지속적인 환경 쇄신과 심장 발전기 구동" 상태가 됩니다.\n\n정면 충돌(지지충)은 일상 속 직접적인 돌파와 위기극복으로 나타나며, 건너뛴 충돌(격충)은 한 템포 간격을 둔 전략적 긴장감 및 보완설계 능력을 드높여, 당신에게 탁월한 생존 위기관리력과 매력적인 승부사 안목을 동시에 선사합니다.'
                                         ) : guideRelTab.includes('hap') || guideRelTab.includes('uhap') || guideRelTab.includes('samhap') || guideRelTab.includes('banghap') || guideRelTab === 'yukhap' ? (
                                           '사주 원국 내에 복수의 합이 다각적으로 결합하는 다중 결속(정합/쟁합) 구조입니다. 이는 단순히 하나의 관계나 단일 목적에 얽매이지 않고, 한편으로는 일관된 협업을 도모하면서(삼합/방합) 다른 한편으로는 정서적인 연합이나 유연한 거래망(육합)을 입체적으로 가동할 수 있는 탁월한 네트워크 역량 및 대인관계 지평이 열려있음을 증명합니다.'
                                         ) : guideRelTab === 'punish' ? (
@@ -6455,56 +6456,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   detailTxtEn = `Subtle destructions operate as a corrective mechanism, highlighting system loopholes to support smooth and proactive upgrades.`;
                                 } else if (isHae) {
                                   strengthBadgeTxt = lang === 'KO' ? '해살 조율' : 'Moderate Harm Adjust';
-                                  detailTxtKo = `영역 간의 경계를 짓는 해살(${remoteBranchesStr}, ${actualName})의 정진력이 흐릅니다. 섣부른 감정 투자로 인한 심리적 소모를 사전에 지혜롭게 예방하고, 상대의 숨은 의도를 기민하게 간파함으로써 나를 지키는 냉철하며 합리적인 처세의 무기를 가집니다.`;
-                                  detailTxtEn = `The protective alert of Harm is processed, enabling intuitive defense against unexpected personal drain or subtle relational conflicts.`;
+                                  detailTxtKo = `영역 주권과 미세 조율에 관계하는 해살(${remoteBranchesStr}, ${actualName})입니다. 불필요하게 영역 내부로 침범당하거나 소용돌이치는 오성 갈등을 차단하며, 타인의 일방적인 경계 침범에 명확하고 냉정한 거절 의사를 표명해 선을 보호하는 현실적인 방어력을 드높여줍니다.`;
+                                  detailTxtEn = `Harm adjustments operate moderately, building clear emotional boundaries and strong risk-mitigation focus around partnerships.`;
                                 } else {
-                                  strengthBadgeTxt = lang === 'KO' ? '중간 마찰 조율' : 'Moderate Friction';
-                                  detailTxtKo = `인접하지 않은 두 글자가 만나는 중간 수준의 보정 과정입니다. 삶의 다양한 가능성을 실현하기 위해 조심스럽게 영역을 점검하고 보정해 가는 안락한 힘을 마련해 줍니다.`;
-                                  detailTxtEn = `Moderate distant friction operates as a stable calibration force across your life.`;
-                                }
-                              } else { // clash_remote or general punish/pa/hae
-                                pulseDescClass = "desc-glow-present";
-                                containerClass = isLight 
-                                  ? 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200 shadow-sm' 
-                                  : 'bg-[#291132] border-fuchsia-500/45 text-fuchsia-200';
-                                
-                                if (isClash) {
-                                  strengthBadgeTxt = lang === 'KO' ? '원격충 조율' : 'Remote Clash';
-                                  detailTxtKo = `사주 원국 양 극단(${remoteBranchesStr})에 위치하여 간접적으로 작용하는 원격충(${actualName})입니다. 현실에서의 물리적인 갈등이나 급변함은 최소화되나, 내면에 예술적인 정밀함, 신중한 판단력, 그리고 시간의 흐름을 기다릴 줄 아는 성숙한 지혜의 자양분이 됩니다.`;
-                                  detailTxtEn = `Quiet remote friction presents low physical clash but triggers deep self-reflection, artistic inspiration, and seasoned strategic prudence.`;
-                                } else if (isHyeong) {
-                                  strengthBadgeTxt = lang === 'KO' ? '원격 형살' : 'Remote Punishment';
-                                  detailTxtKo = `멀리 떨어져서 작용하는 원격 형살(${remoteBranchesStr}, ${actualName})입니다. 실생활의 직접 조율 마찰보다는 미학적/정신적 성찰, 그리고 점진적 조절 능력을 키워줍니다.`;
-                                  detailTxtEn = `Remote punishment operates quietly at a distance, refining your inner discipline and strategic patience rather than causing active friction.`;
-                                } else if (isPa) {
-                                  strengthBadgeTxt = lang === 'KO' ? '원격 파살' : 'Remote Destruction';
-                                  detailTxtKo = `보이지 않는 먼 거리에서 작용하는 원격 파살(${remoteBranchesStr}, ${actualName})입니다. 은근한 틈새를 정돈하며 사소한 오점이나 사각지대를 수시로 조용하게 보완해 가는 힘을 줍니다.`;
-                                  detailTxtEn = `Remote destruction works slowly in the background, offering subtle, precise corrective opportunities over time.`;
-                                } else if (isHae) {
-                                  strengthBadgeTxt = lang === 'KO' ? '원격 해살' : 'Remote Harm';
-                                  detailTxtKo = `원거리에서 조율하는 원격 해살(${remoteBranchesStr}, ${actualName})입니다. 불필요한 감정 자극 없이 담백하고 이성적인 대인관계의 안정 거리를 유지하는 방어기제로 작동합니다.`;
-                                  detailTxtEn = `Remote harm acts as a protective boundary, helping you maintain healthy, objective personal distances.`;
-                                } else {
-                                  strengthBadgeTxt = lang === 'KO' ? '원격 마찰 조율' : 'Remote Friction';
-                                  detailTxtKo = `원거리 지지 간의 완만한 마찰 관계를 조화롭게 다듬습니다.`;
-                                  detailTxtEn = `Gently calibrates the remote relational tension across the chart.`;
+                                  strengthBadgeTxt = lang === 'KO' ? '조율 작용 가동' : 'Active Adjuster';
+                                  detailTxtKo = `원국 지지 간의 긴장을 해소하고 부드럽게 완화해 나가는 완만 조율 기능이 들어와 있습니다.`;
+                                  detailTxtEn = `A mild corrective adjustment operates gently to align details and restore structural comfort.`;
                                 }
                               }
 
-                              // 특수 결합 보정 규칙 (사신합, 묘술합, 진유합 등)
-                              const bStr = activeUserMatch.branches ? activeUserMatch.branches.join('') : '';
-                              if (bStr) {
-                                if ((bStr === '巳申' || bStr === '申巳') && activeUserMatch.type === '육합') {
-                                  if (hasFireStem && !hasWaterStem) {
-                                    const shinTenGodObj = getDetailedTenGod(dayMaster, '庚');
-                                    const shinTenGod = lang === 'KO' ? shinTenGodObj.ko : shinTenGodObj.en;
-                                    detailTxtKo = `사신합(${remoteBranchesStr})은 고열의 기운(巳)과 정밀 금속(申)의 만남입니다. 천간에 화(火)가 강하게 내리쬐고 이의 폭주를 막을 수(수)가 결여되어, 합화(융합)의 긍정적 성취보다는 온전히 조율되지 못하고 형살(刑殺)의 역동이 거세게 드러납니다. 금(金) 기운이 다치기 쉬우니, 신금(申金)의 십성인 ${shinTenGod} 영역(건강, 재물, 대인관계 등)에서 무리한 제어나 충돌 사고를 주의해야 합니다.`;
-                                    detailTxtEn = `Due to the lack of Water and strong Fire, the Si-Shen combination (${remoteBranchesStrEn}) breaks and turns into a Punishment (Hyeong), potentially damaging the Metal element. Exercise caution in the areas represented by ${shinTenGod}.`;
-                                  } else {
-                                    detailTxtKo = `육합, 형, 파가 얽힌 사신(${remoteBranchesStr})은 환경에 따라 수(수)나 금(金)으로 주도권이 변하며, 합(융합)과 형(갈등 및 재조립)을 오갑니다. 상황 변화에 따른 극적인 리모델링이나 패러다임 전환의 역동성을 지닙니다.`;
-                                    detailTxtEn = `The Si-Shen relationship (${remoteBranchesStrEn}) fluctuates between fusion and friction depending on the environment, creating dynamic cycles of breaking and remaking.`;
-                                  }
-                                } else if ((bStr === '卯戌' || bStr === '戌卯') && activeUserMatch.type === '육합') {
+                              const bStr = activeItem.branches;
+                              if ((bStr === '巳申' || bStr === '申巳') && activeUserMatch.type === '육합') {
+                                if (isHyeong) {
+                                  detailTxtKo = `사신합(${remoteBranchesStr})이자 동시에 사신형살(刑)의 성질과 파살(破)의 역동성이 함께 주파수로 교차합니다. 처음에는 강한 은혜와 합화(융합)의 완벽한 밀착으로 출발하나, 시간이 흐르며 권력 구조나 조율적 마찰로 흐르기 쉽고, 다시 금(金)으로 주도권이 변하며, 합(융합)과 형(갈등 및 재조립)을 오갑니다. 상황 변화에 따른 극적인 리모델링이나 패러다임 전환의 역동성을 지닙니다.`;
+                                  detailTxtEn = `The Si-Shen relationship (${remoteBranchesStrEn}) fluctuates between fusion and friction depending on the environment, creating dynamic cycles of breaking and remaking.`;
+                                } else {
+                                  detailTxtKo = `사신합(${remoteBranchesStr})은 합이면서 동시에 형살(刑)의 성질과 파살(破)의 역동성이 교차합니다. 처음엔 강한 은혜와 합화(융합)로 보이나 갈등 해결과 교정 마찰을 통해 금(金)으로 주도권이 변하며, 합(융합)과 형(갈등 및 재조립)을 오갑니다. 상황 변화에 따른 극적인 리모델링이나 패러다임 전환의 역동성을 지닙니다.`;
+                                  detailTxtEn = `The Si-Shen relationship (${remoteBranchesStrEn}) fluctuates between fusion and friction depending on the environment, creating dynamic cycles of breaking and remaking.`;
+                                }
+                              } else if ((bStr === '卯戌' || bStr === '戌卯') && activeUserMatch.type === '육합') {
                                   if (hasFireStem) {
                                     detailTxtKo = `묘술합(${remoteBranchesStr})은 천간에 화(火) 기운이 있어 불꽃으로 변하는 합화가 원활합니다. 예술적 열정이나 학문적 이상이 화려하게 만개하는 긍정적인 발현을 이룹니다.`;
                                     detailTxtEn = `The Mao-Xu combination (${remoteBranchesStrEn}) smoothly transforms into Fire, igniting artistic passion and academic ideals.`;
@@ -6521,7 +6491,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     detailTxtEn = `The Chen-You combination (${remoteBranchesStrEn}) provides reliable, stable support where the moist earth gently nurtures and protects the precious metal.`;
                                   }
                                 }
-                              }
 
                               return (
                                 <div className="space-y-3 mt-3">
@@ -6575,25 +6544,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                                   let relationName = "";
                                                   let relationDescKo = "";
                                                   let relationDescEn = "";
-                                                  
-                                                  if (m.type === '복음') {
-                                                    relationName = lang === 'KO' ? '복음 (기둥 중복)' : 'Pillar Duplication (Bok-eum)';
-                                                    relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '동일 기운의 중공/중복으로 행동 정체나 고도 집중 성찰 주기가 발현됩니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Same pillar energy duplicates, causing potential stagnation or amplified focus.';
-                                                  } else if (m.type === '지지충') {
-                                                    relationName = lang === 'KO' ? '정면 지지충' : 'Direct Branch Clash';
-                                                    relationDescKo = '인접 지지의 충돌로 즉각적이고 과감한 환경 변화나 인생의 강한 역동성을 개척합니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Direct close collision driving instant, catalytic resets and powerful environmental expansion.';
-                                                  } else if (m.type === '격충') {
-                                                    relationName = lang === 'KO' ? '건너뛴 격충' : 'Separated Branch Clash';
-                                                    relationDescKo = '기둥을 건너뛴 마찰로, 간헐적인 심리적 긴장감 및 예리하고 정밀한 보완 능력을 기릅니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Collision across one pillar triggering alert situational awareness and precise detail planning.';
-                                                  } else if (m.type === '원충') {
-                                                    relationName = lang === 'KO' ? '원격 원충' : 'Remote Branch Clash';
-                                                    relationDescKo = '원거리 간접 충돌로, 실생활 변동보다는 철학적 깊이와 성찰 안목을 키워줍니다.';
-                                                    relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Remote spaced clash granting subtle caution, artistic wisdom, and background prudence.';
-                                                  } else if (m.type === '반합') {
-                                                    relationName = lang === 'KO' ? '지합 반합' : 'Half Triad Combination';
+                                                   
+                                                   if (m.type === '복음') {
+                                                     relationName = lang === 'KO' ? '복음 (기둥 중복)' : 'Pillar Duplication (Bok-eum)';
+                                                     relationDescKo = m.note ? m.note.split('|')[0].replace(/<[^>]*>/g, '') : '동일 기운의 중공/중복으로 행동 정체나 고도 집중 성찰 주기가 발현됩니다.';
+                                                     relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Same pillar energy duplicates, causing potential stagnation or amplified focus.';
+                                                   } else if (m.type === '지지충') {
+                                                     relationName = lang === 'KO' ? '정면 지지충' : 'Direct Branch Clash';
+                                                     relationDescKo = '인접 지지의 충돌로 즉각적이고 과감한 환경 변화나 인생의 강한 역동성을 개척합니다.';
+                                                     relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Direct close collision driving instant, catalytic resets and powerful environmental expansion.';
+                                                   } else if (m.type === '격충') {
+                                                     relationName = lang === 'KO' ? '건너뛴 격충' : 'Separated Branch Clash';
+                                                     relationDescKo = '기둥을 건너뛴 마찰로, 간헐적인 심리적 긴장감 및 예리하고 정밀한 보완 능력을 기릅니다.';
+                                                     relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Collision across one pillar triggering alert situational awareness and precise detail planning.';
+                                                   } else if (m.type === '원충') {
+                                                     relationName = lang === 'KO' ? '원격 원충' : 'Remote Branch Clash';
+                                                     relationDescKo = '원거리 간접 충돌로, 실생활 변동보다는 철학적 깊이와 성찰 안목을 키워줍니다.';
+                                                     relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Remote spaced clash granting subtle caution, artistic wisdom, and background prudence.';
+                                                   } else if (m.type === '반합' || m.type === '가합') {
+                                                     relationName = lang === 'KO' ? '지합 반합' : 'Half Triad Combination';
                                                     relationDescKo = '핵심 오행을 포함한 결속으로, 힘차게 돌아가는 엔진 축처럼 기능적 협률을 생산합니다.';
                                                     relationDescEn = m.note && m.note.split('|')[1] ? m.note.split('|')[1].replace(/<[^>]*>/g, '') : 'Powerful partial triad producing stable functional cooperation and dynamic action.';
                                                   } else if (m.type === '삼합') {
@@ -6722,12 +6691,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               <div id="five-elements-guide-section" className="space-y-4 pt-6 mt-6 border-t border-white/10">
                 <h4 className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">4</span>
-                  {lang === 'KO' ? '대자연의 조화: 오행의 생극제화(生剋制化)' : 'Cosmic Balance: Mutual Generation & Overcoming'}
+                  {lang === 'KO' ? '대자연의 조화: 오행의 생극제화(生剋制化)' : 'Cosmic Balance: Generation & Control'}
                 </h4>
                 <p className="text-sm leading-relaxed text-white/80">
                   {lang === 'KO' ? 
                     '우주와 삶은 오행의 순환 속에 있습니다. 상생(相生)은 기운을 키우고 흘러가게 돕는 힘이며, 상극(相剋)은 기운을 제어하여 균형을 잡아주는 힘입니다. 이것이 서로 조화를 이루는 과정이 생극제화(生剋制化)입니다.' : 
-                    'The cosmic nature operates through the cycle of five elements. Sheng (Mutual Generation) is the force that nourishes and flows, while Ke (Mutual Overcoming) is the governing force that maintains balance through control.'}
+                    'The cosmic nature operates through the cycle of five elements. Generating (Mutual Generation) is the force that nourishes and flows, while Controlling (Mutual Control) is the governing force that maintains balance through restraint.'}
                 </p>
 
                 <FiveElementsDiagram lang={lang} isLight={isLight} />
@@ -6764,8 +6733,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       color: ELEMENT_COLORS.Earth,
                       shengOut: { element: 'Metal', icon: '⚔️', labelKo: '金 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '토생금 (토생금)', phraseEn: 'Earth forms Metal', descKo: '단단한 대지 속에 광물을 품어 길러냄', descEn: 'Earth forms precious Minerals and Metals.' },
                       shengIn: { element: 'Fire', icon: '🔥', labelKo: '火 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '화생토 (화생토)', phraseEn: 'Fire forms Earth', descKo: '뜨겁게 타오른 재가 흙을 윤택하게 함', descEn: 'Fire turns to rich ash, enriching Earth.' },
-                      keOut: { element: 'Water', icon: '💧', labelKo: '水 (수·Water)', labelEn: 'Water (수)', phraseKo: '토극수 (토극수)', phraseEn: 'Earth dams Water', descKo: '견고한 대지가 굽이치는 물줄기를 가둠', descEn: 'Earth dams up, absorbs, and directs Water.' },
-                      keIn: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '목극토 (목극토)', phraseEn: 'Wood parts Earth', descKo: '단단한 나무뿌리가 흙을 관통해 누름', descEn: 'Wood parts and restrains Earth with roots.' },
+                      keOut: { element: 'Water', icon: '💧', labelKo: '水 (수·Water)', labelEn: 'Water (水)', phraseKo: '토극수 (토극수)', phraseEn: 'Earth dams Water', descKo: '견고한 대지가 굽이치는 물줄기를 가둠', descEn: 'Earth dams up, absorbs, and directs Water.' },
+                      keIn: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (木)', phraseKo: '목극토 (목극토)', phraseEn: 'Wood parts Earth', descKo: '단단한 나무뿌리가 흙을 관통해 누름', descEn: 'Wood parts and restrains Earth with roots.' },
                     },
                     {
                       element: 'Metal',
@@ -6773,18 +6742,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       labelEn: 'Metal (金)',
                       icon: '⚔️',
                       color: ELEMENT_COLORS.Metal,
-                      shengOut: { element: 'Water', icon: '💧', labelKo: '수 (수·Water)', labelEn: 'Water (수)', phraseKo: '금생수 (금생수)', phraseEn: 'Metal condenses Water', descKo: '정제된 금속 표면에 이슬(물)이 맺힘', descEn: 'Metal cools to condense clean dew.' },
+                      shengOut: { element: 'Water', icon: '💧', labelKo: '수 (수·Water)', labelEn: 'Water (水)', phraseKo: '금생수 (금생수)', phraseEn: 'Metal condenses Water', descKo: '정제된 금속 표면에 이슬(물)이 맺힘', descEn: 'Metal cools to condense clean dew.' },
                       shengIn: { element: 'Earth', icon: '🏔️', labelKo: '土 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '토생금 (토생금)', phraseEn: 'Earth forms Metal', descKo: '흙 속의 풍부한 무기물이 원석을 벼려냄', descEn: 'Earth compresses and forms precious Metals.' },
-                      keOut: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '금극목 (금극목)', phraseEn: 'Metal cuts Wood', descKo: '예리한 날이 우거진 가지를 극제하여 정돈함', descEn: 'Metal axes chop and sculpt overgrown Wood.' },
+                      keOut: { element: 'Wood', icon: '🌱', labelKo: '木 (목·Wood)', labelEn: 'Wood (木)', phraseKo: '금극목 (금극목)', phraseEn: 'Metal cuts Wood', descKo: '예리한 날이 우거진 가지를 극제하여 정돈함', descEn: 'Metal axes chop and sculpt overgrown Wood.' },
                       keIn: { element: 'Fire', icon: '🔥', labelKo: '火 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '화극금 (화극금)', phraseEn: 'Fire melts Metal', descKo: '용광로의 화기가 견고한 금속 구조를 교정함', descEn: 'Fire melts raw Metal to reshape its physical form.' },
                     },
                     {
                       element: 'Water',
                       labelKo: '水 (수·Water)',
-                      labelEn: 'Water (수)',
+                      labelEn: 'Water (水)',
                       icon: '💧',
                       color: ELEMENT_COLORS.Water,
-                      shengOut: { element: 'Wood', icon: '🌱', labelKo: '목 (목·Wood)', labelEn: 'Wood (Mao)', phraseKo: '수생목 (수생목)', phraseEn: 'Water grows Wood', descKo: '흘려보내듯 자비로운 물길이 나무를 키움', descEn: 'Water flows to dynamic roots, nurturing Wood.' },
+                      shengOut: { element: 'Wood', icon: '🌱', labelKo: '목 (목·Wood)', labelEn: 'Wood (木)', phraseKo: '수생목 (수생목)', phraseEn: 'Water grows Wood', descKo: '흘려보내듯 자비로운 물길이 나무를 키움', descEn: 'Water flows to dynamic roots, nurturing Wood.' },
                       shengIn: { element: 'Metal', icon: '⚔️', labelKo: '금 (금·Metal)', labelEn: 'Metal (金)', phraseKo: '금생수 (금생수)', phraseEn: 'Metal condenses Water', descKo: '시원하고 차가운 암반을 거쳐 맑은 샘물이 흘러나옴', descEn: 'Metal cools to condense clean dew.' },
                       keOut: { element: 'Fire', icon: '🔥', labelKo: '화 (화·Fire)', labelEn: 'Fire (火)', phraseKo: '수극화 (수극화)', phraseEn: 'Water tames Fire', descKo: '유연한 물이 치성하게 번져가는 불을 가라앉힘', descEn: 'Water extinguishes rising flames of Fire.' },
                       keIn: { element: 'Earth', icon: '🏔️', labelKo: '토 (토·Earth)', labelEn: 'Earth (土)', phraseKo: '토극수 (토극수)', phraseEn: 'Earth dams Water', descKo: '묵묵한 대지와 제방이 세찬 강줄기를 붙잡음', descEn: 'Earth dams up, absorbs, and directs Water.' },
@@ -6828,16 +6797,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   {lang === 'KO' ? '기준 오행' : 'Base Element'}
                                 </th>
                                 <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`} style={{ width: '22%' }}>
-                                  {lang === 'KO' ? '상생: 내가 생(生)함 [출력]' : 'Sheng-Out: Generates'}
+                                  {lang === 'KO' ? '상생: 내가 생(生)함 [출력]' : 'Generate (Out): Generates'}
                                 </th>
                                 <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`} style={{ width: '22%' }}>
-                                  {lang === 'KO' ? '상생: 나를 생(生)함 [입력]' : 'Sheng-In: Nourished By'}
+                                  {lang === 'KO' ? '상생: 나를 생(生)함 [입력]' : 'Generate (In): Nourished By'}
                                 </th>
                                 <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-rose-700' : 'text-rose-400'}`} style={{ width: '22%' }}>
-                                  {lang === 'KO' ? '상극: 내가 극(剋)함 [제어]' : 'Ke-Out: Controls'}
+                                  {lang === 'KO' ? '상극: 내가 극(剋)함 [제어]' : 'Control (Out): Controls'}
                                 </th>
                                 <th className={`py-4 px-4 font-bold uppercase tracking-wider text-center ${isLight ? 'text-rose-700' : 'text-rose-400'}`} style={{ width: '22%' }}>
-                                  {lang === 'KO' ? '상극: 나를 극(剋)함 [피극]' : 'Ke-In: Controlled By'}
+                                  {lang === 'KO' ? '상극: 나를 극(剋)함 [피극]' : 'Control (In): Controlled By'}
                                 </th>
                               </tr>
                             </thead>
@@ -6903,11 +6872,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         }`}>
                           <span className="font-semibold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            {lang === 'KO' ? '상생(相生): 기운을 듬뿍 실어주고 북돋아주는 관계' : 'Sheng: Generation & Nourishing Relationship'}
+                            {lang === 'KO' ? '상생(相生): 기운을 듬뿍 실어주고 북돋아주는 관계' : 'Generating (Creation): Nurturing relationship that fuels other element'}
                           </span>
                           <span className="font-semibold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                            {lang === 'KO' ? '상극(相剋): 기운을 제어하여 흐트러짐 없게 조율하는 관계' : 'Ke: Control & Directing Relationship'}
+                            {lang === 'KO' ? '상극(相剋): 기운을 제어하여 흐트러짐 없게 조율하는 관계' : 'Overcoming (Restraint): Governing relationship that controls and balances other element'}
                           </span>
                         </div>
                       </div>
@@ -6920,7 +6889,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   isLight ? 'bg-slate-100/80 border-slate-200 text-slate-800' : 'bg-white/5 border-white/10 text-white/50'
                 }`}>
                   <h6 className={`font-bold mb-2 flex items-center gap-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                    💡 {lang === 'KO' ? '생극제화(生剋制化)의 진실: 모든 기운은 필요합니다' : 'The Truth of Sheng-Ke-Hua: Every Force is Vital'}
+                    💡 {lang === 'KO' ? '생극제화(生剋制化)의 진실: 모든 기운은 필요합니다' : 'The Truth of Generation & Restraint: Every Force is Vital'}
                   </h6>
                   <p className="leading-relaxed opacity-95">
                     {lang === 'KO' ? (
@@ -6932,16 +6901,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                       </>
                     ) : (
                       <>
-                        In genuine BaZi, it is a grand misconception to classify generation (Sheng) as unconditionally good and overcoming (Ke) as bad. 
-                        Without Sheng, nothing grows. Without Ke (control), there is infinite growth leading to catastrophic decay. 
-                        When generation and restraint interact dynamically (Sheng-Ke-Hua), true psychological mastery and profound balance emerge.
+                        In genuine BaZi, it is a grand misconception to classify creation (Generation) as unconditionally good and overcoming (Restraint) as bad. 
+                        Without Generation, nothing grows. Without Restraint (control), there is infinite growth leading to catastrophic decay. 
+                        When creation and restraint interact dynamically (Generation-Restraint-Harmonization), true psychological mastery and profound balance emerge.
                       </>
                     )}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4 pt-6 mt-6 border-t border-white/10">
+              <div ref={tenGodsGridRef} className="space-y-4 pt-6 mt-6 border-t border-white/10">
                 <h4 id="guide-section-tengods" className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">5</span>
                   {lang === 'KO' ? '마음의 10가지 가면: 십성 (The 10 Masks of Mind)' : 'The Ten Gods: 10 Masks of Mind'}
@@ -7922,7 +7891,7 @@ const FiveElementsDiagram = ({ lang, isLight }: { lang: 'KO' | 'EN'; isLight: bo
       {/* 타이틀 및 가이드 범례 */}
       <div className="w-full text-center mb-2">
         <h5 className={`text-base font-bold flex items-center justify-center gap-1.5 ${isLight ? 'text-slate-800' : 'text-white'}`}>
-          🌐 {lang === 'KO' ? '오행 상생 상극도 (五行 相生相剋圖)' : 'Five Elements Sheng & Ke Cycles'}
+          🌐 {lang === 'KO' ? '오행 상생 상극도 (五行 相生相剋圖)' : 'Five Elements Generating & Overcoming Cycle'}
         </h5>
         <p className={`text-xs mt-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
           {lang === 'KO' ? '각 오행 위에 마우스를 올려 상생과 상극 관계의 흐름을 확인해 보세요.' : 'Hover over elements to trace and visualize interaction dynamics.'}
@@ -7993,7 +7962,7 @@ const FiveElementsDiagram = ({ lang, isLight }: { lang: 'KO' | 'EN'; isLight: bo
                   fontWeight="black"
                   className="font-sans"
                 >
-                  {lang === 'KO' ? '생 (生)' : 'Sheng'}
+                  {lang === 'KO' ? '생 (生)' : 'Gen'}
                 </text>
               </g>
             );
@@ -8039,11 +8008,11 @@ const FiveElementsDiagram = ({ lang, isLight }: { lang: 'KO' | 'EN'; isLight: bo
               y={cy + 4}
               textAnchor="middle"
               fill="#EA4335"
-              fontSize="12"
+              fontSize={lang === 'KO' ? "12" : "9.5"}
               fontWeight="black"
               className="font-sans"
             >
-              {lang === 'KO' ? '극 (剋)' : 'Ke'}
+              {lang === 'KO' ? '극 (剋)' : 'Control'}
             </text>
           </g>
 
@@ -8185,23 +8154,47 @@ const FiveElementsDiagram = ({ lang, isLight }: { lang: 'KO' | 'EN'; isLight: bo
               <div className="flex flex-wrap items-center gap-4 mt-2 pt-2 border-t border-dashed border-zinc-200/40">
                 <span className="flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  <span className={`font-semibold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>상생:</span>
-                  <span className="font-bold flex items-center gap-0.5" style={{ color: activeDetail.color }}>
+                  <span className={`font-semibold mr-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                    {lang === 'KO' ? '상생:' : 'Generating (Saeng):'}
+                  </span>
+                  <span className="font-bold flex items-center gap-1">
                     {(() => {
                       const sourceEl = activeDetail;
                       const shengTarget = elements.find(item => item.id === sourceEl.nextId)!;
-                      return `${sourceEl.han} ➔ ${shengTarget.han}`;
+                      return (
+                        <>
+                          <span style={{ color: sourceEl.color }}>
+                            {lang === 'KO' ? sourceEl.han : `${sourceEl.han} (${sourceEl.en})`}
+                          </span>
+                          <span className={`text-xs ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>➔</span>
+                          <span style={{ color: shengTarget.color }}>
+                            {lang === 'KO' ? shengTarget.han : `${shengTarget.han} (${shengTarget.en})`}
+                          </span>
+                        </>
+                      );
                     })()}
                   </span>
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                  <span className={`font-semibold ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>상극:</span>
-                  <span className="font-bold flex items-center gap-0.5" style={{ color: activeDetail.color }}>
+                  <span className={`font-semibold mr-1 ${isLight ? 'text-slate-500' : 'text-zinc-400'}`}>
+                    {lang === 'KO' ? '상극:' : 'Overcoming (Keuk):'}
+                  </span>
+                  <span className="font-bold flex items-center gap-1">
                     {(() => {
                       const sourceEl = activeDetail;
                       const keTarget = elements.find(item => item.id === sourceEl.keId)!;
-                      return `${sourceEl.han} ➔ ${keTarget.han}`;
+                      return (
+                        <>
+                          <span style={{ color: sourceEl.color }}>
+                            {lang === 'KO' ? sourceEl.han : `${sourceEl.han} (${sourceEl.en})`}
+                          </span>
+                          <span className={`text-xs ${isLight ? 'text-slate-400' : 'text-zinc-600'}`}>➔</span>
+                          <span style={{ color: keTarget.color }}>
+                            {lang === 'KO' ? keTarget.han : `${keTarget.han} (${keTarget.en})`}
+                          </span>
+                        </>
+                      );
                     })()}
                   </span>
                 </span>
