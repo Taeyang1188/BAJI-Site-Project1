@@ -1111,7 +1111,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         // Calculate offset to place it beautifully (e.g. slightly above center)
         let yOffset = 55; // Push chart up just enough to hide the button but keep pillar headers visible
         if (guideStep === 5) {
-          yOffset = 25; // Push chart up slightly so both chart and explanation fit nicely
+          yOffset = 220; // Push chart up significantly so the hidden stems and explanation popover are fully visible
         } else if (guideStep === 6) {
           yOffset = -30;
         } else if (guideStep === 7) {
