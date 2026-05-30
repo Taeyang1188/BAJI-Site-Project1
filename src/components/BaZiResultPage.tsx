@@ -1109,13 +1109,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
       if (refToScroll?.current) {
         // Calculate offset to place it beautifully (e.g. slightly above center)
-        let yOffset = -10; 
+        let yOffset = 55; // Push chart up just enough to hide the button but keep pillar headers visible
         if (guideStep === 5) {
           yOffset = 25; // Push chart up slightly so both chart and explanation fit nicely
         } else if (guideStep === 6) {
           yOffset = -30;
         } else if (guideStep === 7) {
-          yOffset = -30;
+          yOffset = -320;
         }
 
         const y = refToScroll.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
@@ -3760,16 +3760,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               exit={{ opacity: 0 }}
               className={`absolute left-0 right-0 z-[60] p-4 sm:p-6 rounded-2xl border border-neon-cyan/40 bg-goth-bg/95 shadow-[0_0_30px_rgba(0,242,255,0.3)] pointer-events-auto bottom-[100%] mb-4`}
             >
-              <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              <button onClick={() => setGuideStep(0)} className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </button>
-              <div className="flex flex-col sm:flex-row gap-4 items-start">
-                <div className="w-12 h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)]">
-                  <span className="text-2xl" role="img" aria-label="seasons">🌤️</span>
+              <div className="flex flex-row gap-3 sm:gap-4 items-start">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-neon-cyan/20 flex items-center justify-center shrink-0 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,242,255,0.4)] mt-1">
+                  <span className="text-xl sm:text-2xl" role="img" aria-label="seasons">🌤️</span>
                 </div>
-                <div className="flex-1">
-                  <h4 className="text-base sm:text-lg font-bold text-neon-cyan mb-1 flex items-center gap-2">
-                    {lang === 'KO' ? '대운 (Life Seasons) - 내게 주어진 10년의 테마' : 'Life Seasons - The 10-Year Theme'}
+                <div className="flex-1 pr-6 sm:pr-0">
+                  <h4 className="text-base sm:text-lg font-bold text-neon-cyan mb-1 flex flex-wrap items-center gap-2">
+                    {lang === 'KO' ? '대운 - 내게 주어진 10년의 테마' : 'Life Seasons - The 10-Year Theme'}
                     <span className="text-xs px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-white/70 whitespace-nowrap">
                       Step 7 / 7
                     </span>
@@ -5212,7 +5212,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               <div className="space-y-4">
                 <h4 id="guide-section-daewun" className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-sm">3</span>
-                  {lang === 'KO' ? '시간의 파도: 대운 (Life Seasons)' : 'Life Seasons'}
+                  {lang === 'KO' ? '시간의 파도: 대운' : 'Life Seasons'}
                 </h4>
                 <div className="relative w-full h-[250px] sm:h-[300px] overflow-hidden flex items-center justify-center bg-black/40 rounded-2xl border border-neon-purple/20 py-8">
                   <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,rgba(188,0,255,0.2)_0%,transparent_70%)]"></div>
