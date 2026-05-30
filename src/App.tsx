@@ -592,7 +592,7 @@ export default function App() {
       <div className="fixed inset-0 star-field opacity-20 pointer-events-none" />
       
       {/* Top Navigation */}
-      <nav className="fixed top-0 w-full p-4 sm:p-6 flex justify-between items-center z-50">
+      <nav id="top-nav-bar" className="fixed top-0 w-full p-4 sm:p-6 flex justify-between items-center z-50 transition-opacity duration-300">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => {

@@ -1094,7 +1094,11 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const lifeSeasonsRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (guideStep === 0) return;
+    if (guideStep === 0) {
+      document.body.classList.remove('guide-active');
+      return;
+    }
+    document.body.classList.add('guide-active');
     
     // Slight delay to ensure elements are rendered/uncollapsed properly before scrolling
     const timer = setTimeout(() => {
@@ -1105,9 +1109,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
       if (refToScroll?.current) {
         // Calculate offset to place it beautifully (e.g. slightly above center)
-        const yOffset = -80; // Assuming fixed header offset
+        let yOffset = -10; 
+        if (guideStep === 5) {
+          yOffset = 25; // Push chart up slightly so both chart and explanation fit nicely
+        } else if (guideStep === 6) {
+          yOffset = -30;
+        } else if (guideStep === 7) {
+          yOffset = -30;
+        }
+
         const y = refToScroll.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }
     }, 100);
 
@@ -3825,7 +3837,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           setExpandedYear(null);
                           setExpandedMonth(null);
                         }}
-                        className={`w-full min-h-[95px] sm:min-h-[105px] flex-1 rounded-xl transition-all flex flex-col items-center justify-center p-2 relative shadow-sm cursor-pointer select-none ${
+                        className={`w-full min-h-[110px] sm:min-h-[120px] flex-1 rounded-xl transition-all flex flex-col items-center justify-start pt-2 px-1 pb-4 relative shadow-sm cursor-pointer select-none ${
                           isCurrent 
                             ? (theme === 'light' ? 'ring-2 ring-pink-400 bg-pink-50 shadow-[0_4px_12px_rgba(236,72,153,0.15)] z-10' : 'ring-2 ring-neon-pink bg-[#1a0515] border border-neon-pink/50 shadow-[0_0_20px_rgba(255,0,122,0.4)] z-10')
                             : (theme === 'light' ? 'bg-white border border-slate-200 hover:bg-slate-50' : 'bg-black/80 border border-white/10 hover:bg-white/10')
@@ -3945,7 +3957,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               setExpandedYear(isYearExpanded ? null : api);
                               setExpandedMonth(null);
                             }}
-                            className={`w-full bg-white/5 rounded-xl p-2 flex flex-col items-center border transition-all relative min-h-[85px] justify-center cursor-pointer select-none ${borderClass}`}
+                            className={`w-full bg-white/5 rounded-xl pt-0 flex flex-col items-center border transition-all relative min-h-[90px] sm:min-h-[100px] justify-start cursor-pointer select-none ${borderClass} px-1 pb-3`}
                           >
                             {hasInteractions && (
                               <div 
@@ -3969,7 +3981,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               </div>
                             )}
 
-                            <div className={`text-[13px] font-bold mb-0.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{ap.age}</div>
+                            {/* To visually match Daewun box, we pad the top slightly to account for the missing lifeStage text */}
+                            <div className="h-[12px] sm:h-[14px]"></div>
+                            
+                            <div className={`text-[12px] sm:text-[13px] font-bold mb-0.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{ap.age}</div>
                             <div 
                               className={`font-gothic font-bold text-center leading-tight ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs mb-0.5' : 'text-[13px] sm:text-[14px]'}`}
                               style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}

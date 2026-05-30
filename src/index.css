@@ -620,6 +620,11 @@ body.light-mode .border-neon-pink { border-color: #809BED !important; } /* Unsel
   box-shadow: 0 0 10px var(--color-neon-purple);
 }
 
+body.guide-active #top-nav-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ==========================================================================
    LIGHT MODE HOVER STYLES FOR CONNECTED STEMS
    ========================================================================== */
