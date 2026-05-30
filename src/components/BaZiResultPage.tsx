@@ -1160,21 +1160,10 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         if (targetId) {
           const element = document.getElementById(targetId);
           if (element) {
-            const scrollContainer = element.closest('.overflow-y-auto');
-            if (scrollContainer) {
-              const containerRect = scrollContainer.getBoundingClientRect();
-              const elementRect = element.getBoundingClientRect();
-              const relativeTop = elementRect.top - containerRect.top + scrollContainer.scrollTop;
-              scrollContainer.scrollTo({
-                top: relativeTop - 16,
-                behavior: 'smooth'
-              });
-            } else {
-              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }
-      }, 150);
+      }, 50); // delay minimally, scrollIntoView handles the rest better
     }
   }, [showGuideDetailModal, guideStep]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -4936,7 +4925,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             <div className="p-6 overflow-y-auto space-y-8 no-scrollbar">
 
               <div className="space-y-4">
-                <h4 id="guide-section-tree" className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 id="guide-section-tree" className="text-lg font-bold text-white flex items-center gap-2 scroll-mt-6">
                   <span className="w-6 h-6 rounded-full bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">1</span>
                   {lang === 'KO' ? '생태계적 관점: 사주나무 (Cosmic Tree)' : 'Ecological View: The Cosmic Tree'}
                 </h4>
@@ -5044,7 +5033,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               </div>
 
               <div className="space-y-4">
-                <h4 id="guide-section-jijangan" className={`text-lg font-bold flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                <h4 id="guide-section-jijangan" className={`text-lg font-bold flex items-center gap-2 scroll-mt-6 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                   <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm">2</span>
                   {lang === 'KO' ? '땅 속에 감춰진 씨앗: 지장간' : 'Hidden Seeds: Ji-Jang-Gan'}
                 </h4>
@@ -5210,7 +5199,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                </div>
 
               <div className="space-y-4">
-                <h4 id="guide-section-daewun" className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 id="guide-section-daewun" className="text-lg font-bold text-white flex items-center gap-2 scroll-mt-6">
                   <span className="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-sm">3</span>
                   {lang === 'KO' ? '시간의 파도: 대운' : 'Life Seasons'}
                 </h4>
@@ -6926,7 +6915,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
               </div>
 
               <div ref={tenGodsGridRef} className="space-y-4 pt-6 mt-6 border-t border-white/10">
-                <h4 id="guide-section-tengods" className="text-lg font-bold text-white flex items-center gap-2">
+                <h4 id="guide-section-tengods" className="text-lg font-bold text-white flex items-center gap-2 scroll-mt-6">
                   <span className="w-6 h-6 rounded-full bg-neon-pink/20 text-neon-pink flex items-center justify-center text-sm">5</span>
                   {lang === 'KO' ? '마음의 10가지 가면: 십성 (The 10 Masks of Mind)' : 'The Ten Gods: 10 Masks of Mind'}
                 </h4>
@@ -7067,6 +7056,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                 </div>
               </div>
 
+              {/* Spacer so the last section can scroll all the way to the top */}
+              <div className="h-[70vh] shrink-0" aria-hidden="true" />
             </div>
           </motion.div>
         </div>,
