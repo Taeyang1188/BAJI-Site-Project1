@@ -6983,12 +6983,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           });
 
                           const BRANCHES_INFO: Record<string, { element: string, polarity: number }> = {
-                            '子': { element: 'Water', polarity: 1 }, '丑': { element: 'Earth', polarity: -1 },
+                            '子': { element: 'Water', polarity: -1 }, '丑': { element: 'Earth', polarity: -1 },
                             '寅': { element: 'Wood', polarity: 1 }, '卯': { element: 'Wood', polarity: -1 },
-                            '辰': { element: 'Earth', polarity: 1 }, '巳': { element: 'Fire', polarity: -1 },
-                            '午': { element: 'Fire', polarity: 1 }, '未': { element: 'Earth', polarity: -1 },
+                            '辰': { element: 'Earth', polarity: 1 }, '巳': { element: 'Fire', polarity: 1 },
+                            '午': { element: 'Fire', polarity: -1 }, '未': { element: 'Earth', polarity: -1 },
                             '申': { element: 'Metal', polarity: 1 }, '酉': { element: 'Metal', polarity: -1 },
-                            '戌': { element: 'Earth', polarity: 1 }, '亥': { element: 'Water', polarity: -1 }
+                            '戌': { element: 'Earth', polarity: 1 }, '亥': { element: 'Water', polarity: 1 }
                           };
                           const ELEMENTS = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
                           const dmIdx = allStems.indexOf(dayMaster);
