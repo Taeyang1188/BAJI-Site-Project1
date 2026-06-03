@@ -552,7 +552,7 @@ const GongmangDetail = ({ result, lang, isLight }: { result: BaZiResult, lang: L
   );
 };
 
-import { SocialContext } from '../types';
+import { SocialContext, UserInput } from '../types';
 
 interface BaZiResultPageProps {
   result: BaZiResult;
@@ -563,6 +563,8 @@ interface BaZiResultPageProps {
   socialContext?: SocialContext;
   onBack: () => void;
   skipTyping?: boolean;
+  userInput?: UserInput;
+  coords?: { lat: number; lon: number };
 }
 
 const parseColorBracketsToHtml = (text: string): string => {
@@ -748,7 +750,7 @@ const BaziTooltip = ({
   );
 };
 
-export default function BaZiResultPage({ result, lang, userName, gender, city, socialContext, onBack, skipTyping = false }: BaZiResultPageProps) {
+export default function BaZiResultPage({ result, lang, userName, gender, city, socialContext, onBack, skipTyping = false, userInput, coords }: BaZiResultPageProps) {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const t = TRANSLATIONS[lang].result as any;
@@ -7565,7 +7567,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       </AnimatePresence>
 
       {/* Soul Summary Report Card */}
-      <SoulSummaryCard result={result} lang={lang} />
+      <SoulSummaryCard result={result} lang={lang} userInput={userInput} coords={coords} />
 
       <div className="flex justify-center pt-12 pb-[calc(100px+env(safe-area-inset-bottom))]">
         <motion.button 
@@ -7616,7 +7618,17 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   );
 }
 
-const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language }) => {
+export const SoulSummaryCard = ({ 
+  result, 
+  lang,
+  userInput,
+  coords
+}: { 
+  result: BaZiResult, 
+  lang: Language,
+  userInput?: UserInput,
+  coords?: { lat: number; lon: number }
+}) => {
   const isLight = typeof document !== 'undefined' ? document.body.classList.contains('light-mode') : false;
   const summary = React.useMemo(() => generateSoulSummary(result, lang), [result, lang]);
   const dayPillar = result.pillars.find(p => p.title === 'Day');
@@ -7629,7 +7641,21 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
     const text = lang === 'KO' 
       ? `내 사주로 분석한 영혼의 소울 테마는 [${summary.oneLineReview}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
       : `My soul profile theme analyzed from my BaZi is [${summary.oneLineReview}]! Open your cosmic core energy and lucky features now 🌌`;
-    const url = window.location.href;
+    
+    let url = window.location.href;
+    if (userInput) {
+      try {
+        const payload = {
+          ...userInput,
+          lat: coords?.lat,
+          lon: coords?.lon
+        };
+        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+        url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}`;
+      } catch (e) {
+        console.error("Error generating share URL", e);
+      }
+    }
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
@@ -7901,7 +7927,7 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
           <div className="pt-4 w-full relative">
             <button 
               onClick={handleShare}
-              className="w-full py-4 bg-gradient-to-r from-neon-pink/20 via-neon-purple/20 to-neon-cyan/20 hover:from-neon-pink/35 hover:via-neon-purple/35 hover:to-neon-cyan/35 active:scale-[0.98] transition-all duration-300 border border-white/20 hover:border-white/40 rounded-2xl text-white text-sm font-display tracking-widest uppercase cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.1)] hover:shadow-[0_0_25px_rgba(0,243,255,0.2)] mb-2"
+              className={`w-full py-4 bg-gradient-to-r from-neon-pink/20 via-neon-purple/20 to-neon-cyan/20 hover:from-neon-pink/35 hover:via-neon-purple/35 hover:to-neon-cyan/35 active:scale-[0.98] transition-all duration-300 border border-white/20 hover:border-white/40 rounded-2xl text-white cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.1)] hover:shadow-[0_0_25px_rgba(0,243,255,0.2)] mb-2 ${lang === 'KO' ? 'font-sans font-semibold tracking-normal text-[15px]' : 'font-display text-sm tracking-widest uppercase'}`}
             >
               <Share2 className="w-4 h-4 animate-pulse text-neon-cyan" />
               {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
