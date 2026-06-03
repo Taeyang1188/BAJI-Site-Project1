@@ -493,6 +493,23 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     displayElem = lang === 'KO' ? `${coreElemKo}(${hanja})` : baseElement;
   }
 
+  const rawGeju = result.analysis?.geJu || "";
+  const isSelfDominantGeju = rawGeju.includes("건록") || rawGeju.includes("비견") || rawGeju.includes("겁재") || rawGeju.includes("양인") ||
+                              rawGeju.toLowerCase().includes("prosperity") || rawGeju.toLowerCase().includes("mirror") || rawGeju.toLowerCase().includes("rival") || rawGeju.toLowerCase().includes("blade");
+  const isThreeElementsYongshin = isSelfDominantGeju || yongShenElements.length >= 3;
+
+  if (isThreeElementsYongshin) {
+    const threeElementsIndices = [(dmIdx + 1) % 5, (dmIdx + 2) % 5, (dmIdx + 3) % 5];
+    const threeElements = threeElementsIndices.map(idx => elementsOrder[idx]);
+    displayElem = lang === 'KO' 
+      ? threeElements.map(el => {
+          const ko = BAZI_MAPPING.elements[el as keyof typeof BAZI_MAPPING.elements]?.ko?.split(' ')[0] || el;
+          const hanja = BAZI_MAPPING.elements[el as keyof typeof BAZI_MAPPING.elements]?.hanja || "";
+          return `${ko}(${hanja})`;
+        }).join(' · ')
+      : threeElements.join(' / ');
+  }
+
   // Core Energy logic based on Yong-shin's role (Ten Gods)
   const yongShenRoleIdx = (elementsOrder.indexOf(baseElement) - dmIdx + 5) % 5;
   const roles = ["비겁", "식상", "재성", "관성", "인성"];
@@ -632,12 +649,84 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     }
   };
 
-  const coreInfo = coreEnergyMap[role]?.[lang === 'KO' ? 'ko' : 'en'] || coreEnergyMap["인성"][lang === 'KO' ? 'ko' : 'en'];
+  const threeElementsCoreInfo = {
+    ko: {
+      description: `스스로의 뿌리가 아주 단단한 격국(${rawGeju})입니다. 독립적인 에너지를 바탕으로 다양한 아이디어(식상을 통한 창의적 표현)와 현실적인 성과(재성을 통한 결과물), 그리고 확실한 책임감(관성을 통한 신뢰)을 고루 발휘해 스스로 길을 개척하고 큰 성공을 이뤄낼 수 있습니다.`,
+      practicalAdvice: `생각에 머무는 계획을 거칠게라도 당장 세상에 드러내고(식상), 일의 마무리 단계를 꼼꼼히 챙겨 실리적 결과로 매듭지으며(재성), 신뢰 가득하고 책임감 있는 정돈된 원칙을 지켜 사회적 신용을 높여 보세요(관성).`,
+      luckyHabit: `매주 하나의 독창적인 성과를 기록하고, 합리적인 자금 흐름을 조율하며, 공적인 모임에서 약속과 품위를 신사적으로 관리하기`
+    },
+    en: {
+      description: `With an exceptionally strong and stable personal foundation (${rawGeju}), you possess the rare capacity to seamlessly balance and utilize three practical keys: Output (creative expression), Wealth (tangible results), and Power (social recognition & systems). By remaining anchored in self-reliance while designing, materializing, and scaling within structure, you can masterfully unlock your ultimate success.`,
+      practicalAdvice: `Immediately launch your ideas and refine them in action (Output), meticulously close loop ends to secure real-life gains (Wealth), and maintain transparent, highly disciplined codes of conduct to elevate your social reputation (Power).`,
+      luckyHabit: `Drafting one creative milestone weekly, auditing your personal finance flow, and gracefully refining your public-facing commitments and etiquette.`
+    }
+  };
+
+  let coreInfo = coreEnergyMap[role]?.[lang === 'KO' ? 'ko' : 'en'] || coreEnergyMap["인성"][lang === 'KO' ? 'ko' : 'en'];
+  if (isThreeElementsYongshin) {
+    coreInfo = threeElementsCoreInfo[lang === 'KO' ? 'ko' : 'en'];
+  }
+
+  // Dynamic Destiny Remedy Summary (개운법)
+  let destinyRemedySummary = "";
+  if (lang === 'KO') {
+    if (isThreeElementsYongshin) {
+      destinyRemedySummary = "나의 단단한 중심을 믿고 완벽주의(인성)에 갇히기보다, 아이디어를 적극적으로 실행(식상)하며 확실한 실질 결과(재성)를 만들고 책임감(관성) 마인드로 신뢰를 탄탄하게 세워보세요.";
+    } else if (sikSangScore >= 35) {
+      destinyRemedySummary = "머릿속 기획과 재능을 완벽히 다듬으려 지체하기보다, 조금 투박하더라도 글, 창작, 기술 등 눈에 보이는 실리와 결과(재성)로 매듭지어 세상과 시원하게 승부해 보세요.";
+    } else if (jaeSeongScore >= 35) {
+      destinyRemedySummary = "매사 이익이나 당장의 효율에 집착해 뇌를 과열시키는 대신, 조급함을 끄고 나를 지탱할 학술, 자격증, 지혜 같은 단단한 내실(인성)을 충분히 보강하세요.";
+    } else if (gwanSeongScore >= 35) {
+      destinyRemedySummary = "엄격한 시선과 책임지옥에 숨 막혀하기보다, 명확한 전문 스펙(인성)을 강화하거나 날카로운 개성(식상)으로 나만의 독자적인 영역을 능동적으로 장악하세요.";
+    } else if (bigyeopScore >= 40) {
+      destinyRemedySummary = "소모적인 기싸움이나 해묵은 고집으로 감정을 허비하기 전, 내 주권을 담대히 긍정하고 창작(식상 설기)이나 비즈니스 목표에 모든 에너지를 쏟아보세요.";
+    } else if (inSeongScore >= 40) {
+      destinyRemedySummary = "생각의 성에서 탈출하여 완벽한 준비를 내려놓고, 미완성의 초안이라도 거칠게 실천(식상)하며 실제 세속적인 이익(재성)과 시장 피드백을 통해 역량을 검증해 보세요.";
+    } else {
+      if (role === "식상") {
+        destinyRemedySummary = "내 안의 흥미로운 아이디어와 끼를 지체 없이 표현하고 가벼운 취미와 발산 욕구를 건강하게 해소해 보세요.";
+      } else if (role === "재성") {
+        destinyRemedySummary = "정밀한 계획 복원과 현실적인 자금/일정의 최적화에 힘쓰고 일상의 군더더기를 정리해 가치 중심의 성과로 이끄세요.";
+      } else if (role === "관성") {
+        destinyRemedySummary = "즉흥적인 충동을 긍정적으로 제어하며, 공적인 대의와 단단한 규칙을 바탕으로 원칙주의적인 신뢰도를 대폭 높이세요.";
+      } else if (role === "인성") {
+        destinyRemedySummary = "조용히 서재를 지어 독서에 힘쓰거나 가치 있는 배움과 검증된 라이선스를 획득해 내면의 흔들리지 않는 닻을 내리세요.";
+      } else {
+        destinyRemedySummary = "외부의 지나친 눈치와 참견을 차단하고, 내 삶의 주권적 가치를 회복하며 든든하고 소박한 조력자 동료들과 연대하세요.";
+      }
+    }
+  } else {
+    if (isThreeElementsYongshin) {
+      destinyRemedySummary = "Leverage your solid inner-strength to launch bold ideas (Output), close operational ends (Wealth), and maintain elegant discipline (Power) simultaneously.";
+    } else if (sikSangScore >= 35) {
+      destinyRemedySummary = "Instead of perfecting ideas, project your raw talents into visible, real-world assets (Wealth) to claim tangible rewards.";
+    } else if (jaeSeongScore >= 35) {
+      destinyRemedySummary = "Step back from hyper-focusing on monetary margins, cooling down your overtaxed brain to enrich your license, wisdom, and inner reserves (Resource).";
+    } else if (gwanSeongScore >= 35) {
+      destinyRemedySummary = "Do not let social obligations exhaust you; secure heavy credentials (Resource) or make your own Rules of the Game with dynamic speech (Output).";
+    } else if (bigyeopScore >= 40) {
+      destinyRemedySummary = "Avoid wasting titanium focus on low-level clashes; direct your raw drive fully into grand creative ambitions or pioneering disruptions.";
+    } else if (inSeongScore >= 40) {
+      destinyRemedySummary = "Shatter your sacred perfectionism; release rough drafts immediately to collect actual market feedback and capitalize on secular rewards.";
+    } else {
+      if (role === "식상") {
+        destinyRemedySummary = "Inject your unique voice and innovative sparks directly into tangible outcomes and enjoy creative hobbies.";
+      } else if (role === "재성") {
+        destinyRemedySummary = "Organize loose ends, budget your commitments, and focus tightly on high-trust routines and actionable projects.";
+      } else if (role === "관성") {
+        destinyRemedySummary = "Lead by quiet example, align with high-trust communal systems, and protect your schedule with healthy limits.";
+      } else if (role === "인성") {
+        destinyRemedySummary = "Quietly refine your master skill sets, absorb certified wisdom, and allow yourself cozy off-grid moments.";
+      } else {
+        destinyRemedySummary = "Reclaim sovereign control over your calendar, refuse unsolicited criticism, and foster deep bonds with true allies.";
+      }
+    }
+  }
 
   // Action Prescription
   const actionPrescription = lang === 'KO' ?
-    `이번 달은 ${displayElem}의 기운을 활용해 ${coreInfo.practicalAdvice}` :
-    `This month, use the energy of ${yongShen} to ${coreInfo.practicalAdvice}`;
+    `이번 달은 ${displayElem}의 기운을 활용하는 것이 최고의 개운법입니다. ${destinyRemedySummary}` :
+    `This month, utilizing the energy of ${displayElem} is your best destiny remedy. ${destinyRemedySummary}`;
 
   // Lucky Items
   const luckyItemsMap: Record<string, { name: string, description: string }[]> = {

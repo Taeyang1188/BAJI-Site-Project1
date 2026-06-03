@@ -7873,7 +7873,7 @@ export const SoulSummaryCard = ({
                       : 'text-white/50 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-neon-pink" />
+                  <Sparkles className={`w-3.5 h-3.5 transition-colors ${activeTab === 'elements' ? 'text-white' : 'text-neon-pink'}`} />
                   <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
                     {lang === 'KO' ? '오행 밸런스' : 'Elements'}
                   </span>
@@ -7887,7 +7887,7 @@ export const SoulSummaryCard = ({
                       : 'text-white/50 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Zap className="w-3.5 h-3.5 text-neon-cyan" />
+                  <Zap className={`w-3.5 h-3.5 transition-colors ${activeTab === 'energy' ? 'text-white' : 'text-neon-cyan'}`} />
                   <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
                     {lang === 'KO' ? '핵심 에너지' : 'Core Energy'}
                   </span>
