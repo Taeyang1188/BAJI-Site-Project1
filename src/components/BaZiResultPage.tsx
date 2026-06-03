@@ -7622,22 +7622,29 @@ export const SoulSummaryCard = ({
   result, 
   lang,
   userInput,
-  coords
+  coords,
+  isSharedView = false
 }: { 
   result: BaZiResult, 
   lang: Language,
   userInput?: UserInput,
-  coords?: { lat: number; lon: number }
+  coords?: { lat: number; lon: number },
+  isSharedView?: boolean
 }) => {
-  const isLight = typeof document !== 'undefined' ? document.body.classList.contains('light-mode') : false;
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const summary = React.useMemo(() => generateSoulSummary(result, lang), [result, lang]);
   const dayPillar = result.pillars.find(p => p.title === 'Day');
   const iljuData = dayPillar ? ILJU_DESCRIPTIONS[dayPillar.hanja] : null;
   const [isImageViewMode, setIsImageViewMode] = React.useState(false);
   const [shareState, setShareState] = React.useState<'idle' | 'success' | 'error' | 'copied'>('idle');
+  
+  // Compact state toggles
+  const [isCompact, setIsCompact] = React.useState(isSharedView);
+  const [activeTab, setActiveTab] = React.useState<'elements' | 'energy' | 'fortune'>('elements');
 
   const handleShare = async () => {
-    const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.I.D)';
+    const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.O.I.D)';
     const text = lang === 'KO' 
       ? `내 사주로 분석한 영혼의 소울 테마는 [${summary.oneLineReview}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
       : `My soul profile theme analyzed from my BaZi is [${summary.oneLineReview}]! Open your cosmic core energy and lucky features now 🌌`;
@@ -7710,16 +7717,16 @@ export const SoulSummaryCard = ({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="mt-12 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
+      className="mt-6 p-1 bg-gradient-to-br from-neon-pink/20 via-neon-cyan/20 to-neon-purple/20 rounded-[2rem] shadow-[0_0_30px_rgba(255,0,122,0.15)]"
     >
-      <div className="bg-black/95 rounded-[1.9rem] border border-white/10 relative overflow-hidden flex flex-col justify-center p-6 sm:p-10 min-h-[600px]">
+      <div className="bg-black/95 rounded-[1.9rem] border border-white/10 relative overflow-hidden flex flex-col justify-center p-5 sm:p-8 min-h-[500px]">
         {iljuData?.detailImg && (
           <img 
             src={iljuData.cardBg || iljuData.detailImg}
             alt={`${dayPillar?.hanja} Background`}
             loading="lazy"
             referrerPolicy="no-referrer"
-            className="absolute inset-0 w-full h-full z-0 opacity-40 object-cover transition-opacity duration-700"
+            className="absolute inset-0 w-full h-full z-0 opacity-30 object-cover transition-opacity duration-700"
           />
         )}
 
@@ -7793,38 +7800,251 @@ export const SoulSummaryCard = ({
             pointerEvents: isImageViewMode ? 'none' : 'auto'
           }}
           transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-          className="relative z-10 flex flex-col items-center text-center space-y-6 w-full"
+          className="relative z-10 flex flex-col items-center text-center space-y-5 w-full"
         >
           {/* Aligned balanced top header row when reading content to prevent visual overlap */}
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-white/5 mb-2">
+          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-white/5">
             <div className="inline-block px-4 py-1.5 rounded-full bg-black/30 backdrop-blur-[8px] border border-white/10 text-[10px] font-display font-bold tracking-[0.3em] text-white/40 uppercase shadow-lg">
               Soul Summary Report
             </div>
-            {!isImageViewMode && iljuData?.detailImg && (
-              <button 
-                onClick={() => setIsImageViewMode(true)}
-                className="px-4 py-1.5 rounded-full bg-neon-pink/10 backdrop-blur-md border border-neon-pink/30 text-[10px] sm:text-xs font-bold text-neon-pink hover:text-white hover:bg-neon-pink transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(255,0,122,0.15)] hover:shadow-[0_0_15px_rgba(255,0,122,0.35)]"
-              >
-                <Image className="w-3.5 h-3.5" />
-                {lang === 'KO' ? '이미지 보기' : 'View Image'}
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {/* View Mode Switcher */}
+              <div className="inline-flex p-0.5 bg-white/5 rounded-lg border border-white/10 select-none">
+                <button
+                  type="button"
+                  onClick={() => setIsCompact(true)}
+                  className={`px-3 py-1 text-[9px] sm:text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                    isCompact 
+                      ? 'bg-neon-pink text-white shadow-[0_0_10px_rgba(255,0,122,0.4)]' 
+                      : 'text-white/40 hover:text-white/80'
+                  }`}
+                >
+                  {lang === 'KO' ? '요약 보기' : 'Quick Glance'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCompact(false)}
+                  className={`px-3 py-1 text-[9px] sm:text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                    !isCompact 
+                      ? 'bg-neon-pink text-white shadow-[0_0_10px_rgba(255,0,122,0.4)]' 
+                      : 'text-white/40 hover:text-white/80'
+                  }`}
+                >
+                  {lang === 'KO' ? '전체 보기' : 'Full Scroll'}
+                </button>
+              </div>
+
+              {!isImageViewMode && iljuData?.detailImg && (
+                <button 
+                  onClick={() => setIsImageViewMode(true)}
+                  className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg bg-neon-pink/10 backdrop-blur-md border border-neon-pink/30 text-[10px] font-bold text-neon-pink hover:text-white hover:bg-neon-pink transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_10px_rgba(255,0,122,0.15)]"
+                >
+                  <Image className="w-3.5 h-3.5" />
+                  {lang === 'KO' ? '원화 보기' : 'View Art'}
+                </button>
+              )}
+            </div>
           </div>
               
-              <div className="space-y-2 w-full p-6 bg-black/30 backdrop-blur-[8px] border border-white/10 rounded-2xl shadow-lg">
-                <div className="text-neon-pink text-sm font-bold tracking-widest uppercase">{summary.iljuName}</div>
-                <h2 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
-                  "{summary.oneLineReview}"
-                </h2>
-                <div className="flex flex-wrap justify-center gap-2 mt-3">
-                  {summary.hashtags.map((tag, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-black/40 border border-gray-400/40 text-[11px] sm:text-xs text-[#39FF14] font-bold shadow-[0_0_8px_rgba(57,255,20,0.4)] tracking-wide">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+          <div className="space-y-2 w-full p-5 bg-black/30 backdrop-blur-[8px] border border-white/10 rounded-2xl shadow-lg">
+            <div className="text-neon-pink text-xs font-bold tracking-widest uppercase">{summary.iljuName}</div>
+            <h2 className="text-xl sm:text-3xl font-display font-bold text-white tracking-tight leading-tight px-1">
+              "{summary.oneLineReview}"
+            </h2>
+            <div className="flex flex-wrap justify-center gap-1.5 mt-2">
+              {summary.hashtags.map((tag, i) => (
+                <span key={i} className="px-2.5 py-0.5 rounded-full bg-black/40 border border-gray-400/40 text-[10px] sm:text-xs text-[#39FF14] font-bold shadow-[0_0_8px_rgba(57,255,20,0.25)] tracking-wide">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
               
+          {isCompact ? (
+            /* Interactive Compact Segmented Tab Layout */
+            <div className="w-full flex flex-col space-y-4">
+              <div className="w-full flex p-1 bg-white/5 backdrop-blur-[10px] rounded-xl border border-white/10 gap-1 select-none">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('elements')}
+                  className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    activeTab === 'elements'
+                      ? 'bg-gradient-to-r from-neon-pink to-neon-purple text-white shadow-lg font-extrabold'
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-neon-pink" />
+                  <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
+                    {lang === 'KO' ? '오행 밸런스' : 'Elements'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('energy')}
+                  className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    activeTab === 'energy'
+                      ? 'bg-gradient-to-r from-neon-purple to-neon-cyan text-white shadow-lg font-extrabold'
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5 text-neon-cyan" />
+                  <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
+                    {lang === 'KO' ? '핵심 에너지' : 'Core Energy'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('fortune')}
+                  className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    activeTab === 'fortune'
+                      ? 'bg-gradient-to-r from-neon-cyan to-emerald-400 text-black shadow-lg font-extrabold'
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
+                    {lang === 'KO' ? '행운 처방' : 'Lucky Vibe'}
+                  </span>
+                </button>
+              </div>
+
+              <div className="w-full min-h-[250px] flex items-center">
+                <AnimatePresence mode="wait">
+                  {activeTab === 'elements' && (
+                    <motion.div
+                      key="elements-tab"
+                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full flex flex-col justify-center items-center"
+                    >
+                      <div className="w-full bg-black/40 backdrop-blur-md p-5 rounded-2xl border border-white/5 shadow-inner space-y-3">
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest block text-center">
+                          {lang === 'KO' ? '오행 밸런스 요약' : 'Cosmic Elemental Balance'}
+                        </span>
+                        <div className="grid grid-cols-5 gap-2.5 pt-1">
+                          {summary.elementStrengths.map((es, i) => (
+                            <div key={i} className="flex flex-col items-center gap-1.5">
+                              <div className="w-full bg-white/5 rounded-full h-20 relative overflow-hidden">
+                                <motion.div 
+                                  initial={{ height: 0 }}
+                                  animate={{ height: `${Math.min(es.percentage, 100)}%` }}
+                                  transition={{ delay: 0.05, duration: 0.6, ease: "easeOut" }}
+                                  className="absolute bottom-0 left-0 w-full"
+                                  style={{ backgroundColor: es.color }}
+                                />
+                              </div>
+                              <span className="text-[10px] font-bold text-white/60">{es.name}</span>
+                              <span className="text-[9px] font-mono text-white/40 font-semibold">{es.percentage}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'energy' && (
+                    <motion.div
+                      key="energy-tab"
+                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full text-left bg-black/30 backdrop-blur-[8px] p-5 rounded-2xl border border-white/10 space-y-3 pt-4"
+                    >
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">
+                          {lang === 'KO' ? '가까이 해야할 핵심에너지' : 'Core Energy to Keep Close'}
+                        </span>
+                        <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase tracking-widest transition-colors duration-500">
+                          {(() => {
+                            const elementStr = summary.coreEnergy.element || '';
+                            const parts = elementStr.split(/(\s*[\/·,]\s*|\s+)/g);
+                            return parts.map((part, index) => {
+                              const isSeparator = /^[\s\/·,]+$/.test(part);
+                              if (isSeparator) {
+                                return (
+                                  <span key={index} className="text-slate-400 dark:text-white/40 mx-0.5">
+                                    {part}
+                                  </span>
+                                );
+                              }
+                              const color = getElementColorForText(part, isLight);
+                              return (
+                                <span 
+                                  key={index} 
+                                  style={{ 
+                                    color: color,
+                                    textShadow: isLight ? 'none' : `0 0 10px ${color}55`
+                                  }}
+                                  className="transition-all duration-300"
+                                >
+                                  {part}
+                                </span>
+                              );
+                            });
+                          })()}
+                        </h3>
+                      </div>
+                      <p className={`text-xs sm:text-sm leading-relaxed font-sans mt-1 ${isLight ? 'text-slate-700' : 'text-white/80'}`}>
+                        {summary.coreEnergy.description}
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'fortune' && (
+                    <motion.div
+                      key="fortune-tab"
+                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full space-y-3.5 text-left"
+                    >
+                      <div className="p-4 bg-black/30 backdrop-blur-[8px] rounded-xl border border-white/10 text-left space-y-1">
+                        <div className="flex items-center gap-1.5 text-neon-pink">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span className="text-[9px] font-bold uppercase tracking-wider">{lang === 'KO' ? '행동 처방전' : 'Action Prescription'}</span>
+                        </div>
+                        <p className={`text-xs leading-normal font-sans ${isLight ? 'text-slate-800 font-medium' : 'text-white/85'}`}>{summary.actionPrescription}</p>
+                      </div>
+
+                      <div className="p-4 bg-black/30 backdrop-blur-[8px] rounded-xl border border-white/10 text-left space-y-1">
+                        <div className="flex items-center gap-1.5 text-neon-cyan">
+                          <Sparkles className="w-4 h-4" />
+                          <span className="text-[9px] font-bold uppercase tracking-wider">{lang === 'KO' ? '행운의 습관' : 'Lucky Habit'}</span>
+                        </div>
+                        <p className={`text-[11px] leading-normal font-sans ${isLight ? 'text-slate-800 font-medium' : 'text-white/80'}`}>{summary.coreEnergy.luckyHabit}</p>
+                      </div>
+
+                      <div className="p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 text-left space-y-2">
+                        <div className={`px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5 border ${
+                          isLight 
+                            ? 'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/20 text-emerald-800' 
+                            : 'bg-gradient-to-r from-[#39FF14]/15 via-[#39FF14]/5 to-transparent border-[#39FF14]/20 text-[#39FF14]'
+                        } mb-1.5`}>
+                          <span className="text-[10px] font-bold tracking-wider uppercase flex items-center gap-1">
+                            🍀 {lang === 'KO' ? '최고의 시너지 행운 아이템' : 'Lucky Synergy Items'}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {summary.luckyItems.map((item, i) => (
+                            <div key={i} className="p-2 bg-white/5 rounded-lg border border-white/5 text-left">
+                              <div className="text-[10px] text-neon-purple font-bold uppercase block leading-none mb-1">{item.name}</div>
+                              <p className={`text-[10px] leading-snug font-sans ${isLight ? 'text-slate-500 font-medium' : 'text-white/50'}`}>{item.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          ) : (
+            /* Traditional Full Scroll Layout */
+            <>
               <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
               
               <div className="max-w-2xl w-full space-y-4">
@@ -7850,8 +8070,8 @@ export const SoulSummaryCard = ({
                           <span 
                             key={index} 
                             style={{ 
-                              color: color,
-                              textShadow: isLight ? 'none' : `0 0 12px ${color}66`
+                                color: color,
+                                textShadow: isLight ? 'none' : `0 0 12px ${color}66`
                             }}
                             className="transition-all duration-300"
                           >
@@ -7861,7 +8081,7 @@ export const SoulSummaryCard = ({
                       });
                     })()}
                   </p>
-                  <p className="text-lg sm:text-xl text-white/90 font-medium leading-relaxed mt-2">
+                  <p className={`text-lg sm:text-xl font-medium leading-relaxed mt-2 ${isLight ? 'text-slate-800' : 'text-white/90'}`}>
                     {summary.coreEnergy.description}
                   </p>
                 </div>
@@ -7872,65 +8092,78 @@ export const SoulSummaryCard = ({
                       <CheckCircle2 className="w-4 h-4" />
                       <span className="text-xs font-bold uppercase tracking-wider">{lang === 'KO' ? '이번 달 행동 처방전' : 'Action Prescription'}</span>
                     </div>
-                    <p className="text-sm text-white/70 leading-relaxed">{summary.actionPrescription}</p>
+                    <p className={`text-sm leading-relaxed ${isLight ? 'text-slate-800 font-medium' : 'text-white/70'}`}>{summary.actionPrescription}</p>
                   </div>
                   
                   <div className="p-5 bg-black/30 backdrop-blur-[8px] rounded-2xl border border-white/10 shadow-lg text-left space-y-2">
                     <div className="flex items-center gap-2 text-neon-cyan">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">{lang === 'KO' ? '행운의 습관' : 'Lucky Habit'}</span>
-                </div>
-                <p className="text-sm text-white/70 leading-relaxed">{summary.coreEnergy.luckyHabit}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="w-full pt-4 space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col">
-                <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/60 uppercase self-center sm:self-start">
-                  {lang === 'KO' ? '행운의 아이템' : 'Lucky Items'}
-                </div>
-                <div className="space-y-3 flex-1">
-                  {summary.luckyItems.map((item, i) => (
-                    <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/10 text-left">
-                      <div className="text-[10px] text-neon-purple font-bold uppercase mb-1">{item.name}</div>
-                      <p className="text-[11px] text-white/70 leading-snug">{item.description}</p>
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-xs font-bold uppercase tracking-wider">{lang === 'KO' ? '행운의 습관' : 'Lucky Habit'}</span>
                     </div>
-                  ))}
+                    <p className={`text-sm leading-relaxed ${isLight ? 'text-slate-800 font-medium' : 'text-white/70'}`}>{summary.coreEnergy.luckyHabit}</p>
+                  </div>
                 </div>
               </div>
               
-              <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col justify-center">
-                <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/60 uppercase self-center">
-                  {lang === 'KO' ? '오행 밸런스 요약' : 'Elemental Balance'}
-                </div>
-                <div className="grid grid-cols-5 gap-2 mt-4">
-                  {summary.elementStrengths.map((es, i) => (
-                    <div key={i} className="flex flex-col items-center gap-1">
-                      <div className="w-full bg-white/5 rounded-full h-16 relative overflow-hidden">
-                        <motion.div 
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${Math.min(es.percentage, 100)}%` }}
-                          className="absolute bottom-0 left-0 w-full"
-                          style={{ backgroundColor: es.color }}
-                        />
-                      </div>
-                      <span className="text-[8px] font-bold text-white/40">{es.name}</span>
+              <div className="w-full pt-4 space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col">
+                    <div className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/60 uppercase self-center sm:self-start">
+                      {lang === 'KO' ? '행운의 아이템' : 'Lucky Items'}
                     </div>
-                  ))}
+                    <div className="space-y-3 flex-1">
+                      {summary.luckyItems.map((item, i) => (
+                        <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/10 text-left">
+                          <div className="text-[10px] text-neon-purple font-bold uppercase mb-1">{item.name}</div>
+                          <p className={`text-[11px] leading-snug ${isLight ? 'text-slate-600 font-medium' : 'text-white/70'}`}>{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4 p-5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg flex flex-col justify-center">
+                    <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase self-center border ${
+                      isLight 
+                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800' 
+                        : 'bg-white/5 border border-white/10 text-[#39FF14]'
+                    }`}>
+                      {lang === 'KO' ? '오행 밸런스 요약' : 'Elemental Balance'}
+                    </div>
+                    <div className="grid grid-cols-5 gap-2 mt-4">
+                      {summary.elementStrengths.map((es, i) => (
+                        <div key={i} className="flex flex-col items-center gap-1">
+                          <div className="w-full bg-white/5 rounded-full h-16 relative overflow-hidden">
+                            <motion.div 
+                              initial={{ height: 0 }}
+                              whileInView={{ height: `${Math.min(es.percentage, 100)}%` }}
+                              className="absolute bottom-0 left-0 w-full"
+                              style={{ backgroundColor: es.color }}
+                            />
+                          </div>
+                          <span className="text-[8px] font-bold text-white/40">{es.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
           
           <div className="pt-4 w-full relative">
             <button 
               onClick={handleShare}
-              className={`w-full py-4 bg-gradient-to-r from-neon-pink/20 via-neon-purple/20 to-neon-cyan/20 hover:from-neon-pink/35 hover:via-neon-purple/35 hover:to-neon-cyan/35 active:scale-[0.98] transition-all duration-300 border border-white/20 hover:border-white/40 rounded-2xl text-white cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.1)] hover:shadow-[0_0_25px_rgba(0,243,255,0.2)] mb-2 ${lang === 'KO' ? 'font-sans font-semibold tracking-normal text-[15px]' : 'font-display text-sm tracking-widest uppercase'}`}
+              className={`w-full py-4 rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black active:scale-[0.98] transition-all duration-300 mb-2 
+                ${isLight 
+                  ? 'bg-gradient-to-r from-[#5f46eb] via-[#8539f8] to-[#ea187c] shadow-[0_5px_22px_rgba(95,70,235,0.45)] hover:shadow-[0_8px_30px_rgba(95,70,235,0.65)] border border-white/40 hover:scale-[1.02]' 
+                  : 'bg-gradient-to-r from-neon-pink/30 via-neon-purple/40 to-neon-cyan/30 shadow-[0_0_20px_rgba(250,30,142,0.3)] hover:shadow-[0_0_30px_rgba(5,230,255,0.5)] border border-white/30 hover:border-white/60 hover:scale-[1.02]'
+                } 
+                ${lang === 'KO' ? 'font-sans text-[15px] tracking-wide' : 'font-display text-sm tracking-widest uppercase'}`}
             >
-              <Share2 className="w-4 h-4 animate-pulse text-neon-cyan" />
-              {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
+              <Share2 className="w-4 h-4 animate-bounce text-white" style={{ stroke: '#ffffff', filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(-1px -1px 0 #000) drop-shadow(1px 1px 0 #000)' }} />
+              <span className="high-contrast-neon-text">
+                {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
+              </span>
             </button>
 
             <AnimatePresence>

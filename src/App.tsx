@@ -754,6 +754,7 @@ export default function App() {
                   lang={lang} 
                   userInput={sharedInput} 
                   coords={sharedCoords} 
+                  isSharedView={true}
                 />
               </div>
 

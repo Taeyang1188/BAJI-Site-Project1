@@ -681,4 +681,42 @@ input[type="date"]::-webkit-datetime-edit-day-field {
   white-space: nowrap !important;
 }
 
+/* Highly visible text safety outline & color-shifting neon glow */
+@keyframes neonTextGlowCycle {
+  0% {
+    text-shadow: 
+      -1px -1px 0 #000,  
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 0 10px #FA1E8E, 
+       0 0 20px #FA1E8E;
+  }
+  50% {
+    text-shadow: 
+      -1px -1px 0 #000,  
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 0 10px #05E6FF, 
+       0 0 20px #05E6FF;
+  }
+  100% {
+    text-shadow: 
+      -1px -1px 0 #000,  
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 0 10px #A52BFF, 
+       0 0 20px #A52BFF;
+  }
+}
+
+.high-contrast-neon-text {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  animation: neonTextGlowCycle 4s infinite linear !important;
+}
+
+
 
