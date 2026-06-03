@@ -41,6 +41,7 @@ import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 import { TEN_GOD_DESCRIPTIONS } from '../constants/tenGodDescriptions';
 import { useTheme } from '../contexts/ThemeContext';
+import { compressPayload } from '../services/share-compress-service';
 
 const ILJU_BACKGROUND_IMAGES: Record<string, { base: string, detailed: string }> = {
   '己丑': { base: 'https://i.imgur.com/RyKP0u5.jpeg', detailed: 'https://i.imgur.com/RyKP0u5.jpeg' },
@@ -7644,20 +7645,33 @@ export const SoulSummaryCard = ({
   const [activeTab, setActiveTab] = React.useState<'elements' | 'energy' | 'fortune'>('elements');
 
   const handleShare = async () => {
+    const zodiacEmojis: Record<string, string> = {
+      '子': '🐭',
+      '丑': '🐮',
+      '寅': '🐯',
+      '卯': '🐰',
+      '辰': '🐉',
+      '巳': '🐍',
+      '午': '🐴',
+      '未': '🐑',
+      '申': '🐵',
+      '酉': '🐔',
+      '戌': '🐶',
+      '亥': '🐷'
+    };
+    const dayBranch = dayPillar?.branch || '';
+    const zZodiacEmoji = zodiacEmojis[dayBranch] || '🌌';
+
     const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.O.I.D)';
     const text = lang === 'KO' 
-      ? `내 사주로 분석한 영혼의 소울 테마는 [${summary.oneLineReview}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
-      : `My soul profile theme analyzed from my BaZi is [${summary.oneLineReview}]! Open your cosmic core energy and lucky features now 🌌`;
+      ? `내 사주로 분석한 영혼의 소울 테마는 [${summary.oneLineReview}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 ${zZodiacEmoji}`
+      : `My soul profile theme analyzed from my BaZi is [${summary.oneLineReview}]! Open your cosmic core energy and lucky features now ${zZodiacEmoji}`;
     
     let url = window.location.href;
     if (userInput) {
       try {
-        const payload = {
-          ...userInput,
-          lat: coords?.lat,
-          lon: coords?.lon
-        };
-        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+        const compressed = compressPayload(userInput, coords?.lat, coords?.lon);
+        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(compressed))));
         url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}&lang=${lang}`;
       } catch (e) {
         console.error("Error generating share URL", e);
@@ -7673,28 +7687,29 @@ export const SoulSummaryCard = ({
       }
     }
 
+    const shareContent = `${text}\n👉 ${url}`;
+
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
           title,
-          text,
-          url,
+          text: shareContent,
         });
         setShareState('success');
         setTimeout(() => setShareState('idle'), 3000);
       } catch (err: any) {
         if (err.name !== 'AbortError') {
-          copyToClipboard(url);
+          copyToClipboard(shareContent);
         }
       }
     } else {
-      copyToClipboard(url);
+      copyToClipboard(shareContent);
     }
   };
 
-  const copyToClipboard = (url: string) => {
+  const copyToClipboard = (textToCopy: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(url).then(() => {
+      navigator.clipboard.writeText(textToCopy).then(() => {
         setShareState('copied');
         setTimeout(() => setShareState('idle'), 3000);
       }).catch(() => {
@@ -7704,7 +7719,7 @@ export const SoulSummaryCard = ({
     } else {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
-      textArea.value = url;
+      textArea.value = textToCopy;
       textArea.style.position = 'fixed';
       document.body.appendChild(textArea);
       textArea.focus();
@@ -8179,10 +8194,10 @@ export const SoulSummaryCard = ({
               <AnimatePresence>
                 {shareState !== 'idle' && (
                   <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    initial={{ opacity: 0, y: -35, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                    className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
+                    exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                    className="fixed top-24 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
                   >
                     {shareState === 'copied' && (
                       <>

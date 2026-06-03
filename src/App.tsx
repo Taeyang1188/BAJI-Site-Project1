@@ -15,6 +15,7 @@ import AuroraBackground from './components/AuroraBackground';
 import BaZiResultPage, { SoulSummaryCard } from './components/BaZiResultPage';
 
 import { calculateRealBaZi } from './services/bazi-service';
+import { decompressPayload } from './services/share-compress-service';
 
 import characterWebm from './assets/door.webm';
 import characterApng from './assets/door.png';
@@ -380,13 +381,14 @@ export default function App() {
     if (sharedParam) {
       try {
         const decodedPayload = decodeURIComponent(escape(atob(sharedParam)));
-        const parsedInput = JSON.parse(decodedPayload);
+        const rawObj = JSON.parse(decodedPayload);
+        const parsedInput = decompressPayload(rawObj);
         if (parsedInput && parsedInput.birthDate) {
           setSharedInput(parsedInput);
           setIsSharedView(true);
-          if (parsedInput.lat && parsedInput.lon) {
-            setSharedCoords({ lat: parsedInput.lat, lon: parsedInput.lon });
-          }
+          const finalLat = parsedInput.lat !== undefined ? parsedInput.lat : 37.5665;
+          const finalLon = parsedInput.lon !== undefined ? parsedInput.lon : 126.9780;
+          setSharedCoords({ lat: finalLat, lon: finalLon });
         }
       } catch (e) {
         console.error("Failed to parse shared soul profile payload", e);
