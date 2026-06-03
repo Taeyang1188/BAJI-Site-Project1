@@ -375,8 +375,11 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const sharedParam = params.get('s');
     const langParam = params.get('lang');
-    if (langParam === 'EN' || langParam === 'KO') {
-      setLang(langParam as Language);
+    if (langParam) {
+      const normalizedLang = langParam.toUpperCase();
+      if (normalizedLang === 'EN' || normalizedLang === 'KO') {
+        setLang(normalizedLang as Language);
+      }
     }
     if (sharedParam) {
       try {
