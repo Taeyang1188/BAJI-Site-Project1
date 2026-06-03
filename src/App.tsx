@@ -373,6 +373,10 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sharedParam = params.get('s');
+    const langParam = params.get('lang');
+    if (langParam === 'EN' || langParam === 'KO') {
+      setLang(langParam as Language);
+    }
     if (sharedParam) {
       try {
         const decodedPayload = decodeURIComponent(escape(atob(sharedParam)));

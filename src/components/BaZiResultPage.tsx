@@ -7658,9 +7658,18 @@ export const SoulSummaryCard = ({
           lon: coords?.lon
         };
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-        url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}`;
+        url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}&lang=${lang}`;
       } catch (e) {
         console.error("Error generating share URL", e);
+      }
+    } else {
+      // Append or replace language parameter even if url is window.location.href
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.set('lang', lang);
+        url = u.toString();
+      } catch (e) {
+        url = `${window.location.href}${window.location.href.includes('?') ? '&' : '?'}lang=${lang}`;
       }
     }
 
