@@ -8159,58 +8159,60 @@ export const SoulSummaryCard = ({
             </>
           )}
           
-          <div className="pt-4 w-full relative">
-            <button 
-              onClick={handleShare}
-              className={`w-full py-4 rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black active:scale-[0.98] transition-all duration-300 mb-2 
-                ${isLight 
-                  ? 'bg-gradient-to-r from-[#5f46eb] via-[#8539f8] to-[#ea187c] shadow-[0_5px_22px_rgba(95,70,235,0.45)] hover:shadow-[0_8px_30px_rgba(95,70,235,0.65)] border border-white/40 hover:scale-[1.02]' 
-                  : 'bg-gradient-to-r from-neon-pink/30 via-neon-purple/40 to-neon-cyan/30 shadow-[0_0_20px_rgba(250,30,142,0.3)] hover:shadow-[0_0_30px_rgba(5,230,255,0.5)] border border-white/30 hover:border-white/60 hover:scale-[1.02]'
-                } 
-                ${lang === 'KO' ? 'font-sans text-[15px] tracking-wide' : 'font-display text-sm tracking-widest uppercase'}`}
-            >
-              <Share2 className="w-4 h-4 animate-bounce text-white" style={{ stroke: '#ffffff', filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(-1px -1px 0 #000) drop-shadow(1px 1px 0 #000)' }} />
-              <span className="high-contrast-neon-text">
-                {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
-              </span>
-            </button>
+          {!isSharedView && (
+            <div className="pt-4 w-full relative">
+              <button 
+                onClick={handleShare}
+                className={`w-full py-4 rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black active:scale-[0.98] transition-all duration-300 mb-2 
+                  ${isLight 
+                    ? 'bg-gradient-to-r from-[#5f46eb] via-[#8539f8] to-[#ea187c] shadow-[0_5px_22px_rgba(95,70,235,0.45)] hover:shadow-[0_8px_30px_rgba(95,70,235,0.65)] border border-white/40 hover:scale-[1.02]' 
+                    : 'bg-gradient-to-r from-neon-pink/30 via-neon-purple/40 to-neon-cyan/30 shadow-[0_0_20px_rgba(250,30,142,0.3)] hover:shadow-[0_0_30px_rgba(5,230,255,0.5)] border border-white/30 hover:border-white/60 hover:scale-[1.02]'
+                  } 
+                  ${lang === 'KO' ? 'font-sans text-[15px] tracking-wide' : 'font-display text-sm tracking-widest uppercase'}`}
+              >
+                <Share2 className="w-4 h-4 animate-bounce text-white" style={{ stroke: '#ffffff', filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(-1px -1px 0 #000) drop-shadow(1px 1px 0 #000)' }} />
+                <span className="high-contrast-neon-text">
+                  {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
+                </span>
+              </button>
 
-            <AnimatePresence>
-              {shareState !== 'idle' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                  className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
-                >
-                  {shareState === 'copied' && (
-                    <>
-                      <span className="text-neon-cyan font-bold">🔗</span>
-                      <span className="text-white text-xs sm:text-sm font-medium">
-                        {lang === 'KO' ? '링크 복사 완료! 원하는 메신저/인스타에 붙여넣어봐!' : 'Link copied! Paste it anywhere!'}
-                      </span>
-                    </>
-                  )}
-                  {shareState === 'success' && (
-                    <>
-                      <span className="text-emerald-400 font-bold">🎉</span>
-                      <span className="text-white text-xs sm:text-sm font-medium">
-                        {lang === 'KO' ? '소울 리포트 공유 성공!' : 'Soul report shared successfully!'}
-                      </span>
-                    </>
-                  )}
-                  {shareState === 'error' && (
-                    <>
-                      <span className="text-rose-400 font-bold">😢</span>
-                      <span className="text-white text-xs sm:text-sm font-medium">
-                        {lang === 'KO' ? '링크 복사에 실패했어. 브라우저 주소창을 복사해줘!' : 'Failed to copy URL.'}
-                      </span>
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+              <AnimatePresence>
+                {shareState !== 'idle' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                    className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
+                  >
+                    {shareState === 'copied' && (
+                      <>
+                        <span className="text-neon-cyan font-bold">🔗</span>
+                        <span className="text-white text-xs sm:text-sm font-medium">
+                          {lang === 'KO' ? '링크 복사 완료! 원하는 메신저/인스타에 붙여넣어봐!' : 'Link copied! Paste it anywhere!'}
+                        </span>
+                      </>
+                    )}
+                    {shareState === 'success' && (
+                      <>
+                        <span className="text-emerald-400 font-bold">🎉</span>
+                        <span className="text-white text-xs sm:text-sm font-medium">
+                          {lang === 'KO' ? '소울 리포트 공유 성공!' : 'Soul report shared successfully!'}
+                        </span>
+                      </>
+                    )}
+                    {shareState === 'error' && (
+                      <>
+                        <span className="text-rose-400 font-bold">😢</span>
+                        <span className="text-white text-xs sm:text-sm font-medium">
+                          {lang === 'KO' ? '링크 복사에 실패했어. 브라우저 주소창을 복사해줘!' : 'Failed to copy URL.'}
+                        </span>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.div>
       </div>
     </motion.div>
