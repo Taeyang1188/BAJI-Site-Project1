@@ -222,8 +222,8 @@ export const calculateAdvancedAnalysis = (
         }
 
         descKo = muSikDesc + " " + (isStrongDM 
-          ? "특히 내면에 축적된 고유 에너지(신강)를 밖으로 배출할 마땅한 발산구가 미비한 구조입니다. 생각이 많아지면 결국 정체로 끝나니, 일단 작더라도 즉각적인 세상 릴리즈와 소통을 이행하셔야 건강해집니다." 
-          : "특히 기운의 손실을 최소화해 에너지를 지켜야 유용한 신약 가동 구조에 해당합니다. 과격한 표현이나 에너지를 마구 흘리는 문어발식 오프라인 활동 대신 내실 있고 전문적인 특기로서 담담히 표출해 보십시오.");
+          ? "특히 내면에 쌓인 고유한 에너지(신강)를 바깥으로 뿜어낼 마땅한 탈출구가 좀 부족한 구조야. 생각이 너무 많아지면 결국 정체되기 마련이니까, 일단 아주 작고 사소한 것이라도 세상에 내놓고 드러내는 시도를 할 때 내면의 에너지가 건강하게 순환될 거야." 
+          : "특히 기운이 빠져나가는 걸 막고 내면의 힘을 든든하게 지켜야 유리한 신약 사주야. 굳이 무리해서 과격한 자기표현을 하거나 진을 빼는 에너지를 마구 낭비하기보단, 너만의 깊이 있고 전문적인 특기로서 담담하고 조용하게 표현해 봐.");
         descEn = muSikDescEn + " " + (isStrongDM
           ? "Highly critical, because your high baseline energy needs an expressive outlet. When ideas stagnate, it limits your overall fortune; bypass analytical overthinking and publish your creative outputs directly."
           : "Highly beneficial, because conserving resources is preferred for an Adaptive DM profile. Focus on quiet, curated, or technical outputs rather than exhausting, multi-directional public speaking demands.");
@@ -262,10 +262,10 @@ export const calculateAdvancedAnalysis = (
         }
 
         const personAdviceKo = isWeakButRooted
-          ? "특히 사주 강도 상으로는 신약(身弱)으로 칩거하지만, 지지에 아주 든든하고 단단한 뿌리([tooltip:통근])를 완벽히 장착한 '외유내강' 격조의 지형입니다. 겉으로는 주변과 적절히 타협하는 듯해도 실제 결정적 고비에서는 결코 기백이나 주권을 양보하지 않는 튼튼함이 있습니다. 재물이 당장 노출되지 않더라도 무너지지 않는 이 지지기반이 최고의 자산입니다."
+          ? "특히 사주 강도로 보면 힘이 다소 약한 신약(身弱) 사주 같지만, 지지에 아주 든든하고 단단한 뿌리([tooltip:통근])를 완벽하게 내린 '외유내강' 스타일이야. 겉으로는 주변에 유연하게 맞춰주는 듯해도, 정작 중요한 결정적인 고비나 선택에서는 결코 주관이나 자존심을 굽히지 않는 강단이 있어. 재물이 당장 겉돌고 눈에 띄지 않더라도, 무너지지 않는 이 튼튼한 지지 기반이 결국 너의 진짜 최고의 무기이자 자산이야."
           : (isStrongDM
-            ? "특히 주체적인 내적 자아의 힘(신강)이 풍부하게 솟아나는 특성입니다. 실속 없이 거대한 판만 벌여두기보단 최후의 소유권 계약이나 고유 브랜드 마크를 확실히 매듭짓는 수직 집중형 자산 관리가 자산가로 가는 절대 비결입니다."
-            : "특히 타인의 평가나 수치 변동성에 정신 에너지가 방출되기 쉬운 섬세한 신약 사주입니다. 무리한 단기 배팅을 멀리하고, 확실히 지켜지는 장기 고정수익이나 명확한 고유 문서를 든든하게 보유하는 현실형 우회 방어 전략을 설계하십시오.");
+            ? "특히 주체적이고 내적인 자아의 힘(신강)이 아주 강하게 솟아나는 특성이 있어. 실속 없이 괜히 거대한 판만 벌이고 다니기보다, 최종 소유권 계약이나 나만의 고유 브랜드를 확실하게 매듭짓는 수직 집중형 자산 관리가 부자가 되는 최고의 비결이야."
+            : "특히 타인의 평가나 자산 가치의 변동에 마음과 에너지가 쉽게 흔들릴 수 있는 섬세한 신약 사주야. 한탕을 노리는 무리한 단기 투자는 피하고, 안정적이고 확실하게 지킬 수 있는 장기 고정수익이나 명확한 자산 문서를 든든하게 쥐고 가는 안전한 우회 방어 전략을 설계하는 게 어울려.");
 
         const personAdviceEn = isWeakButRooted
           ? "Specifically, although technically categorized as 'Adaptive/Weak', you possess powerhouse roots in the branches. You may appear accommodating on the outside, but your core resolve is unbreakable when tested. This structural balance naturally shields you from speculative losses."
@@ -287,7 +287,7 @@ export const calculateAdvancedAnalysis = (
           muGwanDescEn = `Like a 'forest without a fence' lacking [${metalCol}:Metal]. Excessive free-spiritedness may cause conflicts in organizational life; you'll achieve more by setting your own rules and self-discipline.`;
         } else if (dmElement === 'Fire') {
           muGwanDesc = `열기를 식혀줄 [${waterCol}:수(水) 관성]이 없는 '꺼지지 않는 불꽃'이야. 감정 조절이나 차분한 마무리가 어려울 수 있으니, 명상이나 정적인 취미를 통해 내면의 평화를 찾는 것이 중요해.`;
-          muGwanDescEn = `An 'unquenchable flame' without [${waterCol}:Water] to cool the heat. Emotional regulation or calm conclusions may be difficult; finding inner peace through meditation is crucial.`;
+          muGwanDescEn = `An 'unquenchable flame' without [${waterCol}:Water] to cool the heat. Emotional regulation or calm conclusions may be difficult; finding inner peace through medication is crucial.`;
         } else if (dmElement === 'Earth') {
           muGwanDesc = `토를 단단하게 잡아줄 [${woodCol}:목(木) 관성]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.`;
           muGwanDescEn = `A 'pillarless land' without [${woodCol}:Wood] to hold the Earth. Life's direction can easily waver; establish strong pillars through clear goal setting and self-improvement.`;
@@ -300,10 +300,10 @@ export const calculateAdvancedAnalysis = (
         }
 
         const personAdviceKo = isWeakButRooted
-          ? "특히 신약 사주 성향을 가졌으나 지지 통근이 단단해 타인의 수직 권위나 군대식 간섭에 무작정 동요되지 않습니다. 직장이라는 틀(관성)이 없어도 강력한 내적 원칙을 바탕으로 자율 프리랜서나 전문 연구직에서 더 눈부신 안정성을 구가할 수 있습니다."
+          ? "특히 성향 자체는 부드럽고 유연하지만, 지지에 내린 뿌리(통근)가 단단해서 타인의 수직적인 주장이나 짓누르는 참견에 무작정 흔들리지 않는 힘이 있어. 직장이라는 갑갑한 틀(관성)이 없더라도 너만의 꿋꿋한 내면의 규칙을 동력 삼아, 자유로운 프리랜서나 깊이 있는 전문 연구직에서 훨씬 편안하고 안정적으로 발휘할 수 있어."
           : (isStrongDM
-            ? "특히 주관과 자아가 철철 흘러넘치는 강력한 에너지를 지닌 구조입니다. 스스로 행동을 붙잡아줄 나만의 명확한 규칙(루틴)을 세우거나 사회적으로 인정받는 확실한 전문 자격(라이선스)을 갖추지 않으면, 기존 조직이나 사회적 규칙에 잘 적응하지 못하고 겉돌며 외롭게 혼자만의 길을 걷는 아웃사이더가 되기 쉬우니 주의하는 것이 좋습니다."
-            : "특히 외부 환경의 돌발적인 과적 지시에 상처를 크게 입기 쉬운 약사주 구도입니다. 마음의 건강을 온전치 않게 하는 무구한 요구나 가스라이팅을 피하려면, '이 선을 지켜 달라'는 사적 경계선(Boundary)을 확실히 매듭짓는 수호 프로토콜이 필수입니다.");
+            ? "특히 주관과 자아가 엄청나게 강해서 나만의 에너지가 가득한 구조야. 스스로의 행동 방식을 통제해 줄 명확한 일상 규칙(루틴)을 기르거나, 남들에게 자격을 인증받을 수 있는 확실한 전문 라이선스를 취득하는 게 매우 중요해. 안 그러면 기존의 경직된 조직에서 적응하기 힘들어서 겉도는 아웃사이더가 되기 쉬우니 유의해 봐."
+            : "특히 외부에서 갑자기 들어오는 돌발적인 요구 성화나 지시에 더 쉽게 상처를 받고 위축될 수 있는 예민한 신약 사주야. 내 멘탈을 지키기 힘들게 하는 무례한 강요나 교묘한 흔들기(가스라이팅 등)를 사전에 막으려면, '여기만큼은 들어오면 안 된다'는 내 사생활의 경계선(Boundary)을 확고하게 긋고 나를 지키는 습관을 들여야 해.");
 
         const personAdviceEn = isWeakButRooted
           ? "Specifically, you are root-grounded despite being socially adaptive. Instead of struggling under rigid hierarchical control systems, you thrive beautifully by building custom consulting operations or specialized projects."

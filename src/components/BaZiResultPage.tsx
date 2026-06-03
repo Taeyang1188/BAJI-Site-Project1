@@ -1700,7 +1700,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       const stemKo = BAZI_MAPPING.stems?.[todayPillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko;
       const branchKo = BAZI_MAPPING.branches?.[todayPillar.branch as keyof typeof BAZI_MAPPING.branches]?.ko;
       
-      main = `오늘의 에너지는 [${stemColor}:${stemKo},${branchKo}(${todayPillar.stem}${todayPillar.branch})] 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. \n\n`;
+      main = `오늘의 에너지는 [${stemColor}:${stemKo}], [${branchColor}:${branchKo}]([${stemColor}:${todayPillar.stem}][${branchColor}:${todayPillar.branch}]) 바이브야!${ganYeoComment} ${processedName} ${address}한테는 ${formatGod(todayPillar.stemTenGodKo, todayPillar.stem)}이랑 ${formatGod(todayPillar.branchTenGodKo, todayPillar.branch)}의 기운으로 들어오네. \n\n`;
 
       // 1. Base Fortune & Clash
       if (hasDayClash) {
@@ -1739,7 +1739,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       }
     } else {
       // English version
-      main = `Today's vibe is [${stemColor}:${todayPillar.stem},${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. \n\n`;
+      main = `Today's vibe is [${stemColor}:${todayPillar.stem}][${branchColor}:${todayPillar.branch}]!${ganYeoComment} For you, it's [${stemColor}:${stemGod}] and [${branchColor}:${branchGod}]. \n\n`;
 
       if (hasDayClash) {
         main += `Today clashes with your Day Branch (your environment), making the base fortune unstable. Expect unexpected bumps or changes, so keep an open mind. `;
@@ -1863,14 +1863,40 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return <Moon size={size} className={`text-sky-300 drop-shadow-[0_0_2px_rgba(125,211,252,0.2)] ${className}`} strokeWidth={2.5} />;
   };
 
-  const getPillarInteractionsTooltipContent = (stem: string, branch: string) => {
-    const stemInteractions = getCycleInteractions(stem, true);
-    const branchInteractions = getCycleInteractions(branch, false);
+  type AdditionalContext = { stem: string, branch: string, labelKo: string, labelEn: string };
 
-    const getPillarNameKO = (idx: number, isStem: boolean) => ["년간", "월간", "일간", "시간"][idx] || (isStem ? "천간" : "지지");
-    const getPillarNameEN = (idx: number, isStem: boolean) => ["Year Stem", "Month Stem", "Day Stem", "Hour Stem"][idx] || (isStem ? "Stem" : "Branch");
-    const getPillarNameKOBranch = (idx: number) => ["연지", "월지", "일지", "시지"][idx] || "지지";
-    const getPillarNameENBranch = (idx: number) => ["Year Branch", "Month Branch", "Day Branch", "Hour Branch"][idx] || "Branch";
+  const getPillarInteractionsTooltipContent = (stem: string, branch: string, extraContexts: AdditionalContext[] = []) => {
+    const extraStems = extraContexts.map(c => c.stem);
+    const extraBranches = extraContexts.map(c => c.branch);
+    const stemInteractions = getCycleInteractions(stem, true, extraStems, extraBranches);
+    const branchInteractions = getCycleInteractions(branch, false, extraStems, extraBranches);
+
+    const getPillarTitle = (idx: number) => result?.pillars?.[idx]?.title;
+    
+    const getPillarNameKO = (idx: number, isStem: boolean) => {
+      if (result && idx >= (result.pillars?.length || 4)) return extraContexts[idx - (result.pillars?.length || 4)].labelKo;
+      const title = getPillarTitle(idx);
+      if (title === 'Year') return isStem ? "연간" : "연지";
+      if (title === 'Month') return isStem ? "월간" : "월지";
+      if (title === 'Day') return isStem ? "일간" : "일지";
+      if (title === 'Hour') return isStem ? "시간" : "시지";
+      return isStem ? "천간" : "지지";
+    };
+    
+    const getPillarNameEN = (idx: number, isStem: boolean) => {
+      if (result && idx >= (result.pillars?.length || 4)) return extraContexts[idx - (result.pillars?.length || 4)].labelEn;
+      const title = getPillarTitle(idx);
+      if (title === 'Year') return isStem ? "Year Stem" : "Year Branch";
+      if (title === 'Month') return isStem ? "Month Stem" : "Month Branch";
+      if (title === 'Day') return isStem ? "Day Stem" : "Day Branch";
+      if (title === 'Hour') return isStem ? "Hour Stem" : "Hour Branch";
+      return isStem ? "Stem" : "Branch";
+    };
+
+    const getCharAtIndex = (idx: number, isStem: boolean) => {
+      if (result && idx >= (result.pillars?.length || 4)) return isStem ? extraStems[idx - (result.pillars?.length || 4)] : extraBranches[idx - (result.pillars?.length || 4)];
+      return isStem ? result.pillars?.[idx]?.stem : result.pillars?.[idx]?.branch;
+    };
 
     const stemCharName = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.ko || stem;
     const branchCharName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
@@ -1893,7 +1919,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
           stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameKo}</strong></div>`);
           stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong></div>`);
         } else {
-          const targetChar = result?.pillars?.[item.pIndex]?.stem || '';
+          const targetChar = getCharAtIndex(item.pIndex, true) || '';
           const targetColor = ELEMENT_COLORS[BAZI_MAPPING.stems[targetChar as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
           const targetPillar = getPillarNameKO(item.pIndex, true);
           const targetPillarEn = getPillarNameEN(item.pIndex, true);
@@ -1916,13 +1942,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       
       branchInteractions.forEach(item => {
         if (item.isSpecial) {
-          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameKo}</strong></div>`);
-          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong></div>`);
+          const partnersKo = item.pIndices.map((idx: number) => {
+              const char = getCharAtIndex(idx, false);
+              const color = ELEMENT_COLORS[BAZI_MAPPING.branches[char as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+              return `${getPillarNameKO(idx, false)} <span style="color: ${color}; font-weight: bold;">${char}</span>`;
+          }).join(', ');
+          
+          const partnersEn = item.pIndices.map((idx: number) => {
+              const char = getCharAtIndex(idx, false);
+              const color = ELEMENT_COLORS[BAZI_MAPPING.branches[char as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+              return `${getPillarNameEN(idx, false)} <span style="color: ${color}; font-weight: bold;">${char}</span>`;
+          }).join(', ');
+
+          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${partnersKo}와(과) 함께 <strong>${item.nameKo}</strong></div>`);
+          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> together with ${partnersEn}</div>`);
         } else {
-          const targetChar = result?.pillars?.[item.pIndex]?.branch || '';
+          const targetChar = getCharAtIndex(item.pIndex, false) || '';
           const targetColor = ELEMENT_COLORS[BAZI_MAPPING.branches[targetChar as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
-          const targetPillar = getPillarNameKOBranch(item.pIndex);
-          const targetPillarEn = getPillarNameENBranch(item.pIndex);
+          const targetPillar = getPillarNameKO(item.pIndex, false);
+          const targetPillarEn = getPillarNameEN(item.pIndex, false);
           
           branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${targetPillar} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span>와(과) <strong>${item.nameKo}</strong></div>`);
           branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> with ${targetPillarEn} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span></div>`);
@@ -1941,12 +1979,12 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     };
   };
 
-  const getCycleInteractions = (targetChar: string, isStem: boolean) => {
+  const getCycleInteractions = (targetChar: string, isStem: boolean, extraStems: string[] = [], extraBranches: string[] = []) => {
     if (!result?.pillars) return [];
     
     const activeInteractions: any[] = [];
-    const natalStems = result.pillars.map(p => p.stem);
-    const natalBranches = result.pillars.map(p => p.branch);
+    const natalStems = [...result.pillars.map(p => p.stem), ...extraStems];
+    const natalBranches = [...result.pillars.map(p => p.branch), ...extraBranches];
     
     if (isStem) {
         const stemHapPairs: Record<string, string> = { '甲己': '합', '己甲': '합', '乙庚': '합', '庚乙': '합', '丙辛': '합', '辛丙': '합', '丁壬': '합', '壬丁': '합', '戊癸': '합', '癸戊': '합' };
@@ -3812,10 +3850,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     {renderTenGodLabel(cycle.stemTenGodKo, cycle.stemTenGodEn, cycle.stemPolarity)}
                   </div>
                   {(() => {
-                    const stemInts = getCycleInteractions(cycle.stem, true);
-                    const branchInts = getCycleInteractions(cycle.branch, false);
+                    const extraContexts: AdditionalContext[] = [];
+                    const extraStems = extraContexts.map(c => c.stem);
+                    const extraBranches = extraContexts.map(c => c.branch);
+                    const stemInts = getCycleInteractions(cycle.stem, true, extraStems, extraBranches);
+                    const branchInts = getCycleInteractions(cycle.branch, false, extraStems, extraBranches);
                     const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
-                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(cycle.stem, cycle.branch) : { ko: '', en: '' };
+                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(cycle.stem, cycle.branch, extraContexts) : { ko: '', en: '' };
 
                     return (
                       <motion.div
@@ -3858,17 +3899,20 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                            {getLifeStage(cycle.age)}
                         </div>
                         <div className={`text-xs sm:text-sm font-bold mb-0.5 ${isCurrent ? (theme === 'light' ? 'text-slate-900' : 'text-white') : (theme === 'light' ? 'text-slate-800' : 'text-white')}`}>{cycle.age}</div>
-                        <div 
-                          className={`font-gothic font-bold leading-none text-center ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] mb-1' : 'text-[14px] sm:text-[15px] md:text-[16px] mb-0.5'}`}
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                        >
-                          <RenderCycleChar char={cycle.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
-                        </div>
-                        <div 
-                          className={`font-gothic font-bold leading-none text-center opacity-90 ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] leading-tight' : 'text-[14px] sm:text-[15px] md:text-[16px] -mt-[1px]'}`}
-                          style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                        >
-                          <RenderCycleChar char={cycle.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                        
+                        <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0">
+                          <div 
+                            className={`font-gothic font-bold leading-none text-center ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] mb-1' : 'text-[14px] sm:text-[15px] md:text-[16px] mb-0.5'}`}
+                            style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[cycle.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                          >
+                            <RenderCycleChar char={cycle.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                          </div>
+                          <div 
+                            className={`font-gothic font-bold leading-none text-center opacity-90 ${lang === 'EN' ? 'text-[11px] sm:text-[12px] md:text-[13px] leading-tight' : 'text-[14px] sm:text-[15px] md:text-[16px] -mt-[1px]'}`}
+                            style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[cycle.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                          >
+                            <RenderCycleChar char={cycle.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                          </div>
                         </div>
                         
                         <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full p-0.5 border shadow-sm transition-all z-20 ${
@@ -3933,10 +3977,16 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                         {renderTenGodLabel(ap.stemTenGodKo, ap.stemTenGodEn, ap.stemPolarity)}
                       </div>
                       {(() => {
-                        const stemInts = getCycleInteractions(ap.stem, true);
-                        const branchInts = getCycleInteractions(ap.branch, false);
+                        const cycle = result.grandCycles[expandedCycle];
+                        const extraContexts: AdditionalContext[] = [
+                            { stem: cycle.stem, branch: cycle.branch, labelKo: `대운`, labelEn: `Daewun` }
+                        ];
+                        const extraStems = extraContexts.map(c => c.stem);
+                        const extraBranches = extraContexts.map(c => c.branch);
+                        const stemInts = getCycleInteractions(ap.stem, true, extraStems, extraBranches);
+                        const branchInts = getCycleInteractions(ap.branch, false, extraStems, extraBranches);
                         const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
-                        const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(ap.stem, ap.branch) : { ko: '', en: '' };
+                        const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(ap.stem, ap.branch, extraContexts) : { ko: '', en: '' };
 
                         return (
                           <motion.div
@@ -3974,17 +4024,20 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                             <div className="h-[12px] sm:h-[14px]"></div>
                             
                             <div className={`text-[12px] sm:text-[13px] font-bold mb-0.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{ap.age}</div>
-                            <div 
-                              className={`font-gothic font-bold text-center leading-tight ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs mb-0.5' : 'text-[13px] sm:text-[14px]'}`}
-                              style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                            >
-                              <RenderCycleChar char={ap.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
-                            </div>
-                            <div 
-                              className={`font-gothic font-bold text-center leading-tight opacity-90 ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs' : 'text-[13px] sm:text-[14px]'}`}
-                              style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
-                            >
-                              <RenderCycleChar char={ap.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                            
+                            <div className="flex-1 flex flex-col justify-center items-center w-full min-h-0">
+                              <div 
+                                className={`font-gothic font-bold text-center leading-tight ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs mb-0.5' : 'text-[13px] sm:text-[14px]'}`}
+                                style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[ap.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                              >
+                                <RenderCycleChar char={ap.stem} isStem={true} hideUnderline={true} hideTooltip={true} />
+                              </div>
+                              <div 
+                                className={`font-gothic font-bold text-center leading-tight opacity-90 ${lang === 'EN' ? 'text-[10px] sm:text-[11px] md:text-xs' : 'text-[13px] sm:text-[14px]'}`}
+                                style={{ color: ELEMENT_COLORS[BAZI_MAPPING.branches?.[ap.branch as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF' }}
+                              >
+                                <RenderCycleChar char={ap.branch} isStem={false} hideUnderline={true} hideTooltip={true} />
+                              </div>
                             </div>
 
                             <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full p-0.5 border shadow-sm transition-all z-20 ${
@@ -4046,10 +4099,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 {lang === 'KO' ? m.stemTenGodKo : m.stemTenGodEn}
                               </div>
                               {(() => {
-                                const stemInts = getCycleInteractions(m.stem, true);
-                                const branchInts = getCycleInteractions(m.branch, false);
+                                const cycle = result.grandCycles[expandedCycle];
+                                const ap = cycle.annualPillars[expandedYear];
+                                const extraContexts: AdditionalContext[] = [
+                                    { stem: cycle.stem, branch: cycle.branch, labelKo: `대운`, labelEn: `Daewun` },
+                                    { stem: ap.stem, branch: ap.branch, labelKo: `세운`, labelEn: `Sewun` }
+                                ];
+                                const extraStems = extraContexts.map(c => c.stem);
+                                const extraBranches = extraContexts.map(c => c.branch);
+                                const stemInts = getCycleInteractions(m.stem, true, extraStems, extraBranches);
+                                const branchInts = getCycleInteractions(m.branch, false, extraStems, extraBranches);
                                 const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
-                                const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(m.stem, m.branch) : { ko: '', en: '' };
+                                const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(m.stem, m.branch, extraContexts) : { ko: '', en: '' };
 
                                 return (
                                   <motion.div
@@ -4144,10 +4205,20 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                     {lang === 'KO' ? d.stemTenGodKo : d.stemTenGodEn}
                                   </div>
                                   {(() => {
-                                    const stemInts = getCycleInteractions(d.stem, true);
-                                    const branchInts = getCycleInteractions(d.branch, false);
+                                    const cycle = result.grandCycles[expandedCycle];
+                                    const ap = cycle.annualPillars[expandedYear];
+                                    const m = ap.monthlyPillars[expandedMonth];
+                                    const extraContexts: AdditionalContext[] = [
+                                        { stem: cycle.stem, branch: cycle.branch, labelKo: `대운`, labelEn: `Daewun` },
+                                        { stem: ap.stem, branch: ap.branch, labelKo: `세운`, labelEn: `Sewun` },
+                                        { stem: m.stem, branch: m.branch, labelKo: `월운`, labelEn: `Monthly` }
+                                    ];
+                                    const extraStems = extraContexts.map(c => c.stem);
+                                    const extraBranches = extraContexts.map(c => c.branch);
+                                    const stemInts = getCycleInteractions(d.stem, true, extraStems, extraBranches);
+                                    const branchInts = getCycleInteractions(d.branch, false, extraStems, extraBranches);
                                     const hasInteractions = stemInts.length > 0 || branchInts.length > 0;
-                                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(d.stem, d.branch) : { ko: '', en: '' };
+                                    const tooltipContent = hasInteractions ? getPillarInteractionsTooltipContent(d.stem, d.branch, extraContexts) : { ko: '', en: '' };
 
                                     return (
                                       <motion.div
@@ -7551,6 +7622,62 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
   const dayPillar = result.pillars.find(p => p.title === 'Day');
   const iljuData = dayPillar ? ILJU_DESCRIPTIONS[dayPillar.hanja] : null;
   const [isImageViewMode, setIsImageViewMode] = React.useState(false);
+  const [shareState, setShareState] = React.useState<'idle' | 'success' | 'error' | 'copied'>('idle');
+
+  const handleShare = async () => {
+    const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.I.D)';
+    const text = lang === 'KO' 
+      ? `내 사주로 분석한 영혼의 소울 테마는 [${summary.oneLineReview}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
+      : `My soul profile theme analyzed from my BaZi is [${summary.oneLineReview}]! Open your cosmic core energy and lucky features now 🌌`;
+    const url = window.location.href;
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+        setShareState('success');
+        setTimeout(() => setShareState('idle'), 3000);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(url);
+        }
+      }
+    } else {
+      copyToClipboard(url);
+    }
+  };
+
+  const copyToClipboard = (url: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        setShareState('copied');
+        setTimeout(() => setShareState('idle'), 3000);
+      }).catch(() => {
+        setShareState('error');
+        setTimeout(() => setShareState('idle'), 3000);
+      });
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setShareState('copied');
+        setTimeout(() => setShareState('idle'), 3000);
+      } catch (err) {
+        setShareState('error');
+        setTimeout(() => setShareState('idle'), 3000);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
   
   return (
     <motion.div 
@@ -7771,14 +7898,50 @@ const SoulSummaryCard = ({ result, lang }: { result: BaZiResult, lang: Language 
             </div>
           </div>
           
-          <div className="pt-4 w-full">
+          <div className="pt-4 w-full relative">
             <button 
-              disabled
-              className="w-full py-4 bg-black/40 backdrop-blur-md border border-dashed border-white/20 rounded-2xl text-white/30 text-sm font-display tracking-widest uppercase cursor-not-allowed flex items-center justify-center gap-2 shadow-lg mb-2"
+              onClick={handleShare}
+              className="w-full py-4 bg-gradient-to-r from-neon-pink/20 via-neon-purple/20 to-neon-cyan/20 hover:from-neon-pink/35 hover:via-neon-purple/35 hover:to-neon-cyan/35 active:scale-[0.98] transition-all duration-300 border border-white/20 hover:border-white/40 rounded-2xl text-white text-sm font-display tracking-widest uppercase cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.1)] hover:shadow-[0_0_25px_rgba(0,243,255,0.2)] mb-2"
             >
-              <Share2 className="w-4 h-4" />
-              {lang === 'KO' ? '리포트 공유하기 (준비 중)' : 'Share Report (Coming Soon)'}
+              <Share2 className="w-4 h-4 animate-pulse text-neon-cyan" />
+              {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
             </button>
+
+            <AnimatePresence>
+              {shareState !== 'idle' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                  className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
+                >
+                  {shareState === 'copied' && (
+                    <>
+                      <span className="text-neon-cyan font-bold">🔗</span>
+                      <span className="text-white text-xs sm:text-sm font-medium">
+                        {lang === 'KO' ? '링크 복사 완료! 원하는 메신저/인스타에 붙여넣어봐!' : 'Link copied! Paste it anywhere!'}
+                      </span>
+                    </>
+                  )}
+                  {shareState === 'success' && (
+                    <>
+                      <span className="text-emerald-400 font-bold">🎉</span>
+                      <span className="text-white text-xs sm:text-sm font-medium">
+                        {lang === 'KO' ? '소울 리포트 공유 성공!' : 'Soul report shared successfully!'}
+                      </span>
+                    </>
+                  )}
+                  {shareState === 'error' && (
+                    <>
+                      <span className="text-rose-400 font-bold">😢</span>
+                      <span className="text-white text-xs sm:text-sm font-medium">
+                        {lang === 'KO' ? '링크 복사에 실패했어. 브라우저 주소창을 복사해줘!' : 'Failed to copy URL.'}
+                      </span>
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>
