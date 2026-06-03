@@ -8197,12 +8197,16 @@ export const SoulSummaryCard = ({
                     initial={{ opacity: 0, y: -35, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                    className="fixed top-24 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.6)] min-w-[280px] justify-center"
+                    className={`fixed top-24 left-1/2 -translate-x-1/2 z-[10000] flex items-center gap-2 px-6 py-3 rounded-full min-w-[280px] justify-center transition-all duration-300 border
+                      ${isLight 
+                        ? 'bg-white/95 backdrop-blur-md border-black/10 shadow-[0_10px_35px_rgba(0,0,0,0.12)]' 
+                        : 'bg-black/90 backdrop-blur-md border-white/20 shadow-[0_10px_35px_rgba(0,0,0,0.6)]'
+                      }`}
                   >
                     {shareState === 'copied' && (
                       <>
                         <span className="text-neon-cyan font-bold">🔗</span>
-                        <span className="text-white text-xs sm:text-sm font-medium">
+                        <span className={`text-xs sm:text-sm font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>
                           {lang === 'KO' ? '링크 복사 완료! 원하는 메신저/인스타에 붙여넣어봐!' : 'Link copied! Paste it anywhere!'}
                         </span>
                       </>
@@ -8210,7 +8214,7 @@ export const SoulSummaryCard = ({
                     {shareState === 'success' && (
                       <>
                         <span className="text-emerald-400 font-bold">🎉</span>
-                        <span className="text-white text-xs sm:text-sm font-medium">
+                        <span className={`text-xs sm:text-sm font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>
                           {lang === 'KO' ? '소울 리포트 공유 성공!' : 'Soul report shared successfully!'}
                         </span>
                       </>
@@ -8218,7 +8222,7 @@ export const SoulSummaryCard = ({
                     {shareState === 'error' && (
                       <>
                         <span className="text-rose-400 font-bold">😢</span>
-                        <span className="text-white text-xs sm:text-sm font-medium">
+                        <span className={`text-xs sm:text-sm font-semibold ${isLight ? 'text-slate-900' : 'text-white'}`}>
                           {lang === 'KO' ? '링크 복사에 실패했어. 브라우저 주소창을 복사해줘!' : 'Failed to copy URL.'}
                         </span>
                       </>
