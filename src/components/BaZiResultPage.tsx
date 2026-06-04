@@ -1146,6 +1146,58 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     return () => clearTimeout(timer);
   }, [showVibeTooltip]);
 
+  // Auto-scroll logic for annual, monthly, and daily pillars to align them centered
+  React.useEffect(() => {
+    if (expandedCycle !== null) {
+      const timer = setTimeout(() => {
+        let targetElement = document.getElementById(`bazi-annual-item-${currentYear}`);
+        if (!targetElement) {
+          const annualPillars = result.grandCycles[expandedCycle]?.annualPillars;
+          if (annualPillars && annualPillars.length > 0) {
+            const middleIndex = Math.floor(annualPillars.length / 2);
+            const middleYear = annualPillars[middleIndex].year;
+            targetElement = document.getElementById(`bazi-annual-item-${middleYear}`);
+          }
+        }
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [expandedCycle, currentYear, result.grandCycles]);
+
+  React.useEffect(() => {
+    if (expandedYear !== null && expandedCycle !== null) {
+      const timer = setTimeout(() => {
+        const targetElement = document.getElementById(`bazi-monthly-item-${currentMonth}`);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [expandedYear, expandedCycle, currentMonth]);
+
+  React.useEffect(() => {
+    if (expandedMonth !== null && expandedYear !== null && expandedCycle !== null) {
+      const timer = setTimeout(() => {
+        let targetElement = document.getElementById(`bazi-daily-item-${currentDay}`);
+        if (!targetElement) {
+          const dailyPillars = result.grandCycles[expandedCycle]?.annualPillars?.[expandedYear]?.monthlyPillars?.[expandedMonth]?.dailyPillars;
+          if (dailyPillars && dailyPillars.length > 0) {
+            const fallbackDay = dailyPillars[dailyPillars.length - 1].day;
+            targetElement = document.getElementById(`bazi-daily-item-${fallbackDay}`);
+          }
+        }
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [expandedMonth, expandedYear, expandedCycle, currentDay, result.grandCycles]);
+
   React.useEffect(() => {
     if (showGuideDetailModal) {
       setTimeout(() => {
@@ -3971,7 +4023,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                   else if (isCurrentYear) borderClass = 'border-neon-pink bg-neon-pink/5';
 
                   return (
-                    <div key={api} className="flex flex-col items-center space-y-1 w-20 flex-shrink-0">
+                    <div key={api} id={`bazi-annual-item-${ap.year}`} className="flex flex-col items-center space-y-1 w-20 flex-shrink-0">
                       <div className="text-xs sm:text-[13px] font-mono font-bold text-white/60">{ap.year}</div>
                       <div 
                         className="text-[11px] sm:text-[12px] font-bold uppercase tracking-tighter flex items-center justify-center text-center h-[28px] w-full" 
@@ -4093,7 +4145,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                           else if (isCurrentMonth) borderClass = 'border-neon-pink bg-neon-pink/5';
 
                           return (
-                            <div key={mi} className="flex flex-col items-center space-y-1 w-24">
+                            <div key={mi} id={`bazi-monthly-item-${m.month}`} className="flex flex-col items-center space-y-1 w-24">
                               <div className="text-[13px] font-mono text-white/90 font-bold uppercase">
                                 {t.months[m.month - 1]}
                               </div>
@@ -4201,7 +4253,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                               else if (isCurrentDay) borderClass = 'border-neon-pink bg-neon-pink/5';
 
                               return (
-                                <div key={di} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
+                                <div key={di} id={`bazi-daily-item-${d.day}`} className="flex flex-col items-center space-y-1 w-16 flex-shrink-0">
                                   <div className="text-[12px] font-mono text-white/90 font-bold">{d.day}</div>
                                   <div className="text-[8px] font-bold uppercase tracking-tighter flex items-center gap-0.5" style={{ color: ELEMENT_COLORS[BAZI_MAPPING.stems?.[d.stem as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] }}>
                                     <PolarityIcon polarity={d.stemPolarity} size={5} />
@@ -7642,7 +7694,7 @@ export const SoulSummaryCard = ({
   
   // Compact state toggles
   const [isCompact, setIsCompact] = React.useState(isSharedView);
-  const [activeTab, setActiveTab] = React.useState<'elements' | 'energy' | 'fortune'>('elements');
+  const [activeTab, setActiveTab] = React.useState<'elements' | 'energy' | 'fortune'>('fortune');
 
   const handleShare = async () => {
     const zodiacEmojis: Record<string, string> = {
@@ -7890,16 +7942,16 @@ export const SoulSummaryCard = ({
               <div className="w-full flex p-1 bg-white/5 backdrop-blur-[10px] rounded-xl border border-white/10 gap-1 select-none">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('elements')}
+                  onClick={() => setActiveTab('fortune')}
                   className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    activeTab === 'elements'
+                    activeTab === 'fortune'
                       ? 'bg-gradient-to-r from-neon-pink to-neon-purple text-white shadow-lg font-extrabold'
                       : 'text-white/50 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Sparkles className={`w-3.5 h-3.5 transition-colors ${activeTab === 'elements' ? 'text-white' : 'text-neon-pink'}`} />
+                  <CheckCircle2 className={`w-3.5 h-3.5 transition-colors ${activeTab === 'fortune' ? 'text-white' : 'text-neon-pink'}`} />
                   <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
-                    {lang === 'KO' ? '오행 밸런스' : 'Elements'}
+                    {lang === 'KO' ? '행운 처방' : 'Lucky Vibe'}
                   </span>
                 </button>
                 <button
@@ -7918,16 +7970,16 @@ export const SoulSummaryCard = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('fortune')}
+                  onClick={() => setActiveTab('elements')}
                   className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    activeTab === 'fortune'
+                    activeTab === 'elements'
                       ? 'bg-gradient-to-r from-neon-cyan to-emerald-400 text-black shadow-lg font-extrabold'
                       : 'text-white/50 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span className={lang === 'KO' ? 'font-sans' : 'font-display'}>
-                    {lang === 'KO' ? '행운 처방' : 'Lucky Vibe'}
+                    {lang === 'KO' ? '오행 밸런스' : 'Elements'}
                   </span>
                 </button>
               </div>
