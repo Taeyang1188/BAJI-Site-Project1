@@ -626,7 +626,7 @@ export function generateSoulSummary(result: BaZiResult, lang: Language): SoulSum
     "관성": {
       ko: {
         description: isStrongDM
-          ? `나만의 깊은 전문성을 사회적인 화합의 약속과 신뢰받는 원칙에 아름답게 조율하여, 명예로운 가치를 공고히 쌓아 올릴 징조입니다.`
+          ? `나의 탄탄한 전문성을 세상에 증명할 때입니다. 강단 있는 선택과 책임감 있는 조율을 통해 명예와 신뢰를 공고히 쌓아 가세요.`
           : `남들이 부과하는 지나치게 무거운 도덕적 의무에 마음 상하지 마시고, 나만을 위한 명확한 한계를 설정해 온전한 충전을 가지는 것이 절실합니다.`,
         practicalAdvice: isStrongDM
           ? `지나친 즉흥적 충동보다는 이미 확립된 단단한 규범과 신중한 지혜를 바탕으로 차분하게 상황을 이끌어 보세요.`

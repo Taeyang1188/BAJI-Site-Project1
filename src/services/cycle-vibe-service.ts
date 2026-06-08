@@ -164,11 +164,22 @@ export function generateCoreRemedy(analysis: any, lang: Language): string {
         };
     };
 
+    const makeEasyGodCombo = (godKo: string) => {
+        const el = godToElement[godKo as keyof typeof godToElement] || "Water";
+        const elKo = elementToKoRaw[el] || el;
+        const color = getElementColorVar(el);
+        return {
+            ko: `[${color}:${elKo} ${godKo}]`
+        };
+    };
+
     const siksangCombo = makeGodCombo("식상", "Artist/Rebel");
     const jaeseongCombo = makeGodCombo("재성", "Maverick/Architect");
     const gwanseongCombo = makeGodCombo("관성", "Warrior/Judge");
     const bigyeopCombo = makeGodCombo("비겁", "Mirror/Rival");
     const inseongCombo = makeGodCombo("인성", "Mystic/Sage");
+    const siksangEasy = makeEasyGodCombo("식상");
+    const jaeseongEasy = makeEasyGodCombo("재성");
     
     const colorVarGi = getElementColorVar(giElement);
     const colorVarHee = getElementColorVar(heeElement);
@@ -185,7 +196,7 @@ export function generateCoreRemedy(analysis: any, lang: Language): string {
         }
         // Mode 2: Jaeseong Overload or Jong-Jae (재성용신 또는 재성과다)
         if (jaeseongPct >= 35 || structTitle.includes("종재")) {
-            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 끊임없이 계산기를 두드리게 만드는 ${jaeseongCombo.ko}의 기운이 너무 강해서, 당장의 이익이나 가성비에만 신경이 곤두서기 쉬워. 매 순간 손익을 따지느라 뇌가 과열되다 보니, 정서적으로 훌쩍 메마르거나 징글징글한 과로에 시달리기도 하는 상태지.\n\n이럴 때는 눈앞의 현실이나 주머니 사정에 너무 연연하면서 스스로를 타이트하게 옭아매지 않는 게 제일 중요해. **조급함을 버리고, 앞으로 널 든든하게 받쳐줄 전문 지식이나 자격증, 흔들리지 않는 내공(${inseongCombo.ko})을 탄탄히 다져봐.** 아니면 장기적으로 수익이 저절로 굴러가는 판을 짜는 설계자(식상생재)가 되어보는 거야. 조급함을 내려놓고 너만의 단단한 내실을 다질 때 비로소 찐 부자의 여유마저 거머쥘 수 있을 거야.`;
+            return `\n\n📌 [ 핵심 과제 & 개운법 ]\n현재 흐름을 짚어보면 끊임없이 계산기를 두드리게 만드는 ${jaeseongCombo.ko}의 기운이 너무 강해서, 당장의 이익이나 가성비에만 신경이 곤두서기 쉬워. 매 순간 손익을 따지느라 뇌가 과열되다 보니, 정서적으로 훌쩍 메마르거나 징글징글한 과로에 시달리기도 하는 상태지.\n\n이럴 때는 눈앞의 현실이나 주머니 사정에 너무 연연하면서 스스로를 타이트하게 옭아매지 않는 게 제일 중요해. **조급함을 버리고, 앞으로 널 든든하게 받쳐줄 전문 지식이나 자격증, 흔들리지 않는 내공(${inseongCombo.ko})을 탄탄히 다져봐.** 아니면 장기적으로 수익이 저절로 굴러가는 판을 짜는 설계자(${siksangEasy.ko} → ${jaeseongEasy.ko})가 되어보는 거야. 조급함을 내려놓고 너만의 단단한 내실을 다질 때 비로소 찐 부자의 여유마저 거머쥘 수 있을 거야.`;
         }
         // Mode 3: Gwanseong Overload or Jong-Sal (관성용신 또는 관성과다)
         if (gwanseongPct >= 35 || structTitle.includes("종살") || structTitle.includes("종관")) {

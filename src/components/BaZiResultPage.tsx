@@ -783,6 +783,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const dayMasterDetails = result?.analysis?.dayMasterStrength?.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
   const isDayMasterRooted = !!(dayMasterDetails && dayMasterDetails.roots && dayMasterDetails.roots.some((rt: any) => !rt.isDestroyed));
 
+  // 등라계갑 특별 예외 연산
+  const dayPillarForSpecial = result?.pillars?.find((p: any) => p.title === 'Day');
+  const dayMasterForSpecial = dayPillarForSpecial?.stem;
+  const isEulDM = dayMasterForSpecial === '乙';
+  const stemsListForSpecial = result?.pillars?.map((p: any) => p.stem) || [];
+  const branchesListForSpecial = result?.pillars?.map((p: any) => p.branch) || [];
+  const hasBackingOak = stemsListForSpecial.includes('甲') || branchesListForSpecial.includes('寅') || branchesListForSpecial.includes('亥');
+  const isDeungRaGyeGap = isEulDM && hasBackingOak;
+  const giShinGodForSpecial = result?.analysis?.yongshinDetail?.giShin?.god;
+  const isGiShinWood = giShinGodForSpecial === '비겁' || giShinGodForSpecial === '비견' || giShinGodForSpecial === '겁재';
+  const shouldApplyDeungRaSpecial = isDeungRaGyeGap && isGiShinWood;
+
   const getUserInteractionMatch = (guideCategory: string, itemBranchesStr: string) => {
     if (!result || !result.analysis || !result.analysis.interactions) return null;
     
@@ -1364,7 +1376,14 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         "Metal": ["庚", "辛"],
         "Water": ["壬", "癸"],
       };
-      const stems = stemsMap[targetElement];
+      let stems = stemsMap[targetElement] ? [...stemsMap[targetElement]] : [];
+
+      const giShinGod = result?.analysis?.yongshinDetail?.giShin?.god;
+      
+      // 등라계갑 예외 처리: 기신이 비겁(목 오행)인 경우, 기신 구하는 호출에서 '甲'을 배제함
+      if (shouldApplyDeungRaSpecial && targetElement === 'Wood' && godCategory === giShinGod) {
+        stems = stems.filter(s => s !== '甲');
+      }
 
       const elementKo = BAZI_MAPPING.elements?.[targetElement as keyof typeof BAZI_MAPPING.elements]?.ko.split(' ')[0];
       const elementEn = targetElement;
@@ -1637,15 +1656,32 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     const todayBranchElementKo = BAZI_MAPPING.elements?.[todayBranchElement as keyof typeof BAZI_MAPPING.elements]?.ko || '';
 
     const dayBranch = result.pillars[1].branch;
+
+    // 등라계갑 특별 예외 운세 연산
+    const dayPillarForSpecial = result?.pillars?.find((p: any) => p.title === 'Day');
+    const dayMasterForSpecial = dayPillarForSpecial?.stem;
+    const isEulDM = dayMasterForSpecial === '乙';
+    const stemsListForSpecial = result?.pillars?.map((p: any) => p.stem) || [];
+    const branchesListForSpecial = result?.pillars?.map((p: any) => p.branch) || [];
+    const hasBackingOak = stemsListForSpecial.includes('甲') || branchesListForSpecial.includes('寅') || branchesListForSpecial.includes('亥');
+    const isDeungRaGyeGap = isEulDM && hasBackingOak;
+    const isDengLaWithTodayGap = isDeungRaGyeGap && todayPillar.stem === '甲';
     
     // 1. Yongshin/Gishin check
     let dailyLuckScore = 50;
     let isStemYongshin = yongShin.includes(todayStemElement) || (todayStemElementKo && yongShin.includes(todayStemElementKo));
     let isStemGishin = giShin.includes(todayStemElement) || (todayStemElementKo && giShin.includes(todayStemElementKo));
     let isBranchYongshin = yongShin.includes(todayBranchElement) || (todayBranchElementKo && yongShin.includes(todayBranchElementKo));
+
+    // 등라계갑 당일 갑목 영접 특별 조율: 기신 취급 전면 배제 및 든든한 버팀목(희신) 환원
+    if (isDengLaWithTodayGap) {
+      isStemGishin = false;
+      isStemYongshin = true;
+      dailyLuckScore += 20;
+    }
     
     if (isStemYongshin) dailyLuckScore += 15;
-    if (isStemGishin) dailyLuckScore -= 15;
+    if (isStemGishin && !isDengLaWithTodayGap) dailyLuckScore -= 15;
     if (isBranchYongshin) dailyLuckScore += 10;
 
     // 2. Clash with Day Pillar
@@ -1770,7 +1806,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
       // 2. Stem (Mind) vs Branch (Reality)
       main += `\n\n${lang === 'KO' ? '그럼 이제 정신과 현실의 분리를 볼까?' : "Shall we look at the separation of mind and reality?"}\n`;
-      if (isStemYongshin) {
+      if (isDengLaWithTodayGap) {
+        main += `오늘 천간(정신)의 기운은 갑목(甲)이야. 비겁(목 오행)이라 원래대로라면 기신(불리한 기운)이어야 하지만, 너는 을목(乙)으로서 거목을 감고 올라가는 등라계갑(藤羅繫甲)의 수호 구조를 취하고 있어! 오늘 찾아온 갑목(甲)은 기신 작용에서 완전히 해방되며, 오히려 너를 귀인처럼 당겨주고 자라나게 해주는 최상의 버팀목(희신) 역할을 멋지게 해낼 거야. `;
+      } else if (isStemYongshin) {
         main += `오늘 천간(정신)의 기운이 네게 희신(좋은 기운)으로 작용해. 스트레스가 풀리고 심리적으로 아주 맑고 긍정적인 기분을 느낄 수 있어. `;
       } else if (isStemGishin) {
         main += `오늘 천간(정신)의 기운이 구신(나쁜 기운)으로 작용해. 괜한 강박이나 스트레스, 우울감이 몰려올 수 있으니 마인드 컨트롤이 필수야. `;
@@ -1789,6 +1827,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       }
 
       // 3. Special Energy
+      if (isDengLaWithTodayGap) {
+        main += `\n\n[특수 기운: 등라계갑(藤羅繫甲)]\n오늘은 을목(乙)이 거목 갑목(甲)을 만나 든든한 날개와 기둥을 얻는 등라계갑의 날이야! 혼자 힘으로는 오르기 힘들었던 높은 위치에 아주 손쉽게 도달하거나, 나를 책임감 있게 지원해 줄 든든한 환경과 귀인을 마주하게 되는 매우 길하고 특별한 기운이 돌기 시작해.`;
+      }
       if (isSuHwaGiJe) {
         main += `\n\n[특수 기운: 수화기제]\n오늘은 수(水)와 화(火)가 만나는 '수화기제'의 날이야. 일이 완벽히 끝나는 건 아니지만, 막혔던 일이 일단락되고 매듭지어지며 다음 스텝을 도모할 수 있는 중요한 전환점이 될 거야.`;
       }
@@ -1807,7 +1848,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       }
 
       main += `\n\nShall we look at the separation of mind and reality?\n`;
-      if (isStemYongshin) {
+      if (isDengLaWithTodayGap) {
+        main += `Today's Heavenly Stem is Gap-Wood (甲). Although traditionally a GiShin (unfavorable), your Eul-Wood (乙) Day Master benefits from the Deungra-Gyegap (藤羅繫甲) structure where the giant oak holds you up! Therefore, Gap-Wood is exempt from negative impacts and instead acts as an elite supportive guide (HeeShin) to boost your potential. `;
+      } else if (isStemYongshin) {
         main += `Today's Heavenly Stem (mind) acts as a favorable energy. Stress will relieve, and you'll feel psychologically clear and positive. `;
       } else if (isStemGishin) {
         main += `Today's Heavenly Stem (mind) acts as an unfavorable energy. Unnecessary obsessions, stress, or gloominess might rush in, so mind control is essential. `;
@@ -1825,6 +1868,9 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         }
       }
 
+      if (isDengLaWithTodayGap) {
+        main += `\n\n[Special Energy: Deungra-Gyegap (藤羅繫甲)]\nToday, your Eul-Wood (乙) climbs up the grand Gap-Wood (甲) oak! It marks a highly rare cycle where you easily scale heights or secure a supportive guide who pushes your limits. Spectacular opportunities await.`;
+      }
       if (isSuHwaGiJe) {
         main += `\n\n[Special Energy: Water-Fire Equilibrium]\nToday is a day where Water and Fire meet. Things might not finish perfectly, but blocked issues will be wrapped up, marking an important turning point for your next step.`;
       }
@@ -1921,10 +1967,75 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   type AdditionalContext = { stem: string, branch: string, labelKo: string, labelEn: string };
 
   const getPillarInteractionsTooltipContent = (stem: string, branch: string, extraContexts: AdditionalContext[] = []) => {
+    const INTERACTION_TIPS: Record<string, { descKo: string, descEn: string }> = {
+      '천간합': {
+        descKo: '생각의 마음이 일치하고 매력과 이성이 끌려 기분 좋은 타협과 만남이 열림',
+        descEn: 'Mental harmony, charm expression, and cooperative agreements'
+      },
+      '천간충': {
+        descKo: '치열한 내면적 소통 혹은 상황의 전환, 빠르고 대담함으로 돌파구 마련',
+        descEn: 'Mental conflict or fast transition, activating rapid execution'
+      },
+      '육합': {
+        descKo: '1:1의 끈끈한 친밀감, 서로 뜻이 맞아 비법을 전수하거나 비밀리에 연대',
+        descEn: 'Close one-on-one affinity, trusting parters or mutual projects'
+      },
+      '충': {
+        descKo: '판도가 흔들리며 완전히 새로워지는 정면 기회, 이동(이사/이직)이나 강력한 동력',
+        descEn: 'Dynamic collision opening up new paths, major relocations or transitions'
+      },
+      '형살': {
+        descKo: '깎여 나가며 다듬어가는 가위질, 계약 검토나 디테일한 점검을 장려하는 피드백 시기',
+        descEn: 'Precision trimming and control, checking legal details and fine-tuning'
+      },
+      '파살': {
+        descKo: '조율과 조정 중에 실없는 오해가 없도록 점검, 기존 일의 마무리 및 조정',
+        descEn: 'Minor repairs and re-arrangements to refine plans'
+      },
+      '해살': {
+        descKo: '인간관계나 신뢰의 피로감 주의, 불필요한 감정 소모보다 나만의 고요한 시간에 전념',
+        descEn: 'Friction warning, focus on self-healing rather than outer controversies'
+      },
+      '원진': {
+        descKo: '이유 모를 자극과 부딪침 조심, 적합한 심리적 거리를 유지하며 덤덤함을 유지',
+        descEn: 'Unexplained emotional friction, healthy relational distancing'
+      },
+      '귀문': {
+        descKo: '비약적으로 치솟는 번뜩이는 직관력과 창작력, 오직 마음에 고요를 비치어 예술로 풀이',
+        descEn: 'Brilliant creative flashes and extreme focus, best channeled artistic flow'
+      },
+      '반합': {
+        descKo: '공동의 결단을 내리는 다리 역할, 힘을 실어줄 세력이 모여 방향이 확실해짐',
+        descEn: 'Part of dynamic alliance establishing basic platform expansion'
+      },
+      '삼합 완': {
+        descKo: '사회적으로 모두가 공감하는 완벽한 합작과 성취, 스케일이 확실한 무대 등장',
+        descEn: 'Magnificent unified assembly forming a massive productive system'
+      },
+      '방합 완': {
+        descKo: '특정 환경과 사람들을 완벽히 단결하여 강력한 내 편의 벽을 완성함',
+        descEn: 'Massive regional framework backing and community support'
+      }
+    };
+
+    const getTip = (nameKo: string) => {
+      if (nameKo.includes('삼합') || nameKo.includes('수국 완성') || nameKo.includes('화국 완성') || nameKo.includes('목국 완성') || nameKo.includes('금국 완성')) {
+        if (nameKo.includes('방합')) return INTERACTION_TIPS['방합 완'];
+        return INTERACTION_TIPS['삼합 완'];
+      }
+      for (const key of Object.keys(INTERACTION_TIPS)) {
+        if (nameKo.includes(key)) {
+          return INTERACTION_TIPS[key];
+        }
+      }
+      return null;
+    };
+
     const extraStems = extraContexts.map(c => c.stem);
     const extraBranches = extraContexts.map(c => c.branch);
-    const stemInteractions = getCycleInteractions(stem, true, extraStems, extraBranches);
-    const branchInteractions = getCycleInteractions(branch, false, extraStems, extraBranches);
+    // Only calculate interactions against the core Birth Chart (원국) to prevent guest-to-guest clutter
+    const stemInteractions = getCycleInteractions(stem, true, [], []);
+    const branchInteractions = getCycleInteractions(branch, false, [], []);
 
     const getPillarTitle = (idx: number) => result?.pillars?.[idx]?.title;
     
@@ -1953,6 +2064,288 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       return isStem ? result.pillars?.[idx]?.stem : result.pillars?.[idx]?.branch;
     };
 
+    const getPillarTenGodKo = (idx: number, isStemFlag: boolean): string => {
+      if (!result || !result.pillars || !result.pillars[idx]) return '';
+      const p = result.pillars[idx];
+      return isStemFlag ? (p.stemKoreanName || '') : (p.branchKoreanName || '');
+    };
+
+    const getDetailedTenGodClean = (godKo: string): string => {
+      if (!godKo) return '';
+      if (godKo.includes('비견') || godKo.includes('겁재')) return '비겁';
+      if (godKo.includes('식신') || godKo.includes('상관')) return '식상';
+      if (godKo.includes('편재') || godKo.includes('정재')) return '재성';
+      if (godKo.includes('편관') || godKo.includes('정관')) return '관성';
+      if (godKo.includes('편인') || godKo.includes('정인')) return '인성';
+      return '';
+    };
+
+    const getElementRelation = (dmEl: string, targetEl: string): string => {
+      if (dmEl === targetEl) return '비겁';
+      if (
+        (dmEl === '목' && targetEl === '화') ||
+        (dmEl === '화' && targetEl === '토') ||
+        (dmEl === '토' && targetEl === '금') ||
+        (dmEl === '금' && targetEl === '수') ||
+        (dmEl === '수' && targetEl === '목')
+      ) {
+        return '식상';
+      }
+      if (
+        (dmEl === '목' && targetEl === '토') ||
+        (dmEl === '토' && targetEl === '수') ||
+        (dmEl === '수' && targetEl === '화') ||
+        (dmEl === '화' && targetEl === '금') ||
+        (dmEl === '금' && targetEl === '목')
+      ) {
+        return '재성';
+      }
+      if (
+        (targetEl === '목' && dmEl === '토') ||
+        (targetEl === '토' && dmEl === '수') ||
+        (targetEl === '수' && dmEl === '화') ||
+        (targetEl === '화' && dmEl === '금') ||
+        (targetEl === '금' && dmEl === '목')
+      ) {
+        return '관성';
+      }
+      if (
+        (targetEl === '목' && dmEl === '화') ||
+        (targetEl === '화' && dmEl === '토') ||
+        (targetEl === '토' && dmEl === '금') ||
+        (targetEl === '금' && dmEl === '수') ||
+        (targetEl === '수' && dmEl === '목')
+      ) {
+        return '인성';
+      }
+      return '';
+    };
+
+    const getPersonalizedActionGuide = (nameKo: string, targetChar: string, isStemFlag: boolean, pIndices: number[]) => {
+      const isSpecialCombo = nameKo.includes('완성') || nameKo.includes('국 완성') || nameKo.includes('국(방합)');
+      const validIdxs = pIndices.filter(i => i >= 0 && i <= 3);
+      if (validIdxs.length === 0 && !isSpecialCombo) return { ko: '', en: '' };
+
+      const positions = validIdxs.map(idx => getPillarNameKO(idx, isStemFlag)).join('·');
+      const uniqueGods = Array.from(new Set(validIdxs.map(idx => getPillarTenGodKo(idx, isStemFlag)).filter(Boolean)));
+      const godLabel = uniqueGods.join('/');
+      let godType = uniqueGods.length > 0 ? getDetailedTenGodClean(uniqueGods[0]) : '';
+
+      let guideKo = '';
+      let guideEn = '';
+
+      const isHap = nameKo.includes('합') || isSpecialCombo;
+      const isChung = nameKo.includes('충') || nameKo.includes('형살');
+      const isWonJin = nameKo.includes('귀문') || nameKo.includes('원진');
+      const isHaePa = nameKo.includes('해살') || nameKo.includes('파살');
+
+      if (isSpecialCombo) {
+        const dayMaster = result?.pillars?.[2]?.stem || '甲';
+        const dmElement = BAZI_MAPPING.stems[dayMaster as keyof typeof BAZI_MAPPING.stems]?.element || '목';
+        
+        let targetElement = '';
+        if (nameKo.includes('금국') || nameKo.includes('신유술')) targetElement = '금';
+        else if (nameKo.includes('목국') || nameKo.includes('인묘진')) targetElement = '목';
+        else if (nameKo.includes('화국') || nameKo.includes('사오미')) targetElement = '화';
+        else if (nameKo.includes('수국') || nameKo.includes('해자축')) targetElement = '수';
+
+        const comboGodType = getElementRelation(dmElement, targetElement);
+        
+        const concreteGuides: Record<string, Record<string, { ko: string; en: string }>> = {
+          '금': {
+            '비겁': {
+              ko: '금(金) 비겁의 형성으로 내면의 주체성과 자아가 아주 단단하게 응축되어 결단력이 치솟습니다. 우유부단함을 털어버리고 나만의 명확한 원칙을 세워 냉철하고 강력하게 추진할 원동력을 얻습니다.',
+              en: 'Your identity and inner drive are highly fortified. Exceptional alignment with core allies triggers dynamic breakthrough forces.'
+            },
+            '식상': {
+              ko: '금(金) 식상의 활동력이 극대화되어 표현과 기획에 예리한 절제력과 단호함이 장착됩니다. 머릿속 아이디어들이 군더더기 없이 일목요연하고 설득력 높은 설계나 구체적이고 확실한 행동 성과물로 단숨에 현실화됩니다.',
+              en: 'Expression power surges to peak state. Unleash specialized creativity and innovative plans onto the active stages seamlessly.'
+            },
+            '재성': {
+              ko: '금(金) 재성의 결속으로 이성적인 계산과 손익 분석의 안목이 고도로 발달합니다. 흐릿했던 금전적 소유권, 지분 관계, 현실 계약 조율을 명확하게 매듭짓고 확실한 자금 통제권과 실리를 확보합니다.',
+              en: 'Massive wealth flow connects flawlessly under unified frames. Optimal timing to lock down large-scale asset agreements.'
+            },
+            '관성': {
+              ko: '금(金) 관성의 체제가 정립되어 공적인 자격이나 규율이 단단하게 연결됩니다. 원칙과 책임감을 치밀하게 지키며 소속 단체, 경쟁 조직으로부터 무거운 책임 영역이나 명망 높은 주도권을 정당하게 양도받습니다.',
+              en: 'Prestigious power and leadership frames align with outstanding authority. Great timing for official appointments or system upgrades.'
+            },
+            '인성': {
+              ko: '금(金) 인성의 후원으로 나를 책임질 안정적인 권리 취득, 자격 인증, 계약 운로가 완벽해집니다. 어설픈 사설 정보 대신 검증된 핵심 면허나 결점이 없는 견고한 약속 서류를 정확하게 움켜쥐기에 수월합니다.',
+              en: 'High-leverage resource energies lock firmly in place. Perfect for finalizing official certifications, core assets, and dynamic licenses.'
+            }
+          },
+          '목': {
+            '비겁': {
+              ko: '목(木) 비겁의 강력한 추동력으로 새로운 탄생과 시작을 향한 파릇한 자아 의지가 만개합니다. 동료들과 적극적으로 생각을 분출하며 열정적으로 프로젝트의 스타트 라인을 힘차게 넘어설 조력을 얻습니다.',
+              en: 'Wood companion energy flourishes. Great timing to unite with active partners, build start-up momentum and advance together.'
+            },
+            '식상': {
+              ko: '목(木) 식상의 에너지가 가동되며 세상에 나를 드러내는 호기심과 성장의 기쁨이 폭발합니다. 참신한 상상력이 가지를 뻗듯 끝없이 자라나며, 외부 영업, 창조적인 지식 콘텐츠 연구, 대중 발표 활동을 시원하게 확장합니다.',
+              en: 'Your ideas grow like fresh sprouts, creating superb avenues for networking, active promotion, and creative expression.'
+            },
+            '재성': {
+              ko: '목(木) 재성의 형성에 따라 신규 비즈니스의 씨앗을 심고 무대를 확장하는 역동적인 개척력이 열립니다. 미래 잠재력이 눈부신 신흥 판로를 적극 발굴하여 실제 매출과 이익 성장의 마중물로 삼습니다.',
+              en: 'Active wealth creation seeds new growth potential. Exceptional timing to step into untouched markets and expand resources.'
+            },
+            '관성': {
+              ko: '목(木) 관성이 깃들어 나를 지탱하는 조직과 직장의 규칙에 역동적이고 신선한 변화가 시작됩니다. 오랜 침체를 벗어난 유연한 소속 관계를 확립하여 내 책임 지위와 권익 세력을 한층 크게 격상시킵니다.',
+              en: 'Gaining status in growth-oriented institutions. Ideal for establishing progressive structures and setting organizational leadership.'
+            },
+            '인성': {
+              ko: '목(木) 인성의 결집으로 배움과 명상의 지혜가 기분 좋게 차오릅니다. 나를 진심으로 발돋움하게 도울 훌륭한 멘토를 발견하거나, 장기적으로 무궁무진한 영감을 전해줄 계약 문서나 학습 코스를 영입하게 됩니다.',
+              en: 'Dynamic learning opportunity appears with elegant mentors. Excellent for acquiring progressive certificates or strategic content.'
+            }
+          },
+          '화': {
+            '비겁': {
+              ko: '화(火) 비겁의 세력이 만개하여 나만의 열정과 기백이 대단히 뜨겁게 폭발합니다. 주위 사람들과의 주도적 대화와 탁월한 사교력으로 내 주장에 힘과 찬사를 얻으며 강력하고 명랑하게 군중을 이끌고 우뚝 섭니다.',
+              en: 'Fire companion energy peaks, radiating intense social confidence. Perfect for taking central leadership and gathering enthusiastic support.'
+            },
+            '식상': {
+              ko: '화(火) 식상의 눈부신 기운으로 내 매력과 역량을 만천하에 드러낼 열정적인 무대가 밝게 조명됩니다. 세련된 설득, 시각 미디어, 혹은 대담한 선언을 통해 대중의 이목을 싹쓸이하는 눈부신 홍보 성취를 달성합니다.',
+              en: 'Your radiant expression reaches peak visibility. Excellent for promotional events, key presentations, and massive public branding.'
+            },
+            '재성': {
+              ko: '화(火) 재성의 흐름을 타면서 막혔던 자금 수혈이나 대규모 금융 기회가 아주 화끈하고 기동력 있게 가동됩니다. 유동성 높은 거래, 단기 금융 협상, 혹은 시원하고 기분 좋은 대규모 재정 성과를 즉각 움켜쥔 장을 선물받습니다.',
+              en: 'Dynamic financial opportunities move rapidly. Outstanding momentum to engage in high-velocity deals and enjoy prominent capital gains.'
+            },
+            '관성': {
+              ko: '화(火) 관성의 위상으로 내 가치와 책임감 있는 직위가 주변 시선과 소속 한가운데에 가장 화려하고 자랑스럽게 공개됩니다. 지지와 신뢰가 쏟아지는 영광스러운 감투를 수려하고 품격 있게 수락하는 국면입니다.',
+              en: 'Your reputation and leadership roles are publicly elevated. Excellent for stepping into competitive posts and showing authority.'
+            },
+            '인성': {
+              ko: '화(火) 인성의 기운으로 내 능력과 명성이 널리 알려지며 공식 자격 취득, 인허가 서류 확보가 한결 수월해집니다. 소중한 지식재산이나 권리 문서를 확실하게 매듭짓고 인정받는 든든한 시기입니다.',
+              en: 'Acquiring highly visible asset credentials or official agreements. Perfect for brand patents and public endorsement contracts.'
+            }
+          },
+          '수': {
+            '비겁': {
+              ko: '수(水) 비겁의 극진한 몰입 기운이 일어나며 보이지 않는 영역에서 지혜와 안목이 깊어집니다. 겉으로 호들갑 떨지 않으면서도 핵심 사람들과 단단한 막후 정치를 완벽히 조율해, 꺾이지 않을 조용한 주도권을 거머쥡니다.',
+              en: 'Deep water companion connection expands. Establish profound private alliances and silent, unshakeable influence.'
+            },
+            '식상': {
+              ko: '수(水) 식상의 유연하고 깊은 감각이 작동하여, 타인의 속내와 심리를 자석처럼 꿰뚫는 노련한 지혜의 기획이 활개칩니다. 깊은 연구 저술, 컨설팅, 치유, 혹은 은밀히 설계된 특수 성과물로 눈부신 실속을 차립니다.',
+              en: 'Deep instinct and quiet expressive power are activated. Perfect for strategy planning, writing, counseling, or hidden design works.'
+            },
+            '재성': {
+              ko: '수(水) 재성의 연계에 힘입어 수면 아래의 내실 가득한 현금 안목과 자금 파이프라인 정비가 이뤄집니다. 보이지 않는 알짜배기 자산 가치나 비공개 금융 지분을 선점해 흔들림 없는 든든한 금전 기틀을 구축합니다.',
+              en: 'Securing valuable private cash flows or non-public financial agreements. Highly efficient for establishing stable backend incomes.'
+            },
+            '관성': {
+              ko: '수(水) 관성의 조율사가 되어 겉치레 대신 외풍을 차단할 실속 있는 배후의 보호막 소속을 굳힙니다. 위기 조율 능력을 증명하며 조직 내 은밀하고 강력한 인사 통제나 의결권을 수임하게 됩니다.',
+              en: 'Gaining immense silent authority or defense positions. Excellent for critical dispute resolution and handling organizational leverage.'
+            },
+            '인성': {
+              ko: '수(水) 인성의 비호 속에서 깊이 있는 전문 학문, 오랜 연구 성과, 비방의 자격 인가를 기어코 취득합니다. 가치 변동이 없는 알짜배기 원천 자산 문서를 내 명의로 온전하고 수려하게 이전하기 매우 이로운 적기입니다.',
+              en: 'Securing profound intellectual property, core credentials, or secret patents. Extremely favorable for real asset contracts.'
+            }
+          },
+          '토': {
+            '비겁': {
+              ko: '토(土) 비겁의 거대한 신뢰성이 구축되며 흔들림 없는 안정된 기조와 리더십을 회복합니다. 흔들리는 흐름에 휩쓸리지 않고 태산 같은 듬직함으로 주체적인 세력을 정돈하고 나아갑니다.',
+              en: 'Unshakable self-confidence and grounding energy are restored. Stand firm with reliable companion systems.'
+            },
+            '식상': {
+              ko: '토(土) 식상의 무거운 지구력이 채워지며 어떤 외풍에도 묵묵하고 꾸준히 하나의 과업을 성사해 내는 실천력이 주어집니다. 안전하고 정밀하게 설계된 생산활동에 심혈을 기울여 보수적인 성취를 다져냅니다.',
+              en: 'Steadfast perseverance empowers physical labor or long-term design. Great for creating a solid foundation of execution.'
+            },
+            '재성': {
+              ko: '토(土) 재성의 안정화에 힘입어 토지, 빌딩, 영구적인 물리적 자산처럼 가치가 보수적이고 안전한 무거운 부동산 실물이나 고정 자금의 계약과 든든히 결탁합니다.',
+              en: 'Securing long-term fixed assets, stable real estate, or robust collateral. Favorable for building a concrete legacy.'
+            },
+            '관성': {
+              ko: '토(土) 관성의 임무 운으로 국가공인 기관이나 오랜 신뢰를 쌓아온 우량 단체로부터 영속적인 신임 감투나 확실한 역할 책임을 인가받아 지위의 지속성을 고도로 향상시킵니다.',
+              en: 'Entrusted with reliable official authority or public platform projects. Establishes long-lasting professional stability.'
+            },
+            '인성': {
+              ko: '토(土) 인성의 정적인 후원으로 세월의 신망이 검증된 가업의 상속, 오랫동안 누려온 권익문서 및 신용 자격을 완전하게 양도받아 가치 있는 기반을 대대로 공고화합니다.',
+              en: 'Acquiring mature asset inheritance or certified licenses. Exceptional timing for securing long-term strategic documents.'
+            }
+          }
+        };
+
+        const keyEl = targetElement || '금';
+        const keyGod = comboGodType || '비겁';
+        const customGuide = concreteGuides[keyEl]?.[keyGod];
+        
+        if (customGuide) {
+          guideKo = customGuide.ko;
+          guideEn = customGuide.en;
+        } else {
+          guideKo = `${targetElement} 오행의 완성으로 ${comboGodType} 기운의 눈부신 활로가 트이며 내면 역량과 현실 방향이 조화롭게 열리는 흐름입니다.`;
+          guideEn = `The system completes the ${targetElement} axis (${comboGodType}). Opening promising real-world pathways.`;
+        }
+        return { ko: guideKo, en: guideEn };
+      }
+
+      if (isWonJin) {
+        if (godType === '인성') {
+          guideKo = `생각이 머릿속을 맴돌며 감정 과부하가 걸리기 쉬우니, 잡념을 털어내고 책을 읽거나 소중한 탐구 연구에 에너지를 몰입해 보세요.`;
+          guideEn = `Heavy thoughts and overthinking. Greatly suited to dive deep into study, private analysis, or strategic planning.`;
+        } else if (godType === '식상') {
+          guideKo = `작업 성과에 예민한 완벽주의 감정이 앞설 수 있으니, 반짝이는 감각을 디자인이나 글쓰기, 전문 전공 기획으로 승화하세요.`;
+          guideEn = `Intense perfectionism on details. Best channeled by putting inspiration into bold creation or custom design.`;
+        } else if (godType === '재성') {
+          guideKo = `손익 계산에 신경이 날카로워져 조급해지기 쉬우니, 금전적 판단을 서둘지 말고 이성적으로 재점검하세요.`;
+          guideEn = `Hyper-sensitive regarding tangible outputs. Avoid rushing deals under pressure, rely strictly on clear logic.`;
+        } else if (godType === '관성') {
+          guideKo = `주변의 이목이나 타인의 평가를 유독 귀담아듣기 쉬운 구간입니다. 기분 좋은 거리감을 유지하며 마음의 주체성을 지키세요.`;
+          guideEn = `Sensitive to social judgments or environmental stress. Gently ground your inner self and avoid taking small comments too seriously.`;
+        } else if (godType === '비겁') {
+          guideKo = `자책을 일삼거나 가까운 사람에게 소소한 상실감을 느끼기 쉬우니, 관계 유지보다 나를 채우는 힐링에 시간을 쏟으세요.`;
+          guideEn = `Self-criticism or subtle relational disappointment. Focus purely on private healing rather than social interactions.`;
+        } else {
+          guideKo = `직관이 치솟아 주변 자극에 날카로워질 수 있는 시기입니다. 차분히 명상을 거치거나 예술 연구에 집중해 번뇌를 털어두세요.`;
+          guideEn = `Extremely heightened intuition. Decongest thoughts by indulging in quiet meditation or physical hobbies.`;
+        }
+      } else if (isChung) {
+        if (godType === '관성') {
+          guideKo = `역할, 부서, 이직 등 공헌 위치에 커다란 역동성과 세력 쇄신이 밀려옵니다. 능동적인 대안 제시로 기회를 포획하십시오.`;
+          guideEn = `Clear momentum for professional change, promotions, or relocating. Harness high external pressure into decisive negotiations.`;
+        } else if (godType === '재성') {
+          guideKo = `막혔던 재물과 자산 흐름의 활로가 시원하게 트이며, 자금 활용성이 커집니다. 문서 계약, 지분율 조정 등 실질적인 이권을 유리하게 확보하고 가치를 높이기에 최적의 기회입니다.`;
+          guideEn = `Moving blockages in asset flow or remodeling. Review legal clauses carefully to maximize real dividends.`;
+        } else if (godType === '식상') {
+          guideKo = `지체되어 온 업무 절차와 불리한 루틴을 대폭 수리하는 흐름입니다. 결단을 내려 쓸모없는 오랜 거죽을 화끈하게 제거하십시오.`;
+          guideEn = `Active revision of working methodologies. Discard sluggish routines and install high-performing habits.`;
+        } else if (godType === '인성') {
+          guideKo = `기존의 전문 자격이나 체결된 계약, 공부하고 있는 분야를 한층 더 보완하고 새롭게 다듬기 좋은 상생의 변화기입니다. 디테일을 꼼꼼하게 검토하여 배움의 깊이를 더하고 소중한 내 권리를 확실히 다지세요.`;
+          guideEn = `Redrafting agreements, updating strategic licenses, or relocating study focuses. Refine documentation with critical insight.`;
+        } else if (godType === '비겁') {
+          guideKo = `늘 끌려가던 소모적 인간관계를 기백 있게 청소하고 우뚝 설 기회입니다. 자립 주도권을 확실하게 되찾아 승배를 안으세요.`;
+          guideEn = `Upgrades in inner circle, cutting parasitic bonds, or setting a major boundary. Embrace constructive independence.`;
+        } else {
+          guideKo = `지체되어 정체되던 불합리한 틀에서 가치 있게 탈피합니다. 변화와 이동 국면을 당당히 장악하며 성취에 기여해 보세요.`;
+          guideEn = `Breaking old stagnation blocks to pioneer dynamic personal growth.`;
+        }
+      } else if (isHap) {
+        if (godType === '식상') {
+          guideKo = `번뜩이는 아이디어와 기획이 우군을 만나 물 흐르듯 가동됩니다. 수월하게 협상을 이끌고 나를 널리 부각시킬 타이밍입니다.`;
+          guideEn = `Your ideas gain tremendous popular demand or active team support, smoothing overall project delivery.`;
+        } else if (godType === '재성') {
+          guideKo = `탄탄한 시장 수요를 맞추거나 투자 동반자의 러브콜을 얻어 장기 소득의 기둥과 풍요로운 자산 발판을 확보합니다.`;
+          guideEn = `Generating a robust income channel and establishing stable capital alliances with top allies.`;
+        } else if (godType === '인성') {
+          guideKo = `우호적인 지지가 결성되거나 면허 취득, 계약 승인 등 핵심 문서와 자격 권한을 순조롭게 손에 넣는 시기입니다.`;
+          guideEn = `Securing dynamic mentorship or passing key strategic certifications. Contract actions run smooth.`;
+        } else if (godType === '관성') {
+          guideKo = `든든하고 정평 있는 집단에 소속되거나 높은 책임 직위를 인가받습니다. 리크루팅 제안이나 합작 성과가 탄탄히 굳어집니다.`;
+          guideEn = `Upgraded status, gaining stable protective umbrella or joining highly competitive teams.`;
+        } else if (godType === '비겁') {
+          guideKo = `주변과 유기적으로 협력하고 상생하는 시기입니다. 공동의 지향점을 향해 나아가며 압도적인 성장의 시너지를 발휘하세요.`;
+          guideEn = `Rallying passionate companions to launch strong joint play instead of wandering on a solo path.`;
+        } else {
+          guideKo = `조화로운 유대의 은덕이 가득 가중되고 우호적 원조 세력이 보강되어, 추진하던 바가 한결 유연하고 견고하게 발달합니다.`;
+          guideEn = `Bringing supportive entities closer to create high-leverage collaborations.`;
+        }
+      } else if (isHaePa) {
+        guideKo = `새로운 일을 크게 벌이거나 무리하기보다는, 현재 상황의 세밀한 틈새나 계획을 점검하며 내실을 다질 때입니다. 마음의 안정을 취하고 차분히 정돈하는 시간을 가지세요.`;
+        guideEn = `Refine plan structures and check minor points. Avoid rush projects and secure protective boundaries.`;
+      }
+
+      return { ko: guideKo, en: guideEn };
+    };
+
     const stemCharName = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.ko || stem;
     const branchCharName = BAZI_MAPPING.branches[branch as keyof typeof BAZI_MAPPING.branches]?.ko || branch;
     const stemCharNameEn = BAZI_MAPPING.stems[stem as keyof typeof BAZI_MAPPING.stems]?.en || stem;
@@ -1969,20 +2362,64 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       const stemLinesKO: string[] = [];
       const stemLinesEN: string[] = [];
       
+      type GroupedStemInteraction = {
+        nameKo: string;
+        nameEn: string;
+        targetChar: string;
+        targetColor: string;
+        pIndices: number[];
+        isSpecial?: boolean;
+      };
+
+      const groupedStems: Record<string, GroupedStemInteraction> = {};
+
       stemInteractions.forEach(item => {
         if (item.isSpecial) {
-          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameKo}</strong></div>`);
-          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong></div>`);
+          const key = `special-${item.nameKo}`;
+          if (!groupedStems[key]) {
+            groupedStems[key] = {
+              nameKo: item.nameKo,
+              nameEn: item.nameEn,
+              targetChar: '',
+              targetColor: '',
+              pIndices: [],
+              isSpecial: true
+            };
+          }
         } else {
           const targetChar = getCharAtIndex(item.pIndex, true) || '';
           const targetColor = ELEMENT_COLORS[BAZI_MAPPING.stems[targetChar as keyof typeof BAZI_MAPPING.stems]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
-          const targetPillar = getPillarNameKO(item.pIndex, true);
-          const targetPillarEn = getPillarNameEN(item.pIndex, true);
-          
-          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${targetPillar} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span>와(과) <strong>${item.nameKo}</strong></div>`);
-          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> with ${targetPillarEn} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span></div>`);
+          const key = `${targetChar}-${item.nameKo}`;
+          if (!groupedStems[key]) {
+            groupedStems[key] = {
+              nameKo: item.nameKo,
+              nameEn: item.nameEn,
+              targetChar,
+              targetColor,
+              pIndices: []
+            };
+          }
+          groupedStems[key].pIndices.push(item.pIndex);
         }
       });
+
+      Object.values(groupedStems).forEach(grouped => {
+        const pGuide = getPersonalizedActionGuide(grouped.nameKo, grouped.targetChar, true, grouped.pIndices);
+        const guideTextKo = pGuide.ko ? `<div class="text-[11px] text-amber-300 drop-shadow-[0_0_3px_rgba(251,191,36,0.15)] font-sans mt-0.5 leading-tight font-normal" style="padding-left: 12px; margin-bottom: 4px;">${pGuide.ko}</div>` : '';
+        const guideTextEn = pGuide.en ? `<div class="text-[10px] text-teal-300/80 font-sans mt-0.5 leading-tight font-normal" style="padding-left: 12px; margin-bottom: 4px;">* ${pGuide.en}</div>` : '';
+
+        if (grouped.isSpecial) {
+          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5"><span class="text-white/90 font-medium">- <strong>${grouped.nameKo}</strong></span>${guideTextKo}</div>`);
+          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5">- <strong>${grouped.nameEn}</strong>${guideTextEn}</div>`);
+        } else {
+          const pillarNamesKo = grouped.pIndices.map(idx => getPillarNameKO(idx, true)).join(', ');
+          const pillarNamesEn = grouped.pIndices.map(idx => getPillarNameEN(idx, true)).join(', ');
+
+          stemLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5"><span class="text-white/90 font-medium">- ${pillarNamesKo} <span style="color: ${grouped.targetColor}; font-weight: bold;">${grouped.targetChar}</span>와(과) <strong>${grouped.nameKo}</strong></span>${guideTextKo}</div>`);
+          stemLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5">- <strong>${grouped.nameEn}</strong> with ${pillarNamesEn} <span style="color: ${grouped.targetColor}; font-weight: bold;">${grouped.targetChar}</span>${guideTextEn}</div>`);
+        }
+      });
+
       koList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${stemElementColor}; font-weight: bold;">천간 ${stemCharName}(${stem})</span>:</div> ${stemLinesKO.join('')}</div>`);
       enList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${stemElementColor}; font-weight: bold;">Stem ${stemCharNameEn}(${stem})</span>:</div> ${stemLinesEN.join('')}</div>`);
     } else {
@@ -1995,32 +2432,78 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
       const branchLinesKO: string[] = [];
       const branchLinesEN: string[] = [];
       
+      type GroupedBranchInteraction = {
+        nameKo: string;
+        nameEn: string;
+        targetChar: string;
+        targetColor: string;
+        pIndices: number[];
+        isSpecial?: boolean;
+        specialIndices?: number[];
+      };
+
+      const groupedBranches: Record<string, GroupedBranchInteraction> = {};
+
       branchInteractions.forEach(item => {
         if (item.isSpecial) {
-          const partnersKo = item.pIndices.map((idx: number) => {
+          const key = `special-${item.nameKo}`;
+          if (!groupedBranches[key]) {
+            groupedBranches[key] = {
+              nameKo: item.nameKo,
+              nameEn: item.nameEn,
+              targetChar: '',
+              targetColor: '',
+              pIndices: [],
+              isSpecial: true,
+              specialIndices: item.pIndices
+            };
+          }
+        } else {
+          const targetChar = getCharAtIndex(item.pIndex, false) || '';
+          const targetColor = ELEMENT_COLORS[BAZI_MAPPING.branches[targetChar as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
+          const key = `${targetChar}-${item.nameKo}`;
+          if (!groupedBranches[key]) {
+            groupedBranches[key] = {
+              nameKo: item.nameKo,
+              nameEn: item.nameEn,
+              targetChar,
+              targetColor,
+              pIndices: []
+            };
+          }
+          groupedBranches[key].pIndices.push(item.pIndex);
+        }
+      });
+
+      Object.values(groupedBranches).forEach(grouped => {
+        const pGuide = getPersonalizedActionGuide(grouped.nameKo, grouped.targetChar, false, grouped.pIndices);
+        const guideTextKo = pGuide.ko ? `<div class="text-[11px] text-amber-300 drop-shadow-[0_0_3px_rgba(251,191,36,0.15)] font-sans mt-0.5 leading-tight font-normal" style="padding-left: 12px; margin-bottom: 4px;">${pGuide.ko}</div>` : '';
+        const guideTextEn = pGuide.en ? `<div class="text-[10px] text-teal-300/80 font-sans mt-0.5 leading-tight font-normal" style="padding-left: 12px; margin-bottom: 4px;">* ${pGuide.en}</div>` : '';
+
+        if (grouped.isSpecial) {
+          const partnersKo = (grouped.specialIndices || []).map((idx: number) => {
               const char = getCharAtIndex(idx, false);
               const color = ELEMENT_COLORS[BAZI_MAPPING.branches[char as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
               return `${getPillarNameKO(idx, false)} <span style="color: ${color}; font-weight: bold;">${char}</span>`;
           }).join(', ');
           
-          const partnersEn = item.pIndices.map((idx: number) => {
+          const partnersEn = (grouped.specialIndices || []).map((idx: number) => {
               const char = getCharAtIndex(idx, false);
               const color = ELEMENT_COLORS[BAZI_MAPPING.branches[char as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
               return `${getPillarNameEN(idx, false)} <span style="color: ${color}; font-weight: bold;">${char}</span>`;
           }).join(', ');
 
-          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${partnersKo}와(과) 함께 <strong>${item.nameKo}</strong></div>`);
-          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> together with ${partnersEn}</div>`);
+          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5"><span class="text-white/90 font-medium">- ${partnersKo}와(과) 함께 <strong>${grouped.nameKo}</strong></span>${guideTextKo}</div>`);
+          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5">- <strong>${grouped.nameEn}</strong> together with ${partnersEn}${guideTextEn}</div>`);
         } else {
-          const targetChar = getCharAtIndex(item.pIndex, false) || '';
-          const targetColor = ELEMENT_COLORS[BAZI_MAPPING.branches[targetChar as keyof typeof BAZI_MAPPING.branches]?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF';
-          const targetPillar = getPillarNameKO(item.pIndex, false);
-          const targetPillarEn = getPillarNameEN(item.pIndex, false);
-          
-          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/20">- ${targetPillar} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span>와(과) <strong>${item.nameKo}</strong></div>`);
-          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/20">- <strong>${item.nameEn}</strong> with ${targetPillarEn} <span style="color: ${targetColor}; font-weight: bold;">${targetChar}</span></div>`);
+          const pillarNamesKo = grouped.pIndices.map(idx => getPillarNameKO(idx, false)).join(', ');
+          const pillarNamesEn = grouped.pIndices.map(idx => getPillarNameEN(idx, false)).join(', ');
+
+          branchLinesKO.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5"><span class="text-white/90 font-medium">- ${pillarNamesKo} <span style="color: ${grouped.targetColor}; font-weight: bold;">${grouped.targetChar}</span>와(과) <strong>${grouped.nameKo}</strong></span>${guideTextKo}</div>`);
+          branchLinesEN.push(`<div class="ml-2 pl-2 border-l border-white/10 mb-1.5">- <strong>${grouped.nameEn}</strong> with ${pillarNamesEn} <span style="color: ${grouped.targetColor}; font-weight: bold;">${grouped.targetChar}</span>${guideTextEn}</div>`);
         }
       });
+
       koList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${branchElementColor}; font-weight: bold;">지지 ${branchCharName}(${branch})</span>:</div> ${branchLinesKO.join('')}</div>`);
       enList.push(`<div class="mb-3"><div class="mb-1"><span style="color: ${branchElementColor}; font-weight: bold;">Branch ${branchCharNameEn}(${branch})</span>:</div> ${branchLinesEN.join('')}</div>`);
     } else {
@@ -2029,8 +2512,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     }
 
     return {
-      ko: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 연관 합형충파해 분석 (Interactions)</div>${koList.join('')}</div>`,
-      en: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 Associated Interactions</div>${enList.join('')}</div>`
+      ko: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 사주 원국과의 합형충파해 분석 (Natal Interactions)</div>${koList.join('')}</div>`,
+      en: `<div class="space-y-1 w-full"><div class="font-bold border-b border-white/20 pb-2 mb-3 tracking-tight">📊 Associated Natal Interactions</div>${enList.join('')}</div>`
     };
   };
 
@@ -4576,6 +5059,25 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                 <div className="flex flex-col items-center">
                                   <span className={`text-[9px] uppercase ${isLight ? 'text-slate-400 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '희신' : 'HeeShin'}</span>
                                   {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god)}
+                                  {shouldApplyDeungRaSpecial && (
+                                    <div className="mt-1 flex flex-col items-center">
+                                      <BaziTooltip 
+                                        content={{
+                                          ko: "을목(乙) 일간이 등라계갑(藤羅繫甲)의 구조를 충족하는 경우, 목 오행이 원래 기신이더라도 갑목(甲)은 기신 작용에서 배제됩니다. 오히려 기댈 거목이 되어 희신 역할을 온전히 수행하며 대운과 세운에서 만나면 아주 유기적으로 발전합니다.",
+                                          en: "Under the Deungra-Gyegap dynamics, even if Wood is traditionally a GiShin, Gap-Wood (甲) stays protected from negative effects and instead acts as a helpful energy (HeeShin) in both major and annual cycles."
+                                        }}
+                                        lang={lang}
+                                      >
+                                        <span 
+                                          className="text-sm font-bold mb-0.5 cursor-help border-b border-dashed border-emerald-500/40 pb-0.5 font-sans"
+                                          style={{ color: '#10b981' }}
+                                        >
+                                          {lang === 'KO' ? '목 - 갑목 (甲)' : 'Wood - Gap (甲)'}
+                                        </span>
+                                      </BaziTooltip>
+                                      <span className="text-[10px] opacity-60 font-sans">({lang === 'KO' ? '등라계갑' : 'DeungRa-GyeGap'})</span>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="flex flex-col items-center">
                                   <span className={`text-[9px] uppercase ${isLight ? 'text-slate-400 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '기신' : 'GiShin'}</span>
@@ -7418,9 +7920,21 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                       {lang === 'KO' ? '용신을 도와주는 긍정적인 에너지야. 용신이 힘을 잃지 않도록 보좌하는 역할을 해.' : 'Positive energy that supports the Yongshin. It assists the Useful God so it doesn\'t lose power.'}
                     </p>
-                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-green-400/90 flex items-center gap-1.5">
-                      <span className="font-bold">{lang === 'KO' ? '나의 희신:' : 'Your HeeShin:'}</span>
-                      {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god, true)}
+                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-green-400/90 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold">{lang === 'KO' ? '나의 희신:' : 'Your HeeShin:'}</span>
+                        {renderYongshinWithElement(result.analysis.yongshinDetail.heeShin.god, true)}
+                      </div>
+                      
+                      {/* 등라계갑 특별 희신 모달 내 표시 */}
+                      {shouldApplyDeungRaSpecial && (
+                        <div className="mt-1.5 pt-1.5 border-t border-white/5 text-[10px] leading-relaxed text-emerald-300">
+                          <span className="font-bold">🌿 등라계갑 [甲(갑목)]: </span>
+                          {lang === 'KO' 
+                            ? '을목(乙) 일간이 거목에 의지해 비상하는 수호 구조에 해당하여, 전체 비겁(목 오행) 중 갑목(甲)은 기신 작용에서 배제되고 든든한 희신 역할을 수행합니다. 대운과 세운에서 갑목을 만나면 큰 귀인 역량과 일어설 발판을 얻게 됩니다.'
+                            : 'Since you have a Deungra-Gyegap structure, the Gap-Wood (甲) is excluded from negative influences and acts as a powerful helper (HeeShin). Meeting Gap-Wood in major/annual cycles triggers magnificent backing and prosperity.'}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -7429,9 +7943,21 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     <p className="text-[11px] sm:text-xs text-white/60 mb-1.5">
                       {lang === 'KO' ? '용신을 극(沖/剋)하여 방해하는 부정적인 에너지야. 이 기운이 강해지면 삶의 균형이 깨지기 쉬워.' : 'Negative energy that attacks or hinders the Yongshin. When this energy is strong, life\'s balance can easily be disrupted.'}
                     </p>
-                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-red-400/90 flex items-center gap-1.5">
-                      <span className="font-bold">{lang === 'KO' ? '나의 기신:' : 'Your GiShin:'}</span>
-                      {renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god, true)}
+                    <div className="text-[11px] sm:text-xs bg-black/40 p-1.5 rounded text-red-400/90 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold">{lang === 'KO' ? '나의 기신:' : 'Your GiShin:'}</span>
+                        {renderYongshinWithElement(result.analysis.yongshinDetail.giShin.god, true)}
+                      </div>
+                      
+                      {/* 등라계갑 기신 배제 모달 내 안내 */}
+                      {shouldApplyDeungRaSpecial && (
+                        <div className="mt-1.5 pt-1.5 border-t border-white/5 text-[10px] leading-relaxed text-red-300/80">
+                          <span className="font-bold">ℹ️ 등라계갑 갑목(甲) 예외: </span>
+                          {lang === 'KO'
+                            ? '목 오행이 기신이더라도, 등라계갑 성립으로 인해 갑목(甲)은 기신 작용에서 제외됩니다. (을목(乙) 기운만 경쟁심이나 방해 요인으로 작용합니다.)'
+                            : 'Even though Wood is GiShin, Gap-Wood (甲) is excluded due to Deungra-Gyegap. Only Eul-Wood (乙) remains as a negative force.'}
+                        </div>
+                      )}
                     </div>
                   </div>
 
