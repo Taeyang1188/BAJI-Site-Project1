@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { BaZiResult, Language } from '../types';
-import BaZiInterpretationPage from './BaZiInterpretationPage';
 import { TRANSLATIONS, ELEMENT_COLORS, TEN_GOD_COLORS, ELEMENT_DESCRIPTIONS } from '../constants';
 import { SHINSAL_DEFINITIONS } from '../constants/shinsal-definitions';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
@@ -42,7 +41,7 @@ import { getTodayPillar } from '../services/bazi-service';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 import { TEN_GOD_DESCRIPTIONS } from '../constants/tenGodDescriptions';
 import { useTheme } from '../contexts/ThemeContext';
-import { compressPayload, compressToShortId } from '../services/share-compress-service';
+import { compressPayload } from '../services/share-compress-service';
 
 const ILJU_BACKGROUND_IMAGES: Record<string, { base: string, detailed: string }> = {
   '己丑': { base: 'https://i.imgur.com/RyKP0u5.jpeg', detailed: 'https://i.imgur.com/RyKP0u5.jpeg' },
@@ -1101,7 +1100,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showYongshinRolesInfo, setShowYongshinRolesInfo] = useState(false);
   const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const [viewMode, setViewMode] = useState<'result' | 'interpretation'>('result');
   const [showHanja, setShowHanja] = useState(true);
   const [guideStep, setGuideStep] = useState(0); // 0: None, 1: Year, 2: Month, 3: Day, 4: Hour, 5: JiJangGan, 6: TenGods, 7: Daewun
 
@@ -2769,18 +2767,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         </BaziTooltip>
     );
   };
-
-  if (viewMode === 'interpretation') {
-    return (
-      <BaZiInterpretationPage
-        result={result}
-        lang={lang}
-        userInput={userInput}
-        coords={coords}
-        onBack={() => setViewMode('result')}
-      />
-    );
-  }
 
   return (
     <div className="w-full max-w-4xl mx-auto px-2 sm:px-6 py-4 sm:py-12 space-y-8 sm:space-y-12 bazi-result-root">
@@ -4833,31 +4819,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-
-      {/* 내 사주 리포트 보기 버튼 따로 추가 */}
-      <div className="flex justify-center pt-2 pb-6">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            if (showAnalysis) {
-              setShowAnalysis(false);
-            } else {
-              setShowAnalysis(true);
-              setTimeout(() => {
-                const el = document.getElementById('analysis-report-section');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }, 100);
-            }
-          }}
-          className="px-8 py-3.5 bg-neon-cyan/10 border border-neon-cyan/40 text-neon-cyan font-display font-black text-xs tracking-[0.2em] rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:bg-neon-cyan/20 hover:border-neon-cyan transition-all cursor-pointer"
-        >
-          <Zap className="w-4 h-4 text-neon-cyan animate-pulse" />
-          {showAnalysis ? (lang === 'KO' ? '내 사주 리포트 닫기' : 'Hide Bazi Report') : (lang === 'KO' ? '내 사주 리포트 보기' : 'View Bazi Report')}
-        </motion.button>
       </div>
 
       {/* Saju Analysis Report Section */}
@@ -8212,13 +8173,23 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              setViewMode('interpretation');
+              if (showAnalysis) {
+                setShowAnalysis(false);
+              } else {
+                setShowAnalysis(true);
+                setTimeout(() => {
+                  const el = document.getElementById('analysis-report-section');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
+              }
             }}
-            className="w-full py-4 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-black text-[15px] sm:text-base tracking-[0.2em] rounded-[2rem] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.4)] relative overflow-hidden animate-[pulse_2s_infinite]"
+            className="w-full py-4 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-black text-[15px] sm:text-base tracking-[0.2em] rounded-[2rem] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.4)] relative overflow-hidden"
           >
             {/* Button Shine Effect (optional purely CSS) */}
             <div className="absolute inset-0 bg-white/10 w-[50%] -skew-x-12 -translate-x-[150%] animate-[shine_3s_infinite]" />
-            {lang === 'KO' ? '내 사주 자세히보기' : 'Extract Soul Details'}
+            {showAnalysis ? (lang === 'KO' ? '내 사주 자세히 닫기' : 'Hide Soul Details') : (lang === 'KO' ? '내 사주 자세히 보기' : 'Extract Soul Details')}
           </motion.button>
         </div>
       </div>
@@ -8277,11 +8248,8 @@ export const SoulSummaryCard = ({
     let url = window.location.href;
     if (userInput) {
       try {
-        const shortId = compressToShortId(userInput, coords?.lat, coords?.lon);
-        const b64 = btoa(unescape(encodeURIComponent(shortId)))
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/, '');
+        const compressed = compressPayload(userInput, coords?.lat, coords?.lon);
+        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(compressed))));
         url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}&lang=${lang}`;
       } catch (e) {
         console.error("Error generating share URL", e);
@@ -8786,35 +8754,20 @@ export const SoulSummaryCard = ({
           
           {!isSharedView && (
             <div className="pt-4 w-full relative">
-              <motion.button 
+              <button 
                 onClick={handleShare}
-                animate={{
-                  y: [0, -4, 0]
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 3,
-                  ease: "easeInOut"
-                }}
-                whileHover={{
-                  scale: 1.04,
-                  boxShadow: isLight
-                    ? "0 10px 25px rgba(95, 70, 235, 0.4)"
-                    : "0 0 30px rgba(5, 230, 255, 0.5)"
-                }}
-                whileTap={{ scale: 0.98 }}
                 className={`w-full py-4 rounded-2xl cursor-pointer flex items-center justify-center gap-2 font-black active:scale-[0.98] transition-all duration-300 mb-2 
                   ${isLight 
-                    ? 'bg-gradient-to-r from-[#5f46eb] via-[#8539f8] to-[#ea187c] shadow-[0_5px_22px_rgba(95, 70, 235, 0.45)] border border-white/40' 
-                    : 'bg-gradient-to-r from-neon-pink/30 via-neon-purple/40 to-neon-cyan/30 shadow-[0_0_20px_rgba(250,30,142,0.3)] border border-white/30 hover:border-white/60'
+                    ? 'bg-gradient-to-r from-[#5f46eb] via-[#8539f8] to-[#ea187c] shadow-[0_5px_22px_rgba(95,70,235,0.45)] hover:shadow-[0_8px_30px_rgba(95,70,235,0.65)] border border-white/40 hover:scale-[1.02]' 
+                    : 'bg-gradient-to-r from-neon-pink/30 via-neon-purple/40 to-neon-cyan/30 shadow-[0_0_20px_rgba(250,30,142,0.3)] hover:shadow-[0_0_30px_rgba(5,230,255,0.5)] border border-white/30 hover:border-white/60 hover:scale-[1.02]'
                   } 
                   ${lang === 'KO' ? 'font-sans text-[15px] tracking-wide' : 'font-display text-sm tracking-widest uppercase'}`}
               >
-                <Share2 className="w-4 h-4 animate-bounce text-white-force" style={{ stroke: '#ffffff', filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(-1px -1px 0 #000) drop-shadow(1px 1px 0 #000)' }} />
-                <span className="text-white-force font-extrabold uppercase tracking-wide">
+                <Share2 className="w-4 h-4 animate-bounce text-white" style={{ stroke: '#ffffff', filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.85)) drop-shadow(-1px -1px 0 #000) drop-shadow(1px 1px 0 #000)' }} />
+                <span className="high-contrast-neon-text">
                   {lang === 'KO' ? '나의 소울 리포트 공유하기' : 'Share My Soul Report'}
                 </span>
-              </motion.button>
+              </button>
 
               <AnimatePresence>
                 {shareState !== 'idle' && (

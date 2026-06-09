@@ -13,10 +13,9 @@ import CosmicWheel from './components/CosmicWheel';
 import AuroraBackground from './components/AuroraBackground';
 
 import BaZiResultPage, { SoulSummaryCard } from './components/BaZiResultPage';
-import BaZiInterpretationPage from './components/BaZiInterpretationPage';
 
 import { calculateRealBaZi } from './services/bazi-service';
-import { decompressPayload, decompressFromShortId } from './services/share-compress-service';
+import { decompressPayload } from './services/share-compress-service';
 
 import characterWebm from './assets/door.webm';
 import characterApng from './assets/door.png';
@@ -384,20 +383,9 @@ export default function App() {
     }
     if (sharedParam) {
       try {
-        let base64 = sharedParam
-          .replace(/-/g, '+')
-          .replace(/_/g, '/');
-        while (base64.length % 4) {
-          base64 += '=';
-        }
-        const decodedPayload = decodeURIComponent(escape(atob(base64)));
-        let parsedInput;
-        if (decodedPayload.startsWith('v4_') || decodedPayload.startsWith('v5_')) {
-          parsedInput = decompressFromShortId(decodedPayload);
-        } else {
-          const rawObj = JSON.parse(decodedPayload);
-          parsedInput = decompressPayload(rawObj);
-        }
+        const decodedPayload = decodeURIComponent(escape(atob(sharedParam)));
+        const rawObj = JSON.parse(decodedPayload);
+        const parsedInput = decompressPayload(rawObj);
         if (parsedInput && parsedInput.birthDate) {
           setSharedInput(parsedInput);
           setIsSharedView(true);
@@ -739,32 +727,75 @@ export default function App() {
           {isSharedView && sharedResult && sharedInput ? (
             <motion.div
               key="shared-view"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full max-w-4xl mx-auto px-4 relative z-10 py-1"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-4xl mx-auto px-4 relative z-10 flex flex-col items-center justify-center text-center py-10"
             >
-              <BaZiInterpretationPage 
-                result={sharedResult} 
-                lang={lang} 
-                userInput={sharedInput} 
-                coords={sharedCoords} 
-                onBack={() => {
-                  setIsSharedView(false);
-                  setSharedInput(null);
-                  setPage(2);
-                }}
-                isSharedView={true}
-                onStartAnalysis={() => {
-                  if (typeof window !== 'undefined') {
-                    const newUrl = window.location.origin + window.location.pathname;
-                    window.history.replaceState(null, '', newUrl);
-                  }
-                  setIsSharedView(false);
-                  setSharedInput(null);
-                  setPage(2);
-                }}
-              />
+              {/* Specialized Header for Shared Mode */}
+              <div className="mb-8 space-y-3">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-semibold uppercase tracking-widest font-mono select-none"
+                >
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse text-neon-pink" />
+                  {lang === 'KO' ? '공유된 운명의 우주 프로필' : 'Shared Cosmic Soul Profile'}
+                </motion.div>
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan select-none pr-1">
+                    {sharedInput.name || (lang === 'KO' ? '익명' : 'Anonymous')}
+                  </span>
+                  {lang === 'KO' ? '님의 실시간 영혼의 테마' : "'s Soul Theme Analysis"}
+                </h1>
+                <p className="text-white/60 text-xs sm:text-sm max-w-md mx-auto font-sans leading-relaxed">
+                  {lang === 'KO' 
+                    ? '사주(BaZi)의 기하학적 기운과 에너지를 결합해 정교하게 추출된 자아 분석 리포트입니다.'
+                    : 'A sophisticated self-analysis report calculated from the energetic geometry of their birth time.'}
+                </p>
+              </div>
+
+              {/* Render the full SoulSummaryCard */}
+              <div className="w-full max-w-3xl">
+                <SoulSummaryCard 
+                  result={sharedResult} 
+                  lang={lang} 
+                  userInput={sharedInput} 
+                  coords={sharedCoords} 
+                  isSharedView={true}
+                />
+              </div>
+
+              {/* High-Impact CTA Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="w-full max-w-md mx-auto mt-10 px-4"
+              >
+                <div className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan animate-[pulse_3s_infinite] shadow-[0_0_25px_rgba(255,0,122,0.25)] hover:shadow-[0_0_35px_rgba(0,243,255,0.4)] transition-all duration-300">
+                  <button
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        const newUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState(null, '', newUrl);
+                      }
+                      setIsSharedView(false);
+                      setSharedInput(null);
+                      setPage(2); // Go directly to saju birth date input form
+                    }}
+                    className="w-full py-5 px-6 bg-[#0B0118] hover:bg-[#0B0118]/80 text-white font-bold rounded-2xl transition-all flex flex-col items-center justify-center gap-1.5 focus:outline-none"
+                  >
+                    <span className={`text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-neon-cyan flex items-center gap-2 ${lang === 'KO' ? 'font-sans tracking-normal' : 'font-display tracking-wider'}`}>
+                      🌌 {lang === 'KO' ? '나도 5초만에 무료 영혼 분석 시작하기' : 'Analyze My Cosmic Soul Theme too for Free'}
+                    </span>
+                    <span className="text-[10px] sm:text-xs text-white/50 font-sans tracking-normal font-normal">
+                      {lang === 'KO' ? '이름과 태어난 일시만 입력하면 즉시 계산 완료! (100% 무료)' : 'Takes only 5 seconds to reveal your destiny!'}
+                    </span>
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
           ) : page === 1 && (
             <motion.div 

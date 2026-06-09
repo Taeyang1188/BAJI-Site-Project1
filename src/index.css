@@ -718,10 +718,5 @@ input[type="date"]::-webkit-datetime-edit-day-field {
   animation: neonTextGlowCycle 4s infinite linear !important;
 }
 
-.text-white-force {
-  color: #ffffff !important;
-}
-
-
 
 

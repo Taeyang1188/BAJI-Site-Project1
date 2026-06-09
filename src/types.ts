@@ -236,5 +236,4 @@ export interface BaZiResult {
     overloadAnalysis?: any;
     advancedEdgeCases?: any;
   };
-  dynamic_luck?: BaziMatrix['dynamic_luck'];
 }
