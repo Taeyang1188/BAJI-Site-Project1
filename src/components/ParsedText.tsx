@@ -1,0 +1,467 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+
+interface ParsedTextProps {
+  text: string;
+  className?: string;
+  lang?: 'KO' | 'EN';
+}
+
+const TOOLTIP_DICTIONARY: Record<string, { ko: string, en: string }> = {
+  'Gan-yeo-ji-dong': {
+    ko: '간여지동: 천간과 지지가 같은 오행으로 이루어진 기둥. 자아가 강하고 배우자 자리에 자신이 앉아있는 형국이라 배우자와의 갈등이 있을 수 있습니다.',
+    en: 'Gan-yeo-ji-dong: A pillar where the Heavenly Stem and Earthly Branch are of the same element. Indicates a strong ego and potential conflict with spouse.'
+  },
+  '간여지동': {
+    ko: '천간과 지지가 같은 오행으로 이루어진 기둥. 자아가 강하고 배우자 자리에 자신이 앉아있는 형국이라 배우자와의 갈등이 있을 수 있습니다.',
+    en: 'A pillar where the Heavenly Stem and Earthly Branch are of the same element. Indicates a strong ego and potential conflict with spouse.'
+  },
+  'up-sang-dae-che': {
+    ko: '업상대체: 사주에 내재된 부정적인 기운이나 흉살을 직업이나 활동으로 승화시켜 액운을 피하는 방법입니다.',
+    en: 'Up-sang-dae-che: Sublimating negative energies or bad luck inherent in the chart through one\'s profession or activities.'
+  },
+  '업상대체': {
+    ko: '사주에 내재된 부정적인 기운이나 흉살을 직업이나 활동으로 승화시켜 액운을 피하는 방법입니다.',
+    en: 'Sublimating negative energies or bad luck inherent in the chart through one\'s profession or activities.'
+  },
+  '토다매금': {
+    ko: '토다매금: 흙이 너무 많아 금(보석)이 묻히는 형국. 재능이 있으나 빛을 보지 못하거나 과도한 보호로 자립심이 약해질 수 있습니다.',
+    en: 'To-da-mae-geum: Too much Earth burying the Metal (gem). Indicates hidden talent or weakened independence due to overprotection.'
+  },
+  'To-da-mae-geum': {
+    ko: '토다매금: 흙이 너무 많아 금(보석)이 묻히는 형국. 재능이 있으나 빛을 보지 못하거나 과도한 보호로 자립심이 약해질 수 있습니다.',
+    en: 'To-da-mae-geum: Too much Earth burying the Metal (gem). Indicates hidden talent or weakened independence due to overprotection.'
+  },
+  '재다신약': {
+    ko: '재다신약: 재물(목표, 기회)은 너무 많은데 이를 감당할 내 힘(비겁/인성)이 부족한 형국. 빚을 지거나 건강을 해칠 수 있습니다.',
+    en: 'Jae-da-sin-yak: Too much Wealth energy but weak Daily Master. Indicates overwhelming opportunities that one lacks the strength to handle, leading to debt or health issues.'
+  },
+  'Jae-da-sin-yak': {
+    ko: '재다신약: 재물(목표, 기회)은 너무 많은데 이를 감당할 내 힘(비겁/인성)이 부족한 형국. 빚을 지거나 건강을 해칠 수 있습니다.',
+    en: 'Jae-da-sin-yak: Too much Wealth energy but weak Daily Master. Indicates overwhelming opportunities that one lacks the strength to handle, leading to debt or health issues.'
+  },
+  '군비쟁재': {
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
+  },
+  'Gun-bi-jaeng-jae': {
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
+  },
+  'Peer Rivalry for Wealth': {
+    ko: '군비쟁재(群比爭財): 주변의 비견/겁재(동료, 경쟁자)들이 나의 소중한 재성(재물, 결과물)을 두고 어지럽게 다투어 탈취해 가려는 형국. 동업, 자금 대여, 무리한 투자나 확장을 극도로 기피하고 조용히 실속을 챙겨야 합니다.',
+    en: 'Peer Rivalry for Wealth: A configuration where multiple peers/competitors (Companions) contend for a single wealth resource. It demands absolute caution against joint investments, lending money, or publicizing financial success.'
+  },
+  '재자약살': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
+  },
+  '재자약살(財滋弱殺)': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
+  },
+  'Wealth Nourishing Weak Power': {
+    ko: '재자약살(財滋弱殺): 사주 내에서 일간이 충분히 힘이 있으나, 지배력이나 권위를 뜻하는 관성(칠살)이 다소 약할 때, 재성(재물)의 생조를 받아 관성의 리더십과 명예를 드높이는 형국을 뜻합니다.',
+    en: 'Wealth Nourishing Weak Power: A configuration where the Day Master is robust but the authority/leadership star (Power/Sal) is relatively light, so incoming Wealth energy elevates your honor, status, and leadership capacity.'
+  },
+  '모다멸자': {
+    ko: '모다멸자: 인성(어머니/지원)이 너무 많아 오히려 식상(자식/행동력)을 극하여 자립심을 잃게 만드는 형국입니다.',
+    en: 'Mo-da-myeol-ja: Too much Resource (Mother) energy suppressing Output (Child), leading to a loss of independence.'
+  },
+  'Mo-da-myeol-ja': {
+    ko: '모다멸자: 인성(어머니/지원)이 너무 많아 오히려 식상(자식/행동력)을 극하여 자립심을 잃게 만드는 형국입니다.',
+    en: 'Mo-da-myeol-ja: Too much Resource (Mother) energy suppressing Output (Child), leading to a loss of independence.'
+  },
+  '수다목부': {
+    ko: '수다목부: 물이 너무 많아 나무가 뿌리를 내리지 못하고 떠내려가는 형국. 정서적 과잉이나 지나친 생각으로 실행력이 떨어질 수 있습니다.',
+    en: 'Su-da-mok-bu: Too much Water causing the Wood to float. Indicates lack of execution due to emotional excess or overthinking.'
+  },
+  'Su-da-mok-bu': {
+    ko: '수다목부: 물이 너무 많아 나무가 뿌리를 내리지 못하고 떠내려가는 형국. 정서적 과잉이나 지나친 생각으로 실행력이 떨어질 수 있습니다.',
+    en: 'Su-da-mok-bu: Too much Water causing the Wood to float. Indicates lack of execution due to emotional excess or overthinking.'
+  },
+  '목다화식': {
+    ko: '목다화식: 나무(땔감)가 너무 많아 불이 꺼지는 형국. 지나친 지원이나 기대가 오히려 발전을 저해할 수 있습니다.',
+    en: 'Mok-da-hwa-sik: Too much Wood (firewood) extinguishing the Fire. Indicates excessive support or expectations hindering progress.'
+  },
+  'Mok-da-hwa-sik': {
+    ko: '목다화식: 나무(땔감)가 너무 많아 불이 꺼지는 형국. 지나친 지원이나 기대가 오히려 발전을 저해할 수 있습니다.',
+    en: 'Mok-da-hwa-sik: Too much Wood (firewood) extinguishing the Fire. Indicates excessive support or expectations hindering progress.'
+  },
+  '복음': {
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
+  },
+  'Bok-eum': {
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
+  },
+  'Bokeum': {
+    ko: '복음(伏吟): 자신의 일주나 연주와 똑같은 흐름이 찾아오는 시기. 넘치는 에너지가 자칫 극단적인 선택이나 시험대가 될 수 있어 신중함이 극도로 요구되는 상태를 뜻합니다.',
+    en: 'Bok-eum: A period where the exact same zodiac pillar as your own pillar (especially Day or Year) arrives. It requires extreme caution and inner reflection as identical energies multiply.'
+  },
+  '자형': {
+    ko: '자형: 스스로를 형(刑)하는 기운. 내적 갈등이나 자기 검열이 심해질 수 있으나, 이를 극복하면 큰 성장을 이룰 수 있습니다.',
+    en: 'Self-Punishment: Energy that punishes oneself. Can cause internal conflict, but overcoming it leads to great growth.'
+  },
+  '벽갑': {
+    ko: '벽갑: 도끼(금)로 통나무(목)를 쪼개어 땔감으로 만드는 형국. 시련과 압박을 통해 잠재력을 현실화하는 과정입니다.',
+    en: 'Byeok-gap: Splitting a log (Wood) with an axe (Metal) to make firewood. The process of actualizing potential through trials and pressure.'
+  },
+  '충': {
+    ko: '충(沖): 기운이 서로 강하게 부딪히는 현상. 갈등, 변화, 이동, 분리 등을 의미하며, 낡은 것을 깨고 새로운 것을 시작하는 원동력이 되기도 합니다.',
+    en: 'Clash (Chung): A strong collision of energies. Signifies conflict, change, movement, or separation, often acting as a driving force for new beginnings.'
+  },
+  '일지 형충': {
+    ko: '일지 형충: 배우자 자리인 일지에 충(부딪힘)이나 형(형벌/조정)이 들어오는 것. 배우자와의 갈등이나 관계의 변화, 조율이 필요한 시기를 의미합니다.',
+    en: 'Day Branch Clash/Punishment: A clash or penalty affecting the Day Branch (Spouse Palace). Indicates potential conflict, change, or a need for adjustment in the relationship.'
+  },
+  'Day Branch Clash/Punishment': {
+    ko: '일지 형충: 배우자 자리인 일지에 충(부딪힘)이나 형(형벌/조정)이 들어오는 것. 배우자와의 갈등이나 관계의 변화, 조율이 필요한 시기를 의미합니다.',
+    en: 'Day Branch Clash/Punishment: A clash or penalty affecting the Day Branch (Spouse Palace). Indicates potential conflict, change, or a need for adjustment in the relationship.'
+  },
+  '진술축미': {
+    ko: '진술축미(辰戌丑未): 사주의 지지에 해당하는 네 개의 흙(土) 기운. 계절의 환절기를 의미하며, 고집이 세고 변화무쌍하며 만물을 품고 저장하는 특성이 있습니다.',
+    en: 'Jin-Sul-Chuk-Mi (Earth Branches): The four Earth branches representing the change of seasons. Characterized by stubbornness, versatility, and the ability to store and embrace all things.'
+  },
+  'Earth Branch on Day': {
+    ko: '일지 진술축미: 배우자 자리에 흙(土)의 기운이 있는 것. 배우자가 고집이 세거나 속을 알기 어려울 수 있으며, 관계에서 인내심이 필요할 수 있습니다.',
+    en: 'Earth Branch on Day: Having an Earth branch in the Spouse Palace. The partner may be stubborn or hard to read, requiring patience in the relationship.'
+  },
+  '일지 진술축미': {
+    ko: '일지 진술축미: 배우자 자리에 흙(土)의 기운이 있는 것. 배우자가 고집이 세거나 속을 알기 어려울 수 있으며, 관계에서 인내심이 필요할 수 있습니다.',
+    en: 'Earth Branch on Day: Having an Earth branch in the Spouse Palace. The partner may be stubborn or hard to read, requiring patience in the relationship.'
+  },
+  '백호/괴강살': {
+    ko: '백호/괴강살: 호랑이에게 물려가거나 우두머리가 되는 강렬한 기운. 프로페셔널하고 카리스마가 넘치지만, 기운이 너무 강해 배우자 자리가 불안정해질 수 있습니다.',
+    en: 'White tiger star/Overload star: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
+  },
+  'White tiger star/Overload star': {
+    ko: '백호/괴강살: 호랑이에게 물려가거나 우두머리가 되는 강렬한 기운. 프로페셔널하고 카리스마가 넘치지만, 기운이 너무 강해 배우자 자리가 불안정해질 수 있습니다.',
+    en: 'White tiger star/Overload star: Intense energies symbolizing a white tiger or a powerful leader. Highly professional and charismatic, but the strong energy can make the spouse palace unstable.'
+  },
+  '부성/처성임묘': {
+    ko: '부성/처성임묘: 남편(부성)이나 아내(처성)를 뜻하는 글자가 무덤(묘)에 들어가는 형국. 배우자의 건강이 약해지거나 인연이 짧아질 수 있음을 암시하며, 주말부부나 각자의 영역을 존중하는 것으로 액땜(업상대체)할 수 있습니다.',
+    en: 'Spouse Star in Tomb: A configuration where the spouse star enters a "tomb" state. Suggests potential health issues or a weak connection with the spouse. Can be mitigated by living apart (e.g., weekend couple) or respecting each other\'s independence.'
+  },
+  'Spouse Star in Tomb': {
+    ko: '부성/처성임묘: 남편(부성)이나 아내(처성)를 뜻하는 글자가 무덤(묘)에 들어가는 형국. 배우자의 건강이 약해지거나 인연이 짧아질 수 있음을 암시하며, 주말부부나 각자의 영역을 존중하는 것으로 액땜(업상대체)할 수 있습니다.',
+    en: 'Spouse Star in Tomb: A configuration where the spouse star enters a "tomb" state. Suggests potential health issues or a weak connection with the spouse. Can be mitigated by living apart (e.g., weekend couple) or respecting each other\'s independence.'
+  },
+  '부성임묘': {
+    ko: '부성임묘: 남편을 뜻하는 글자가 무덤(묘)에 들어가는 형국. 남편의 건강이나 운기가 약해질 수 있음을 암시합니다.',
+    en: 'Husband Star in Tomb: A configuration where the husband star enters a "tomb" state. Suggests potential health issues or weakened luck for the husband.'
+  },
+  '처성임묘': {
+    ko: '처성임묘: 아내를 뜻하는 글자가 무덤(묘)에 들어가는 형국. 아내의 건강이나 운기가 약해질 수 있음을 암시합니다.',
+    en: 'Wife Star in Tomb: A configuration where the wife star enters a "tomb" state. Suggests potential health issues or weakened luck for the wife.'
+  }
+};
+
+export const TooltipWrapper: React.FC<{ term: string, info?: {ko: string, en: string}, children: React.ReactNode, lang?: 'KO' | 'EN' }> = ({ term, info, children, lang = 'KO' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, placement: 'top' as 'top' | 'bottom' });
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const tooltipInfo = info || TOOLTIP_DICTIONARY[term];
+  
+  const updatePosition = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const tooltipWidth = 256; // w-64 = 16rem = 256px
+      let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+      
+      if (left < 10) left = 10;
+      if (left + tooltipWidth > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth - 10;
+      }
+
+      let top = rect.top - 8;
+      let placement: 'top' | 'bottom' = 'top';
+
+      if (top < 120) {
+        top = rect.bottom + 8;
+        placement = 'bottom';
+      }
+
+      setPosition({ top, left, placement });
+    }
+  };
+
+  const showTooltip = () => {
+    updatePosition();
+    setIsVisible(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+  };
+
+  const hideTooltip = () => {
+    setIsVisible(false);
+  };
+
+  const handleInteraction = (e: React.MouseEvent | React.TouchEvent) => {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouch) {
+      if (isVisible) {
+        hideTooltip();
+      } else {
+        showTooltip();
+        timerRef.current = setTimeout(() => {
+          setIsVisible(false);
+        }, 5000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        hideTooltip();
+      }
+    };
+
+    if (isVisible) {
+      window.addEventListener('click', handleClickOutside);
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+    }
+
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isVisible]);
+
+  if (!tooltipInfo) return <>{children}</>;
+
+  return (
+    <span 
+      ref={containerRef}
+      className="relative inline-block border-b border-dashed border-white/50 cursor-help"
+      onMouseEnter={() => {
+        if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+          showTooltip();
+        }
+      }}
+      onMouseLeave={() => {
+        if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+          hideTooltip();
+        }
+      }}
+      onClick={handleInteraction}
+    >
+      {children}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isVisible && (
+            <motion.div 
+              initial={{ opacity: 0, y: position.placement === 'top' ? 5 : -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: position.placement === 'top' ? 5 : -5 }}
+              style={{ 
+                position: 'fixed', 
+                top: position.top, 
+                left: position.left, 
+                transform: position.placement === 'top' ? 'translateY(-100%)' : 'none',
+                zIndex: 9999 
+              }}
+              className="w-64 p-3 bg-black/95 border border-white/20 rounded-lg shadow-2xl backdrop-blur-xl pointer-events-none"
+            >
+              <span className="block font-bold text-white mb-2 text-sm">{term}</span>
+              {lang === 'KO' ? (
+                <span className="block whitespace-pre-wrap text-white text-xs">{tooltipInfo.ko}</span>
+              ) : (
+                <span className="block whitespace-pre-wrap text-white text-xs">{tooltipInfo.en}</span>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+    </span>
+  );
+};
+
+export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", lang = 'KO' }) => {
+  const idId = React.useId();
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+  let currentText = '';
+  let keyCount = 0;
+
+  if (!text) return null;
+
+  // We no longer auto-wrap terms. Tooltips will only be applied to terms explicitly wrapped in color codes or tooltip tags.
+  let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  while (i < processedText.length) {
+    if (processedText.startsWith('\n', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      elements.push(<br key={`${idId}-${keyCount++}`} />);
+      i += 1;
+      continue;
+    }
+
+    if (processedText.startsWith('<h3>', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      let endH3Index = processedText.indexOf('</h3>', i);
+      if (endH3Index !== -1) {
+        const h3Content = processedText.substring(i + 4, endH3Index);
+        elements.push(<h3 key={`${idId}-${keyCount++}`} className="font-bold text-xl mb-4 mt-2 text-white italic drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] tracking-wide">
+          <ParsedText text={h3Content} lang={lang} />
+        </h3>);
+        i = endH3Index + 5;
+        continue;
+      } else {
+        // Tag is open but not closed yet (probably typing)
+        const h3Content = processedText.substring(i + 4);
+        elements.push(<h3 key={`${idId}-${keyCount++}`} className="font-bold text-xl mb-4 mt-2 text-white italic drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] tracking-wide">
+          <ParsedText text={h3Content} lang={lang} />
+        </h3>);
+        i = processedText.length;
+        continue;
+      }
+    }
+
+    if (processedText.startsWith('<strong>', i)) {
+      if (currentText) {
+        elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+        currentText = '';
+      }
+      let endStrongIndex = processedText.indexOf('</strong>', i);
+      if (endStrongIndex !== -1) {
+        const strongContent = processedText.substring(i + 8, endStrongIndex);
+        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+          <ParsedText text={strongContent} lang={lang} />
+        </span>);
+        i = endStrongIndex + 9;
+        continue;
+      } else {
+        // Tag is open but not closed yet
+        const strongContent = processedText.substring(i + 8);
+        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+          <ParsedText text={strongContent} lang={lang} />
+        </span>);
+        i = processedText.length;
+        continue;
+      }
+    }
+
+    if (processedText[i] === '[') {
+      // Find the matching closing bracket for this specific opening bracket
+      let bracketCount = 1;
+      let j = i + 1;
+      let endBracketIndex = -1;
+      
+      while (j < processedText.length) {
+        if (processedText[j] === '[') bracketCount++;
+        else if (processedText[j] === ']') bracketCount--;
+        
+        if (bracketCount === 0) {
+          endBracketIndex = j;
+          break;
+        }
+        j++;
+      }
+
+      if (endBracketIndex !== -1) {
+        const tagContent = processedText.substring(i + 1, endBracketIndex);
+        
+        if (tagContent.startsWith('delay:')) {
+          if (currentText) {
+            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+            currentText = '';
+          }
+          i = endBracketIndex + 1;
+          continue;
+        }
+        
+        if (tagContent.startsWith('tooltip:')) {
+          if (currentText) {
+            elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+            currentText = '';
+          }
+          const content = tagContent.substring(8);
+          let term = content;
+          let info;
+          if (content.includes('|')) {
+            const parts = content.split('|');
+            term = parts[0];
+            info = { ko: parts[1], en: parts[2] || parts[1] };
+          }
+          elements.push(
+            <TooltipWrapper key={`${idId}-${keyCount++}`} term={term} info={info} lang={lang}>
+              {term}
+            </TooltipWrapper>
+          );
+          i = endBracketIndex + 1;
+          continue;
+        }
+
+        // Improved color/element tag detection: handle both hex and var()
+        const colonIndex = tagContent.indexOf(':');
+        if (colonIndex !== -1) {
+          const color = tagContent.substring(0, colonIndex).trim();
+          const content = tagContent.substring(colonIndex + 1);
+          
+          if (color.startsWith('#') || color.startsWith('var(') || color.startsWith('rgba(') || color.startsWith('rgb(')) {
+            if (currentText) {
+              elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+              currentText = '';
+            }
+            
+            // Auto-wrap terms with tooltips ONLY inside color tags
+            let processedContent = content;
+            Object.keys(TOOLTIP_DICTIONARY).forEach(term => {
+              // Properly escape term for regex
+              const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`(?<!\\[[^\\]]*)\\b${escapedTerm}\\b(?!\\s*\\])`, 'gi');
+              const koRegex = new RegExp(`(?<!\\[[^\\]]*)${escapedTerm}(?!\\s*\\])`, 'g');
+              
+              if (/[a-zA-Z]/.test(term)) {
+                processedContent = processedContent.replace(regex, `[tooltip:${term}]`);
+              } else {
+                processedContent = processedContent.replace(koRegex, `[tooltip:${term}]`);
+              }
+            });
+
+            elements.push(
+              <span 
+                key={`${idId}-${keyCount++}`} 
+                className="inline-flex items-center align-middle void-element-wrapper" 
+                style={{ '--elem-color': color, color: 'var(--text-elem-color, ' + color + ')' } as React.CSSProperties}
+              >
+                <span 
+                  className="void-element-badge w-2 h-2 rounded-full hidden shrink-0 mr-1" 
+                  style={{ backgroundColor: color }}
+                />
+                <span className="inline">
+                  <ParsedText text={processedContent} lang={lang} />
+                </span>
+              </span>
+            );
+            
+            i = endBracketIndex + 1;
+            continue;
+          }
+        }
+      }
+    }
+    currentText += processedText[i];
+    i++;
+  }
+  
+  if (currentText) {
+    elements.push(<span key={`${idId}-${keyCount++}`}>{currentText}</span>);
+  }
+
+  return <span className={`whitespace-pre-wrap ${className}`}>{elements}</span>;
+};

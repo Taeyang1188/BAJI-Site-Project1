@@ -1,0 +1,1476 @@
+DEBUG: gwanRatio: 0
+DEBUG: isGwanDa: false
+DEBUG: gwanRatio: 43
+DEBUG: isGwanDa: true
+DEBUG: gwanRatio: 29
+DEBUG: isGwanDa: false
+--- 19920611 10:40 Male ---
+{
+  "pillars": [
+    {
+      "title": "Hour",
+      "hanja": "丁巳",
+      "stem": "丁",
+      "branch": "巳",
+      "stemEnglishName": "The Sage",
+      "stemKoreanName": "정인",
+      "branchEnglishName": "The Sage",
+      "branchKoreanName": "정인",
+      "element": "Fire",
+      "description": "정화 / 사화",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    },
+    {
+      "title": "Day",
+      "hanja": "戊午",
+      "stem": "戊",
+      "branch": "午",
+      "stemEnglishName": "The Ego",
+      "stemKoreanName": "일간(나)",
+      "branchEnglishName": "The Mystic",
+      "branchKoreanName": "편인",
+      "element": "Earth",
+      "description": "무토 / 오화",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    },
+    {
+      "title": "Month",
+      "hanja": "丙午",
+      "stem": "丙",
+      "branch": "午",
+      "stemEnglishName": "The Mystic",
+      "stemKoreanName": "편인",
+      "branchEnglishName": "The Mystic",
+      "branchKoreanName": "편인",
+      "element": "Fire",
+      "description": "병화 / 오화",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    },
+    {
+      "title": "Year",
+      "hanja": "壬申",
+      "stem": "壬",
+      "branch": "申",
+      "stemEnglishName": "The Maverick",
+      "stemKoreanName": "편재",
+      "branchEnglishName": "The Artist",
+      "branchKoreanName": "식신",
+      "element": "Water",
+      "description": "임수 / 신금",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    }
+  ],
+  "analysis": {
+    "gender": "male",
+    "geJu": "정인격",
+    "yongShen": "금(金) (식상)",
+    "interactions": [
+      {
+        "type": "원합",
+        "stems": [
+          "丁",
+          "壬"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "element": "Fire",
+        "severity": "partial",
+        "note": "<div class=\"space-y-1\"><b>원합: 丁-壬</b><br/><b>위치:</b> 시주(丁)와 연주(壬)<br/><b>영향:</b> 시주(자식/미래)와 연주(조상/근본) 간의 정신적 결합이야. 정인(丁)과 편재(壬)이 서로 합을 하여 지향하는 가치가 일치함을 의미해.</div>|<div class=\"space-y-1\"><b>Far Combination: 丁-壬</b><br/><b>Position:</b> Hour (丁) and Year (壬)<br/><b>Influence:</b> Mental combination between Hour (Children/Future) and Year (Ancestors/Roots). Represents alignment of values between The Sage (丁) and The Maverick (壬).</div>"
+      },
+      {
+        "type": "육합",
+        "branches": [
+          "巳",
+          "申"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "element": "Water",
+        "severity": "full",
+        "note": "<div class=\"space-y-2\"><b>육합: 巳-申</b><br/><b>위치:</b> 시주(巳)와 연주(申)<br/><b>성격:</b> 수(水)의 기운을 강화해.<br/><b>영향:</b> 육합은 부부나 연인처럼 다정한 합이야. 시주(자식/미래)와 연주(조상/근본)가 합을 하고 있어 정서적인 안정감을 줘. 또한 정인(巳)과 식신(申)이 합을 하므로, 해당 십성들의 에너지가 서로 긍정적으로 연결되어 시너지를 내.</div>|<div class=\"space-y-2\"><b>Six Combination: 巳-申</b><br/><b>Position:</b> Hour (巳) and Year (申)<br/><b>Nature:</b> Strengthens Water energy.<br/><b>Influence:</b> The Six Combination is an affectionate bond like a couple. The Hour (Children/Future) and Year (Ancestors/Roots) are combining, providing emotional stability. Also, the The Sage (巳) and The Artist (申) combine, creating a positive synergy between these energies.</div>"
+      },
+      {
+        "type": "방합",
+        "subtype": "준방합",
+        "branches": [
+          "巳",
+          "午"
+        ],
+        "pillarIndices": [
+          0,
+          1
+        ],
+        "element": "Fire",
+        "severity": "partial",
+        "partial": true,
+        "note": "<div class=\"space-y-2\"><b>준방합: 巳-午</b><br/><b>위치:</b> 시주(巳)와 일주(午)<br/><b>성격:</b> 화(火)의 기운을 강화해.<br/><b>영향:</b> 준방합은 같은 계절(방향)의 강력한 세력이야. 시주(자식/미래)와 일주(나/배우자)가 모여 화(火)의 기운을 증폭시켜. 정인(巳)과 편인(午)이 무리를 지어 해당 분야에서 폭발적인 에너지와 추진력을 발휘하게 돼.</div>|<div class=\"space-y-2\"><b>Semi-Directional Combination: 巳-午</b><br/><b>Position:</b> Hour (巳) and Day (午)<br/><b>Nature:</b> Strengthens Fire energy.<br/><b>Influence:</b> This is a powerful force of the same season/direction. The Hour (Children/Future) and Day (Self/Spouse) gather to amplify Fire energy. The The Sage (巳) and The Mystic (午) form a group, exerting explosive energy and drive in their respective fields.</div>"
+      },
+      {
+        "type": "반형",
+        "branches": [
+          "巳",
+          "申"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "category": "지세",
+        "severity": "half",
+        "note": "<div class=\"space-y-1\"><b>반형: 巳-申</b><br/><b>위치:</b> 시주(巳)와 연주(申)<br/><b>영향:</b> 시주(자식/미래)와 연주(조상/근본) 간의 형(刑) 작용이야. 정인(巳)과 식신(申) 사이의 조정이나 법적/심리적 압박이 있을 수 있으니 세밀한 관리가 필요해.</div>|<div class=\"space-y-1\"><b>Half Punishment: 巳-申</b><br/><b>Position:</b> Hour (巳) and Year (申)<br/><b>Influence:</b> Punishment between Hour (Children/Future) and Year (Ancestors/Roots). May lead to adjustments or legal/psychological pressure between The Sage (巳) and The Artist (申).</div>"
+      },
+      {
+        "type": "자형",
+        "branches": [
+          "午",
+          "午"
+        ],
+        "pillarIndices": [
+          1,
+          2
+        ],
+        "category": "자형",
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>자형: 午-午</b><br/><b>위치:</b> 일주(午)와 월주(午)<br/><b>영향:</b> 일주(나/배우자)와 월주(부모/사회)에서 스스로를 볶는 기운이 강해져. 편인(午)과 편인(午)의 에너지가 과잉되어 스스로 심리적 압박을 가할 수 있으니 주의가 필요해.</div>|<div class=\"space-y-1\"><b>Self Punishment: 午-午</b><br/><b>Position:</b> Day (午) and Month (午)<br/><b>Influence:</b> Self-punishment in Day (Self/Spouse) and Month (Parents/Society). Overactive energy of The Mystic (午) and The Mystic (午) may cause internal stress.</div>"
+      },
+      {
+        "type": "복음",
+        "branches": [
+          "午",
+          "午"
+        ],
+        "pillarIndices": [
+          1,
+          2
+        ],
+        "category": "복음",
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>복음: 午-午</b><br/><b>위치:</b> 일주(午)와 월주(午)<br/><b>영향:</b> 일주(나/배우자)와 월주(부모/사회)에 같은 기운이 중첩됐어. 편인(午)과 편인(午)의 에너지가 정체되거나 중복된 고민이 생길 수 있는 시기야.</div>|<div class=\"space-y-1\"><b>Duplicate Pillar: 午-午</b><br/><b>Position:</b> Day (午) and Month (午)<br/><b>Influence:</b> Overlapping energy in Day (Self/Spouse) and Month (Parents/Society). Stagnation or repetitive concerns related to The Mystic (午) and The Mystic (午).</div>"
+      },
+      {
+        "type": "천간충",
+        "stems": [
+          "丙",
+          "壬"
+        ],
+        "pillarIndices": [
+          2,
+          3
+        ],
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>천간충: 丙-壬</b><br/><b>위치:</b> 월주(丙)와 연주(壬)<br/><b>영향:</b> 월주(부모/사회)와 연주(조상/근본) 간의 정신적 충돌이야. 편인(丙)과 편재(壬)이 서로 부딪혀 생각의 차이나 목표의 갈등이 생길 수 있어.</div>|<div class=\"space-y-1\"><b>Stem Clash: 丙-壬</b><br/><b>Position:</b> Month (丙) and Year (壬)<br/><b>Influence:</b> Mental conflict between Month (Parents/Society) and Year (Ancestors/Roots). Suggests differences in thoughts or goals between The Mystic (丙) and The Maverick (壬).</div>"
+      },
+      {
+        "type": "파",
+        "branches": [
+          "巳",
+          "申"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>파: 巳-申</b><br/><b>위치:</b> 시주(巳)와 연주(申)<br/><b>영향:</b> 시주(자식/미래)와 연주(조상/근본) 간의 파괴 작용이야. 정인(巳)과 식신(申) 사이의 관계나 일의 마무리에 있어 균열이 생기지 않도록 주의해야 해.</div>|<div class=\"space-y-1\"><b>Destruction: 巳-申</b><br/><b>Position:</b> Hour (巳) and Year (申)<br/><b>Influence:</b> Destruction between Hour (Children/Future) and Year (Ancestors/Roots). Caution needed in relationships or finalizing tasks between The Sage (巳) and The Artist (申).</div>"
+      }
+    ],
+    "conflicts": [],
+    "shinsal": [
+      {
+        "name": "겁살",
+        "nameKo": "겁살(劫殺)",
+        "basis": "년지",
+        "foundAt": [
+          "시주"
+        ],
+        "branches": [
+          "巳"
+        ],
+        "severity": "present",
+        "note": "사주정설: 겁살 감지"
+      },
+      {
+        "name": "재살",
+        "nameKo": "재살(災殺)",
+        "basis": "년지",
+        "foundAt": [
+          "일주",
+          "월주"
+        ],
+        "branches": [
+          "午",
+          "午"
+        ],
+        "severity": "strong",
+        "note": "사주정설: 재살 감지"
+      },
+      {
+        "name": "지살",
+        "nameKo": "지살(地殺)",
+        "basis": "년지",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "申"
+        ],
+        "severity": "present",
+        "note": "사주정설: 지살 감지"
+      },
+      {
+        "name": "문창귀인",
+        "nameKo": "문창귀인(文昌貴人)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "申"
+        ],
+        "severity": "present",
+        "note": "학문과 예술에 뛰어난 재능이 있어."
+      },
+      {
+        "name": "학당귀인",
+        "nameKo": "학당귀인(學堂貴人)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "申"
+        ],
+        "severity": "present",
+        "note": "지적 능력이 뛰어나고 가르치는 일에 소질이 있어."
+      },
+      {
+        "name": "양인살",
+        "nameKo": "양인살(羊刃殺)",
+        "basis": "일간",
+        "foundAt": [
+          "일주",
+          "월주"
+        ],
+        "branches": [
+          "午",
+          "午"
+        ],
+        "severity": "strong",
+        "note": "강한 기질과 칼을 휘두르는 힘을 상징해."
+      },
+      {
+        "name": "현침살",
+        "nameKo": "현침살(懸針殺)",
+        "basis": "원국",
+        "foundAt": [
+          "일주",
+          "월주",
+          "년주"
+        ],
+        "branches": [
+          "午",
+          "午",
+          "申"
+        ],
+        "severity": "present",
+        "note": "날카로운 통찰력과 전문적인 기술을 상징해."
+      },
+      {
+        "name": "탕화살",
+        "nameKo": "탕화살(湯火殺)",
+        "basis": "일지",
+        "foundAt": [
+          "일주",
+          "월주"
+        ],
+        "branches": [
+          "午",
+          "午"
+        ],
+        "severity": "present",
+        "note": "욱하는 기질과 열정적인 변화를 의미해."
+      },
+      {
+        "name": "암록",
+        "nameKo": "암록(暗祿)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "申"
+        ],
+        "severity": "present",
+        "note": "보이지 않는 도움과 예상치 못한 횡재를 의미해."
+      },
+      {
+        "name": "월덕귀인",
+        "nameKo": "월덕귀인(月德貴人)",
+        "basis": "월지",
+        "foundAt": [
+          "월주"
+        ],
+        "branches": [],
+        "severity": "present",
+        "note": "매사 순조롭고 인복이 두터운 기운이야."
+      }
+    ],
+    "gongmang": {
+      "branches": [
+        "子",
+        "丑"
+      ],
+      "affectedPillars": [],
+      "inChart": false,
+      "note": "공망에 해당하는 글자(子, 丑)가 사주 원국에 없으므로 실질적인 공망의 피해나 영향이 거의 없어. 다만, 대운이나 세운에서 이 글자가 들어올 때는 해당 시기에 일시적인 지연이나 채워지지 않는 갈증을 느낄 수 있어.",
+      "noteEn": "The Void branches (子, 丑) are not present in your natal chart, so their practical negative impact is minimal. However, when these branches appear in your Grand Cycle (Daewun) or Annual Cycle (Sewun), you may experience temporary delays or a sense of unfulfillment during that period."
+    },
+    "tenGodsRatio": {
+      "비겁(Mirror/Rival)": 0,
+      "식상(Artist/Rebel)": 14,
+      "재성(Maverick/Architect)": 14,
+      "관성(Warrior/Judge)": 0,
+      "인성(Mystic/Sage)": 71
+    },
+    "dayMasterStrength": {
+      "score": 91,
+      "level": "극신강",
+      "title": "극신강",
+      "isStrong": true,
+      "breakdown": {
+        "self": 72,
+        "wisdom": 123,
+        "total": 214
+      },
+      "activeCombinations": [
+        {
+          "type": "Bang-hap",
+          "element": "Fire"
+        },
+        {
+          "type": "Stem-hap-trans",
+          "stems": [
+            "丁",
+            "壬"
+          ],
+          "element": "Fire"
+        },
+        {
+          "type": "Jo-hu",
+          "status": "Hot",
+          "note": "Dried Metal/Wood"
+        }
+      ],
+      "floatingStems": [],
+      "elementScores": {
+        "Wood": 0,
+        "Fire": 123,
+        "Earth": 72,
+        "Metal": 8,
+        "Water": 11
+      }
+    },
+    "yongshinDetail": {
+      "primary": {
+        "god": "식상",
+        "element": "Metal",
+        "reason": "화다토초/화토중탁 → 금(金) 통관용신",
+        "reasonEn": "Fire Dominance → Metal Useful God"
+      },
+      "heeShin": {
+        "god": "재성",
+        "element": "Water"
+      },
+      "giShin": {
+        "god": "인성",
+        "element": "Fire"
+      },
+      "guShin": {
+        "god": "관성",
+        "element": "Wood"
+      },
+      "hanShin": {
+        "god": "비겁",
+        "element": "Earth"
+      },
+      "method": "특수격용신",
+      "dominantElement": "Fire",
+      "byeongYak": {
+        "byeong": "Fire",
+        "yak": "Earth",
+        "note": "화(인성) 기운이 강한 격국은 그 기운을 거스르면 안 돼. 토(비겁)으로 기운을 부드럽게 설기하는 것이 좋아.",
+        "noteEn": "Structures with strong Fire energy should not be clashed. It is best to gently drain the energy with Earth (Artist/Rebel)."
+      },
+      "tongGwan": null,
+      "eokbu": null
+    },
+    "structureDetail": {
+      "title": "화토중탁",
+      "enTitle": "Fire-Earth Heavy-Turbid",
+      "category": "Image",
+      "description": "불과 흙이 뒤섞여 메마르고 탁해진 격국. 금(Metal)으로 설기하거나 수(Water)로 식혀야 함.",
+      "enDescription": "A dry and turbid structure where Fire and Earth are mixed. Needs Metal to drain or Water to cool.",
+      "marketingMessage": "",
+      "enMarketingMessage": "",
+      "logicNote": "Confidence: 90%",
+      "isDirty": true,
+      "mainElement": "Metal"
+    },
+    "elementRatios": {
+      "Wood": 0,
+      "Fire": 62.5,
+      "Earth": 12.5,
+      "Metal": 12.5,
+      "Water": 12.5
+    },
+    "balanceWarnings": [
+      {
+        "title": "화다수증(火多수蒸)",
+        "titleEn": "Fire-Heavy Water-Steam",
+        "description": "[#ef4444:불(火)]이 너무 강해 [#3b82f6:물(水)]이 순식간에 증발하여 사라지는 형국이야. 감정이 격해지기 쉽고 자신을 통제할 이성이 무력화될 수 있으니, 억지로 물을 끌어오면 폭발(왕신충발)하니, [#94a3b8:금(金)]을 통해 열기를 밖으로 빼내는 '설기'에만 집중해.",
+        "enDescription": "Strong Fire evaporates Water instantly. Emotions may flare and self-control may be neutralized; instead of forcing Water, stabilize with Earth or drain energy with Metal.",
+        "type": "warning",
+        "element": "Fire"
+      },
+      {
+        "title": "화다토초(火多土焦)",
+        "titleEn": "Fire-Heavy Earth-Scorch",
+        "description": "특히 너, 너는 뜨거운 열기에 본인의 [#eab308:대지(土)]가 갈라지고 불모지가 된 형국이야. 조급함은 독이 되니, [#94a3b8:금(金)]의 기운으로 열기를 식히고 [#3b82f6:수(水)]의 기운으로 메마른 땅을 적셔야 해. 여유를 갖고 내실을 다져.",
+        "enDescription": "Especially you, your land ([#eab308:Earth]) is cracked and barren due to intense heat ([#ef4444:Fire]). Impatience is poison; use [#94a3b8:Metal] to cool the heat and [#3b82f6:Water] to moisten the dry land. Take your time and focus on inner stability.",
+        "type": "danger",
+        "element": "Fire"
+      }
+    ],
+    "muJaRon": [
+      {
+        "title": "무비겁 사주 (무자론)",
+        "description": "[#eab308:토(土) 비겁]이 없는 '기반 없는 대지'야. 넓은 포용력을 발휘할 대상이 없어 허전할 수 있지만, 특정 집단에 얽매이지 않는 자유로운 영혼으로 살아가기에 매우 유리한 구조야.",
+        "enDescription": "A 'foundationless land' without [#eab308:Earth]. You may feel empty without targets for your broad tolerance, but it's an advantageous structure for living as a free spirit unbound by specific groups."
+      },
+      {
+        "title": "무관성 사주 (무자론)",
+        "description": "토를 단단하게 잡아줄 [#22c55e:목(木)]이 없는 '기둥 없는 대지'야. 삶의 방향성이 흔들리기 쉬우니, 명확한 목표 설정과 자기 계발을 통해 삶의 든든한 기둥을 세워야 해.",
+        "enDescription": "A 'pillarless land' without [#22c55e:Wood] to hold the Earth. Life's direction can easily waver; establish strong pillars through clear goal setting and self-improvement."
+      }
+    ],
+    "daJaRon": [
+      {
+        "title": "인성다자 사주 (다자론)",
+        "description": "\"고집불통 보수주의자.\" 자신의 신념이 너무 강해 타인의 의견을 배척하고 변화를 거부할 수 있어. [#94a3b8:금(식상)]이 없으면 융통성 제로가 되어 고립될 수 있으니 개방적인 태도가 필요해.",
+        "enDescription": "\"A stubborn conservative.\" Strong convictions may lead to rejecting others' opinions and resisting change. Without [#94a3b8:Metal Output], you might become inflexible and isolated; an open attitude is needed."
+      }
+    ],
+    "advancedEdgeCases": [],
+    "relationshipAnalysis": {
+      "siblings": {
+        "title": "형제 및 동료 (비겁/식상)",
+        "ratio": 14,
+        "description": "형제나 동료와의 관계가 무난한 편이야. 서로의 영역을 존중하며 평력적인 관계를 유지할 수 있어."
+      },
+      "parents": {
+        "title": "부모 및 윗사람 (인성/재성)",
+        "ratio": 71,
+        "description": "[#ef4444:편인(偏印)]의 기운이 강하니 부모님이 너에게 특별한 재능이나 깊은 지혜를 물려주셨다고 해석할 거야. 남다른 통찰력을 가진 가문이라고 치켜세우겠지.\n\n글쎄, 그건 '조건부 사랑'의 다른 이름일 뿐이야. 부모의 기분에 따라 변하는 애정 때문에 너는 눈치 보느라 속이 다 썩었네. 혜택이 아니라 나중에 갚아야 할 빚처럼 느껴지는 무거운 유산이지.\n\n부모님과 형(刑)의 관계가 보이네. 부모님이 바라는 모습과 네가 살고 싶은 삶이 달라서 자주 부딪히고 답답했을 거야. 널 위한다는 말이 때로는 무거운 족쇄처럼 느껴졌지? 네 잘못이 아니야. 부모님의 기대보다 네 행복이 먼저라는 걸 잊지 마."
+      },
+      "spouse": {
+        "title": "배우자 및 연인",
+        "godName": "재성",
+        "ratio": 14,
+        "description": "배우자 운이 안정적이며 서로의 역할을 충실히 수행해. 사주 전체의 조화에 따라 배우자가 나의 부족한 기운을 채워주는 든든한 조력자가 돼."
+      },
+      "children": {
+        "title": "자식 및 결과물",
+        "godName": "관성",
+        "ratio": 0,
+        "description": "원국에 자식 별이 뚜렷하게 드러나지 않았어. 이는 자식이 없다는 뜻이 아니라, 부모와 자식이 서로에게 얽매이지 않고 각자 독립적이고 자립적인 운명을 살아간다는 긍정적인 의미야.\n\n[#f97316:[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.]"
+      }
+    },
+    "shinGangShinYak": {
+      "isStrong": true,
+      "score": 91,
+      "level": "극신강",
+      "title": "극신강",
+      "summary": "자아의 기운이 폭발적으로 강해, 주변 환경을 압도하는 제왕의 기운이야.",
+      "description": "자존심과 고집이 매우 강하며, 남의 밑에 있기 힘든 독립적인 성격이야. 강력한 추진력으로 불가능해 보이는 일도 해내는 힘이 있어.",
+      "socialContext": "전문직, 사업가, 혹은 한 분야의 독보적인 권위자로 성공할 확률이 매우 높아. 다만 독단적인 결정을 주의해야 해."
+    },
+    "personalizedInsights": {
+      "Self": {
+        "ko": "나의 신용과 무게감 (비겁 - 토(土))",
+        "en": "My credit and weight (Mirror/Rival - Earth(土))"
+      },
+      "Output": {
+        "ko": "만물을 키우는 활동력 (식상 - 금(金))",
+        "en": "Vitality to grow all things (Artist/Rebel - Metal(金))"
+      },
+      "Wealth": {
+        "ko": "보이지 않는 현금과 유동성 (재성 - 수(水))",
+        "en": "Hidden cash and liquidity (Maverick/Architect - Water(水))"
+      },
+      "Power": {
+        "ko": "나를 세우는 명예 (관성 - 목(木))",
+        "en": "Honor that builds me (Warrior/Judge - Wood(木))"
+      },
+      "Wisdom": {
+        "ko": "나를 품는 포용력 (인성 - 화(火))",
+        "en": "Tolerance that embraces me (Mystic/Sage - Fire(火))"
+      },
+      "lifeCycle": {
+        "ko": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다.",
+        "en": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다."
+      }
+    },
+    "dayMasterElement": "Earth",
+    "specialStatuses": {
+      "isFireEarthHeavy": true,
+      "isGoldBuried": false,
+      "isColdWater": false,
+      "isSikSangIsolated": false,
+      "isDryChart": false,
+      "isColdWet": false,
+      "isHotDry": true,
+      "isWoodHeavy": false,
+      "elementRatios": {
+        "Wood": 0,
+        "Fire": 62.5,
+        "Earth": 12.5,
+        "Metal": 12.5,
+        "Water": 12.5
+      },
+      "surplusElement": "Fire",
+      "surplusGod": "InSeong",
+      "palaceState": "stable"
+    },
+    "specialCombinations": {
+      "isByeokGapInHwa": false,
+      "isDengLaJieJia": false,
+      "isDoSeJuOk": false,
+      "isGangHwiSangYeong": false,
+      "isHwaChiSeungRyong": false,
+      "isGiToTakIm": false
+    },
+    "geokGukDetail": {
+      "geonRok": false,
+      "yangIn": false,
+      "isSpecial": true,
+      "specialTitle": "화다토초/화토중탁",
+      "description": "안정적인 [일반격]이야. 오행의 조력이 필요한 만큼 주변과 협조하며 차근차근 성공을 일궈가는 스타일이야."
+    }
+  },
+  "daeun": "none"
+}
+--- 19930226 10:40 Male ---
+{
+  "pillars": [
+    {
+      "title": "Hour",
+      "hanja": "丁巳",
+      "stem": "丁",
+      "branch": "巳",
+      "stemEnglishName": "The Sage",
+      "stemKoreanName": "정인",
+      "branchEnglishName": "The Sage",
+      "branchKoreanName": "정인",
+      "element": "Fire",
+      "description": "정화 / 사화",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    },
+    {
+      "title": "Day",
+      "hanja": "戊寅",
+      "stem": "戊",
+      "branch": "寅",
+      "stemEnglishName": "The Ego",
+      "stemKoreanName": "일간(나)",
+      "branchEnglishName": "The Warrior",
+      "branchKoreanName": "편관",
+      "element": "Earth",
+      "description": "무토 / 인목",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    },
+    {
+      "title": "Month",
+      "hanja": "甲寅",
+      "stem": "甲",
+      "branch": "寅",
+      "stemEnglishName": "The Warrior",
+      "stemKoreanName": "편관",
+      "branchEnglishName": "The Warrior",
+      "branchKoreanName": "편관",
+      "element": "Wood",
+      "description": "갑목 / 인목",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    },
+    {
+      "title": "Year",
+      "hanja": "癸酉",
+      "stem": "癸",
+      "branch": "酉",
+      "stemEnglishName": "The Architect",
+      "stemKoreanName": "정재",
+      "branchEnglishName": "The Rebel",
+      "branchKoreanName": "상관",
+      "element": "Water",
+      "description": "계수 / 유금",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    }
+  ],
+  "analysis": {
+    "gender": "male",
+    "geJu": "편관격",
+    "yongShen": "금(金) (식상)",
+    "interactions": [
+      {
+        "type": "격합",
+        "stems": [
+          "戊",
+          "癸"
+        ],
+        "pillarIndices": [
+          1,
+          3
+        ],
+        "element": "Fire",
+        "severity": "half",
+        "note": "<div class=\"space-y-1\"><b>격합: 戊-癸</b><br/><b>위치:</b> 일주(戊)와 연주(癸)<br/><b>영향:</b> 일주(나/배우자)와 연주(조상/근본) 간의 정신적 결합이야. 일간(나)(戊)과 정재(癸)이 서로 합을 하여 지향하는 가치가 일치함을 의미해.</div>|<div class=\"space-y-1\"><b>Distant Combination: 戊-癸</b><br/><b>Position:</b> Day (戊) and Year (癸)<br/><b>Influence:</b> Mental combination between Day (Self/Spouse) and Year (Ancestors/Roots). Represents alignment of values between The Ego (戊) and The Architect (癸).</div>"
+      },
+      {
+        "type": "반합",
+        "branches": [
+          "巳",
+          "酉"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "element": "Metal",
+        "severity": "half",
+        "isFull": false,
+        "note": "<div class=\"space-y-2\"><b>반합: 巳-酉</b><br/><b>위치:</b> 시주(巳)와 연주(酉)<br/><b>성격:</b> 금(金)의 기운을 강화해.<br/><b>영향:</b> 반합은 사회적인 목적을 위한 강력한 결속이야. 시주(자식/미래)와 연주(조상/근본)가 합을 하여 금(金)의 기운을 만들어내. 정인(巳)과 상관(酉)이 결합하여 사회적 성취와 목적 달성을 향한 강한 원동력이 돼.</div>|<div class=\"space-y-2\"><b>Half Combination: 巳-酉</b><br/><b>Position:</b> Hour (巳) and Year (酉)<br/><b>Nature:</b> Strengthens Metal energy.<br/><b>Influence:</b> This combination is a strong alliance for social purpose. The Hour (Children/Future) and Year (Ancestors/Roots) combine to create Metal energy. The The Sage (巳) and The Rebel (酉) unite to become a strong driving force for social achievement.</div>"
+      },
+      {
+        "type": "반형",
+        "branches": [
+          "寅",
+          "巳"
+        ],
+        "pillarIndices": [
+          1,
+          0
+        ],
+        "category": "지세",
+        "severity": "half",
+        "note": "<div class=\"space-y-1\"><b>반형: 寅-巳</b><br/><b>위치:</b> 일주(寅)와 시주(巳)<br/><b>영향:</b> 일주(나/배우자)와 시주(자식/미래) 간의 형(刑) 작용이야. 편관(寅)과 정인(巳) 사이의 조정이나 법적/심리적 압박이 있을 수 있으니 세밀한 관리가 필요해.</div>|<div class=\"space-y-1\"><b>Half Punishment: 寅-巳</b><br/><b>Position:</b> Day (寅) and Hour (巳)<br/><b>Influence:</b> Punishment between Day (Self/Spouse) and Hour (Children/Future). May lead to adjustments or legal/psychological pressure between The Warrior (寅) and The Sage (巳).</div>"
+      },
+      {
+        "type": "복음",
+        "branches": [
+          "寅",
+          "寅"
+        ],
+        "pillarIndices": [
+          1,
+          2
+        ],
+        "category": "복음",
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>복음: 寅-寅</b><br/><b>위치:</b> 일주(寅)와 월주(寅)<br/><b>영향:</b> 일주(나/배우자)와 월주(부모/사회)에 같은 기운이 중첩됐어. 편관(寅)과 편관(寅)의 에너지가 정체되거나 중복된 고민이 생길 수 있는 시기야.</div>|<div class=\"space-y-1\"><b>Duplicate Pillar: 寅-寅</b><br/><b>Position:</b> Day (寅) and Month (寅)<br/><b>Influence:</b> Overlapping energy in Day (Self/Spouse) and Month (Parents/Society). Stagnation or repetitive concerns related to The Warrior (寅) and The Warrior (寅).</div>"
+      },
+      {
+        "type": "원충",
+        "stems": [
+          "丁",
+          "癸"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "severity": "partial",
+        "note": "<div class=\"space-y-1\"><b>원충: 丁-癸</b><br/><b>위치:</b> 시주(丁)와 연주(癸)<br/><b>영향:</b> 시주(자식/미래)와 연주(조상/근본) 간의 먼 정신적 충돌이야. 정인(丁)과 정재(癸)이 서로 부딪히나 그 영향은 미미해.</div>|<div class=\"space-y-1\"><b>Remote Clash: 丁-癸</b><br/><b>Position:</b> Hour (丁) and Year (癸)<br/><b>Influence:</b> Remote mental conflict between Hour (Children/Future) and Year (Ancestors/Roots). Suggests differences in thoughts between The Sage (丁) and The Architect (癸) but with minimal impact.</div>"
+      },
+      {
+        "type": "해",
+        "branches": [
+          "巳",
+          "寅"
+        ],
+        "pillarIndices": [
+          0,
+          1
+        ],
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>해: 巳-寅</b><br/><b>위치:</b> 시주(巳)와 일주(寅)<br/><b>영향:</b> 시주(자식/미래)와 일주(나/배우자) 간의 해로움이야. 정인(巳)과 편관(寅) 사이의 보이지 않는 방해나 시기, 질투로 인한 갈등을 경계해야 해.</div>|<div class=\"space-y-1\"><b>Harm: 巳-寅</b><br/><b>Position:</b> Hour (巳) and Day (寅)<br/><b>Influence:</b> Harm between Hour (Children/Future) and Day (Self/Spouse). Guard against invisible interference or jealousy between The Sage (巳) and The Warrior (寅).</div>"
+      },
+      {
+        "type": "해",
+        "branches": [
+          "巳",
+          "寅"
+        ],
+        "pillarIndices": [
+          0,
+          2
+        ],
+        "severity": "full",
+        "note": "<div class=\"space-y-1\"><b>해: 巳-寅</b><br/><b>위치:</b> 시주(巳)와 월주(寅)<br/><b>영향:</b> 시주(자식/미래)와 월주(부모/사회) 간의 해로움이야. 정인(巳)과 편관(寅) 사이의 보이지 않는 방해나 시기, 질투로 인한 갈등을 경계해야 해.</div>|<div class=\"space-y-1\"><b>Harm: 巳-寅</b><br/><b>Position:</b> Hour (巳) and Month (寅)<br/><b>Influence:</b> Harm between Hour (Children/Future) and Month (Parents/Society). Guard against invisible interference or jealousy between The Sage (巳) and The Warrior (寅).</div>"
+      }
+    ],
+    "conflicts": [],
+    "shinsal": [
+      {
+        "name": "지살",
+        "nameKo": "지살(地殺)",
+        "basis": "년지",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "酉"
+        ],
+        "severity": "present",
+        "note": "사주정설: 지살 감지"
+      },
+      {
+        "name": "반안살",
+        "nameKo": "반안살(攀鞍殺)",
+        "basis": "년지",
+        "foundAt": [
+          "일주",
+          "월주"
+        ],
+        "branches": [
+          "寅",
+          "寅"
+        ],
+        "severity": "strong",
+        "note": "사주정설: 반안살 감지"
+      },
+      {
+        "name": "화개살",
+        "nameKo": "화개살(華蓋殺)",
+        "basis": "년지",
+        "foundAt": [
+          "시주"
+        ],
+        "branches": [
+          "巳"
+        ],
+        "severity": "present",
+        "note": "사주정설: 화개살 감지"
+      },
+      {
+        "name": "원진살",
+        "nameKo": "원진살(元嗔殺)",
+        "basis": "지합",
+        "foundAt": [
+          "원국"
+        ],
+        "branches": [
+          "寅",
+          "寅",
+          "酉"
+        ],
+        "severity": "present",
+        "note": "복잡한 인간관계와 깊은 감수성을 의미해."
+      },
+      {
+        "name": "탕화살",
+        "nameKo": "탕화살(湯火殺)",
+        "basis": "일지",
+        "foundAt": [
+          "시주",
+          "일주",
+          "월주"
+        ],
+        "branches": [
+          "巳",
+          "寅",
+          "寅"
+        ],
+        "severity": "strong",
+        "note": "욱하는 기질과 열정적인 변화를 의미해."
+      },
+      {
+        "name": "천덕귀인",
+        "nameKo": "천덕귀인(天德貴人)",
+        "basis": "월지",
+        "foundAt": [
+          "시주"
+        ],
+        "branches": [],
+        "severity": "present",
+        "note": "하늘의 보살핌으로 흉한 일이 길하게 변해."
+      }
+    ],
+    "gongmang": {
+      "branches": [
+        "申",
+        "酉"
+      ],
+      "affectedPillars": [
+        "년주"
+      ],
+      "inChart": true,
+      "note": "사주 원국의 년주에 공망이 있어 해당 궁성이나 십성의 기운이 약화되거나 채워지지 않는 갈증을 느낄 수 있어.",
+      "noteEn": "The Void branches affect your 년주, which may weaken the energy of those pillars or create a sense of unfulfillment in related aspects of life."
+    },
+    "tenGodsRatio": {
+      "비겁(Mirror/Rival)": 0,
+      "식상(Artist/Rebel)": 14,
+      "재성(Maverick/Architect)": 14,
+      "관성(Warrior/Judge)": 43,
+      "인성(Mystic/Sage)": 29
+    },
+    "dayMasterStrength": {
+      "score": 56,
+      "level": "중화신강",
+      "title": "중화신강",
+      "isStrong": true,
+      "breakdown": {
+        "self": 49,
+        "wisdom": 57,
+        "total": 190
+      },
+      "activeCombinations": [
+        {
+          "type": "Sam-hap",
+          "element": "Metal"
+        },
+        {
+          "type": "Stem-hap-trans",
+          "stems": [
+            "戊",
+            "癸"
+          ],
+          "element": "Fire"
+        }
+      ],
+      "floatingStems": [
+        "癸"
+      ],
+      "elementScores": {
+        "Wood": 45,
+        "Fire": 57,
+        "Earth": 49,
+        "Metal": 39,
+        "Water": -7
+      }
+    },
+    "yongshinDetail": {
+      "primary": {
+        "god": "식상",
+        "element": "Metal",
+        "reason": "관다신약 → 식상용신 (식신제살)",
+        "reasonEn": "GwanDa -> Artist/Rebel Useful God"
+      },
+      "heeShin": {
+        "god": "비겁",
+        "element": "Earth"
+      },
+      "giShin": {
+        "god": "재성",
+        "element": "Water"
+      },
+      "guShin": {
+        "god": "인성",
+        "element": "Fire"
+      },
+      "method": "관다용신",
+      "byeongYak": {
+        "byeong": "Wood",
+        "yak": "Metal",
+        "note": "병(Wood)을 치료하는 약(Metal)이 있음",
+        "noteEn": "Has Medicine (Metal) to cure the Disease (Wood)"
+      },
+      "tongGwan": null,
+      "eokbu": null
+    },
+    "structureDetail": {
+      "title": "편관격",
+      "enTitle": "편관격",
+      "category": "Standard",
+      "description": "",
+      "enDescription": "",
+      "marketingMessage": "",
+      "enMarketingMessage": "",
+      "logicNote": "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."
+    },
+    "elementRatios": {
+      "Wood": 37.5,
+      "Fire": 25,
+      "Earth": 12.5,
+      "Metal": 12.5,
+      "Water": 12.5
+    },
+    "balanceWarnings": [],
+    "muJaRon": [
+      {
+        "title": "무비겁 사주 (무자론)",
+        "description": "[#eab308:토(土) 비겁]이 없는 '기반 없는 대지'야. 넓은 포용력을 발휘할 대상이 없어 허전할 수 있지만, 특정 집단에 얽매이지 않는 자유로운 영혼으로 살아가기에 매우 유리한 구조야.",
+        "enDescription": "A 'foundationless land' without [#eab308:Earth]. You may feel empty without targets for your broad tolerance, but it's an advantageous structure for living as a free spirit unbound by specific groups."
+      }
+    ],
+    "daJaRon": [
+      {
+        "title": "관성다자 사주 (다자론)",
+        "description": "\"뿌리가 너무 깊어 갈라지는 땅.\" 명예와 권력에 대한 집착이 강해 주변 사람들과 마찰을 빚을 수 있어. [#ef4444:화(인성)]이 없으면 고집불통으로 낙인찍힐 수 있으니, 타인과 타협하고 포용하는 자세를 길러야 해.",
+        "enDescription": "\"Earth cracking from roots too deep.\" Strong obsession with honor and power may cause friction with those around you. Without [#ef4444:Fire Resource], you might be branded as stubborn; cultivate an attitude of compromise and embrace."
+      }
+    ],
+    "advancedEdgeCases": [
+      {
+        "title": "재성허부(財星虛浮) - 뜬구름 재물",
+        "description": "천간에 재성(癸)이 떠 있으나 지지에 뿌리가 전혀 없어. 이는 겉으로는 화려해 보이나 실속이 없거나, 큰 돈을 꿈꾸지만 현실적인 기반이 약해 '뜬구름 잡는 돈 걱정'에 머물기 쉬운 형국이야. 실질적인 자산 관리에 집중해야 해.",
+        "type": "info"
+      }
+    ],
+    "relationshipAnalysis": {
+      "siblings": {
+        "title": "형제 및 동료 (비겁/식상)",
+        "ratio": 14,
+        "description": "형제나 동료와의 관계가 무난한 편이야. 서로의 영역을 존중하며 평력적인 관계를 유지할 수 있어."
+      },
+      "parents": {
+        "title": "부모 및 윗사람 (인성/재성)",
+        "ratio": 29,
+        "description": "월주 [#22c55e:편관]이면 부모님이 너를 지켜주는 거대한 방패나 권위 있는 존재처럼 보이기 쉬워. 든든한 울타리 안에서 보호받는 형상이라고들 하지.\n\n진실은 그 방패에 네가 깔려 죽기 직전이라는 거야. 부모의 강압적인 기운이 너를 압박하고, 그들의 짐을 네가 대신 짊어져야 하는 구조네. 부모님의 그늘을 벗어나 세상을 마주하려는 그 용기를 응원할게!"
+      },
+      "spouse": {
+        "title": "배우자 및 연인",
+        "godName": "재성",
+        "ratio": 14,
+        "description": "배우자 운에서 [#ef4444:[tooltip:일지 형충|반형: 寅-巳\n위치: 일주(寅)와 시주(巳)\n영향: 일주(나/배우자)와 시주(자식/미래) 간의 형(刑) 작용이야. 편관(寅)과 정인(巳) 사이의 조정이나 법적/심리적 압박이 있을 수 있으니 세밀한 관리가 필요해.|Half Punishment: 寅-巳\nPosition: Day (寅) and Hour (巳)\nInfluence: Punishment between Day (Self/Spouse) and Hour (Children/Future). May lead to adjustments or legal/psychological pressure between The Warrior (寅) and The Sage (巳).]]의 기운이 관찰돼. 배우자 자리에 변화가 잦거나 본인의 주관이 강해 충돌이 생길 수 있는 구조야. 서로의 다름을 인정하고 적절한 거리감을 유지할 때 관계가 더욱 건강해질 수 있어."
+      },
+      "children": {
+        "title": "자식 및 결과물",
+        "godName": "관성",
+        "ratio": 43,
+        "description": "자식 별이 청년기를 뜻하는 월주에 있어. 20~30대의 사회활동 시기에 안정적으로 자녀를 얻고 양육할 기반이 튼튼한 구조야. 관성(사회적 능력)이 뚜렷해 남들에게 자랑할 만한 훌륭한 타이틀과 능력을 갖춘 자식을 둘 확률이 커.\n\n[#f97316:[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.]"
+      }
+    },
+    "shinGangShinYak": {
+      "isStrong": true,
+      "score": 56,
+      "level": "중화신강",
+      "title": "중화신강",
+      "summary": "자아의 힘이 충분하면서도 주변과 조화를 이룰 줄 아는 이상적인 강함이야.",
+      "description": "주관은 뚜렷하지만 타인의 의견을 수용할 줄 아는 유연함을 갖췄어. 에너지가 안정적이라 기복이 적고 꾸준한 성취를 이뤄내.",
+      "socialContext": "어느 조직에서나 환영받는 리더이자 조율자야. 안정적인 사회생활과 성공을 동시에 거머쥘 수 있는 좋은 구조야."
+    },
+    "personalizedInsights": {
+      "Self": {
+        "ko": "나의 신용과 무게감 (비겁 - 토(土))",
+        "en": "My credit and weight (Mirror/Rival - Earth(土))"
+      },
+      "Output": {
+        "ko": "만물을 키우는 활동력 (식상 - 금(金))",
+        "en": "Vitality to grow all things (Artist/Rebel - Metal(金))"
+      },
+      "Wealth": {
+        "ko": "보이지 않는 현금과 유동성 (재성 - 수(水))",
+        "en": "Hidden cash and liquidity (Maverick/Architect - Water(水))"
+      },
+      "Power": {
+        "ko": "나를 세우는 명예 (관성 - 목(木))",
+        "en": "Honor that builds me (Warrior/Judge - Wood(木))"
+      },
+      "Wisdom": {
+        "ko": "나를 품는 포용력 (인성 - 화(火))",
+        "en": "Tolerance that embraces me (Mystic/Sage - Fire(火))"
+      },
+      "lifeCycle": {
+        "ko": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다.",
+        "en": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다."
+      }
+    },
+    "dayMasterElement": "Earth",
+    "specialStatuses": {
+      "isFireEarthHeavy": false,
+      "isGoldBuried": false,
+      "isColdWater": false,
+      "isSikSangIsolated": false,
+      "isDryChart": false,
+      "isColdWet": false,
+      "isHotDry": false,
+      "isWoodHeavy": false,
+      "elementRatios": {
+        "Wood": 37.5,
+        "Fire": 25,
+        "Earth": 12.5,
+        "Metal": 12.5,
+        "Water": 12.5
+      },
+      "surplusElement": "Wood",
+      "surplusGod": "GwanSeong",
+      "palaceState": "unstable"
+    },
+    "specialCombinations": {
+      "isByeokGapInHwa": false,
+      "isDengLaJieJia": false,
+      "isDoSeJuOk": false,
+      "isGangHwiSangYeong": false,
+      "isHwaChiSeungRyong": false,
+      "isGiToTakIm": false
+    },
+    "geokGukDetail": {
+      "geonRok": false,
+      "yangIn": false,
+      "isSpecial": false,
+      "specialTitle": "관다신약",
+      "description": "안정적인 [일반격]이야. 오행의 조력이 필요한 만큼 주변과 협조하며 차근차근 성공을 일궈가는 스타일이야."
+    }
+  },
+  "daeun": "none"
+}
+--- 19901116 14:00 Female ---
+{
+  "pillars": [
+    {
+      "title": "Hour",
+      "hanja": "癸未",
+      "stem": "癸",
+      "branch": "未",
+      "stemEnglishName": "The Mystic",
+      "stemKoreanName": "편인",
+      "branchEnglishName": "The Maverick",
+      "branchKoreanName": "편재",
+      "element": "Water",
+      "description": "계수 / 미토",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    },
+    {
+      "title": "Day",
+      "hanja": "乙酉",
+      "stem": "乙",
+      "branch": "酉",
+      "stemEnglishName": "The Ego",
+      "stemKoreanName": "일간(나)",
+      "branchEnglishName": "The Warrior",
+      "branchKoreanName": "편관",
+      "element": "Wood",
+      "description": "을목 / 유금",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    },
+    {
+      "title": "Month",
+      "hanja": "丁亥",
+      "stem": "丁",
+      "branch": "亥",
+      "stemEnglishName": "The Artist",
+      "stemKoreanName": "식신",
+      "branchEnglishName": "The Mystic",
+      "branchKoreanName": "편인",
+      "element": "Fire",
+      "description": "정화 / 해수",
+      "stemPolarity": -1,
+      "branchPolarity": -1
+    },
+    {
+      "title": "Year",
+      "hanja": "庚午",
+      "stem": "庚",
+      "branch": "午",
+      "stemEnglishName": "The Judge",
+      "stemKoreanName": "정관",
+      "branchEnglishName": "The Rebel",
+      "branchKoreanName": "상관",
+      "element": "Metal",
+      "description": "경금 / 오화",
+      "stemPolarity": 1,
+      "branchPolarity": 1
+    }
+  ],
+  "analysis": {
+    "gender": "female",
+    "geJu": "정인격",
+    "yongShen": "수(水) (인성)",
+    "interactions": [
+      {
+        "type": "격합",
+        "stems": [
+          "乙",
+          "庚"
+        ],
+        "pillarIndices": [
+          1,
+          3
+        ],
+        "element": "Metal",
+        "severity": "half",
+        "note": "<div class=\"space-y-1\"><b>격합: 乙-庚</b><br/><b>위치:</b> 일주(乙)와 연주(庚)<br/><b>영향:</b> 일주(나/배우자)와 연주(조상/근본) 간의 정신적 결합이야. 일간(나)(乙)과 정관(庚)이 서로 합을 하여 지향하는 가치가 일치함을 의미해.</div>|<div class=\"space-y-1\"><b>Distant Combination: 乙-庚</b><br/><b>Position:</b> Day (乙) and Year (庚)<br/><b>Influence:</b> Mental combination between Day (Self/Spouse) and Year (Ancestors/Roots). Represents alignment of values between The Ego (乙) and The Judge (庚).</div>"
+      },
+      {
+        "type": "육합",
+        "branches": [
+          "未",
+          "午"
+        ],
+        "pillarIndices": [
+          0,
+          3
+        ],
+        "element": "Fire",
+        "severity": "full",
+        "note": "<div class=\"space-y-2\"><b>육합: 未-午</b><br/><b>위치:</b> 시주(未)와 연주(午)<br/><b>성격:</b> 화(火)의 기운을 강화해.<br/><b>영향:</b> 육합은 부부나 연인처럼 다정한 합이야. 시주(자식/미래)와 연주(조상/근본)가 합을 하고 있어 정서적인 안정감을 줘. 또한 편재(未)과 상관(午)이 합을 하므로, 해당 십성들의 에너지가 서로 긍정적으로 연결되어 시너지를 내.</div>|<div class=\"space-y-2\"><b>Six Combination: 未-午</b><br/><b>Position:</b> Hour (未) and Year (午)<br/><b>Nature:</b> Strengthens Fire energy.<br/><b>Influence:</b> The Six Combination is an affectionate bond like a couple. The Hour (Children/Future) and Year (Ancestors/Roots) are combining, providing emotional stability. Also, the The Maverick (未) and The Rebel (午) combine, creating a positive synergy between these energies.</div>"
+      },
+      {
+        "type": "방합",
+        "subtype": "준방합",
+        "branches": [
+          "午",
+          "未"
+        ],
+        "pillarIndices": [
+          3,
+          0
+        ],
+        "element": "Fire",
+        "severity": "partial",
+        "partial": true,
+        "note": "<div class=\"space-y-2\"><b>준방합: 午-未</b><br/><b>위치:</b> 연주(午)와 시주(未)<br/><b>성격:</b> 화(火)의 기운을 강화해.<br/><b>영향:</b> 준방합은 같은 계절(방향)의 강력한 세력이야. 연주(조상/근본)와 시주(자식/미래)가 모여 화(火)의 기운을 증폭시켜. 상관(午)과 편재(未)이 무리를 지어 해당 분야에서 폭발적인 에너지와 추진력을 발휘하게 돼.</div>|<div class=\"space-y-2\"><b>Semi-Directional Combination: 午-未</b><br/><b>Position:</b> Year (午) and Hour (未)<br/><b>Nature:</b> Strengthens Fire energy.<br/><b>Influence:</b> This is a powerful force of the same season/direction. The Year (Ancestors/Roots) and Hour (Children/Future) gather to amplify Fire energy. The The Rebel (午) and The Maverick (未) form a group, exerting explosive energy and drive in their respective fields.</div>"
+      },
+      {
+        "type": "격충",
+        "stems": [
+          "癸",
+          "丁"
+        ],
+        "pillarIndices": [
+          0,
+          2
+        ],
+        "severity": "half",
+        "note": "<div class=\"space-y-1\"><b>격충: 癸-丁</b><br/><b>위치:</b> 시주(癸)와 월주(丁)<br/><b>영향:</b> 시주(자식/미래)와 월주(부모/사회) 간의 간접적인 정신적 충돌이야. 편인(癸)과 식신(丁)이 서로 부딪혀 생각의 차이가 생길 수 있으나 제한적이야.</div>|<div class=\"space-y-1\"><b>Distant Clash: 癸-丁</b><br/><b>Position:</b> Hour (癸) and Month (丁)<br/><b>Influence:</b> Indirect mental conflict between Hour (Children/Future) and Month (Parents/Society). Suggests differences in thoughts between The Mystic (癸) and The Artist (丁) but with limited impact.</div>"
+      }
+    ],
+    "conflicts": [],
+    "shinsal": [
+      {
+        "name": "지살",
+        "nameKo": "지살(地殺)",
+        "basis": "년지",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "午"
+        ],
+        "severity": "present",
+        "note": "사주정설: 지살 감지"
+      },
+      {
+        "name": "년살",
+        "nameKo": "년살(年殺)",
+        "basis": "년지",
+        "foundAt": [
+          "시주"
+        ],
+        "branches": [
+          "未"
+        ],
+        "severity": "present",
+        "note": "사주정설: 년살 감지"
+      },
+      {
+        "name": "망신살",
+        "nameKo": "망신살(亡身殺)",
+        "basis": "년지",
+        "foundAt": [
+          "일주"
+        ],
+        "branches": [
+          "酉"
+        ],
+        "severity": "present",
+        "note": "사주정설: 망신살 감지"
+      },
+      {
+        "name": "반안살",
+        "nameKo": "반안살(攀鞍殺)",
+        "basis": "년지",
+        "foundAt": [
+          "월주"
+        ],
+        "branches": [
+          "亥"
+        ],
+        "severity": "present",
+        "note": "사주정설: 반안살 감지"
+      },
+      {
+        "name": "문창귀인",
+        "nameKo": "문창귀인(文昌貴人)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "午"
+        ],
+        "severity": "present",
+        "note": "학문과 예술에 뛰어난 재능이 있어."
+      },
+      {
+        "name": "학당귀인",
+        "nameKo": "학당귀인(學堂貴人)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "午"
+        ],
+        "severity": "present",
+        "note": "지적 능력이 뛰어나고 가르치는 일에 소질이 있어."
+      },
+      {
+        "name": "태극귀인",
+        "nameKo": "태극귀인(太極貴人)",
+        "basis": "일간",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [
+          "午"
+        ],
+        "severity": "present",
+        "note": "시작과 끝이 좋고 큰 복록을 누리게 돼."
+      },
+      {
+        "name": "월덕귀인",
+        "nameKo": "월덕귀인(月德貴人)",
+        "basis": "월지",
+        "foundAt": [
+          "년주"
+        ],
+        "branches": [],
+        "severity": "present",
+        "note": "매사 순조롭고 인복이 두터운 기운이야."
+      }
+    ],
+    "gongmang": {
+      "branches": [
+        "午",
+        "未"
+      ],
+      "affectedPillars": [
+        "시주",
+        "년주"
+      ],
+      "inChart": true,
+      "note": "사주 원국의 시주, 년주에 공망이 있어 해당 궁성이나 십성의 기운이 약화되거나 채워지지 않는 갈증을 느낄 수 있어.",
+      "noteEn": "The Void branches affect your 시주, 년주, which may weaken the energy of those pillars or create a sense of unfulfillment in related aspects of life."
+    },
+    "tenGodsRatio": {
+      "비겁(Mirror/Rival)": 0,
+      "식상(Artist/Rebel)": 29,
+      "재성(Maverick/Architect)": 14,
+      "관성(Warrior/Judge)": 29,
+      "인성(Mystic/Sage)": 29
+    },
+    "dayMasterStrength": {
+      "score": 43,
+      "level": "신약",
+      "title": "신약",
+      "isStrong": false,
+      "breakdown": {
+        "self": 29,
+        "wisdom": 43,
+        "total": 169
+      },
+      "activeCombinations": [
+        {
+          "type": "Stem-hap-trans",
+          "stems": [
+            "乙",
+            "庚"
+          ],
+          "element": "Metal"
+        }
+      ],
+      "floatingStems": [],
+      "elementScores": {
+        "Wood": 29,
+        "Fire": 39,
+        "Earth": 18,
+        "Metal": 40,
+        "Water": 43
+      }
+    },
+    "yongshinDetail": {
+      "primary": {
+        "god": "인성",
+        "element": "Water",
+        "reason": "인성격 일간약 → 인성용신",
+        "reasonEn": "Mystic/Sage Structure & Weak DM → Mystic/Sage Useful God"
+      },
+      "heeShin": {
+        "god": "관성",
+        "element": "Metal"
+      },
+      "giShin": {
+        "god": "재성",
+        "element": "Earth"
+      },
+      "guShin": {
+        "god": "식상",
+        "element": "Fire"
+      },
+      "method": "격국용신",
+      "byeongYak": null,
+      "tongGwan": {
+        "el1": "Fire",
+        "el2": "Metal",
+        "tongGwan": "Earth",
+        "note": "Fire와 Metal 사이를 통관하는 Earth 필요",
+        "noteEn": "Needs Earth to mediate between Fire and Metal"
+      },
+      "eokbu": null
+    },
+    "structureDetail": {
+      "title": "정인격",
+      "enTitle": "정인격",
+      "category": "Standard",
+      "description": "",
+      "enDescription": "",
+      "marketingMessage": "",
+      "enMarketingMessage": "",
+      "logicNote": "전통적인 월지 지장간 투출 원리에 따른 내격 구조야."
+    },
+    "elementRatios": {
+      "Wood": 12.5,
+      "Fire": 25,
+      "Earth": 12.5,
+      "Metal": 25,
+      "Water": 25
+    },
+    "balanceWarnings": [],
+    "muJaRon": [
+      {
+        "title": "무비겁 사주 (무자론)",
+        "description": "[#22c55e:목(木) 비겁]이 없는 '뿌리 없는 나무'와 같아. 지지해줄 형제나 동료가 부족해 외로움을 타기 쉽지만, 그만큼 독립심이 강해 혼자서도 잘 해내는 자수성가형의 힘이 있어.",
+        "enDescription": "Like a 'rootless tree' lacking [#22c55e:Wood]. You may feel lonely due to a lack of supportive siblings or peers, but you have the self-made strength to succeed independently."
+      }
+    ],
+    "daJaRon": [],
+    "advancedEdgeCases": [
+      {
+        "title": "관살혼잡(官殺混雜) - 명예와 책임의 과부하",
+        "description": "정관(명예)과 편관(권위)이 섞여 있어 삶의 목표가 충돌하고 에너지가 분산되는 형상이야. 책임감이 너무 강해 스스로를 볶아치거나, 이성 관계 및 직장 생활에서 선택의 기로에 놓이기 쉬워. 하나를 확실히 택하거나, [#3b82f6:인성(Mystic/Sage)]을 통해 이 기운을 부드럽게 소화하는 게 유일한 살길이야.",
+        "type": "warning"
+      }
+    ],
+    "relationshipAnalysis": {
+      "siblings": {
+        "title": "형제 및 동료 (비겁/식상)",
+        "ratio": 29,
+        "description": "형제나 동료와의 관계가 무난한 편이야. 서로의 영역을 존중하며 평력적인 관계를 유지할 수 있어."
+      },
+      "parents": {
+        "title": "부모 및 윗사람 (인성/재성)",
+        "ratio": 29,
+        "description": "[#3b82f6:편인(偏印)]의 기운이 강하니 부모님이 너에게 특별한 재능이나 깊은 지혜를 물려주셨다고 해석할 거야. 남다른 통찰력을 가진 가문이라고 치켜세우겠지.\n\n글쎄, 그건 '조건부 사랑'의 다른 이름일 뿐이야. 부모의 기분에 따라 변하는 애정 때문에 너는 눈치 보느라 속이 다 썩었네. 혜택이 아니라 나중에 갚아야 할 빚처럼 느껴지는 무거운 유산이지."
+      },
+      "spouse": {
+        "title": "배우자 및 연인",
+        "godName": "관성",
+        "ratio": 29,
+        "description": "배우자 자리에 나를 통제하려는 강한 힘([#94a3b8:편관])이 들어와 있어. 친구 같은 인연보다는 내가 존경할 수 있거나, 혹은 나를 강하게 리드하는 카리스마 있는 사람과 인연이 깊어. 서로의 주관이 뚜렷해 충돌이 잦을 수 있으니 [#3b82f6:\"존중\"]과 [#3b82f6:\"거리두기\"]가 관계 유지의 핵심이야."
+      },
+      "children": {
+        "title": "자식 및 결과물",
+        "godName": "식상",
+        "ratio": 29,
+        "description": "자식 별이 청년기를 뜻하는 월주에 있어. 20~30대의 사회활동 시기에 안정적으로 자녀를 얻고 양육할 기반이 튼튼한 구조야. 식상(친밀도)이 발달해 자녀가 나이를 먹어서도 스스럼없이 스킨십을 나눌 정도로 정서적, 물리적 친밀도가 매우 높아. 관성(사회적 능력)이 뚜렷해 남들에게 자랑할 만한 훌륭한 타이틀과 능력을 갖춘 자식을 둘 확률이 커. 여성의 경우 자녀 출산을 기점으로 에너지가 자식에게 쏠리며 남편(관성)과 심리적으로 멀어지거나, 자녀를 매개로 주도권을 쥐게 되는 부부 역학의 변화가 생길 수 있어.\n\n[#f97316:[주의] 부모의 사주만으로 자식을 100% 재단하는 것은 한계가 있어. 가장 완벽한 자식운 판별을 위해서는 훗날 자식과의 1:1 궁합을 통해 서로의 상호 보완성을 확인하는 것이 궁극적인 결론이야.]"
+      }
+    },
+    "shinGangShinYak": {
+      "isStrong": false,
+      "score": 43,
+      "level": "신약",
+      "title": "신약",
+      "summary": "타인에 대한 배려와 공감 능력이 뛰어나며, 주변 환경에 유연하게 적응하는 태도를 보여.",
+      "description": "겸손하고 협조적이며, 타인의 감정을 잘 읽어 대인관계가 원만해. 강하게 밀어붙이기보다 주변의 도움을 이끌어내어 목표를 달성해.",
+      "socialContext": "팀워크가 중시되는 조직이나 서비스, 교육 분야에서 큰 성과를 내. 주변의 신망을 얻어 안정적인 사회 기반을 닦아."
+    },
+    "personalizedInsights": {
+      "Self": {
+        "ko": "나의 뿌리와 주관 (비겁 - 목(木))",
+        "en": "My roots and conviction (Mirror/Rival - Wood(木))"
+      },
+      "Output": {
+        "ko": "꽃을 피우는 표현력 (식상 - 화(火))",
+        "en": "Expressive power to bloom (Artist/Rebel - Fire(火))"
+      },
+      "Wealth": {
+        "ko": "부동산 및 현실적 안정감 (재성 - 토(土))",
+        "en": "Real estate and realistic stability (Maverick/Architect - Earth(土))"
+      },
+      "Power": {
+        "ko": "나를 다듬는 절제력 (관성 - 금(金))",
+        "en": "Self-discipline to refine me (Warrior/Judge - Metal(金))"
+      },
+      "Wisdom": {
+        "ko": "나를 키우는 자양분 (인성 - 수(水))",
+        "en": "Nutrients that grow me (Mystic/Sage - Water(水))"
+      },
+      "lifeCycle": {
+        "ko": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다.",
+        "en": "[30대: 식상생재의 시대 (현실적 도약)] 미래에 대한 걱정과 경제관념이 생기며, 자신의 재능을 실질적인 결과물로 바꾸기 위해 현실적인 계산을 시작하는 시기입니다."
+      }
+    },
+    "dayMasterElement": "Wood",
+    "specialStatuses": {
+      "isFireEarthHeavy": false,
+      "isGoldBuried": false,
+      "isColdWater": false,
+      "isSikSangIsolated": false,
+      "isDryChart": false,
+      "isColdWet": true,
+      "isHotDry": false,
+      "isWoodHeavy": false,
+      "elementRatios": {
+        "Wood": 12.5,
+        "Fire": 25,
+        "Earth": 12.5,
+        "Metal": 25,
+        "Water": 25
+      },
+      "surplusElement": null,
+      "surplusGod": null,
+      "palaceState": "unstable"
+    },
+    "specialCombinations": {
+      "isByeokGapInHwa": false,
+      "isDengLaJieJia": true,
+      "isDoSeJuOk": false,
+      "isGangHwiSangYeong": false,
+      "isHwaChiSeungRyong": false,
+      "isGiToTakIm": false
+    },
+    "geokGukDetail": {
+      "geonRok": false,
+      "yangIn": false,
+      "isSpecial": false,
+      "specialTitle": "인성격 일간약",
+      "description": "안정적인 [일반격]이야. 오행의 조력이 필요한 만큼 주변과 협조하며 차근차근 성공을 일궈가는 스타일이야."
+    }
+  },
+  "daeun": "none"
+}
