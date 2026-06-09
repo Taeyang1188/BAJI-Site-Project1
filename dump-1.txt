@@ -1,0 +1,650 @@
+1850: ` +
+1851:       `[향후 가장 강력한 결혼운]
+1852: ${finalFutureLuck.year}년(${finalFutureLuck.stem}${finalFutureLuck.branch}년): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+년\([^)]+\)(?:\*\*)?:\s*/, '')}
+1853: 
+1854: ` +
+1855:       `결혼은 단순히 운의 흐름을 타는 게 아니라, 그 흐름 속에서 네가 어떤 선택을 하느냐가 중요해. 이 시기들을 잘 활용해봐.` :
+1856:       `I've scanned your relationship timeline. [delay:1500]
+1857: 
+1858: ` +
+1859:       `🕒 [Most Recent/Current Marriage Luck]
+1860: ${pastLuck.year} (${pastLuck.stem}${pastLuck.branch}): ${formatLuck(pastLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}
+1861: 
+1862: ` +
+1863:       `🚀 [Strongest Future Marriage Luck]
+1864: ${finalFutureLuck.year} (${finalFutureLuck.stem}${finalFutureLuck.branch}): ${formatLuck(finalFutureLuck).replace(/^(?:\*\*)?[0-9]+\s*\([^)]+\)(?:\*\*)?:\s*/, '')}
+1865: 
+1866: ` +
+1867:       `Marriage isn't just about following the flow of luck, but about the choices you make within that flow. Use these timings wisely.`;
+1868: 
+1869:     const glitch = lang === 'KO' ? '운명은 준비된 자에게 찾아오는 법이야.' : 'Fate comes to those who are prepared.';
+1870:     return { main, glitch };
+1871:   };
+1872:   // --- Theme 2: Wealth Focus (황금의 늪) ---
+1873:   const analyzeWealth = () => {
+1874:     const jaeSeongScore = Object.entries(tenGodsRatio).reduce((s, [k, v]) => k.includes('재성') ? s + (v as number) : s, 0);
+1875:     const dmStrengthScore = result.analysis?.dayMasterStrength?.score ?? 50;
+1876:     
+1877:     const hasPyunJae = seunAllGods.some(g => g.includes('편재')) || luckGods.some(g => g.includes('편재'));
+1878:     const hasJungJae = seunAllGods.some(g => g.includes('정재')) || luckGods.some(g => g.includes('정재'));
+1879: 
+1880:     const isTrueJaeDaSinYak = jaeSeongScore >= 40 && dmStrengthScore <= 35;
+1881:     const isSimpleJaeDaSinYak = jaeSeongScore >= 30 && jaeSeongScore < 40 && dmStrengthScore < 45;
+1882: 
+1883:     let layer1 = ''; // Structure
+1884:     let layer2 = ''; // Annual Flow
+1885:     let layer3 = ''; // Tactical Advice
+1886:     let wealthGlitch = ''; // Glitch
+1887: 
+1888:     if (lang === 'KO') {
+1889:       if (jaeSeongScore >= 40) {
+1890:         layer1 = "사주에 <strong>재물의 기운</strong>이 이미 가득 차 있어. 돈을 쫓는 감각과 결과물을 만들어내는 능력은 탁월하지만, 그 무게가 때로는 본인의 에너지를 압도할 수 있겠네.";
+1891:       } else if (jaeSeongScore === 0) {
+1892:         layer1 = "명식에 드러난 재물운이 약한 편이지만, 이는 오히려 돈에 얽매이지 않는 <strong>자유로운 영혼</strong>임을 뜻해. 성실함과 운의 조력이 만날 때 예상치 못한 큰 성취를 이룰 수 있는 잠재력이 있어.";
+1893:       } else {
+1894:         layer1 = "당장 큰 돈이 쏟아지는 구조는 아니지만, 본인의 <strong>성실함과 운의 조력</strong>에 따라 충분히 남부럽지 않은 성취를 이룰 수 있는 잠재력이 있어.";
+1895:       }
+1896: 
+1897:       if (hasPyunJae) {
+1898:         layer2 = "올해는 <strong>편재(횡재수)</strong>의 기운이 네 주변을 맴돌고 있어. 한 번에 큰 것을 노리고 싶은 도파민이 솟구치는 해가 될 거야.";
+1899:       } else if (hasJungJae) {
+1900:         layer2 = "올해는 <strong>정재(안정 자산)</strong>의 기운이 강해. 무리한 투자보다는 현재의 수익원을 잘 지키고 관리하는 것이 부를 쌓는 지름길이야.";
+1901:       } else {
+1902:         layer2 = "특별한 재물운의 급격한 변동보다는 <strong>안정적인 흐름</strong>을 유지하며 다음 큰 기회를 위해 자본을 비축해야 하는 시기야.";
+1903:       }
+1904: 
+1905:       if (isTrueJaeDaSinYak) {
+1906:         layer3 = "올해 가장 경계해야 할 것은 '어설픈 개입'이야. 네게 쥐어진 얄팍한 무기를 믿고 무리하게 투자를 하거나 판을 키우려 들면, 그 거대한 재물의 무게에 짓눌려 빚더미에 앉을 수 있어.";
+1907:         wealthGlitch = "물타기, 영끌, 무리한 확장은 절대 금물. 차라리 부자들 옆에 납작 엎드려 콩고물이나 주워 먹는 게 현명해.";
+1908:       } else if (isSimpleJaeDaSinYak) {
+1909:         layer3 = "돈 냄새는 나는데, 무리해서 쫓아가면 네가 먼저 쓰러질 수 있어.";
+1910:         wealthGlitch = "돈은 보이는데 네 몸이 버겁대. 건강검진에 돈을 쓰거나 운동에 투자해. 몸집을 키워야 그 돈을 들 수 있어.";
+1911:       } else if (hasPyunJae) {
+1912:         layer3 = "하이 리스크 하이 리턴... 하지만 확실한 판이 아니면 승부수를 걸지 마, 아니면 아예 쳐다보지도 마.";
+1913:         wealthGlitch = "도파민에 속지마. 네 판단력은 생각보다 날카로우니까.";
+1914:       } else if (hasJungJae) {
+1915:         layer3 = "지금은 실속을 챙겨야 할 때야. 나가는 돈을 막고 들어오는 돈을 차곡차곡 쌓는 게 네 유일한 구원이자 전략이야.";
+1916:         wealthGlitch = "지루하더라도 엑셀을 켜고 가계부를 써. 1원 단위의 통제가 널 지켜줄 거야.";
+1917:       } else {
+1918:         layer3 = "조급하게 성과를 내려고 하면 오히려 더 꼬일 수 있어. <strong>현 상태를 유지</strong>하면서 다음 상승 운을 기다리는 여유가 필요해.";
+1919:         wealthGlitch = "황금의 그림자가 저 멀리서 아른거리고 있어. 아직은 손을 뻗을 때가 아니야.";
+1920:       }
+1921:     } else {
+1922:       layer1 = jaeSeongScore >= 40 ? "Your chart is full of wealth energy." : "You have steady potential for wealth.";
+1923:       layer2 = hasPyunJae ? "This year brings windfall opportunities." : "Focus on stable income management.";
+1924:       layer3 = "Focus on practical gains and steady growth.";
+1925:       wealthGlitch = "Stay calculated and steady.";
+1926:     }
+1927: 
+1928:     const main = lang === 'KO' ? 
+1929:       `네 지갑의 운명을 스캔해봤어. [delay:1500]
+1930: 
+1931: **[자산 운용 성향]**
+1932: ${layer1}
+1933: 
+1934: **[올해의 흐름]**
+1935: ${layer2}
+1936: 
+1937: **[전술적 조언]**
+1938: ${layer3}` :
+1939:       `Scanning your wealth destiny... [delay:1500]
+1940: 
+1941: **[Wealth Potential]**
+1942: ${layer1}
+1943: 
+1944: **[Annual Flow]**
+1945: ${layer2}
+1946: 
+1947: **[Tactical Advice]**
+1948: ${layer3}`;
+1949: 
+1950:     return { main, glitch: wealthGlitch };
+1951:   };
+1952: 
+1953:   // --- Theme 5: Moving (궤도의 이탈) ---
+1954:   const analyzeMoving = () => {
+1955:     const targetDayMaster = result.pillars[1].stem;
+1956:     const movingDmElement = BAZI_MAPPING.stems[targetDayMaster as keyof typeof BAZI_MAPPING.stems]?.element || '';
+1957:     const dmStrengthScoreVal = result.analysis?.dayMasterStrength?.score ?? 50;
+1958:     const structureDetail = result.analysis?.structureDetail;
+1959:     const ratios = result.analysis?.elementRatios || {};
+1960:     
+1961:     let gwanSeongScoreValue = 0;
+1962:     let jaeSeongScoreValue = 0;
+1963:     let inSeongScoreValue = 0;
+1964:     let biGyeopScoreValue = 0;
+1965: 
+1966:     Object.entries(result.analysis?.tenGodsRatio || {}).forEach(([k, v]) => {
+1967:       const val = v as number;
+1968:       if (k.includes('관성')) gwanSeongScoreValue += val;
+1969:       if (k.includes('재성')) jaeSeongScoreValue += val;
+1970:       if (k.includes('인성')) inSeongScoreValue += val;
+1971:       if (k.includes('비겁')) biGyeopScoreValue += val;
+1972:     });
+1973:     
+1974:     const isJaeDaShinYak = jaeSeongScoreValue > 35 && dmStrengthScoreVal < 40;
+1975:     const isGwanSalTaeGwang = gwanSeongScoreValue > 35 && dmStrengthScoreVal < 40;
+1976:     const isShinGangInBi = (inSeongScoreValue + biGyeopScoreValue) > 50;
+1977:     
+1978:     const isToDaMaeGeum = movingDmElement === 'Metal' && ratios.Earth > 50;
+1979:     const isHwaDaGeumYong = movingDmElement === 'Metal' && ratios.Fire > 40 && ratios.Water < 10;
+1980: 
+1981:     const hasYeokma = analysis.shinsal?.some((s: any) => s.name.includes('역마'));
+1982:     const isChungDay = allInteractions.some(i => i.note.includes(result.pillars[2].branch) && i.type.includes('충'));
+1983:     const isChungMonth = allInteractions.some(i => i.note.includes(result.pillars[1].branch) && i.type.includes('충'));
+1984: 
+1985:     const hasMoveIndicator = hasYeokma || isChungDay || isChungMonth;
+1986:     const isGoodLuckValue = luckScore >= 60;
+1987: 
+1988:     let psychology = '';
+1989:     const currentYearNum = currentAnnualPillar?.year || new Date().getFullYear();
+1990:     const seunAllGodsLocal = [seunStemGodKo, seunBranchGodKo];
+1991:     const hasBiGyeopYear = seunAllGodsLocal.some(g => g?.includes('비견') || g?.includes('겁재'));
+1992:     const hasSikSangYear = seunAllGodsLocal.some(g => g?.includes('식신') || g?.includes('상관'));
+1993: 
+1994:     if (lang === 'KO') {
+1995:       if (hasBiGyeopYear) {
+1996:         psychology = `올해(${currentYearNum}년)는 본인의 주관과 독립심이 폭발하는 해입니다. 주변에 휘둘리지 않고 본인만의 룰을 세우고자 강하게 환경을 바꾸고 싶어 합니다.`;
+1997:       } else if (hasSikSangYear) {
+1998:         psychology = `올해(${currentYearNum}년)는 내면에서 새로운 시도와 변화를 향한 욕구가 요동치는 해입니다. 틀에 박힌 생활에서 벗어나 궤도를 이탈하고 싶은 충동이 강할 것입니다.`;
+1999:       } else if (hasMoveIndicator) {
+2000:         psychology = `올해(${currentYearNum}년)는 운세의 흔들림으로 인해 마음이 불안정해지기 쉬운 해입니다. 어디론가 훌쩍 떠나 새롭게 안착하고 싶은 열망이 피어오르고 있습니다.`;
+2001:       } else {
+2002:         psychology = `올해(${currentYearNum}년)는 외부적인 이동보다는 내면의 성찰이 깊어지는 시기일 것입니다. 스스로 변화의 필요성을 고민하며 은밀히 다음 스텝을 재고 있습니다.`;
+2003:       }
+2004: 
+2005:       let fateAnalysis = '';
+2006:       if (isToDaMaeGeum || isHwaDaGeumYong) {
+2007:         fateAnalysis = `사주 구조상 이번 이동은 잠든 천재성을 깨우기 위한 필수 생존 기제로 발동하며, 귀하의 가치를 새롭게 입증할 기회가 될 것입니다.`;
+2008:       } else if (isShinGangInBi) {
+2009:         fateAnalysis = `내면의 거대한 에너지를 밖으로 표출할 영역 확장의 시기로, 이동 시 뚜렷한 주도권 획득과 사회적 입지 강화를 기대할 수 있습니다.`;
+2010:       } else if (isJaeDaShinYak) {
+2011:         fateAnalysis = `이번 이동은 적극적인 수익 확장보다는 소진되는 에너지를 보존하고 번아웃상태에서 벗어나기 위한 휴식의 성격이 강해야 합니다.`;
+2012:       } else if (isGwanSalTaeGwang) {
+2013:         fateAnalysis = `억압과 책임감에서 벗어나려는 탈출의 성격이 짙으므로, 준비되지 않은 이동은 피하고 자기방어를 우선시하는 실리적 선택이 필요합니다.`;
+2014:       } else {
+2015:         fateAnalysis = `이번 이동수는 막힌 운의 물꼬를 트는 전환점이 될 수 있으며, 환경 변화가 제공하는 유리한 조건들을 전략적으로 취할 수 있을 것입니다.`;
+2016:       }
+2017: 
+2018:       let finalVerdict = '';
+2019:       if (isGoodLuckValue && hasMoveIndicator) {
+2020:         finalVerdict = `당신의 명식과 올해 운기가 완벽히 부합하니 더 큰 무대로 비상하기 위한 골든타임입니다. 과감하게 이동을 추진하세요.`;
+2021:       } else if (isGoodLuckValue && !hasMoveIndicator) {
+2022:         finalVerdict = `길운의 흐름은 좋으나 굳이 먼 이동을 감행할 필요는 없습니다. 지금 자리에서 내실을 다지고 주도권을 확고히 하는 데 주력하세요.`;
+2023:       } else if (!isGoodLuckValue && hasMoveIndicator) {
+2024:         finalVerdict = `이동하고 싶은 충동은 강하지만, 무리하면 실익을 잃을 위험이 큽니다. 잠시 뜻을 접고 에너지가 차오를 때까지 기다리는 것이 현명합니다.`;
+2025:       } else {
+2026:         finalVerdict = `변화보다는 보수적인 태도로 현재 자리를 단단하게 지키는 것이 이롭습니다. 무리한 개척보다는 안전자산을 확보하며 유연하게 버티세요.`;
+2027:       }
+2028: 
+2029:       const yongshinElement = analysis.yongshinDetail?.primary?.element || '';
+2030:       const directionsTable: Record<string, string> = {
+2031:         'Wood': '동쪽(푸른 계열의 에너지가 강한 곳)', 
+2032:         'Fire': '남쪽(화창하고 빛이 잘 드는 곳)', 
+2033:         'Metal': '서쪽(바람이 통하고 깔끔한 곳)', 
+2034:         'Water': '북쪽(차분하고 조용한 곳)', 
+2035:         'Earth': '중앙 또는 연고지(안정적인 기반)'
+2036:       };
+2037:       const bestDirection = directionsTable[yongshinElement];
+2038:       
+2039:       const riskCheck = (isJaeDaShinYak || isGwanSalTaeGwang) ? 
+2040:         `이동 직후 6개월간은 에너지가 크게 소모될 수 있으니 무리한 투자는 피하고 비상 현금 흐름 확보에 집중하세요.` :
+2041:         `이해관계가 복잡해질 수 있으니 초기 6개월간은 주변과의 조화로운 관계 형성과 네트워킹 구축에 만전을 기하세요.`;
+2042: 
+2043:       const gyeokName = (structureDetail as any)?.title || '';
+2044:       let spatialAdvice = '';
+2045:       if (gyeokName.includes('상관') || gyeokName.includes('식신')) {
+2046:         spatialAdvice = `교류가 활발하고 사람들의 아이디어가 섞이는 활기찬 도심지나 오피스 밀집 지역이 운기에 가장 이상적입니다.`;
+2047:       } else if (isGwanSalTaeGwang || isJaeDaShinYak) {
+2048:         spatialAdvice = `심리적 압박에서 벗어나 재충전할 수 있는 조용하고 프라이버시가 완벽히 보장되는 독립적인 주거 형태를 추천합니다.`;
+2049:       } else {
+2050:         spatialAdvice = `본인의 기질을 넓게 펼쳐 활동성을 극대화할 수 있도록 채광이 좋고 개방감이 돋보이는 트인 공간을 1순위로 고려하세요.`;
+2051:       }
+2052: 
+2053:       const mainText = 
+2054:         `### [궤도의 이탈: 이동수 검증 리포트]
+2055: 
+2056: 1. **[심리 상태]**: ${psychology}
+2057: 2. **[운기 분석]**: ${fateAnalysis}
+2058: 3. **[최종 판결]**: ${finalVerdict}
+2059: 
+2060: 4. **[성공 전략]**:
+2061:    - 전략적 방향성: ${bestDirection || '유연한 방향 탐색'}
+2062:    - 6개월 리스크 방어: ${riskCheck}
+2063:    - 최적 공간 조건: ${spatialAdvice}`;
+2064:       
+2065:       const glitchText = isGoodLuckValue ?
+2066:         "이사나 이직은 단순한 변경이 아닌 에너지 진동수의 재조정입니다. 본인에게 맞는 공간을 찾는 것이 개운의 핵심 기제입니다." :
+2067:         "이동하고픈 바람은 헛된 것이 아닐지라도, 날씨가 나쁠 땐 출항하지 않는 것이 최고의 뱃사공입니다.";
+2068: 
+2069:       return { main: mainText, glitch: glitchText };
+2070:     } else {
+2071:       const mainText = `### [Mobility Verification Report]
+2072: 
+2073: 1. **[Psychology]**: The energy for change is building up. Make sure your desires are not just a craving for escape.
+2074: 2. **[Fate Analysis]**: Moving can serve as a catalyst to unlock dormant energy and expand your domain.
+2075: 3. **[Final Verdict]**: Follow your intuition, but ensure you land in a secure place.
+2076: 
+2077: 4. **[Success Strategy]**:
+2078:    - Navigate towards elements that support your core.
+2079:    - Maintain a solid financial buffer for at least 6 months.
+2080:    - Choose spaces that nurture your personal expression and comfort.`;
+2081: 
+2082:       return { 
+2083:         main: mainText, 
+2084:         glitch: 'Moving is a retuning of your life frequency. Choose wisely.' 
+2085:       };
+2086:     }
+2087:   };
+2088: 
+2089:   // --- Theme 3: Health/Mental (영혼의 균열) ---
+2090:   const analyzeHealth = () => {
+2091:     let text = '';
+2092:     if (isFrozen || (analysis.elementRatios?.Fire || 0) >= 60) {
+2093:       text = lang === 'KO' ? `조후의 불균형이 심해지면서 몸과 마음이 쉽게 지칠 수 있어. 특히 ${isFrozen ? '냉증과 우울감' : '화기와 조급함'}을 다스리는 게 급선무야. ` : `As the temperature imbalance worsens, your body and mind can easily get exhausted. It's urgent to manage ${isFrozen ? 'coldness and depression' : 'heat and impatience'}. `;
+2094:     }
+2095:     if (allInteractions.some((i: any) => i.type === '충')) {
+2096:       text += lang === 'KO' ? `원국에 강한 충이 발생하면서 에너지가 자꾸만 분산되고 있어. 휴식이 최고의 개운법이야. ` : `A strong clash in your chart is constantly scattering your energy. Resting is the best remedy. `;
+2097:     }
+2098: 
+2099:     const main = lang === 'KO' ? 
+2100:       `흔들리는 영혼의 균열을 메우고 싶구나. ${text || '다행히 큰 위기는 없지만, 규칙적인 생활로 리듬을 찾는 게 좋아.'} [delay:3000]
+2101: 
+2102: 평화는 네 안에서 시작될 거야.` :
+2103:       `Regarding your health and peace... ${text || 'Fortunately, there are no major crises, but it is good to find a rhythm with a regular lifestyle.'} [delay:3000]
+2104: 
+2105: Peace will begin within you.`;
+2106:     
+2107:     const glitch = lang === 'KO' ? '몸이 보내는 작은 신호를 무시하지 마. 그게 곧 운의 흐름이니까.' : 'Do not ignore the small signals your body sends. That is the flow of luck.';
+2108:     return { main, glitch };
+2109:   };
+2110: 
+2111:   // --- Theme 4: Secrets (금기된 페이지) ---
+2112:   const analyzeSecrets = () => {
+2113:     let text = '';
+2114:     const hasAmHap = allInteractions.some((i: any) => i.type.includes('암합'));
+2115:     const hasWonjin = allInteractions.some((i: any) => i.type.includes('원진'));
+2116:     const hasChung = allInteractions.some((i: any) => i.type.includes('충'));
+2117:     const hasHyung = allInteractions.some((i: any) => i.type.includes('형'));
+2118:     
+2119:     // 12-stage Life Cycle (12운성) check
+2120:     const seunStage = result.currentYearPillar?.lifeStage;
+2121:     const isMokYok = seunStage === '목욕';
+2122:     const isDeathOrGrave = seunStage === '사' || seunStage === '묘';
+2123: 
+2124:     const marital = interactionsData?.maritalStatus;
+2125:     const children = interactionsData?.hasChildren;
+2126: 
+2127:     // Corruption Logic (재물과 탐욕)
+2128:     const originalGods = result.pillars.flatMap(p => [p.stemKoreanName, p.branchKoreanName]).filter(Boolean);
+2129:     const hasOriginalInseong = originalGods.some(g => g?.includes('인성') || g?.includes('정인') || g?.includes('편인'));
+2130:     const hasLuckJaeseong = luckGods.some(g => g.includes('재성') || g.includes('정재') || g.includes('편재'));
+2131:     const isDarkDeal = hasAmHap && hasOriginalInseong && hasLuckJaeseong;
+2132: 
+2133:     const hasLuckSangGwan = luckGods.some(g => g.includes('상관'));
+2134:     const hasPyunJae = luckGods.some(g => g.includes('편재')) || originalGods.some(g => g?.includes('편재'));
+2135:     const isGamblersMadness = hasLuckSangGwan && hasPyunJae;
+2136: 
+2137:     const hasOriginalJae = originalGods.some(g => g?.includes('재성') || g?.includes('정재') || g?.includes('편재'));
+2138:     const hasBiGyeopLuck = luckGods.some(g => g.includes('비견') || g.includes('겁재'));
+2139:     const isGunBiJaengJae = hasBiGyeopLuck && hasOriginalJae;
+2140:     const isBloodMoney = isGunBiJaengJae && hasWonjin;
+2141: 
+2142:     let isCorruption = false;
+2143:     let corruptionText = '';
+2144: 
+2145:     if (isDarkDeal) {
+2146:       isCorruption = true;
+2147:       corruptionText = lang === 'KO' ? `문서 아래로 오가는 검은 손길... 지금 잡는 그 돈은 네 명예(인성)를 갉아먹는 대가야. 들키지 않을 거라 믿어? 종이는 불을 이기지 못해. ` : `A dark hand moving under the documents... The money you are grabbing now is the price eating away at your honor. Do you believe you won't get caught? Paper cannot beat fire. `;
+2148:     } else if (isGamblersMadness) {
+2149:       isCorruption = true;
+2150:       corruptionText = lang === 'KO' ? `법의 테두리를 벗어난 질주야. 네 기발한 속임수가 통할 것 같지? 하지만 벼랑 끝에 선 건 너 자신이야. 한탕의 꿈이 무덤이 되는 건 한 끗 차이지. ` : `It's a sprint outside the boundaries of the law. Do you think your clever tricks will work? But you are the one standing on the edge of the cliff. The dream of a jackpot becoming a grave is a fine line. `;
+2151:     } else if (isBloodMoney) {
+2152:       isCorruption = true;
+2153:       corruptionText = lang === 'KO' ? `돈 냄새를 맡은 까마귀들이 서로의 눈을 파먹고 있네. 네가 쥔 그 황금은 누군가의 눈물이고 원망이야. 그 돈을 쓰며 잠이 올까? ` : `Crows smelling money are pecking at each other's eyes. The gold you hold is someone's tears and resentment. Can you sleep while spending that money? `;
+2154:     }
+2155: 
+2156:     let prefix = '';
+2157:     if (!isCorruption) {
+2158:       if (marital === '기혼') {
+2159:         prefix = lang === 'KO' ? `이미 가정을 이룬 상태에서 이런 기운을 마주하다니, 위태롭네. ` : `Facing this energy while already married is quite precarious. `;
+2160:         if (children) {
+2161:           prefix += lang === 'KO' ? `지켜야 할 것들이 있는데도 흔들리는 마음 때문에 더 괴로울 수 있어. ` : `It might be more painful because your heart is wavering despite having things to protect. `;
+2162:         }
+2163:       } else if (marital === '돌싱') {
+2164:         prefix = lang === 'KO' ? `한 번의 굴레를 벗어났음에도, 또다시 위험한 불꽃에 눈길이 가고 있네. ` : `Even after escaping the cycle once, your eyes are drawn to a dangerous flame again. `;
+2165:       } else {
+2166:         prefix = lang === 'KO' ? `아직 얽매인 곳은 없지만, 남들에게 쉽게 털어놓지 못할 은밀한 서사가 시작되려 해. ` : `You are not bound to anyone yet, but a secret narrative that you can't easily share with others is about to begin. `;
+2167:       }
+2168:     }
+2169: 
+2170:     if (hasAmHap && hasChung) {
+2171:       text = lang === 'KO' ? `겉으로는 차갑게 밀어내고 싸우면서도, 지장간 속에서는 몰래 손을 잡는 '암합'의 긴장감이 흐르고 있어. 이건 지독한 집착이야. 낮에는 적이지만 밤에는 서로의 그림자를 쫓는 기묘한 관계에 중독될 수 있어. ` : `While pushing away and fighting on the surface, there's a hidden tension of 'Am-Hap' secretly holding hands underneath. This is a severe obsession. You might get addicted to a bizarre relationship where you are enemies by day but chase each other's shadows by night. `;
+2172:     } else if (hasAmHap) {
+2173:       text = lang === 'KO' ? `겉으론 아무 일 없는 척해도, 네 무의식은 이미 그 사람의 그림자를 쫓고 있어. 들키고 싶지 않은 그 은밀한 긴장감이 네 영혼을 갉아먹고 있네. ` : `Even if you pretend nothing is happening, your subconscious is already chasing their shadow. That secret tension you don't want to be caught in is eating away at your soul. `;
+2174:     }
+2175: 
+2176:     if (isMokYok) {
+2177:       text += lang === 'KO' ? `게다가 지금은 '목욕(Mok-Yok)'의 기운이 네 이성을 마비시키고 있어. 품격보다는 본능, 사랑보다는 탐닉이 앞서는 시기지. 이 관계는 축복보다는 치명적인 중독에 가까워. ` : `Moreover, the energy of 'Mok-Yok (Bathing)' is paralyzing your reason right now. It's a time when instinct precedes dignity, and indulgence precedes love. This relationship is closer to a fatal addiction than a blessing. `;
+2178:     } else if (isDeathOrGrave) {
+2179:       text += lang === 'KO' ? `기운이 극도로 침잠된 상태에서 만나는 인연이야. 화려함은 없지만, 서로의 상처를 파고드는 지독한 연민이 사랑으로 착각될 수 있어. ` : `It's a connection met in a state of extremely sunken energy. There's no glamour, but a deep compassion that digs into each other's wounds can be mistaken for love. `;
+2180:     }
+2181: 
+2182:     if (!text && hasWonjin) {
+2183:       text = lang === 'KO' ? `미워할수록 더 깊게 중독되는 원진의 굴레에 갇혀 있네. 망할 걸 알면서도 끌리는 불나방 같은 선택을 조심해. ` : `You are trapped in the cycle of Wonjin, where the more you hate, the deeper you get addicted. Be careful of making choices like a moth drawn to a flame, knowing it will ruin you. `;
+2184:     }
+2185: 
+2186:     const isSecretAffairTrigger = hasAmHap || isMokYok || hasWonjin || isDeathOrGrave;
+2187:     let consequence = '';
+2188: 
+2189:     if (isSecretAffairTrigger && (hasChung || hasHyung)) {
+2190:       consequence = lang === 'KO' ? `비밀은 달콤하지만, 그 대가는 소금보다 쓸 거야. 지금 네가 잡은 그 손은 결국 수갑(관재)이나 낙인(구설)이 되어 돌아올 텐데, 그래도 열어보겠어? ` : `Secrets are sweet, but the price will be more bitter than salt. The hand you are holding now will eventually return as handcuffs (legal issues) or a stigma (gossip). Will you still open it? `;
+2191:     }
+2192: 
+2193:     if (isFrozen && isSecretAffairTrigger) {
+2194:       consequence += lang === 'KO' ? `이건 사랑이 아니라 저체온증이 만든 환각이야. 너무 추워서 옆에 있는 독초를 난로라 착각하고 품으려 하는구나. ` : `This is not love, but a hallucination created by hypothermia. You are so cold that you mistake the poisonous plant next to you for a heater and try to embrace it. `;
+2195:     }
+2196: 
+2197:     const finalNarrative = isCorruption ? corruptionText : `${prefix}
+2198: 
+2199: ${text || (lang === 'KO' ? '네 안의 본능이 조용히 숨죽이고 있네. 하지만 언제든 타오를 준비가 되어 있어.' : 'Your instincts are quiet for now, but ready to ignite.')}
+2200: 
+2201: ${consequence}`;
+2202: 
+2203:     const main = lang === 'KO' ? 
+2204:       `금기된 페이지를 열어보고 싶어? [delay:1500]
+2205: 
+2206: ${finalNarrative} [delay:3000]
+2207: 
+2208: 비밀은 무덤까지 가져갈 수 있을까?
+2209: 
+2210: <span style='color: #9ca3af;'>이 메시지는 1분 뒤 자동 삭제됩니다.</span>` :
+2211:       `Opening the forbidden page... [delay:1500]
+2212: 
+2213: ${finalNarrative} [delay:3000]
+2214: 
+2215: Can you take the secret to your grave?
+2216: 
+2217: <span style='color: #9ca3af;'>This message will self-destruct in 1 minute.</span>`;
+2218:     
+2219:     let glitch = '';
+2220:     if (isCorruption) {
+2221:       glitch = lang === 'KO' ? '법의 심판을 비웃는 대가로 네 평안을 팔겠어?' : 'Will you sell your peace in exchange for mocking the judgment of the law?';
+2222:     } else {
+2223:       glitch = lang === 'KO' ? 
+2224:         (isMokYok ? '이성이 본능을 이길 수 없는 시기야. 후회할 짓은 하지 마, 아니면 제대로 즐기든가.' : '비밀이 탄로 나는 순간, 네가 쌓아온 모든 게 흔일릴 수 있다는 걸 명심해.') :
+2225:         (isMokYok ? 'Reason cannot beat instinct right now. Don\'t do anything you\'ll regret, or just enjoy it fully.' : 'Keep in mind that the moment the secret is revealed, everything you\'ve built could be shaken.');
+2226:     }
+2227: 
+2228:     return { main, glitch, isCorruption };
+2229:   };
+2230: 
+2231:   // --- Theme 5: Moving (궤도의 이탈) ---
+2232:   const analyzeMoving = () => {
+2233:     const yearBranch = result.pillars[0].branch;
+2234:     const monthBranch = result.pillars[1].branch;
+2235:     const dayBranch = result.pillars[2].branch;
+2236:     const hourBranch = result.pillars[3]?.branch;
+2237: 
+2238:     const yearInteraction = allInteractions.filter(i => i.note.includes(yearBranch));
+2239:     const monthInteraction = allInteractions.filter(i => i.note.includes(monthBranch));
+2240:     const dayInteraction = allInteractions.filter(i => i.note.includes(dayBranch));
+2241:     const hourInteraction = hourBranch ? allInteractions.filter(i => i.note.includes(hourBranch)) : [];
+2242: 
+2243:     const hasYearMove = yearInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+2244:     const hasMonthMove = monthInteraction.some(i => i.type.includes('충') || i.type.includes('형') || i.type.includes('합'));
+2245:     const hasDayMove = dayInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+2246:     const hasHourMove = hourInteraction.some(i => i.type.includes('충') || i.type.includes('형'));
+2247: 
+2248:     // Structural Analysis for Mobility
+2249:     const targetDayMaster = result.pillars[1].stem;
+2250:     const movingDmElement = BAZI_MAPPING.stems[targetDayMaster as keyof typeof BAZI_MAPPING.stems]?.element || '';
+2251:     const dmStrength = result.analysis?.dayMasterStrength?.score ?? 50;
+2252:     const structureDetail = result.analysis?.structureDetail;
+2253:     const isSpecial = (structureDetail as any)?.isSpecial || (structureDetail as any)?.category?.includes('Special');
+2254:     
+2255:     const ratios = result.analysis?.elementRatios || {};
+2256:     const jaeSeongScore = Object.entries(result.analysis?.tenGodsRatio || {}).reduce((s, [k, v]) => k.includes('재성') ? s + (v as number) : s, 0);
+2257:     const gwanSeongScore = Object.entries(result.analysis?.tenGodsRatio || {}).reduce((s, [k, v]) => k.includes('관성') ? s + (v as number) : s, 0);
+2258:     const inSeongScore = Object.entries(result.analysis?.tenGodsRatio || {}).reduce((s, [k, v]) => k.includes('인성') ? s + (v as number) : s, 0);
+2259:     
+2260:     const isJaeDaShinYak = jaeSeongScore > 35 && dmStrength < 40;
+2261:     const isGwanSalTaeGwang = gwanSeongScore > 35 && dmStrength < 40;
+2262:     const isShinGangInBi = (inSeongScore + Object.entries(result.analysis?.tenGodsRatio || {}).reduce((s, [k, v]) => k.includes('비겁') ? s + (v as number) : s, 0)) > 50;
+2263:     
+2264:     // To-da-mae-geum / Hwa-da-geum-yong checks
+2265:     const isToDaMaeGeum = movingDmElement === 'Metal' && ratios.Earth > 50;
+2266:     const isHwaDaGeumYong = movingDmElement === 'Metal' && ratios.Fire > 40 && ratios.Water < 10;
+2267: 
+2268:     let moveType = '';
+2269:     if (hasYearMove) moveType = lang === 'KO' ? '주거지 이동(이사)' : 'Moving house';
+2270:     if (hasMonthMove) moveType = moveType ? moveType + (lang === 'KO' ? ' 및 직장 변동' : ' and job change') : (lang === 'KO' ? '직장 및 사회적 환경 변동' : 'Job and social environment change');
+2271:     if (hasDayMove) moveType = moveType ? moveType + (lang === 'KO' ? ', 신상 변화' : ', personal change') : (lang === 'KO' ? '개인 신상 및 배우자 관련 이동' : 'Personal and spouse-related movement');
+2272: 
+2273:     // 1. 심리 분석 (Psychology): 올해의 기운이 만드는 욕구
+2274:     const currentYearNum = new Date().getFullYear();
+2275:     const seunAllGods = [seunStemGodKo, seunBranchGodKo];
+2276:     
+2277:     const hasBiGyeopYear = seunAllGods.some(g => g?.includes('비견') || g?.includes('겁재'));
+2278:     const hasSikSangYear = seunAllGods.some(g => g?.includes('식신') || g?.includes('상관'));
+2279:     const hasChungYear = yearInteraction.some(i => i.type.includes('충')) || monthInteraction.some(i => i.type.includes('충')) || dayInteraction.some(i => i.type.includes('충'));
+2280: 
+2281:     let psychology = '';
+2282:     if (hasBiGyeopYear) {
+2283:       psychology = lang === 'KO' ? 
+2284:         `올해(${currentYearNum}년)는 ${seunStem}${seunBranch}년, 네 주관과 독립심이 폭발하는 시기야. 지금 당장 환경을 바꾸고 새 출발을 하고 싶어 미칠 것 같지? ` :
+2285:         `This year (${currentYearNum}) is the year of ${seunStem}${seunBranch}, a period where your ego and independence explode. You're probably dying to start fresh and change your environment right now, aren't you? `;
+2286:     } else if (hasSikSangYear) {
+2287:       psychology = lang === 'KO' ? 
+2288:         `새로운 걸 시도하고 싶은 욕구가 네 안에서 요동치고 있네. 틀에 박힌 생활에서 벗어나 궤도를 이탈하고 싶은 마음이 굴뚝같을 거야. ` :
+2289:         `A desire to try new things is surging within you. You likely have a huge urge to derail from your orbit and break away from routine. `;
+2290:     } else if (hasChungYear) {
+2291:       psychology = lang === 'KO' ? 
+2292:         `주변 환경이 자꾸 너를 흔드니 마음이 붕 떠 있구나. 정착하기보다 어디론가 떠나고 싶은 충동이 강하게 고개를 드는 시기야. ` :
+2293:         `Since your environment keeps shaking you, your mind feels unsettled. It's a period where the impulse to leave rather than settle is strongly rising. `;
+2294:     } else {
+2295:       psychology = lang === 'KO' ? 
+2296:         `올해는 눈에 띄는 변화보다는 네 내면의 갈등이 더 클 거야. 스스로를 돌아보며 변화의 타이밍을 조용히 재고 있는 모습이네. ` :
+2297:         `This year, internal conflict will be greater than visible change. You seem to be quietly weighing the timing of a change while reflecting on yourself. `;
+2298:     }
+2299: 
+2300:     // 2. 운기 분석 (Fate Analysis): 명식의 그릇과 이동의 성격
+2301:     let fateAnalysis = '';
+2302:     if (isToDaMaeGeum || isHwaDaGeumYong) {
+2303:       fateAnalysis = lang === 'KO' ? 
+2304:         `하지만 네 사주를 보면 이동은 단순한 선택이 아니야. 흙 속에 묻힌 보석을 꺼내기 위한 필수적인 생존 기제지. 옮기지 않으면 네 재능이 썩을 수 있다는 걸 명심해. ` : 
+2305:         `But looking at your chart, moving isn't just a choice. It's an essential survival mechanism to extract the gem buried in the dirt. Keep in mind that your talent might rot if you don't move. `;
+2306:     } else if (isShinGangInBi) {
+2307:       fateAnalysis = lang === 'KO' ? 
+2308:         `현재 네 에너지는 넘쳐서 밖으로 뻗어나가고 싶어 해. 이번 이동은 단순히 자리를 옮기는 게 아니라 네 영역을 넓히는 '성장의 확장'이 될 거야. ` : 
+2309:         `Your energy is currently overflowing and wanting to reach out. This move isn't just about changing places; it's an 'expansion for growth' to widen your territory. `;
+2310:     } else if (isJaeDaShinYak) {
+2311:       fateAnalysis = lang === 'KO' ? 
+2312:         `재물이 보이니 몸이 먼저 반응하겠지만, 네 그릇(강도)에 비해 재물의 무게가 너무 무거워. 이동이 '에너지 소진'으로 이어지지 않도록 주의가 필요해. ` : 
+2313:         `Your body might react first as you see wealth, but the weight of that wealth is too heavy compared to your capacity. Caution is needed so the move doesn't lead to 'energy depletion'. `;
+2314:     } else if (isGwanSalTaeGwang) {
+2315:       fateAnalysis = lang === 'KO' ? 
+2316:         `압박감과 책임감 때문에 도망치고 싶은 거라면 신중해야 해. 준비 없이 옮겼다간 또 다른 멍에를 짊어질 뿐이니까. ` : 
+2317:         `If you're trying to escape because of pressure and responsibility, be careful. Moving without preparation just means carrying another yoke. `;
+2318:     } else {
+2319:       fateAnalysis = lang === 'KO' ? 
+2320:         `지금의 이동수는 네 삶의 정체된 물길을 터주는 역할을 할 거야. 다만 그 방향이 너에게 실익이 있는지는 따져봐야겠지. ` : 
+2321:         `The current indication for a move will serve to clear the stagnant flow of your life. However, we must see if that direction brings actual benefit to you. `;
+2322:     }
+2323: 
+2324:     // 3. 최종 판결 (Final Verdict): 무결성 검증을 통한 일관성 있는 메시지
+2325:     const isGoodLuck = luckScore >= 60;
+2326:     const hasMoveIndicator = !!moveType;
+2327:     let finalVerdict = '';
+2328:     
+2329:     // Yong-shin indicators for profit check
+2330:     const yongshinElement = result.analysis?.yongshinDetail?.primary?.element || '';
+2331:     const elementToDir: Record<string, string> = {
+2332:       'Wood': lang === 'KO' ? '동쪽' : 'East',
+2333:       'Fire': lang === 'KO' ? '남쪽' : 'South',
+2334:       'Metal': lang === 'KO' ? '서쪽' : 'West',
+2335:       'Water': lang === 'KO' ? '북쪽' : 'North',
+2336:       'Earth': lang === 'KO' ? '중앙 혹은 연고지' : 'Center or Hometown'
+2337:     };
+2338:     const profitDir = elementToDir[yongshinElement] || (lang === 'KO' ? '알 수 없음' : 'Unknown');
+2339:     const profitText = lang === 'KO' ? 
+2340:       `[지표 1: 실익 방향] 현재 당신의 사주에 필요한 ${yongshinElement} 기운을 보완하는 ${profitDir} 방향으로의 이동인가?` :
+2341:       `[Indicator 1: Profit Direction] Is it an move toward the ${profitDir} that supplements your needed ${yongshinElement} energy?`;
+2342: 
+2343:     const riskText = lang === 'KO' ?
+2344:       `[지표 2: 리스크 체크] 이동 직후 6개월간은 비행기가 이륙할 때 가장 큰 연료를 쓰듯 전략적 인내가 필요해. 현금 흐름을 미리 확보했는가?` :
+2345:       `[Indicator 2: Risk Check] The 6 months after the move require strategic patience, much like a plane consumes the most fuel during takeoff. Have you secured your cash flow?`;
+2346: 
+2347:     if (isGoodLuck) {
+2348:       if (hasMoveIndicator) {
+2349:         finalVerdict = lang === 'KO' ? 
+2350:           `결론을 내줄게. 지금이 바로 네가 궤도를 벗어나 비상할 골든타임이야. 올해의 운도, 네 명식의 흐름도 일치해. 망설이지 말고 네가 원하던 곳으로 움직여봐.
+2351: 
+2352: ${profitText}
+2353: ${riskText}` : 
+2354:           `Here is the verdict. Now is the golden time for you to derail and soar. Both the year's luck and your chart's flow align. Don't hesitate and move to where you want.
+2355: 
+2356: ${profitText}
+2357: ${riskText}`;
+2358:       } else {
+2359:         // Year is good (luckScore >= 60) but no Bazi move indicator
+2360:         // If it's a good year, suggest staying to reap rewards OR careful move
+2361:         finalVerdict = lang === 'KO' ? 
+2362:           `운은 너를 돕고 있지만, 네 명식 자체에서 당장 움직여야 할 강한 압박은 없어. 지금 자리에서 내실을 더 다지면 올해의 좋은 기운을 고스란히 결실로 바꿀 수 있을 거야. 무리한 이동보다는 현재의 상승세를 유지하는 데 집중해봐.
+2363: 
+2364: ${profitText}
+2365: ${riskText}` : 
+2366:           `Luck is on your side, but your chart doesn't show a strong inner urge to move right now. If you focus on solidifying your current position, you can turn this year's good energy into solid results. Focus on maintaining your upward trend rather than a forced move.
+2367: 
+2368: ${profitText}
+2369: ${riskText}`;
+2370:       }
+2371:     } else {
+2372:       // Bad or moderate luck (luckScore < 60)
+2373:       if (hasMoveIndicator) {
+2374:         finalVerdict = lang === 'KO' ? 
+2375:           `서둘러 움직이고 싶은 마음은 이해하지만, 지금의 이동은 실기(失期)할 위험이 커. 명식에서는 변화를 원하지만 운의 조력이 부족하니, 조급함을 내려놓고 에너지가 차오를 때까지 다음 기회를 노리는 게 훨씬 현명한 선택이야.
+2376: 
+2377: ${profitText}
+2378: ${riskText}` : 
+2379:           `I understand your heart wants to move quickly as your chart suggests change, but moving now carries a high risk of failure due to lack of luck support. It's much wiser to let go of impatience and wait for the next opportunity when your energy is fully recharged.
+2380: 
+2381: ${profitText}
+2382: ${riskText}`;
+2383:       } else {
+2384:         finalVerdict = lang === 'KO' ? 
+2385:           `지금은 보수적으로 움직여야 해. 변화를 꾀하기보다 네 에너지가 충분히 차오를 때까지 기다리며 현재 자리를 지키는 게 네 그릇을 지키는 길이야. 무리한 변화는 손재수나 스트레스로 이어질 수 있으니 주의해.
+2386: 
+2387: ${profitText}
+2388: ${riskText}` : 
+2389:           `You must move conservatively right now. Rather than seeking change, staying in your spot and waiting until your energy is fully recharged is the way to protect your capacity. Be careful as forced changes could lead to financial loss or high stress.
+2390: 
+2391: ${profitText}
+2392: ${riskText}`;
+2393:       }
+2394:     }
+2395: 
+2396:     // Direction & Spatial Characteristics
+2397:     const directionsTable: Record<string, string> = {
+2398:       'Wood': lang === 'KO' ? '동쪽 (생명력, 시작, 교육)' : 'East (Vitality, Start, Education)',
+2399:       'Fire': lang === 'KO' ? '남쪽 (열정, 명예, 예술)' : 'South (Passion, Honor, Art)',
+2400:       'Metal': lang === 'KO' ? '서쪽 (결단, 기술, 금융)' : 'West (Decision, Tech, Finance)',
+2401:       'Water': lang === 'KO' ? '북쪽 (지혜, 유통, 아이디어)' : 'North (Wisdom, Distribution, Ideas)',
+2402:       'Earth': lang === 'KO' ? '중앙/연고지 (안정, 부동산, 저장)' : 'Center/Hometown (Stability, Real Estate, Storage)'
+2403:     };
+2404:     
+2405:     // Spatial detail based on category/Gyeok-guk
+2406:     const gyeokName = (structureDetail as any)?.title || '';
+2407:     let spatialDetail = '';
+2408:     if (gyeokName.includes('상관') || gyeokName.includes('식신')) {
+2409:       spatialDetail = lang === 'KO' ? '사람이 많이 모이고 아이디어가 교환되는 핫플레이스나 오피스 밀집 지역' : 'Hot spots or dense office areas where people gather and ideas are exchanged';
+2410:     } else if (isGwanSalTaeGwang) {
+2411:       spatialDetail = lang === 'KO' ? '고요하고 정제된 법원 근처, 대형 병원 인근, 혹은 공원이 가까운 차분한 주거지' : 'Quiet, refined areas near courts, large hospitals, or calm residential areas near parks';
+2412:     } else if (isJaeDaShinYak) {
+2413:       spatialDetail = lang === 'KO' ? '혼자만의 독립된 공간이 확보되는 프라이빗한 오피스텔이나 층수가 낮은 안정적인 주택' : 'Private officetels or low-rise stable housing where independent space is secured';
+2414:     } else {
+2415:       spatialDetail = lang === 'KO' ? '교통이 편리하고 네 활동성이 보장되는 개방적인 공간' : 'Open spaces where transportation is convenient and your activity is guaranteed';
+2416:     }
+2417: 
+2418:     const bestDirectionText = directionsTable[yongshinElement] || (lang === 'KO' ? '상황에 맞춘 유연한 이동' : 'Flexible movement');
+2419:     const finalDirectionGuidance = lang === 'KO' ? 
+2420:       `당신의 명식상 ${bestDirectionText} 방향 및 ${spatialDetail} 등이 조화로운 곳으로 움직일 때 성공 확률이 70% 이상입니다.` :
+2421:       `Moving to a place that harmonizes the ${bestDirectionText} direction and ${spatialDetail} shows a success rate of over 70% based on your Bazi.`;
+2422: 
+2423:     const main = lang === 'KO' ? 
+2424:       `지금 머무는 곳이 네 무덤일까, 아니면 발판일까? [delay:1500]
+2425: 
+2426: ` +
+2427:       `[심리 분석] ${psychology}
+2428: 
+2429: ` +
+2430:       `[운기 분석] ${fateAnalysis}
+2431: 
+2432: ` +
+2433:       `[최종 판결] ${finalVerdict}
+2434: 
+2435: ` +
+2436:       `추천 에너지 충전소(방향): ${finalDirectionGuidance}` :
+2437:       `Is your current place a grave or a stepping stone? [delay:1500]
+2438: 
+2439: ` +
+2440:       `[Psychology] ${psychology}
+2441: 
+2442: ` +
+2443:       `[Fate Analysis] ${fateAnalysis}
+2444: 
+2445: ` +
+2446:       `[Final Verdict] ${finalVerdict}
+2447: 
+2448: ` +
+2449:       `Recommended Direction: ${finalDirectionGuidance}`;
+2450:     
+2451:     const glitch = lang === 'KO' ? 
+2452:       '이사나 이직은 단순히 주소를 바꾸는 게 아니라 네 영혼의 주파수를 맞추는 작업이야. 네 용신의 색깔이 많이 보이는 동네로 가봐. 그게 진짜 풍수지.' : 
+2453:       'Moving or changing jobs isn\'t just about changing an address; it\'s about tuning your soul\'s frequency. Go to a neighborhood where the colors of your yong-shin are abundant. That\'s true Feng Shui.';
+2454:     
+2455:     return { main, glitch };
+2456:   };
+2457: 
+2458:   // --- Theme 6: General Luck (금년운세) ---
+2459:   const analyzeGeneral = () => {
+2460:     const prefix = lang === 'KO' ? 
+2461:       `이번에는 대운과 세운의 흐름을 좀 볼까? 보채지는 말아줘. 
+2462: 
+2463: ` : 
+2464:       `Let's look at your cycles. Don't rush me. 
+2465: 
+2466: `;
+2467:     return { main: prefix + main, glitch: glitch };
+2468:   };
+2469: 
+2470:   // Populate Analyses
+2471:   themeAnalyses['romance'] = analyzeRomance();
+2472:   themeAnalyses['marriage_timing'] = analyzeMarriageTiming();
+2473:   themeAnalyses['wealth'] = analyzeWealth();
+2474:   themeAnalyses['health'] = analyzeHealth();
+2475:   themeAnalyses['secrets'] = analyzeSecrets();
+2476:   themeAnalyses['moving'] = analyzeMoving();
+2477:   themeAnalyses['general'] = analyzeGeneral();
+2478: 
+2479:   // Next Hook Logic
+2480:   const interactions = analysis.interactions || [];
+2481:   const hasWonjin = interactions.some((i: any) => i.type.includes('원진'));
+2482:   if (hasWonjin) {
+2483:     themeAnalyses['wealth'].nextHook = { text: "금화의 흐름은 읽었어. 그런데 네 사주 구석에 숨은 지독한 악연(원진)이 네 재물을 갉아먹고 있는 건 알고 있어? 이 비밀의 페이지도 열어볼래?", themeId: 'secrets' };
+2484:     themeAnalyses['general'].nextHook = { text: "전반적인 흐름은 이래. 그런데 네 인연의 실타래가 아주 복잡하게 꼬여있는 게 보이네. 확인해볼래?", themeId: 'romance' };
+2485:   }
+2486: 
+2487:   // Theme Targeting Score Calculation
+2488:   if (isFrozen || (analysis.elementRatios?.Fire || 0) >= 60) themeScores.health += 50;
+2489:   if (allInteractions.some((i: any) => i.type === '충')) themeScores.health += 30;
+2490: 
+2491:   const hasAmHapGlobal = allInteractions.some((i: any) => i.type.includes('암합'));
+2492:   const hasDohwa = analysis.shinsal?.some((s: any) => s.name.includes('도화'));
+2493:   const hasWonjinSal = allInteractions.some((i: any) => i.type.includes('원진'));
+2494:   const hasBathGlobal = result.pillars.some((p) => p.lifeStage === '목욕');
+2495:   if (hasAmHapGlobal) themeScores.secrets += 50;
+2496:   if (hasDohwa) themeScores.secrets += 30;
+2497:   if (hasWonjinSal && hasBathGlobal) themeScores.secrets += 40;
+2498: 
+2499:   const hasYeokmaGlobal = analysis.shinsal?.some((s: any) => s.name.includes('역마'));

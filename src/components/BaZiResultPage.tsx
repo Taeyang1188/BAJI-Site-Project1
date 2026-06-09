@@ -5430,6 +5430,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                     
                     <GongmangDetail result={result} lang={lang} isLight={isLight} />
 
+                    <AdvancedAnalysisSection result={result} lang={lang} />
+
 
                   </>
                 )}
