@@ -1056,38 +1056,57 @@ export function generatePersonalizedTexts(
   const overload = findOverloadedTenGods(dayStem, stems, branches);
   const siblingRoot = findSiblingRoots(dayStem, branches);
 
+  // Pillar-by-pillar personalized text
+  const dayBranchKo = BRANCH_PERSONALITIES[dayBranch]?.koName || dayBranch;
+  const dayBranchEn = BRANCH_EN_NAMES[dayBranch] || dayBranch;
+  const monthBranchKo = BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch;
+  const monthBranchEn = BRANCH_EN_NAMES[monthBranch] || monthBranch;
+
+  const dmSection = isKO
+    ? `• **일간 ${dayStem}(${dayMasterKo}) — 내면의 본질적 자아**\n${STEM_PERSONALITIES[dayStem]?.coreIdentity || ''}\n${STEM_PERSONALITIES[dayStem]?.innateDesire || ''}`
+    : `• **Day Master ${dayStem}(${dayMasterKo}) — Your Core Self**\n${STEM_INFO_EN[dayStem]?.coreIdentity || ''}\n${STEM_INFO_EN[dayStem]?.innateDesire || ''}`;
+
+  const dbSection = isKO
+    ? `• **일지 ${dayBranch}(${dayBranchKo}) — 내밀한 감성과 태도**\n${BRANCH_PERSONALITIES[dayBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[dayBranch]?.hiddenStruggle || ''}`
+    : `• **Day Branch ${dayBranch}(${dayBranchEn}) — Inner Mind & Private Demeanor**\n${BRANCH_INFO_EN[dayBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[dayBranch]?.hiddenStruggle || ''}`;
+
+  const mbSection = isKO
+    ? `• **월지 ${monthBranch}(${monthBranchKo}) — 사회적 환경과 처세**\n귀하의 사회적 삶은 월지 ${monthBranch}의 분위기 안에서 펼쳐집니다. ${BRANCH_PERSONALITIES[monthBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[monthBranch]?.socialPattern || ''}`
+    : `• **Month Branch ${monthBranch}(${monthBranchEn}) — Social Context & Relationships**\nYour social life unfolds within the atmosphere of Month Branch ${monthBranch}. ${BRANCH_INFO_EN[monthBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[monthBranch]?.socialPattern || ''}`;
+
+  const pillarTemperamentDesc = isKO
+    ? `**[🔍 기둥별 타고난 기질 해설]**\n\n${dmSection}\n\n${dbSection}\n\n${mbSection}`
+    : `**[🔍 Pillar-by-Pillar Innate Temperament]**\n\n${dmSection}\n\n${dbSection}\n\n${mbSection}`;
+
+  let categoryTitle = '';
+  let categoryDesc = '';
+
   if (hapNet) {
-    // 1순위: 합 네트워크
-    innateTitle = isKO 
+    categoryTitle = isKO 
       ? `[합(合) 네트워크] 우주적 에너지가 결집된 강력한 지향성` 
       : `[Union Network] Powerful Alignment Crafted by Cosmic Conjunction`;
-    innateDesc = isKO
+    categoryDesc = isKO
       ? `당신의 명식은 지지에 **${hapNet.koName}**의 결합을 완성하고, 그 강한 기운이 천간 **${hapNet.type}** 오행으로 분출되어 투간된 매우 비범한 구조입니다. 이는 에너지가 한곳으로 집중되어 강력한 돌파력과 확실한 정체성을 발휘함을 의미합니다. 혼란 속에서도 명확한 지향점을 스스로 설정하고 이끌어갈 수 있는 선천적 리더십과 추진력이 탑재되어 있습니다.`
       : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your core drive is highly focused, granting you unyielding determination and a clear sense of identity. You are naturally equipped with the pioneering leadership to define your own path and command situations even amidst chaos.`;
-    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = hapNet.keyPillars;
   } else if (overload) {
-    // 2순위: 특정 성분 도배
-    innateTitle = isKO 
+    categoryTitle = isKO 
       ? `[성분 집중형] ${overload.nameKo} 에너지가 지배하는 개성파 기질` 
       : `[Concentrated Type] Character Dominated by ${overload.nameEn}`;
-    innateDesc = isKO
+    categoryDesc = isKO
       ? `귀하의 사주는 **${overload.nameKo}** 기운이 3개 이상 포진하여, 해당 에너지가 성격과 행동 양식을 강력하게 지배하고 있습니다. 이는 남들과 구별되는 극대화된 개성과 독창적인 무기를 의미합니다. 스스로의 확고한 주도권과 전문 영역을 확보할 때 이 쏠린 에너지는 폭발적인 창조력으로 승화됩니다.`
       : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to strongly dictate your behavior and character. This marks you as an individual of extreme color and distinct talent. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an explosive creative force.`;
-    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
-    // 3순위: 비겁의 뿌리 세포
-    innateTitle = isKO
+    categoryTitle = isKO
       ? `[주체성의 뿌리] 스스로를 지탱하는 자아의 근본 기둥`
       : `[Root of Ego] Indestructible Foundation Anchoring the Self`;
-    innateDesc = isKO
+    categoryDesc = isKO
       ? `귀하의 명식은 비록 강한 쏠림은 없으나, 지지에 일간의 든든한 동료이자 힘이 되어주는 비겁(뿌리) 글자들이 2개 이상 포진하고 있습니다. 이는 외부 환경에 쉽게 흔들리지 않고 스스로 중심을 잡는 '자아의 뿌리 세포'가 매우 튼튼함을 의미합니다. 실패를 겪어도 오뚝이처럼 일어나는 복원력과 주체성이 귀하의 근본 강점입니다.`
       : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a highly resilient "ego root system" that keeps you anchored through any external turbulence. Your fundamental strength lies in your autonomous recovery power and self-reliance, rising like a phoenix from any setback.`;
-    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = siblingRoot.keyPillars;
   } else {
-    // 4순위: 일간 중심 삼각편대 (Default)
+    // Default
     const innateElem = dominantElement([
       BAZI_MAPPING.branches[dayBranch as keyof typeof BAZI_MAPPING.branches]?.element,
       BAZI_MAPPING.stems[monthStem   as keyof typeof BAZI_MAPPING.stems]?.element,
@@ -1102,39 +1121,11 @@ export function generatePersonalizedTexts(
       Water: isKO ? `${dayMasterKo}이 담아낸 지혜 — 흐르며 꿰뚫어보는 선천적 통찰` : `The wisdom contained in ${dayMasterKo} — Innate flowing insight that sees through situations`,
     };
 
-    innateTitle = innateTitleMap[innateElem] || (isKO ? `${dayMasterKo}이 빚어낸 타고난 기질` : `Innate Temperament Crafted by ${dayMasterKo}`);
+    categoryTitle = innateTitleMap[innateElem] || (isKO ? `${dayMasterKo}이 빚어낸 타고난 기질` : `Innate Temperament Crafted by ${dayMasterKo}`);
 
-    // 기존 삼각편대 조립
-    const p1 = isKO
-      ? (STEM_PERSONALITIES[dayStem] ? `당신의 ${dayStem}(${dayMasterKo}) 일간은 **${STEM_PERSONALITIES[dayStem].coreIdentity}**\n${STEM_PERSONALITIES[dayStem].innateDesire}` : `**당신의 일간 ${dayStem}의 기운이 삶의 모든 방향을 결정하는 핵심 축이 됩니다.**`)
-      : (STEM_INFO_EN[dayStem] ? `Your Day Master ${dayStem}(${dayMasterKo}) is **${STEM_INFO_EN[dayStem].coreIdentity}**\n${STEM_INFO_EN[dayStem].innateDesire}` : `**Your Day Master ${dayStem} serves as the core axis deciding all directions of your life.**`);
-
-    const p2 = isKO
-      ? (monthPillar && TEN_GOD_POSITION_EFFECTS[computeTenGodLocal(dayStem, monthStem, true)]?.monthly
-        ? `여기에 월간 ${monthStem}(${isKO ? (STEM_PERSONALITIES[monthStem]?.koName || monthStem) : (STEM_EN_NAMES[monthStem] || monthStem)})의 ${computeTenGodLocal(dayStem, monthStem, true)} 기운이 겹쳐집니다.\n**${TEN_GOD_POSITION_EFFECTS[computeTenGodLocal(dayStem, monthStem, true)].monthly}**`
-        : '')
-      : (monthPillar && TG_POSITION_EFFECTS_EN[computeTenGodLocal(dayStem, monthStem, true)]
-        ? `Here, the ${TEN_GOD_EN_NAMES[computeTenGodLocal(dayStem, monthStem, true)] || computeTenGodLocal(dayStem, monthStem, true)} energy of Month Stem ${monthStem}(${isKO ? (STEM_PERSONALITIES[monthStem]?.koName || monthStem) : (STEM_EN_NAMES[monthStem] || monthStem)}) overlays.\n**${TG_POSITION_EFFECTS_EN[computeTenGodLocal(dayStem, monthStem, true)].monthly}**`
-        : '');
-
-    const p3 = isKO
-      ? (yearPillar && TEN_GOD_POSITION_EFFECTS[computeTenGodLocal(dayStem, yearStem, true)]?.yearly
-        ? `조상과 초년의 기질로 자리 잡은 년간 ${yearStem}(${isKO ? (STEM_PERSONALITIES[yearStem]?.koName || yearStem) : (STEM_EN_NAMES[yearStem] || yearStem)})의 ${computeTenGodLocal(dayStem, yearStem, true)}은\n**${TEN_GOD_POSITION_EFFECTS[computeTenGodLocal(dayStem, yearStem, true)].yearly}**`
-        : '')
-      : (yearPillar && TG_POSITION_EFFECTS_EN[computeTenGodLocal(dayStem, yearStem, true)]
-        ? `The ${TEN_GOD_EN_NAMES[computeTenGodLocal(dayStem, yearStem, true)] || computeTenGodLocal(dayStem, yearStem, true)} of Year Stem ${yearStem}(${isKO ? (STEM_PERSONALITIES[yearStem]?.koName || yearStem) : (STEM_EN_NAMES[yearStem] || yearStem)}), representing your ancestors and early years,\n**${TG_POSITION_EFFECTS_EN[computeTenGodLocal(dayStem, yearStem, true)].yearly}**`
-        : '');
-
-    const p4 = isKO
-      ? (BRANCH_PERSONALITIES[dayBranch] ? `일지 ${dayBranch}(${isKO ? (BRANCH_PERSONALITIES[dayBranch]?.koName || dayBranch) : (BRANCH_EN_NAMES[dayBranch] || dayBranch)})은 귀하의 가장 내밀한 내면의 분위기를 이룹니다.\n**${BRANCH_PERSONALITIES[dayBranch].hiddenStruggle}**\n또한 ${BRANCH_PERSONALITIES[dayBranch].behavioralTrigger}` : '')
-      : (BRANCH_INFO_EN[dayBranch] ? `The Day Branch ${dayBranch}(${isKO ? (BRANCH_PERSONALITIES[dayBranch]?.koName || dayBranch) : (BRANCH_EN_NAMES[dayBranch] || dayBranch)}) forms the most private atmosphere of your inner self.\n**${BRANCH_INFO_EN[dayBranch].hiddenStruggle}**\nAlso, it triggers when ${BRANCH_INFO_EN[dayBranch].behavioralTrigger}` : '');
-
-    const p5 = isKO
-      ? (STEM_PERSONALITIES[dayStem] ? `이 기운들이 합쳐질 때 귀하에게는 뚜렷한 이중성이 나타납니다.\n**${STEM_PERSONALITIES[dayStem].strengthInSociety}**\n반면 ${STEM_PERSONALITIES[dayStem].shadowSide}` : '')
-      : (STEM_INFO_EN[dayStem] ? `When these energies combine, a distinct duality emerges within you.\n**${STEM_INFO_EN[dayStem].strengthInSociety}**\nOn the other hand, ${STEM_INFO_EN[dayStem].shadowSide}` : '');
-
-    innateDesc = [p1, p2, p3, p4, p5].filter(s => s.trim().length > 0).join('\n\n');
-    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
+    categoryDesc = isKO
+      ? (STEM_PERSONALITIES[dayStem] ? `당신에게는 일간을 둘러싼 성분들이 조화를 이루며 독특한 이중성과 균형을 보여줍니다. **${STEM_PERSONALITIES[dayStem].strengthInSociety}** 반면 때로는 **${STEM_PERSONALITIES[dayStem].shadowSide}**` : '')
+      : (STEM_INFO_EN[dayStem] ? `A distinct duality and balance emerge from the surrounding elements around your Day Master. **${STEM_INFO_EN[dayStem].strengthInSociety}** On the other hand, **${STEM_INFO_EN[dayStem].shadowSide}**` : '');
 
     innatePillars = [
       { pillarTitle: 'Day',   type: 'branch' as const },
@@ -1146,6 +1137,29 @@ export function generatePersonalizedTexts(
       innatePillars.push({ pillarTitle: 'Year', type: 'stem' as const });
     }
   }
+
+  const categorySection = isKO
+    ? `**[🧬 기질의 구조적 지향성: ${categoryTitle}]**\n\n${categoryDesc}`
+    : `**[🧬 Structural Focus: ${categoryTitle}]**\n\n${categoryDesc}`;
+
+  let traitsSection = '';
+  if (traitScores && traitScores.length >= 2) {
+    const top1 = traitScores[0];
+    const top2 = traitScores[1];
+    
+    const explanation1Ko = getTraitDetailText(top1.key, top1.score, 'KO');
+    const explanation2Ko = getTraitDetailText(top2.key, top2.score, 'KO');
+    
+    const explanation1En = getTraitDetailText(top1.key, top1.score, 'EN');
+    const explanation2En = getTraitDetailText(top2.key, top2.score, 'EN');
+
+    traitsSection = isKO
+      ? `**[📊 기질적 강점과 잠재력 분석]**\n\n귀하의 잠재력 지표 중 가장 강력하게 작용하는 핵심 무기는 **${top1.name}(${top1.score}점)**과 **${top2.name}(${top2.score}점)**입니다. 귀하는 ${explanation1Ko} 또한 ${explanation2Ko} 이러한 지표들이 결합할 때 귀하만의 고유한 기질적 본질이 삶과 사회 무대에서 폭발적인 성공 가능성으로 발현됩니다.`
+      : `**[📊 Cosmic Weapon & Potential Analysis]**\n\nSpecifically, the strongest potential traits in your profile are **${top1.name} (${top1.score} points)** and **${top2.name} (${top2.score} points)**. You are someone who, ${explanation1En} and also ${explanation2En} When these qualities align, they form your ultimate cosmic weapon, translating your inner potential into outstanding reality.`;
+  }
+
+  innateTitle = categoryTitle;
+  innateDesc = `${pillarTemperamentDesc}\n\n─────────────────────────────────────────────\n\n${categorySection}\n\n─────────────────────────────────────────────\n\n${traitsSection}`;
 
   // ─────────────────────────────────────────────
   // 2. [살아가는 방식] 연산 및 텍스트 구성
