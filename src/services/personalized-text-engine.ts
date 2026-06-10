@@ -860,7 +860,8 @@ function findPenetrationDetails(
         descKo += `\n\n- **${tg}의 투출 성향**: ${tenGodPenetrationKo[tg]}`;
       }
       if (tenGodPenetrationEn[tg]) {
-        descEn += `\n\n- **Projected ${tg} Trait**: ${tenGodPenetrationEn[tg]}`;
+        const tgEn = TEN_GOD_EN_NAMES[tg] || tg;
+        descEn += `\n\n- **Projected ${tgEn} Trait**: ${tenGodPenetrationEn[tg]}`;
       }
     });
   }
@@ -1063,7 +1064,7 @@ export function generatePersonalizedTexts(
     innateDesc = isKO
       ? `당신의 명식은 지지에 **${hapNet.koName}**의 결합을 완성하고, 그 강한 기운이 천간 **${hapNet.type}** 오행으로 분출되어 투간된 매우 비범한 구조입니다. 이는 에너지가 한곳으로 집중되어 강력한 돌파력과 확실한 정체성을 발휘함을 의미합니다. 혼란 속에서도 명확한 지향점을 스스로 설정하고 이끌어갈 수 있는 선천적 리더십과 추진력이 탑재되어 있습니다.`
       : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your core drive is highly focused, granting you unyielding determination and a clear sense of identity. You are naturally equipped with the pioneering leadership to define your own path and command situations even amidst chaos.`;
-    innateDesc += traitsSuffixKo;
+    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = hapNet.keyPillars;
   } else if (overload) {
     // 2순위: 특정 성분 도배
@@ -1073,7 +1074,7 @@ export function generatePersonalizedTexts(
     innateDesc = isKO
       ? `귀하의 사주는 **${overload.nameKo}** 기운이 3개 이상 포진하여, 해당 에너지가 성격과 행동 양식을 강력하게 지배하고 있습니다. 이는 남들과 구별되는 극대화된 개성과 독창적인 무기를 의미합니다. 스스로의 확고한 주도권과 전문 영역을 확보할 때 이 쏠린 에너지는 폭발적인 창조력으로 승화됩니다.`
       : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to strongly dictate your behavior and character. This marks you as an individual of extreme color and distinct talent. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an explosive creative force.`;
-    innateDesc += traitsSuffixKo;
+    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
     // 3순위: 비겁의 뿌리 세포
@@ -1083,7 +1084,7 @@ export function generatePersonalizedTexts(
     innateDesc = isKO
       ? `귀하의 명식은 비록 강한 쏠림은 없으나, 지지에 일간의 든든한 동료이자 힘이 되어주는 비겁(뿌리) 글자들이 2개 이상 포진하고 있습니다. 이는 외부 환경에 쉽게 흔들리지 않고 스스로 중심을 잡는 '자아의 뿌리 세포'가 매우 튼튼함을 의미합니다. 실패를 겪어도 오뚝이처럼 일어나는 복원력과 주체성이 귀하의 근본 강점입니다.`
       : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a highly resilient "ego root system" that keeps you anchored through any external turbulence. Your fundamental strength lies in your autonomous recovery power and self-reliance, rising like a phoenix from any setback.`;
-    innateDesc += traitsSuffixKo;
+    innateDesc += isKO ? traitsSuffixKo : traitsSuffixEn;
     innatePillars = siblingRoot.keyPillars;
   } else {
     // 4순위: 일간 중심 삼각편대 (Default)
@@ -1379,7 +1380,7 @@ export function generatePersonalizedTexts(
 
   const getPipelineByDayStem = (stem: string, engineType: WealthEngineType): string => {
     // 일간별 고유 적성과 격국 유형을 결합한 현대적 파이프라인 추천
-    const pipelineMap: Record<string, Record<WealthEngineType, string>> = {
+    const pipelineMapKo: Record<string, Record<WealthEngineType, string>> = {
       '甲': {
         EXPLOSIVE:   '대규모 부동산 개발·분양, 숲·생태 관련 ESG 펀드, 타이밍 기반 부동산 레버리지 투자',
         CIRCULATION: '롱폼 콘텐츠 창작(유튜브·책·강의), 목재·자연 소재 제조업, 스타트업 창업자',
@@ -1453,7 +1454,7 @@ export function generatePersonalizedTexts(
         SELFMADE:    '1인 스타일리스트·이미지 컨설턴트, 독립 디자이너, 프리랜서 에디터',
       },
       '壬': {
-        EXPLOSIVE:   '해외 투자·글로벌 펀드, 무역·물류 대규모 레버리지, 핀테크·블록체인 스타트업 투자',
+        EXPLOSIVE:   '해외 투자·글로벌 펀드, 무역·물류 대규모 레버리지, 핀테크·블록체임 스타트업 투자',
         CIRCULATION: '무역·수출입 에이전시, 글로벌 플랫폼 비즈니스, 물류·유통 중개 서비스',
         SYSTEM:      '무역 법인·수출입 회사, 글로벌 B2B 플랫폼 운영, 해운·물류 법인',
         IP:          '무역 노하우 컨설팅 저작권, 글로벌 SaaS·솔루션 라이선싱, 물류 기술 특허',
@@ -1471,8 +1472,105 @@ export function generatePersonalizedTexts(
         SELFMADE:    '1인 데이터 분석가, 독립 교육 강사, 프리랜서 카피라이터·편집자',
       },
     };
+
+    const pipelineMapEn: Record<string, Record<WealthEngineType, string>> = {
+      '甲': {
+        EXPLOSIVE:   'Large-scale Property Development, ESG Forestry/Ecology Funds, Timing Real Estate Leverage',
+        CIRCULATION: 'Long-form Content Creation, Wood/Natural Material Manufacturing, Startup Founder',
+        SYSTEM:      'Corporate CEO Position, Forestry/Environmental Business Licensing, Platform Franchise Headquarters',
+        IP:          'Publishing/Copyright Agency, Brand Trademark Licensing, Content IP Development Studio',
+        SHIELD:      'Single-member Corp Sole Contract, 100% Sole Ownership Business, Premium Nature-based Service',
+        ARTISAN:     'Master Woodworker/Sculptor, Independent Book Publishing, Screenplay/Novel Writing',
+        SELFMADE:    'Freelance Planner/Producer, Independent Agency Operation, Lecture Creator',
+      },
+      '乙': {
+        EXPLOSIVE:   'Small-scale Flower Market Leverage, Small Property Auction, Beauty/Wellness Brand Launch',
+        CIRCULATION: 'Beauty/Lifestyle Content Creator, Online Floral/Gardening Shop, Handmade Craft Art Shop',
+        SYSTEM:      'Beauty/Healthcare Franchise, SME CFO/Financial Partner, Reselling Platform Distribution',
+        IP:          'Handicraft/Pattern Design Copyright, Beauty Recipe Licensing, Handmade Brand Trademark',
+        SHIELD:      'Small Premium Atelier Operation, Private Studio Membership, Income-generating Small Rental',
+        ARTISAN:     'Florist/Fashion Designer, Interior Props Artist, Independent Illustrator',
+        SELFMADE:    'Sole Stylist/Beauty Consultant, Social Seller, Handmade Artist',
+      },
+      '丙': {
+        EXPLOSIVE:   'Media/Entertainment Investment, Solar/Renewable Energy Funds, Hot-issue Brand Launch Investment',
+        CIRCULATION: 'Brand PR Marketer, YouTube/Influencer Media Channel, Event/Performance Planning Agency',
+        SYSTEM:      'Media Corp/MCN Establishment, Large Event Agency, Public Agency PR/Advertising Bidding',
+        IP:          'Brand Character/IP Licensing, Music/Video Copyright Agency, Celeb/Influencer Trademark',
+        SHIELD:      'Personal Brand Independent Agency, Celebrity Exclusive Management, Solo Media Corporation',
+        ARTISAN:     'Film/Music Video Director, Independent Music Producer, Stage Lighting/Production Director',
+        SELFMADE:    'YouTuber/Podcaster, Solo Advertising Agency, Event MC/Speaker',
+      },
+      '丁': {
+        EXPLOSIVE:   'Art/Craft Auction Investment, Edtech Platform Equity Investment, Small-scale Rental Leverage',
+        CIRCULATION: 'Art/Craft Digital Content, Counseling/Coaching Programs, Traditional Skill Online Lectures',
+        SYSTEM:      'Counseling Center Corporate Operation, Academy/Educational Franchise, Professional License-based Office',
+        IP:          'Traditional Craft/Recipe Copyright, Psychological Counseling Content Licensing, Art NFT Creation',
+        SHIELD:      'Exclusive Contract Independent Counselor, Small Workshop Sole Operation, Subscription Mentorship',
+        ARTISAN:     'Traditional Craft Artisan, Painter/Calligrapher, Meditation/Healing Content Creator',
+        SELFMADE:    'Sole Coach/Counselor, Independent Academy Lecturer, Art Curator',
+      },
+      '戊': {
+        EXPLOSIVE:   'Large-scale Property Development Leverage, Construction/Infrastructure PF Investment, Logistics Warehouse Rental',
+        CIRCULATION: 'Real Estate Brokerage/Rental Management, Construction/Interior Contracting, Agriculture/Food Distribution',
+        SYSTEM:      'Real Estate Corporation, Large Construction Subcontracting, Real Estate Developer',
+        IP:          'Land/Construction Patents, Real Estate Data/Solution SaaS, Interior Design Copyright',
+        SHIELD:      'Sole Corporate Land Ownership, Private Real Estate Portfolio Management, Premium Warehousing/Logistics',
+        ARTISAN:     'Traditional Architecture/Stonemason Master, Landscaping Specialist, Earth/Natural Material Artwork',
+        SELFMADE:    'Independent Construction Site Management, Real Estate Consultant, Sole Interior Contractor',
+      },
+      '己': {
+        EXPLOSIVE:   'Farmland/Rural Home Leverage, Food/Healthcare Brand Launch, Small Real Estate Auction',
+        CIRCULATION: 'Food/Beverage Business, Daily Supplies/Beauty D2C Brand, Agriculture/Gardening Distribution',
+        SYSTEM:      'Food Franchise Franchising, SME Operations Manager, Public Procurement/Food Ingredients Supply',
+        IP:          'Recipe/Food Patents, Agricultural Technology Licensing, Lifestyle Brand Trademark',
+        SHIELD:      'Private Restaurant/Cafe Sole Operation, Family Business Sole Ownership, Small Farm Direct Trade',
+        ARTISAN:     'Traditional Fermented Food/Pottery Artisan, Garden Designer, Korean Cuisine Chef',
+        SELFMADE:    'Sole Food Business Founder, Independent Food Distributor, Small-scale Catering',
+      },
+      '庚': {
+        EXPLOSIVE:   'Stock/Commodity Leverage Investment, Large Manufacturing Facility Investment, Metal/Mineral Futures Trading',
+        CIRCULATION: 'Manufacturing/Machinery Parts Production, Professional Law/Tax Services, Consulting Agency',
+        SYSTEM:      'Manufacturing Corp/Factory Establishment, Law/Patent Firm, Large B2B Supply Contracts',
+        IP:          'Manufacturing Process Patents, Legal/Consulting Methodology Copyright, Technology Licensing',
+        SHIELD:      'Solo Corp Exclusive Contract, Professional Sole Practice, Machinery Rental',
+        ARTISAN:     'Metal Craft/Blade Master, Independent Sculptor, Mold/Precision Manufacturing Specialist',
+        SELFMADE:    'Freelance Consultant/Advisor, Solo Manufacturing Workshop, Independent Law/Tax Office',
+      },
+      '辛': {
+        EXPLOSIVE:   'Precious Metal/Gemstone Leverage, Luxury/High-end Brand Investment, Patent Auction/M&A Investment',
+        CIRCULATION: 'Jewelry/Luxury Reselling, Professional Consulting, Personal Branding/Image Consulting',
+        SYSTEM:      'Luxury Distribution Corp, Professional License-based Franchise, Hair/Beauty Corporate Chain',
+        IP:          'Design/Fashion Patents, Beauty Formula Licensing, Professional Brand Trademark Trade',
+        SHIELD:      'High-end Sole Professional Service, Private Salon/Clinic',
+        ARTISAN:     'Jewelry Craftsman/Designer, Perfumer, Precision Craft Master',
+        SELFMADE:    'Sole Stylist/Image Consultant, Independent Designer, Freelance Editor',
+      },
+      '壬': {
+        EXPLOSIVE:   'Overseas/Global Fund Investment, Large-scale Trade/Logistics Leverage, Fintech/Blockchain Startup Investment',
+        CIRCULATION: 'Trade/Import-Export Agency, Global Platform Business, Logistics/Distribution Brokerage',
+        SYSTEM:      'Trade Corp/Import-Export Company, Global B2B Platform Operations, Shipping/Logistics Corp',
+        IP:          'Trade Know-how Consulting Copyright, Global SaaS/Solutions Licensing, Logistics Technology Patents',
+        SHIELD:      'Private Trade Independent Agency, Sole Online Seller Account, Global Sole Business',
+        ARTISAN:     'Ocean/Underwater Artwork, Independent Documentary Director, Global Travel Content Creator',
+        SELFMADE:    'Sole Trade Business, Independent Global Consultant, Online Importer-Exporter Seller',
+      },
+      '癸': {
+        EXPLOSIVE:   'Small Fund/ETF Leverage, Info/Data-based Startup Investment, Edtech Platform Investment',
+        CIRCULATION: 'Data Analysis/Research Service, Online Education Platform, Counseling/Coaching Content',
+        SYSTEM:      'Information Service Corp, Educational Institution Operation, B2B Data Solution Contract',
+        IP:          'Research/Study Copyright, Dataset Licensing, Psychological Test/Educational Content IP',
+        SHIELD:      'Sole Researcher/Analyst Operation, Subscription Newsletter/Reports, Private Institute',
+        ARTISAN:     'Independent Writer/Poet, Art Therapist, Archive/Curator',
+        SELFMADE:    'Sole Data Analyst, Independent Educational Instructor, Freelance Copywriter/Editor',
+      },
+    };
+
+    const pipelineMap = isKO ? pipelineMapKo : pipelineMapEn;
     return pipelineMap[stem]?.[engineType] ||
-      '전문 기술직 프리랜서, 콘텐츠 기반 1인 비즈니스, 전문 컨설팅 서비스';
+      (isKO 
+        ? '전문 기술직 프리랜서, 콘텐츠 기반 1인 비즈니스, 전문 컨설팅 서비스'
+        : 'Specialized Freelancing, Content-based Solo Business, Professional Consulting');
   };
 
   if (hasExplosiveTrigger) {

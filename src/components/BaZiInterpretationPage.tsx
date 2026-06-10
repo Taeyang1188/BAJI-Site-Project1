@@ -10,7 +10,7 @@ import { generateBaziInterpretation, BaziInterpretationData } from '../services/
 import { useTheme } from '../contexts/ThemeContext';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
-import { compressPayload } from '../services/share-compress-service';
+import { compressToShortId } from '../services/share-compress-service';
 
 interface BaZiInterpretationPageProps {
   result: BaZiResult;
@@ -20,6 +20,8 @@ interface BaZiInterpretationPageProps {
   onBack: () => void;
   isSharedView?: boolean;
   onStartAnalysis?: () => void;
+  skipLoading?: boolean;
+  onLoadingComplete?: () => void;
 }
 
 const ELEMENT_STYLES = {
@@ -43,6 +45,28 @@ const ZODIAC_EMOJIS: Record<string, string> = {
   '午': '🐴', '未': '🐑', '申': '🐵', '酉': '🐔', '戌': '🐶', '亥': '🐷'
 };
 
+const formatKeyPillarsEn = (keyPillars: { pillarTitle: string; type: 'stem' | 'branch' }[]) => {
+  const stems = keyPillars.filter(kp => kp.type === 'stem').map(kp => kp.pillarTitle);
+  const branches = keyPillars.filter(kp => kp.type === 'branch').map(kp => kp.pillarTitle);
+  
+  const parts: string[] = [];
+  if (stems.length > 0) {
+    if (stems.length === 1) {
+      parts.push(`${stems[0]} Stem`);
+    } else {
+      parts.push(`${stems.join(', ')} Stems`);
+    }
+  }
+  if (branches.length > 0) {
+    if (branches.length === 1) {
+      parts.push(`${branches[0]} Branch`);
+    } else {
+      parts.push(`${branches.join(', ')} Branches`);
+    }
+  }
+  return parts.join(' · ');
+};
+
 export default function BaZiInterpretationPage({
   result,
   lang,
@@ -50,7 +74,9 @@ export default function BaZiInterpretationPage({
   coords,
   onBack,
   isSharedView = false,
-  onStartAnalysis
+  onStartAnalysis,
+  skipLoading = false,
+  onLoadingComplete
 }: BaZiInterpretationPageProps) {
   const { theme } = useTheme();
   const isLight = theme === 'light';
@@ -60,24 +86,26 @@ export default function BaZiInterpretationPage({
   const pinkColor = isLight ? '#E11D48' : '#FF2A6D';
   const purpleColor = isLight ? '#7C3AED' : '#9B30FF';
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [activeStep, setActiveStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(!skipLoading);
+  const [progress, setProgress] = useState(skipLoading ? 100 : 0);
+  const [activeStep, setActiveStep] = useState(skipLoading ? 7 : 0);
 
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'error'>('idle');
 
   const handleShare = async () => {
     const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.I.D)';
+    const cleanTitle = data.profile.title.startsWith('[')
+      ? data.profile.title.slice(1).replace(']', ':')
+      : data.profile.title;
     const text = lang === 'KO' 
-      ? `내 사주로 분석한 영혼의 소울 테마는 [${data.profile.title}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
-      : `My soul profile theme analyzed from my BaZi is [${data.profile.title}]! Open your cosmic core energy and lucky features now 🌌`;
+      ? `내 사주로 분석한 영혼의 소울 테마는 [${cleanTitle}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
+      : `My soul profile theme analyzed from my BaZi is [${cleanTitle}]! Open your cosmic core energy and lucky features now 🌌`;
     
     let url = window.location.href;
     if (userInput) {
       try {
-        const compressed = compressPayload(userInput, coords?.lat, coords?.lon);
-        const jsonStr = JSON.stringify(compressed);
-        const b64 = btoa(unescape(encodeURIComponent(jsonStr)))
+        const shortId = compressToShortId(userInput, coords?.lat, coords?.lon);
+        const b64 = btoa(unescape(encodeURIComponent(shortId)))
           .replace(/\+/g, '-')
           .replace(/\//g, '_')
           .replace(/=+$/, '');
@@ -175,6 +203,10 @@ export default function BaZiInterpretationPage({
 
   // Loading effect
   useEffect(() => {
+    if (skipLoading) {
+      onLoadingComplete?.();
+      return;
+    }
     let timer: number;
     let currentProgress = 0;
     let currentStep = 0; // 로컬 변수로 단계 추적 (state 의존성 제거)
@@ -184,7 +216,10 @@ export default function BaZiInterpretationPage({
       if (currentProgress >= 100) {
         currentProgress = 100;
         setProgress(100);
-        setTimeout(() => setIsLoading(false), 600); // 완료 후 여운 600ms
+        setTimeout(() => {
+          setIsLoading(false);
+          onLoadingComplete?.();
+        }, 600); // 완료 후 여운 600ms
       } else {
         setProgress(Math.floor(currentProgress));
 
@@ -201,7 +236,7 @@ export default function BaZiInterpretationPage({
 
     timer = window.setTimeout(tick, 50);
     return () => clearTimeout(timer);
-  }, [loadingSteps]); // 의존성 추가
+  }, [loadingSteps, skipLoading]);
 
   // Render loading screen
   if (isLoading) {
@@ -394,6 +429,28 @@ export default function BaZiInterpretationPage({
     );
   };
 
+  // [유형명] 설명 형식을 파싱: 유형명만 강조하는 렌더러
+  const renderTypeTitle = (title: string, accentColor?: string): React.ReactNode => {
+    // '[유형명] 설명텍스트' 또는 '유형명 — 설명' 형식 파싱
+    const bracketMatch = title.match(/^\[([^\]]+)\]\s*(.*)$/);
+    if (bracketMatch) {
+      const typeName = bracketMatch[1];
+      // 설명은 무시하고 유형명만 표시
+      return (
+        <span>
+          <span
+            className="font-black tracking-tight"
+            style={accentColor ? { color: accentColor } : {}}
+          >
+            {typeName}
+          </span>
+        </span>
+      );
+    }
+    // 대괄호 없는 경우 그대로 반환
+    return <span className="font-black">{title}</span>;
+  };
+
 
   // Loaded Content View
   return (
@@ -435,7 +492,7 @@ export default function BaZiInterpretationPage({
               ✦ {lang === 'KO' ? '당신을 정의하는 한 마디' : 'Your Cosmic Identity'}
             </span>
             <h2 className={`text-xl sm:text-2xl font-black leading-normal tracking-tight font-display ${isLight ? 'text-black' : 'text-white'}`}>
-              "{data.profile.title}"
+              {renderTypeTitle(data.profile.title)}
             </h2>
             <div className="w-12 h-1 bg-gradient-to-r from-neon-pink to-neon-cyan mx-auto rounded-full my-2" />
             <p className={`text-xs sm:text-sm max-w-xl mx-auto leading-relaxed ${isLight ? 'text-neutral-600' : 'text-white/60'}`}>
@@ -613,7 +670,7 @@ export default function BaZiInterpretationPage({
               <>
                 Your innate temperament is highly influenced by{' '}
                 <span className="font-bold" style={{ color: woodColor }}>
-                  {data.innateTemperament.keyPillars.map(kp => `${kp.pillarTitle} ${kp.type === 'stem' ? 'Stem' : 'Branch'}`).join(' · ')}
+                  {formatKeyPillarsEn(data.innateTemperament.keyPillars)}
                 </span>{' '}
                 among the 8 characters
               </>
@@ -659,7 +716,7 @@ export default function BaZiInterpretationPage({
 
           {/* 개인화 해설 */}
           <div className="goth-glass p-5 sm:p-7 rounded-3xl space-y-4" style={{ borderColor: `${woodColor}26` }}>
-            <h4 className="text-sm sm:text-base font-bold leading-snug" style={{ color: woodColor }}>{data.innateTemperament.title}</h4>
+            <h4 className="text-sm sm:text-base font-bold leading-snug" style={{ color: woodColor }}>{renderTypeTitle(data.innateTemperament.title, woodColor)}</h4>
             <div className="w-20 h-[1px]" style={{ backgroundColor: `${woodColor}4d` }}></div>
             {renderParagraphs(data.innateTemperament.description, woodColor)}
           </div>
@@ -700,7 +757,7 @@ export default function BaZiInterpretationPage({
               <>
                 Your way of living is highly influenced by{' '}
                 <span className="font-bold" style={{ color: cyanColor }}>
-                  {data.lifestylePattern.keyPillars.map(kp => `${kp.pillarTitle} ${kp.type === 'stem' ? 'Stem' : 'Branch'}`).join(' · ')}
+                  {formatKeyPillarsEn(data.lifestylePattern.keyPillars)}
                 </span>{' '}
                 among the 8 characters
               </>
@@ -745,7 +802,7 @@ export default function BaZiInterpretationPage({
           </div>
 
           <div className="goth-glass p-5 sm:p-7 rounded-3xl space-y-4" style={{ borderColor: `${cyanColor}26` }}>
-            <h4 className="text-sm sm:text-base font-bold leading-snug" style={{ color: cyanColor }}>{data.lifestylePattern.title}</h4>
+            <h4 className="text-sm sm:text-base font-bold leading-snug" style={{ color: cyanColor }}>{renderTypeTitle(data.lifestylePattern.title, cyanColor)}</h4>
             <div className="w-20 h-[1px]" style={{ backgroundColor: `${cyanColor}4d` }}></div>
             {renderParagraphs(data.lifestylePattern.description, cyanColor)}
           </div>
@@ -786,7 +843,7 @@ export default function BaZiInterpretationPage({
               <>
                 Your wealth flows and energy are strongly influenced by{' '}
                 <span className="font-bold" style={{ color: purpleColor }}>
-                  {data.wealthFlow.keyPillars.map(kp => `${kp.pillarTitle} ${kp.type === 'stem' ? 'Stem' : 'Branch'}`).join(' · ')}
+                  {formatKeyPillarsEn(data.wealthFlow.keyPillars)}
                 </span>
               </>
             )}
@@ -841,7 +898,7 @@ export default function BaZiInterpretationPage({
                 </span>
               </div>
               <h4 className={`text-lg sm:text-xl font-black leading-snug tracking-tight font-display ${isLight ? 'text-black' : 'text-white'}`}>
-                {data.wealthFlow.typeTitle}
+                {renderTypeTitle(data.wealthFlow.typeTitle, purpleColor)}
               </h4>
               <div className="w-full h-[1px]" style={{ backgroundImage: `linear-gradient(to right, ${purpleColor}4d, transparent)` }}></div>
               <p className={`text-xs sm:text-sm leading-relaxed ${isLight ? 'text-neutral-600' : 'text-white/60'}`}>
@@ -1039,7 +1096,7 @@ export default function BaZiInterpretationPage({
                     {lang === 'KO' ? '시그니처 패턴' : 'Signature Pattern'}
                   </span>
                   <h4 className={`text-sm sm:text-base font-black leading-snug ${isLight ? 'text-black' : 'text-white'}`}>
-                    {data.realWorldPattern.title}
+                    {renderTypeTitle(data.realWorldPattern.title, pinkColor)}
                   </h4>
                 </div>
               </div>
