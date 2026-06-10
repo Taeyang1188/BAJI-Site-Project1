@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Award, Compass, Heart, AlertCircle, Shield,
   User, Landmark, Calendar, Activity, Zap, Check,
-  ArrowLeft, Gem, Briefcase, Eye, ThumbsUp, RefreshCw, Share2
+  ArrowLeft, Gem, Briefcase, Eye, ThumbsUp, RefreshCw, Share2,
+  Search, TrendingUp
 } from 'lucide-react';
 import { BaZiResult, UserInput, Language } from '../types';
 import { generateBaziInterpretation, BaziInterpretationData } from '../services/bazi-interpretation-service';
@@ -423,17 +424,81 @@ export default function BaZiInterpretationPage({
     const p1Class = isLight ? 'text-black/85' : 'text-white/85';
     const pNClass = isLight ? 'text-black/70' : 'text-white/70';
     return (
-      <div className="space-y-3 font-sans">
-        {description.split('\n\n').map((para, pi) => (
-          <p key={pi} className={`text-xs sm:text-sm leading-relaxed ${pi === 0 ? p1Class : pNClass}`}>
-            {para.split('\n').map((line, li, arr) => (
-              <span key={li}>
-                {parseHighlighted(line)}
-                {li < arr.length - 1 && <br />}
-              </span>
-            ))}
-          </p>
-        ))}
+      <div className="space-y-4 font-sans">
+        {description.split('\n\n').map((para, pi) => {
+          const trimmed = para.trim();
+          
+          // Check if it's a section header
+          // Format is like: **[🔍 기둥별 타고난 기질 해설]** or **[🧬 기질의 구조적 지향성: ...]**
+          const headerMatch = trimmed.match(/^\*\*\[(🔍|🧬|📊)\s*([^\]]+)\]\*\*/);
+          
+          if (headerMatch) {
+            const emoji = headerMatch[1];
+            const titleText = headerMatch[2];
+            
+            // Map emoji to styled Lucide Icons or custom glowing badges
+            let icon: React.ReactNode = null;
+            const themeColor = accentColor || '#9B30FF'; // default to purple
+            
+            if (emoji === '🔍') {
+              icon = <Search className="w-4 h-4" style={{ color: themeColor }} />;
+            } else if (emoji === '🧬') {
+              icon = <Activity className="w-4 h-4" style={{ color: themeColor }} />;
+            } else if (emoji === '📊') {
+              icon = <TrendingUp className="w-4 h-4" style={{ color: themeColor }} />;
+            }
+
+            return (
+              <div 
+                key={pi} 
+                className={`flex items-center gap-3 py-2 px-3 rounded-xl border ${
+                  isLight 
+                    ? 'bg-black/[0.02] border-black/5 shadow-sm' 
+                    : 'bg-white/[0.02] border-white/5 shadow-[0_0_15px_rgba(255,255,255,0.01)]'
+                } mt-4 mb-2`}
+              >
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                  isLight ? 'bg-black/5' : 'bg-white/5'
+                }`}>
+                  {icon}
+                </div>
+                <h4 
+                  className={`text-xs sm:text-sm font-black tracking-wider uppercase ${
+                    isLight ? 'text-neutral-800' : 'text-white'
+                  }`}
+                >
+                  {titleText}
+                </h4>
+                <div className="h-[1px] flex-1 bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${themeColor}30, transparent)` }}></div>
+              </div>
+            );
+          }
+
+          // Check if it's a simple divider line like "─────────────────────────────────────────────"
+          if (trimmed.includes('───')) {
+            return (
+              <div key={pi} className="py-2">
+                <div className={`h-[1px] w-full bg-gradient-to-r ${
+                  isLight 
+                    ? 'from-transparent via-black/10 to-transparent' 
+                    : 'from-transparent via-white/10 to-transparent'
+                }`} />
+              </div>
+            );
+          }
+
+          // Default paragraph rendering
+          return (
+            <p key={pi} className={`text-xs sm:text-sm leading-relaxed ${pi === 0 ? p1Class : pNClass}`}>
+              {para.split('\n').map((line, li, arr) => (
+                <span key={li}>
+                  {parseHighlighted(line)}
+                  {li < arr.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          );
+        })}
       </div>
     );
   };
