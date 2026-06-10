@@ -94,9 +94,18 @@ export default function BaZiInterpretationPage({
 
   const handleShare = async () => {
     const title = lang === 'KO' ? '나의 소울 프로필 (V.O.I.D)' : 'My Soul Profile (V.O.I.D)';
-    const cleanTitle = data.profile.title.startsWith('[')
-      ? data.profile.title.slice(1).replace(']', ':')
-      : data.profile.title;
+    
+    // Extract clean title inside single quotes if present
+    const quoteMatch = data.profile.title.match(/'([^']+)'/);
+    let cleanTitle = data.profile.title;
+    if (quoteMatch) {
+      const typeName = quoteMatch[1];
+      const suffix = lang === 'KO' ? ' 유형' : ' Type';
+      cleanTitle = `'${typeName}'${suffix}`;
+    } else if (data.profile.title.startsWith('[')) {
+      cleanTitle = data.profile.title.slice(1).replace(']', ':');
+    }
+
     const text = lang === 'KO' 
       ? `내 사주로 분석한 영혼의 소울 테마는 [${cleanTitle}]야! 네 우주의 중심 에너지와 행운의 요소를 지금 열어봐 🌌`
       : `My soul profile theme analyzed from my BaZi is [${cleanTitle}]! Open your cosmic core energy and lucky features now 🌌`;
@@ -431,7 +440,27 @@ export default function BaZiInterpretationPage({
 
   // [유형명] 설명 형식을 파싱: 유형명만 강조하는 렌더러
   const renderTypeTitle = (title: string, accentColor?: string): React.ReactNode => {
-    // '[유형명] 설명텍스트' 또는 '유형명 — 설명' 형식 파싱
+    // 1. Single quote pattern (for main profile titles, e.g. "그 어떤 비바람에도 흔들리지 않고 독고다이로 돌파하는 '강인한 개척자' 유형")
+    const quoteMatch = title.match(/'([^']+)'/);
+    if (quoteMatch) {
+      const typeName = quoteMatch[1];
+      const suffix = lang === 'KO' ? ' 유형' : ' Type';
+      return (
+        <span>
+          <span
+            className="font-black tracking-tight"
+            style={accentColor ? { color: accentColor } : {}}
+          >
+            {`'${typeName}'`}
+          </span>
+          <span className={`font-medium text-[0.8em] ml-1 ${isLight ? 'text-black/50' : 'text-white/50'}`}>
+            {suffix}
+          </span>
+        </span>
+      );
+    }
+
+    // 2. Bracket pattern (for section sub-type titles like "[군비쟁재 리스크관리형] ...")
     const bracketMatch = title.match(/^\[([^\]]+)\]\s*(.*)$/);
     if (bracketMatch) {
       const typeName = bracketMatch[1];
@@ -448,7 +477,7 @@ export default function BaZiInterpretationPage({
       );
     }
     // 대괄호 없는 경우 그대로 반환
-    return <span className="font-black">{title}</span>;
+    return <span className="font-black" style={accentColor ? { color: accentColor } : {}}>{title}</span>;
   };
 
 
