@@ -910,13 +910,13 @@ function findClashHyeongDetails(
         let customKo = '';
         let customEn = '';
         if ((val1 === '子' && val2 === '午') || (val1 === '午' && val2 === '子') || (val1 === '巳' && val2 === '亥') || (val1 === '亥' && val2 === '巳')) {
-          customKo = '지지의 물(水)과 불(火)이 격렬하게 충돌하며 감정과 이성 사이의 심한 조율 장애(온도 차)를 일으킵니다. 순간적인 강한 동기나 감정으로 열정을 급격히 피워 올렸다가도, 어느 순간 차갑게 식어 냉담해지는 변덕(모순점)이 보입니다. 대인관계에서도 극적 몰입과 단호한 단절을 오가기 쉽습니다.';
+          customKo = '지지의 물(水)과 불(火)이 격렬하게 충돌하며 **감정과 이성 사이의 심한 온도 차이**를 일으킵니다. 실제 삶에서 **순간적인 열정으로 번개처럼 몰입**했다가도, 어느 순간 차갑게 식어 냉담해져 버리는 **강한 행동적 모순점**이 도드라집니다. 대인관계 역시 **극적인 감정 표현**과 **단호한 침묵/단절**의 양극단을 오가는 패턴이 반복되기 쉽습니다.';
           customEn = 'The collision of Water and Fire in your branches creates a sharp oscillation between rational coldness and emotional passion. You might work with explosive energy, only to shut down and isolate yourself without warning, creating an emotional rollercoaster that puzzles those around you.';
         } else if ((val1 === '寅' && val2 === '申') || (val1 === '申' && val2 === '寅') || (val1 === '卯' && val2 === '酉') || (val1 === '酉' && val2 === '卯')) {
-          customKo = '지지의 금(Metal)과 목(Wood)의 충돌로 인해 돌진하려는 본능과 억제하려는 규율이 매 순간 부딪힙니다. 무언가 의욕적으로 시작해 보려고(목) 하면, 스스로 "이것이 완벽한가? 나에게 실효성이 있는가?"를 냉혹하게 자문(금)하여 자기검열에 걸려 스스로의 날개를 꺾어버리는 포기 습관(모순점)이 나타나기 쉽습니다.';
+          customKo = '지지의 금(Metal)과 목(Wood)의 결합으로 **시작하는 추진력과 끊어내는 자기검열이 정면 충돌**합니다. 새로운 일이나 프로젝트를 **의욕적으로 벌여놓고도**, 스스로 **"이게 정말 가치 있고 완벽한가?" 하는 차갑고 비판적인 계산**에 휩싸여 주저앉게 됩니다. **시작은 창대했으나 중간에 스스로 검열해 손을 놓아버리는 행동 습관**을 주의해야 합니다.';
           customEn = 'The clash between Metal and Wood pits your pioneering, creative drive against strict self-censorship and rules. Whenever you feel excited to launch a new project, you might immediately scrutinize and doubt your own ability, resulting in self-sabotage or leaving tasks half-finished.';
         } else {
-          customKo = '지지의 토(Earth)들이 충돌하면서 내면의 가치관 신조들이 무겁게 요동칩니다. 평소에는 무덤덤하고 인내심 강하게 자리를 지키는 척하지만, 내면의 자존심이나 영역이 침범당하면 겉잡을 수 없이 고집스럽게 폭발하는 버릇을 내재합니다. 옛 일이나 해묵은 섭섭함을 마음에 오랫동안 묻어두고 꺼내며 괴로워하는 모순을 띱니다.';
+          customKo = '지지의 토(Earth)들이 서로 부딪히며 **내면의 신념과 자존심이 무겁게 요동치는 갈등**을 보입니다. 평소에는 **묵묵히 참고 인내심 깊게 인연이나 조직을 지탱**하는 듯 보이지만, 임계점을 넘어 **나의 사적 선이 침범당하면 걷잡을 수 없이 강박 어린 아집과 고집으로 폭발**합니다. 마음속 깊이 **오래된 서운함과 해묵은 감정 응어리를 품고 혼자 앓는 내면적 모순**을 의식해야 합니다.';
           customEn = 'The friction between Earth elements triggers a deep stubbornness and conflicts over core values. You usually present a steady, unmoving patience, but when a personal boundary or self-esteem is threatened, you might release an explosive, unyielding anger. You also tend to store past emotional grudges deeply, finding it hard to forgive.';
         }
 
@@ -937,15 +937,15 @@ function findClashHyeongDetails(
   const hasJaMyo = branchVals.includes('子') && branchVals.includes('卯');
 
   if (hasInSaSin) {
-    hyeongDescKo += `\n\n- **지지의 역동적 충돌(寅·巳·申 형살)**: 몸과 마음을 쉴 새 없이 바쁘게 몰아치며 효율을 고집하는 조급한 습관이 있습니다. 신속한 결단력을 발휘하지만, 속도를 중시하느라 사소한 절차적 누락을 내거나 주변 동료에게도 과도한 가속을 요구해 갈등(문제점)을 자초하기도 합니다.`;
+    hyeongDescKo += `\n\n- **지지의 역동적 충돌(寅·巳·申 형살)**: 가만히 있으면 도태될 것 같은 불안에 치여 **자신을 극도로 피로하고 급박하게 채찍질하며 속도에 집착하는 습관**이 있습니다. 해결사 노릇을 톡톡히 하지만, **과도한 효율성과 가속도를 곁의 동료에게도 강요**함으로써 **대인공간에서 불필요한 대립과 갈등을 스스로 유발하고 고립을 자초**하는 모순적 행동양식이 활성화됩니다.`;
     hyeongDescEn += `\n\n- **Dynamic Action Penalty (In-Sa-Sin Hyeong)**: The dynamic, fast-moving penalty (Hyeong) in your branches induces impatience and a low tolerance for inefficiency. You might rush processes to secure quick results, leading to oversight or creating friction by demanding the same speed from others.`;
   }
   if (hasChukSulMi) {
-    hyeongDescKo += `\n\n- **지지의 축적된 마찰(丑·戌·未 형살)**: 나만의 확고한 신조와 논리에 함몰되어 타인의 합리적인 비판이나 피드백을 수용하기 힘들어하는 고집스러운 모순이 보입니다. 가슴속에 답답함과 불편을 쌓아두다가 해소하지 못한 채 인간관계를 조용히 단절해 버리는 냉소적인 태도를 가지기 쉽습니다.`;
+    hyeongDescKo += `\n\n- **지지의 축적된 마찰(丑·戌·未 형살)**: 스스로 설정한 법관 같은 완고한 프레임 안에 갇혀, **외부의 건설적인 제언이나 따뜻한 피드백에 대해 차가운 불신과 철벽**을 세우는 경향이 있습니다. 갈등이 생기면 **풀어보려 소통하기보다 가슴속에 앙금을 눌러 담은 뒤 소리 없이 관계를 끊고 고독망 속으로 침잠**해 버리는 행동양식을 성찰할 필요가 있습니다.`;
     hyeongDescEn += `\n\n- **Earth Consolidation Penalty (Chuk-Sul-Mi Hyeong)**: The Earth penalty (Hyeong) introduces a stubborn attachment to your own logic, making it difficult to accept external advice. You tend to swallow grievances silently for long periods, which can culminate in sudden, cold terminations of relationships.`;
   }
   if (hasJaMyo) {
-    hyeongDescKo += `\n\n- **지지의 무례 갈등(子·卯 형살)**: 가깝고 사적인 인간관계에서 "상대방이 나의 호의와 선을 배려하지 않았다"고 느껴 홀로 토라지고 서운해하는 감정의 조율 장애(문제점)가 관찰됩니다. 상대방의 말이나 태도의 미세한 뉘앙스를 예민하게 주시하다 오해를 키우는 모순을 주의해야 합니다.`;
+    hyeongDescKo += `\n\n- **지지의 감정적 조율 갈등(子·卯 형살)**: 아주 친밀하고 사적인 연인이나 파트너 관계에서 **"상대가 내 진심 어린 배려와 친절에 눈높이를 맞추지 못한다"며 무기력감과 서운함을 쉽게 느끼는 패턴**이 있습니다. 말 한마디, 행동 속 **미세한 온도의 변화에 가시 돋친 듯 예민하게 반응**하여 인간관계에서 **스스로 상처를 지어내는 악순환**을 다스리는 것이 시급합니다.`;
     hyeongDescEn += `\n\n- **Relational Friction Penalty (Ja-Myo Hyeong)**: The Ja-Myo penalty introduces sensitivity in close relationships. You easily feel neglected or hurt when others do not match your exact standards of consideration, sometimes magnifying minor slights into deep misunderstandings.`;
   }
 
@@ -956,7 +956,7 @@ function findClashHyeongDetails(
   branches.forEach(b => { counts[b.val] = (counts[b.val] || 0) + 1; });
   const selfPenalties = ['辰', '午', '酉', '亥'].filter(bChar => counts[bChar] >= 2);
   if (selfPenalties.length > 0) {
-    selfDescKo += `\n\n- **스스로를 채찍질하는 자형(${selfPenalties.join(', ')} 중첩)**: 타인이 나를 비판하기 전에 스스로에게 지나치게 매정한 잣대를 들이대며 괴롭히는 강박적 완벽주의를 겪습니다. 실수할까 두려울 때 속마음을 단단한 에고의 가면 뒤에 숨기고 깊은 동굴로 숨어버리는 모순을 띱니다.`;
+    selfDescKo += `\n\n- **스스로를 가두고 채찍질하는 자형(${selfPenalties.join(', ')} 중첩)**: 타인이 평가하기 전에 **내가 먼저 심장의 방아쇠를 당기듯 심한 자기검열과 자책**을 선사합니다. 실수에 대한 가혹한 공포심 탓에 **일정 선 이상의 부담을 주는 상황에서는 무의식적으로 에고의 가면을 쓰고 연락을 두절한 채 동굴 속으로 숨어버리는 극단적 완벽주의 행동**을 초래하기 쉽습니다.`;
     selfDescEn += `\n\n- **Self-Penalty (Ja-Hyeong for ${selfPenalties.join(', ')})**: The duplication of matching branch characters triggers self-penalty (Ja-Hyeong). You suffer from a self-sabotaging perfectionism, criticizing yourself before anyone else can. When anxious, you tend to build thick defensive walls and isolate yourself.`;
   }
 
@@ -969,7 +969,7 @@ function findClashHyeongDetails(
       const b2 = branches[j];
       const isPah = pahs.some(p => (p[0] === b1.val && p[1] === b2.val) || (p[0] === b2.val && p[1] === b1.val));
       if (isPah) {
-        pahDescKo += `\n\n- **지지의 매듭짓기 불안정(破)**: 일을 의욕 넘치게 설계하고 착수하지만, 마지막 마무리를 해야 할 중요한 고비나 서류 마감 단계에서 급격히 집중력이 흐트러지며 어처구니없는 실수를 반복하는 뒷심 부족(모순점)이 습관적으로 발생할 수 있습니다.`;
+        pahDescKo += `\n\n- **마무리에 다다르면 흔들리는 매듭 불안정(破)**: 초기 실행 단계에서는 놀라운 야심과 속도전으로 진두지휘하지만, **마무리를 장식해야 할 최종 서류 마감이나 뒷수습 구간에서 급격하게 집중력이 증발해 다 망쳐버리는 패턴**이 성화를 냅니다. **마지막 10%의 매듭짓기를 소홀히 여겨 그동안 쌓아올린 막강한 실적의 알맹이를 사소한 누락으로 상실**하기 십상입니다.`;
         pahDescEn += `\n\n- **Interference (Pah)**: The presence of breaking (Pah) energy in your branches indicates difficulty in closing projects. You start tasks with high momentum but lose steam during the final 10%, leading to administrative oversights or unfinished details.`;
         break;
       }
@@ -1086,7 +1086,7 @@ export function generatePersonalizedTexts(
       ? `[합(合) 네트워크] 우주적 에너지가 결집된 강력한 지향성` 
       : `[Union Network] Powerful Alignment Crafted by Cosmic Conjunction`;
     categoryDesc = isKO
-      ? `당신의 명식은 지지에 **${hapNet.koName}**의 결합을 완성하고, 그 강한 기운이 천간 **${hapNet.type}** 오행으로 분출되어 투간된 매우 비범한 구조입니다. 이는 에너지가 한곳으로 집중되어 강력한 돌파력과 확실한 정체성을 발휘함을 의미합니다. 혼란 속에서도 명확한 지향점을 스스로 설정하고 이끌어갈 수 있는 선천적 리더십과 추진력이 탑재되어 있습니다.`
+      ? `귀하의 명식은 지지에 **${hapNet.koName}의 합(合) 네트워크를 정밀하게 완성**하고, 그 압도적인 자장이 천간의 **${hapNet.type}** 오행으로 통하여 하늘과 땅이 수직 직통하는 매우 비범한 천지맥 구조입니다. 이는 **에너지가 정밀하게 한곳으로 집속되어 누구도 꺾기 힘든 고집스러운 돌파력과 영민한 정체성**을 뿜어냅니다. 하지만 **합 기운이 강한 나머지, 특정한 방향이나 신념에 철저하게 내면이 매몰될 때 타인의 조언을 귀담아듣지 않은 채 독선적 마이웨이를 걷는 구조적 모순점**도 가집니다. 위기 돌파 등 **결정적인 문제 해결** 상황에서는 극강의 화력을 뽐내나, 평시 일상의 조화와 협조 국면에서는 의식적인 조율이 절대 필요합니다.`
       : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your core drive is highly focused, granting you unyielding determination and a clear sense of identity. You are naturally equipped with the pioneering leadership to define your own path and command situations even amidst chaos.`;
     innatePillars = hapNet.keyPillars;
   } else if (overload) {
@@ -1094,7 +1094,7 @@ export function generatePersonalizedTexts(
       ? `[성분 집중형] ${overload.nameKo} 에너지가 지배하는 개성파 기질` 
       : `[Concentrated Type] Character Dominated by ${overload.nameEn}`;
     categoryDesc = isKO
-      ? `귀하의 사주는 **${overload.nameKo}** 기운이 3개 이상 포진하여, 해당 에너지가 성격과 행동 양식을 강력하게 지배하고 있습니다. 이는 남들과 구별되는 극대화된 개성과 독창적인 무기를 의미합니다. 스스로의 확고한 주도권과 전문 영역을 확보할 때 이 쏠린 에너지는 폭발적인 창조력으로 승화됩니다.`
+      ? `귀하의 명식은 우주적 성분 중 오직 **${overload.nameKo} 기운 하나에 에너지가 극단적으로 쏠려 쏠림의 한계를 만드는 개성과 특이점**을 품고 있습니다. 이는 **남들과 궤를 달리하는 극대화된 독립성과 칼날 같은 전문성**의 무기를 가졌음을 반증하지만, 반대로 **에너지의 심한 정체로 특정 상황이나 관계에서 한 번 눈이 돌거나 꼬이면 이성을 잃고 한평생 후회할 무리수를 고집스럽게 밀어붙이는 집착적인 모습을 보이기도 합니다**. 스스로 제어하기 힘든 과포화 상태의 마력을 온전히 길들여 일상생활의 루틴과 조화로운 소통 속에서 다듬어야만 이 강력한 무기가 비로소 빛을 냅니다.`
       : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to strongly dictate your behavior and character. This marks you as an individual of extreme color and distinct talent. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an explosive creative force.`;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
@@ -1102,7 +1102,7 @@ export function generatePersonalizedTexts(
       ? `[주체성의 뿌리] 스스로를 지탱하는 자아의 근본 기둥`
       : `[Root of Ego] Indestructible Foundation Anchoring the Self`;
     categoryDesc = isKO
-      ? `귀하의 명식은 비록 강한 쏠림은 없으나, 지지에 일간의 든든한 동료이자 힘이 되어주는 비겁(뿌리) 글자들이 2개 이상 포진하고 있습니다. 이는 외부 환경에 쉽게 흔들리지 않고 스스로 중심을 잡는 '자아의 뿌리 세포'가 매우 튼튼함을 의미합니다. 실패를 겪어도 오뚝이처럼 일어나는 복원력과 주체성이 귀하의 근본 강점입니다.`
+      ? `귀하의 원국은 어지러운 에너지의 극단 비대함 없이, 오직 **나를 지지하고 단단하게 밀어주는 지지의 비겁(뿌리 글자)들을 통해 자아 세포를 완벽히 고정**해 두었습니다. 이는 세상사의 모진 도전에 마주해도 **스스로 회복하고 우뚝 일어설 내면의 용암 같은 복원 주체성이 탑재**되었음을 보증합니다. 반면, **자존심에 사소한 상처라도 받으면 즉각적으로 자아 방어기제가 과도하게 발동되어 타인의 사소한 일침에도 차가운 반감과 장벽**을 세우며 자가 격리를 고집하는 모순을 겪기도 하니 유의하셔야 합니다. 타인과 경쟁하기보다 **나 자신과의 동행**을 지향할 때 가장 성숙한 성장을 이뤄냅니다.`
       : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a highly resilient "ego root system" that keeps you anchored through any external turbulence. Your fundamental strength lies in your autonomous recovery power and self-reliance, rising like a phoenix from any setback.`;
     innatePillars = siblingRoot.keyPillars;
   } else {

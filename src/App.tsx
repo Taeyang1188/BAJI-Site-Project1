@@ -15,7 +15,7 @@ import AuroraBackground from './components/AuroraBackground';
 import BaZiResultPage, { SoulSummaryCard } from './components/BaZiResultPage';
 
 import { calculateRealBaZi } from './services/bazi-service';
-import { decompressPayload } from './services/share-compress-service';
+import { decompressPayload, decompressFromShortId } from './services/share-compress-service';
 
 import characterWebm from './assets/door.webm';
 import characterApng from './assets/door.png';
@@ -384,8 +384,19 @@ export default function App() {
     if (sharedParam) {
       try {
         const decodedPayload = decodeURIComponent(escape(atob(sharedParam)));
-        const rawObj = JSON.parse(decodedPayload);
-        const parsedInput = decompressPayload(rawObj);
+        let parsedInput: any = null;
+        if (decodedPayload.startsWith('v5_') || decodedPayload.startsWith('v4_')) {
+          parsedInput = decompressFromShortId(decodedPayload);
+        } else {
+          try {
+            const rawObj = JSON.parse(decodedPayload);
+            parsedInput = decompressPayload(rawObj);
+          } catch (jsonErr) {
+            // Check if decodePayload itself might be a direct shortId string (without JSON wrapping)
+            parsedInput = decompressFromShortId(decodedPayload);
+          }
+        }
+
         if (parsedInput && parsedInput.birthDate) {
           setSharedInput(parsedInput);
           setIsSharedView(true);

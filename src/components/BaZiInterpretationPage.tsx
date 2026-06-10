@@ -4,7 +4,7 @@ import {
   Sparkles, Award, Compass, Heart, AlertCircle, Shield,
   User, Landmark, Calendar, Activity, Zap, Check,
   ArrowLeft, Gem, Briefcase, Eye, ThumbsUp, RefreshCw, Share2,
-  Search, TrendingUp
+  Search, TrendingUp, Pin
 } from 'lucide-react';
 import { BaZiResult, UserInput, Language } from '../types';
 import { generateBaziInterpretation, BaziInterpretationData } from '../services/bazi-interpretation-service';
@@ -407,7 +407,9 @@ export default function BaZiInterpretationPage({
   // **강조** 마커 파싱 후 각 세그먼트에 colorizeChars 적용
   const parseHighlighted = (text: string): React.ReactNode => {
     const parts = text.split(/\*\*(.*?)\*\*/gs);
-    const boldClass = isLight ? 'text-black font-semibold' : 'text-white font-semibold';
+    const boldClass = isLight 
+      ? 'text-neutral-950 font-bold' 
+      : 'text-white font-bold';
     const normalClass = isLight ? 'text-black/70' : 'text-white/70';
 
     return parts.map((part, i) =>
@@ -430,7 +432,8 @@ export default function BaZiInterpretationPage({
           
           // Check if it's a section header
           // Format is like: **[🔍 기둥별 타고난 기질 해설]** or **[🧬 기질의 구조적 지향성: ...]**
-          const headerMatch = trimmed.match(/^\*\*\[(🔍|🧬|📊)\s*([^\]]+)\]\*\*/);
+          // Greedily match till the final closing bracket to handle nested tags like [Concentrated Type] perfectly!
+          const headerMatch = trimmed.match(/^\*\*\[(🔍|🧬|📊|📌)\s*(.+)\]\*\*/);
           
           if (headerMatch) {
             const emoji = headerMatch[1];
@@ -446,6 +449,8 @@ export default function BaZiInterpretationPage({
               icon = <Activity className="w-4 h-4" style={{ color: themeColor }} />;
             } else if (emoji === '📊') {
               icon = <TrendingUp className="w-4 h-4" style={{ color: themeColor }} />;
+            } else if (emoji === '📌') {
+              icon = <Pin className="w-4 h-4" style={{ color: themeColor }} />;
             }
 
             return (
