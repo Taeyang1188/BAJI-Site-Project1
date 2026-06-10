@@ -350,18 +350,7 @@ export function generateBaziInterpretation(result: BaZiResult, userInput: UserIn
     score: traitsMap[t.key] || 50
   })).sort((a, b) => b.score - a.score).slice(0, 8);
 
-  if (lang === 'KO') {
-    const dynamicTexts = generatePersonalizedProfileText(
-      userName,
-      dayMasterStem,
-      result,
-      ratios,
-      traitScores,
-      profileCode
-    );
-    profile.character = dynamicTexts.character;
-    profile.description = dynamicTexts.description;
-  }
+  // Use the pre-defined concise bilingual character profiles directly to keep KO and EN descriptions concise, consistent, and clean.
 
   // 6. Yongshin Advice extraction
   const yongShenElement = result.analysis?.yongshinDetail?.primary?.element || result.analysis?.yongShen || 'Wood';
