@@ -119,7 +119,7 @@ export default function BaZiInterpretationPage({
           .replace(/\+/g, '-')
           .replace(/\//g, '_')
           .replace(/=+$/, '');
-        url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}&lang=${lang}`;
+        url = `${window.location.origin}${window.location.pathname}?s=${encodeURIComponent(b64)}&lang=${lang}&view=interpretation`;
       } catch (e) {
         console.error("Error generating share URL", e);
       }
