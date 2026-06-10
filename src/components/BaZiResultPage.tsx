@@ -13,6 +13,7 @@ import { ParsedText, TooltipWrapper } from './ParsedText';
 import { GeJuHelpModal } from './GeJuHelpModal';
 import PersonaTestSection from './PersonaTestSection';
 import { SeasonalFlow } from './SeasonalFlow';
+import BaZiInterpretationPage from './BaZiInterpretationPage';
 import { calculateTenGods, STEM_ELEMENTS, BRANCH_ELEMENTS } from '../services/bazi-engine';
 import { 
   ChevronDown, 
@@ -1100,6 +1101,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showYongshinRolesInfo, setShowYongshinRolesInfo] = useState(false);
   const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [viewMode, setViewMode] = useState<'result' | 'interpretation'>('result');
   const [showHanja, setShowHanja] = useState(true);
   const [guideStep, setGuideStep] = useState(0); // 0: None, 1: Year, 2: Month, 3: Day, 4: Hour, 5: JiJangGan, 6: TenGods, 7: Daewun
 
@@ -2767,6 +2769,18 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
         </BaziTooltip>
     );
   };
+
+  if (viewMode === 'interpretation') {
+    return (
+      <BaZiInterpretationPage
+        result={result}
+        lang={lang}
+        userInput={userInput}
+        coords={coords}
+        onBack={() => setViewMode('result')}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto px-2 sm:px-6 py-4 sm:py-12 space-y-8 sm:space-y-12 bazi-result-root">
@@ -4819,6 +4833,31 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* 내 사주 리포트 보기 버튼 따로 추가 */}
+      <div className="flex justify-center pt-2 pb-6">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            if (showAnalysis) {
+              setShowAnalysis(false);
+            } else {
+              setShowAnalysis(true);
+              setTimeout(() => {
+                const el = document.getElementById('analysis-report-section');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }
+          }}
+          className="px-8 py-3.5 bg-neon-cyan/10 border border-neon-cyan/40 text-neon-cyan font-display font-black text-xs tracking-[0.2em] rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:bg-neon-cyan/20 hover:border-neon-cyan transition-all cursor-pointer"
+        >
+          <Zap className="w-4 h-4 text-neon-cyan animate-pulse" />
+          {showAnalysis ? (lang === 'KO' ? '내 사주 리포트 닫기' : 'Hide Bazi Report') : (lang === 'KO' ? '내 사주 리포트 보기' : 'View Bazi Report')}
+        </motion.button>
       </div>
 
       {/* Saju Analysis Report Section */}
@@ -8175,23 +8214,13 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              if (showAnalysis) {
-                setShowAnalysis(false);
-              } else {
-                setShowAnalysis(true);
-                setTimeout(() => {
-                  const el = document.getElementById('analysis-report-section');
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }, 100);
-              }
+              setViewMode('interpretation');
             }}
-            className="w-full py-4 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-black text-[15px] sm:text-base tracking-[0.2em] rounded-[2rem] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.4)] relative overflow-hidden"
+            className="w-full py-4 bg-neon-pink/20 border border-neon-pink text-neon-pink font-display font-black text-[15px] sm:text-base tracking-[0.2em] rounded-[2rem] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,0,122,0.4)] relative overflow-hidden animate-[pulse_2s_infinite]"
           >
             {/* Button Shine Effect (optional purely CSS) */}
             <div className="absolute inset-0 bg-white/10 w-[50%] -skew-x-12 -translate-x-[150%] animate-[shine_3s_infinite]" />
-            {showAnalysis ? (lang === 'KO' ? '내 사주 자세히 닫기' : 'Hide Soul Details') : (lang === 'KO' ? '내 사주 자세히 보기' : 'Extract Soul Details')}
+            {lang === 'KO' ? '내 사주 자세히보기' : 'Extract Soul Details'}
           </motion.button>
         </div>
       </div>
