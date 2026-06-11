@@ -990,6 +990,84 @@ function findClashHyeongDetails(
   };
 }
 
+const OVERLOAD_PERSONALIZED_DESC_KO: Record<string, Record<string, string>> = {
+  '비겁': {
+    Wood: '곧고 단단하게 뻗어 나가는 나무의 성정이 겹쳐져, **그 어떤 통제나 간섭도 용납하지 않는 극강의 독립심과 굳건한 자립 자아**를 보여줍니다. 이는 **스스로 길을 개척하는 훌륭한 자수성가형 에너지**가 되지만, 지지의 비겁 세력이 너무 비대해지면 **\'내가 다 맞다\'는 아집에 갇혀 타인의 유익한 조언을 차단하거나, 협업 과정에서 독선적으로 흐르기 쉬운 모순**이 있습니다. 나의 고집을 고수하기보다 유연한 나뭇가지처럼 타인의 의견을 포용하는 연습이 큰 성취를 완성하는 열쇠입니다.',
+    Fire: '활활 타오르는 불꽃의 기운이 증폭되어, **남다른 자존감과 타인의 시선에 굴하지 않는 뜨거운 주체성**을 보여줍니다. 이는 **어떤 불리한 환경에서도 기어코 불씨를 살려 존재감을 내뿜는 원동력**이 되지만, 내면에 경쟁심과 투쟁심이 지나치게 커지면 **사소한 자존심 싸움에 에너지를 낭비하거나 타인을 적으로 인식해 불필요한 갈등을 자초하는 모순**을 품기 쉽습니다. 뜨거운 에너지를 외부와의 대립이 아닌 내면의 창조적 몰입으로 전환할 때 큰 부와 명예가 따릅니다.',
+    Earth: '흔들리지 않는 태산과 넓은 대지의 기운이 중첩되어, **한 번 마음먹은 기준을 꺾지 않는 무거운 뚝심과 묵직한 자아 방어**를 보여줍니다. 이는 **어떤 풍파에도 흔들리지 않고 자리를 지키며 깊은 신뢰를 주는 든든한 강점**이 되지만, 비겁 에너지가 과포화되면 **기존의 방식만을 지나치게 고수하는 완고함에 갇혀 시대의 변화나 기회를 놓치는 융통성 결여의 모순**을 겪기 쉽습니다. 내면의 굳건함을 유지하되, 흘러가는 물을 받아들이듯 변화와 타인의 피드백을 수용하는 유연성이 절실합니다.',
+    Metal: '단단한 무쇠와 정교한 보석의 칼날 같은 주체성이 증폭되어, **스스로 설정한 법관 같은 완벽한 원칙과 극강의 자존심**을 보여줍니다. 이는 **도덕성과 타협 없는 실행력으로 독보적인 카리스마를 관철하는 장점**이 되지만, 금 기운의 비겁이 과해지면 **스스로에게는 물론 타인에게도 너무 칼 같은 잣대를 들이대어 곁의 사람들을 질식시키거나 스스로를 고독 속에 가두는 모순**을 만듭니다. 날카로운 검을 칼집에 부드럽게 넣어두듯, 타인의 불완전함을 용인하는 포용력을 기를 때 귀인의 도움을 얻을 수 있습니다.',
+    Water: '거침없이 흐르는 바다와 이슬의 기운이 한데 뭉쳐, **틀에 갇히는 것을 거부하고 끊임없이 자유를 갈망하는 도도한 독립심**을 보여줍니다. 이는 **어떤 압박에도 유연하게 흐름을 바꾸어 살아남는 적응력의 무기**가 되지만, 수 기운의 비겁이 넘치면 **내면에 감정의 파도를 통제하지 못해 겉으로는 잔잔한 척하면서 속으로는 깊은 우울과 고립감에 스스로를 매몰시키는 이중적 모순**이 작용합니다. 나만의 세계에 침잠하기보다 세상과 적극적으로 소통하며 물길을 외부로 터줄 필요가 있습니다.'
+  },
+  '식상': {
+    Wood: '나무가 아낌없이 가지를 뻗어 꽃(火)을 피우듯, **내면의 감성과 반짝이는 아이디어를 거침없이 뿜어내는 정열적인 창의력과 예술적 안목**을 보여줍니다. 이는 **주변을 매료시키는 뛰어난 설득력과 스타성**이 되지만, 솟구치는 화 기운의 식상이 과해지면 **감정 제어가 되지 않아 홧김에 직설적인 팩트를 내뱉어 구설을 사거나, 시작은 불꽃처럼 화려하지만 마무리를 짓지 못하고 쉽게 식어버리는 모순**을 겪기 쉽습니다. 표현의 속도를 늦추고 차분한 절제를 더할 때 당신의 말과 글은 진짜 권위를 갖추게 됩니다.',
+    Fire: '불꽃이 활활 타올라 대지(토)를 덮듯, **어떤 주제든 내 방식대로 가공하고 퍼트리는 막강한 기획력과 뜨거운 표현 본능**을 보여줍니다. 이는 **다양한 분야를 조합하여 대중을 설득해내는 기획 전문가의 자산**이 되지만, 토 기운의 식상이 과해지면 **말과 행동의 무게감이 떨어지거나, 남을 가르치려 드는 오지랖으로 비쳐 호의를 베풀고도 뒤돌아서 원망을 듣는 모순**에 빠지기 쉽습니다. 나의 에너지를 외부에 낭비하기보다 조용히 내실을 채우는 집중력을 발휘하는 것이 부의 단단한 그릇이 됩니다.',
+    Earth: '대지가 품은 광물(金)을 벼려내듯, **말 한마디에 뼈가 있고 사물의 이면을 정확히 도려내는 예리한 관찰력과 비평 능력**을 보여줍니다. 이는 **완벽을 기하는 실무적 디테일과 전문성**이라는 훌륭한 날무기가 되지만, 금 기운의 식상이 과다해지면 **비판을 위한 비판을 던져 상대를 얼어붙게 만들거나 스스로 높은 기준에 짓눌려 시작조차 하지 못하는 완벽주의 늪에 빠지는 모순**을 유발합니다. 차가운 칼날에 따뜻한 정서적 온기를 더할 때 비로소 진정한 조력자를 모을 수 있습니다.',
+    Metal: '단단한 바위 틈에서 맑은 샘물(水)이 솟구치듯, **막힘 없는 언어 감각과 상황을 예리하게 꿰뚫어 해석하는 천재적인 아이디어 뱅크**의 자질을 보여줍니다. 이는 **기획과 트렌드 리딩에서 독보적인 가치**가 되지만, 수 기운의 식상이 과해지면 **생각이 꼬리를 물어 밤잠을 설치고 내면의 불안을 극단적이고 날카로운 말로 표현하여 깊은 관계를 망치는 모순**을 초래하기 쉽습니다. 흐르는 물을 담아둘 단단한 원칙과 고요한 명상의 시간을 마련해 뇌의 피로를 풀어주어야 합니다.',
+    Water: '물이 대지를 적셔 나무(木)를 기르듯, **주변 사람들의 성장을 도우며 조용하지만 끈질기게 자기 아이디어를 현실화하는 기획적 침투력**을 보여줍니다. 이는 **사람을 키우고 가치를 확장하는 교육 및 컨설팅 능력이 돋보이는 강점**이지만, 목 기운의 식상이 과다하면 **너무 많은 일을 동시다발적으로 벌려 마무리를 유실하거나 남의 일에는 열성적이면서 정작 자기 실속은 전혀 챙기지 못하는 모순**에 부딪힙니다. 일의 우선순위를 냉정히 세우고 나의 경계를 지키는 이기심이 일부 필요합니다.'
+  },
+  '재성': {
+    Wood: '나무가 거대한 영토(토)에 뿌리를 내리려 분투하듯, **끊임없이 새로운 사업적 기회나 결실의 가치를 확장하고자 하는 남다른 영토 개척 욕구와 현실 감각**을 보여줍니다. 이는 **사업적 설계나 유통 흐름을 읽는 안목**이 뛰어나지만, 흙이 너무 많아 나무의 뿌리가 상하는 \'재다신약\'의 역설처럼 **에너지는 부족한데 너무 많은 영역을 홀로 다 가지려 욕심내다 과부하가 걸려 일을 매듭짓지 못하는 모순**이 작용합니다. 욕심을 덜어내고 확실한 한 놈만 패듯 선택과 집중을 할 때 재화가 모입니다.',
+    Fire: '뜨거운 불꽃이 광물(金)을 완벽히 제련하여 결실을 거두려는 욕망처럼, **목표 지향적이고 칼날 같이 선명하게 결과를 취하려는 영민한 실리 본능과 추진력**을 보여줍니다. 이는 **승부처에서 확실한 성과를 움켜쥐는 탁월한 비즈니스 감각**이 되지만, 금 재성이 과포화되면 **결과만을 너무 조급하게 쫓다가 동료들의 신뢰를 잃거나 본인의 건강과 에너지를 극단적으로 소진해 버리는 모순**을 부릅니다. 결과보다 과정을 중요시하며 조율하는 장기적 관점을 훈련해야 부가 단단해집니다.',
+    Earth: '마른 대지가 물(水)을 빈틈없이 흡수해 내 것으로 만드려는 것처럼, **시장의 흐름과 돈이 흘러가는 패턴을 영리하게 파악하고 내 실속을 채우는 현실성**을 보여줍니다. 이는 **실패율을 극소화하는 뛰어난 위기 관리와 현금 흐름 관리 능력**이 강점이지만, 수 재성이 과해지면 **머릿속으로 수십 번 손익계산기만 두드리다가 정작 과감히 투자하고 나설 타이밍을 놓치는 결정 장애의 모순**을 겪기 쉽습니다. 완벽한 계산보다 70%의 확신이 있을 때 발을 떼는 과단성이 필요합니다.',
+    Metal: '예리한 칼날로 나무(木)를 다듬어 작품을 만들 듯, **무엇이든 확실한 수치와 뚜렷한 아웃풋으로 정량화하고 구조를 통제하는 현실 설계력**을 보여줍니다. 이는 **구체적인 목표 달성과 효율적인 재물 관리 능력이 남다른 무기**가 되지만, 목 재성이 과도해지면 **작은 지출이나 디테일에 너무 집착하여 큰 그림의 투자를 보지 못하거나 주변 사람들을 너무 계산적으로 대해 적을 만드는 모순**을 품습니다. 때로는 효율성보다 사람 간의 따뜻한 정서적 유대를 우선시해야 부의 그릇이 커집니다.',
+    Water: '넘치는 강물이 뜨거운 불(화)의 에너지를 덮어 담아내려는 기세처럼, **화려하고 넓은 시장에서 유행을 읽고 역동적으로 재화를 순환시키려는 뛰어난 수완과 사교 감각**을 보여줍니다. 이는 **대범하게 판을 흔들어 부를 창출하는 강점**이 있지만, 화 재성이 과도해지면 **겉으로만 화려해 보이고 실속은 텅 비어 재물이 스쳐 지나가 버리는 만성적 불안(재다신약의 피로)의 모순**을 피하기 힘듭니다. 허세를 걷어내고 가장 보수적인 리스크 관리를 병행하는 것이 부를 움켜쥐는 관건입니다.'
+  },
+  '관성': {
+    Wood: '연약한 나무가 차가운 바위와 검(金)에 둘러싸여 절제당하는 고통처럼, **어떤 비바람에도 흔들리지 않고 원칙과 의무를 완수해 내려는 철갑 같은 책임감과 자기 통제력**을 보여줍니다. 이는 **조직과 사회에서 깊은 존경을 받는 신뢰의 표상**이 되지만, 금 관성이 과해지면 **나의 한계를 넘는 압박마저 억지로 견디며 감정을 삭이다가 한순간 번아웃으로 주저앉거나 타인에게 너무 엄격한 규칙을 강제하는 모순**을 낳습니다. 자신을 옭아맨 무거운 갑옷을 풀고 때로는 부드럽게 쉬어가는 마음의 쉼표가 절실합니다.',
+    Fire: '타오르는 불씨가 차가운 빗물(水)의 통제를 받아 빛을 조율하는 기류처럼, **대외적인 평판을 엄수하고 완벽한 도덕성으로 자신의 명예를 빛내려는 명예 지향과 공적인 책임 의식**을 보여줍니다. 이는 **안정적이고 투명한 조직 체계 내에서 신뢰받는 조력자이자 관리자로 도약하는 강점**이지만, 수 관성이 과다해지면 **실패나 나쁜 소문에 대한 극심한 공포심 탓에 과도한 감정 검열을 겪거나 눈치를 보며 주눅 드는 모순**을 만듭니다. 타인의 시선이라는 허상을 걷어내고 내면의 진솔한 불꽃을 지키는 뻔뻔함을 키우셔야 합니다.',
+    Earth: '광활한 대지가 빽빽한 나무 숲(木)의 통제를 받아 고정되는 기운처럼, **단단하고 체계적인 법전이자 규칙 그 자체가 되어 조직의 질서를 수호하려는 강직한 의무감**을 보여줍니다. 이는 **어떤 리스크 앞에서도 변치 않는 깊은 신용의 자산**이 되지만, 목 관성이 과포화되면 **내부의 고정관념과 규율에 스스로를 스스로 유폐시켜 생각과 행동의 반경을 극도로 좁히는 자가당착의 모순**을 겪기 쉽습니다. 규칙은 수단일 뿐임을 인지하고, 때로는 과감하게 선을 넘는 모험심을 가져야 성장의 틀을 깨부술 수 있습니다.',
+    Metal: '날카로운 쇠가 용광로의 불(화) 아래 들어가 정교한 제품으로 제련되듯, **타협을 거부하고 스스로를 고도로 채찍질하여 완성하려는 철저한 절제력과 프로페셔널리즘**을 보여줍니다. 이는 **맡은 바 임무를 기어코 완벽하게 마무리 짓는 훌륭한 실행력**이 되지만, 화 관성이 과해지면 **완벽하지 못한 스스로를 견디지 못해 깊은 우울에 빠지거나 사소한 결함을 실패로 간주해버리는 자기 파괴적 완벽주의의 모순**에 도달합니다. 내가 부족해도 충분히 가치 있음을 인정하는 따뜻한 자기 연민이 필요합니다.',
+    Water: '도도히 흐르는 물이 거대한 댐과 둑(토)에 갇혀 질서를 부여받듯, **어떤 낯선 조직이나 환경에서도 나를 그 규격에 유연하게 맞추어 공정함을 잃지 않으려는 사회적 지혜와 평판 관리력**을 보여줍니다. 이는 **집단의 중심에서 조용히 평화를 지키는 훌륭한 완충 자산**이 되지만, 토 관성이 과다하면 **주변의 기대와 압박에 내 감정을 완전히 억눌러 겉으로는 순응하는 척하지만 속으로는 통제에 대한 차가운 반감과 스트레스를 켜켜이 쌓아두는 모순**을 갖습니다. 참기만 하기보다 내 의견을 확실히 발언하는 독립성이 핵심 치유법입니다.'
+  },
+  '인성': {
+    Wood: '나무가 마르지 않는 끊임없는 수분(水)을 받아 뿌리를 깊게 내리듯, **눈앞의 얕은 기교보다 학문적 본질과 지혜, 사물의 이면을 꿰뚫어 사색하려는 남다른 학구열과 수용성**을 보여줍니다. 이는 **어떤 분야든 깊이 있는 통찰을 구축하는 훌륭한 멘토의 그릇**이 되지만, 수 인성이 과포화되면 **머릿속 생각의 물길이 너무 무거워져 생각의 미로에 갇히고 정작 행동을 미루어 기회를 흘리는 실행력 마비의 모순**에 처하게 됩니다. 생각의 양을 줄이고, 배운 것을 즉시 세상 밖으로 꺼내는 실행 훈련이 성공의 지름길입니다.',
+    Fire: '불꽃이 울창한 숲(木)을 땔감 삼아 타오르듯, **나만의 확고한 철학과 세상을 바라보는 고유한 프레임을 구축해 깊이 있게 탐구하려는 지적 열망과 자긍심**을 보여줍니다. 이는 **내공 깊은 아이디어와 철학적 설득력으로 대중을 이끄는 정신적 지도자의 무기**가 되지만, 목 인성이 과도하게 쌓이면 **내 가치관과 기준에 반하는 현실에 대해 강한 불신과 냉소를 보내며 스스로 고립망 속으로 침잠하는 모순**에 빠지기 쉽습니다. 현실이 완벽하지 않더라도 흙을 밟고 걸어가듯 세상의 불완전함 속으로 나아가 부딪쳐야 합니다.',
+    Earth: '거대한 대지가 태양과 온기(화)의 보살핌을 받아 모든 것을 수용하듯, **타인의 고통을 품어주는 깊은 포용력과 상황을 멀리서 조망하여 근본 원인을 짚어내는 지혜**를 보여줍니다. 이는 **누구든 기대고 싶게 만드는 거대한 정신적 쉼터의 그릇**이 되지만, 화 인성이 과포화되면 **주변의 의존을 당연시하거나 모든 행동에 완벽한 당위성과 명분이 갖춰질 때까지 한 발자국도 떼려 하지 않는 고집스러운 완고함의 모순**을 보입니다. 가끔은 명분 없이 가벼운 마음으로 즉흥적인 선택을 즐길 필요가 있습니다.',
+    Metal: '광물이 비옥한 흙(토) 속에 묻혀 단단하게 영양을 채우듯, **세상의 사소한 현상도 허투루 보지 않고 철저하게 구조화하고 분석하여 완성도를 기하려는 장인 정신과 정교한 사색력**을 보여줍니다. 이는 **이론적 깊이와 디테일의 완성도에서 타의 추종을 불허하는 가치**가 되지만, 토 인성이 과다해지면 **내가 완벽히 소화하지 못한 지식이나 매뉴얼은 절대 신뢰하지 않는 의심병에 갇히거나 스스로 정해둔 틀 밖으로 나오지 않으려는 폐쇄성의 모순**을 초래합니다. 내 기준을 깨트릴 파괴적 혁신과 변화를 적극적으로 수용해야 합니다.',
+    Water: '바다와 이슬이 차가운 쇠(금)의 기운을 거쳐 정밀하게 정화되듯, **직관이 매우 뛰어나고 말 너머의 본질을 단숨에 캐치하는 천재적인 통찰력과 지적 욕구**를 보여줍니다. 이는 **남들이 보지 못하는 무의식과 본질을 꿰뚫는 강력한 지혜**가 되지만, 금 인성이 과다하게 쏠리면 **현실적인 실리를 챙기는 세속적인 일을 속으로 하찮게 여기거나, 끊임없이 이론만 연구하며 실전 배팅에는 나서지 않는 지적 허영의 모순**을 유발하기 쉽습니다. 현실의 흙먼지를 묻히며 실리적 성과를 만들어내는 계산기를 켜야 진짜 성공이 찾아옵니다.'
+  }
+};
+
+const OVERLOAD_PERSONALIZED_DESC_EN: Record<string, Record<string, string>> = {
+  '비겁': {
+    Wood: 'as a **${dayMasterKo}** Day Master, your Gap/Eul Wood nature grants you **intense independence and self-reliance that rejects any control**. While this forms a **powerful self-made energy to carve your own path**, it can also manifest as **stubbornness, where you lock yourself in your own views and ignore helpful advice**. Learning to bend like a flexible branch rather than breaking will be your ultimate key to success.',
+    Fire: 'as a **${dayMasterKo}** Day Master, the roaring fire increases your **strong self-esteem and fierce subjectivity that doesn\'t bend to others**. While this **helps you shine in any situation**, it can lead to **wasting energy on petty pride battles or treating others as competitors**. Channeling this heat into creative work rather than conflict will bring you great wealth.',
+    Earth: 'as a **${dayMasterKo}** Day Master, the heavy mountain or broad earth energy gives you **heavy endurance and solid boundaries**. While this **earns deep trust as you stand firm through any storm**, it can make you **rigid, rejecting change and missing new windows of opportunity**. Embracing changes and others\' feedback like flowing water will unlock your growth.',
+    Metal: 'as a **${dayMasterKo}** Day Master, your iron or gem nature amplifies your **uncompromising principles and strict standards**. While this **projects immense charisma and moral discipline**, it can lead to **measuring others with the same razor-sharp scale, exhausting your peers or isolating yourself**. Softening your blade to accept imperfections will draw precious helpers to your side.',
+    Water: 'as a **${dayMasterKo}** Day Master, your flowing river or morning dew energy grants you **boundless desire for freedom, resisting any box or boundaries**. While this **makes you highly adaptable to survive in any setup**, it can cause you to **suppress intense emotional waves, wearing a calm mask but suffering from deep isolation inside**. Opening up and directing your thoughts outward is vital.'
+  },
+  '식상': {
+    Wood: 'with **Expression** overload, your Wood Day Master sprouts creative fire, **projecting vibrant artistic senses and expressive communication**. While this **serves as a magnetic asset to persuade others**, it can lead to **sharp, unfiltered remarks that cause misunderstandings, or losing steam before finishing tasks**. Slowing down your expression will grant real weight to your words.',
+    Fire: 'with **Expression** overload, your Fire Day Master covers the earth, **generating vast design skills and passionate presentation instincts**. While this **makes you an excellent planner**, it can also **make you look overbearing, or invite resentment by unsolicited preaching**. Focusing your energy on deep substance rather than outward display builds a solid wealth vessel.',
+    Earth: 'with **Expression** overload, your Earth Day Master extracts metal, **refining a sharp eye and analytical criticisms that cut straight to the core**. While this **ensures perfect professional details**, it can **turn into destructive criticism or cause analysis paralysis due to self-imposed high standards**. Adding emotional warmth to your sharp blades will help you win allies.',
+    Metal: 'with **Expression** overload, your Metal Day Master generates water, **projecting swift wit and a genius capacity for trendsetting ideas**. While this **provides unmatched value in conceptualizing**, it can **cause overthinking, sleep disruption, or projecting inner anxiety into sharp words that break relationships**. Establishing quiet meditation routines will heal your mental fatigue.',
+    Water: 'with **Expression** overload, your Water Day Master nurtures wood, **quietly helping others grow while driving your plans with persistence**. While this **shines in coaching and advisory roles**, it can **lead you to take on too many projects or exhaust yourself helping others while ignoring your own profits**. Setting cold boundaries and prioritizing yourself is necessary.'
+  },
+  '재성': {
+    Wood: 'with **Wealth** overload, your Wood Day Master strives to root in vast Earth, **showing a relentless drive to expand business domains and seize practical results**. While this **gives you an outstanding eye for cash flow**, it can **overload you, scattering your focus on too many fields without completing them**. Selecting and concentrating on one key target will consolidate your assets.',
+    Fire: 'with **Wealth** overload, your Fire Day Master refines Metal, **showing a goal-oriented practical instinct to capture achievements**. While this **grabs success in critical moments**, it can **provoke impatience, hurting relationships or burning out your physical health for immediate gains**. Prioritizing sustainable processes over quick wins builds lasting wealth.',
+    Earth: 'with **Wealth** overload, your Earth Day Master absorbs Water, **showing a realistic eye to read market trends and secure profits**. While this **minimizes failure risks through financial management**, it can **lead to calculation paralysis, calculation-based anxiety, or missing investment timings**. Taking action when 70% certain rather than waiting for 100% calculation is key.',
+    Metal: 'with **Wealth** overload, your Metal Day Master shapes Wood, **showing a structured ability to organize reality with quantitative metrics**. While this **sets clear targets and efficient asset management**, it can **make you over-focused on minor details, missing the big picture, or appearing overly calculating**. Prioritizing relational warmth over numbers expands your wealth vessel.',
+    Water: 'with **Wealth** overload, your Water Day Master commands Fire, **showing a brilliant social talent to read trends and circulate assets in active markets**. While this **carves out bold wealth channels**, it can **result in a flashy exterior with hollow substance, letting wealth slip away**. Setting conservative risk management protocols is the key to holding onto your gains.'
+  },
+  '관성': {
+    Wood: 'with **Influence** overload, your Wood Day Master is bound by Metal, **showing an ironclad sense of duty and self-control to fulfill commitments**. While this **makes you a trusted pillar in society**, it can **lead you to swallow extreme stress until you burn out, or enforce rigid rules on others**. Releasing your heavy armor and allowing yourself to rest is crucial.',
+    Fire: 'with **Influence** overload, your Fire Day Master is controlled by Water, **showing a strong desire to protect your reputation and honor with public responsibility**. While this **builds a trusted path in stable organizations**, it can **trigger excessive anxiety over failure or bad reviews, making you overly self-conscious**. Trusting your inner fire over outer opinion is essential.',
+    Earth: 'with **Influence** overload, your Earth Day Master is shaped by Wood, **acting as a solid book of law to maintain system order**. While this **creates deep credit that stays firm under risk**, it can **confine your thinking and action to self-imposed boundaries**. Recognizing that rules are just tools and taking bold steps will break your growth limits.',
+    Metal: 'with **Influence** overload, your Metal Day Master is refined by Fire, **demonstrating relentless self-discipline and professionalism to achieve perfection**. While this **drives you to finish duties flawlessly**, it can **lead to self-destructive perfectionism, treating minor flaws as complete failures**. Practicing self-compassion is the key to mental balance.',
+    Water: 'with **Influence** overload, your Water Day Master is regulated by Earth, **utilizing social wisdom to fit yourself flexibly into any organizational structure**. While this **maintains peace at the center of groups**, it can **suppress your own emotions to conform, accumulating silent resentment toward control**. Expressing your voice clearly is your ultimate remedy.'
+  },
+  '인성': {
+    Wood: 'with **Intellect** overload, your Wood Day Master is nourished by Water, **possessing deep curiosity and academic patience to seek truths**. While this **builds profound wisdom as a natural mentor**, it can **weigh down your thoughts, trapping you in a maze of options and delaying action**. Reducing your analysis and putting knowledge into immediate action is key.',
+    Fire: 'with **Intellect** overload, your Fire Day Master is fueled by Wood, **seeking to establish a unique philosophy and look at the world with deep pride**. While this **projects magnetic intellectual leadership**, it can **manifest as cold skepticism toward an imperfect reality, isolating yourself**. Stepping into the messy world and clashing with it is required.',
+    Earth: 'with **Intellect** overload, your Earth Day Master is warmed by Fire, **holding deep empathy and the wisdom to look at situations from a broad view**. While this **creates a trusted mental refuge for others**, it can **make you refuse to take steps until you have perfect justification**. Embracing spontaneous, light-hearted choices will bring joy.',
+    Metal: 'with **Intellect** overload, your Metal Day Master is nurtured by Earth, **refining a craftsman\'s precision to structure and analyze details**. While this **creates unmatched theoretical depth**, it can **lead to suspicion, refusing to trust systems you haven\'t verified, or closed-mindedness**. Actively accepting external innovations will expand your horizon.',
+    Water: 'with **Intellect** overload, your Water Day Master is purified by Metal, **projecting brilliant intuition to read hidden motives**. While this **gives you the wisdom to see through situations**, it can **make you dismiss practical matters as trivial, focusing on theory while avoiding actual execution**. Getting your hands dirty with real-world execution is your key.'
+  }
+};
+
+
+
 // ─────────────────────────────────────────────
 // 메인 생성 함수 (Priority Queue 기반 개편)
 // ─────────────────────────────────────────────
@@ -1098,9 +1176,14 @@ export function generatePersonalizedTexts(
     categoryTitle = isKO 
       ? `[성분 집중형] ${overload.nameKo} 에너지가 지배하는 개성파 기질` 
       : `[Concentrated Type] Character Dominated by ${overload.nameEn}`;
+    
+    const element = STEM_INFO_LOCAL[dayStem]?.element || 'Wood';
+    const overloadKoDesc = OVERLOAD_PERSONALIZED_DESC_KO[overload.nameKo]?.[element] || '';
+    const overloadEnDesc = OVERLOAD_PERSONALIZED_DESC_EN[overload.nameKo]?.[element] || '';
+
     categoryDesc = isKO
-      ? `귀하의 명식은 우주적 성분 중 **${overload.nameKo} 성분 ${overload.keyPillars.length}개**에 에너지가 다소 한 방향에 쏠려, **${OVERLOAD_BEHAVIOR_KO[overload.nameKo]}** 개성을 보여줍니다. 이는 **독보적인 재능이자 남다른 몰입력**이라는 훌륭한 무기를 의미하지만, 한편으로는 **한 번 꽂힌 일이나 관계에 지나치게 집착하여 시야가 좁아지거나 스스로를 피로하게 만드는 경향**도 존재합니다. 이 강력한 에너지를 일방적으로 분출하기보다는, 일상의 차분한 루틴과 균형 잡힌 시각으로 다듬어나갈 때 비로소 그 진가가 발휘됩니다.`
-      : `In your cosmic layout, **${overload.keyPillars.length} characters** are concentrated in **${overload.nameEn}** energy, showing a unique personality of **${OVERLOAD_BEHAVIOR_EN[overload.nameEn]}**. While this grants you **exceptional talent and deep focus** in your chosen domain, it can also lead you to **over-focus or become stubborn** on specific viewpoints. Balancing this intense energy with a broader perspective and healthy routines will allow your ultimate strengths to shine.`;
+      ? `귀하의 명식은 우주적 성분 중 **${overload.nameKo} 성분 ${overload.keyPillars.length}개**에 에너지가 다소 한 방향에 쏠려 있습니다. ${overloadKoDesc.replace(/\$\{dayMasterKo\}/g, dayMasterKo).replace(/\$\{count\}/g, String(overload.keyPillars.length))}`
+      : `In your cosmic layout, **${overload.keyPillars.length} characters** are concentrated in **${overload.nameEn}** energy. ${overloadEnDesc.replace(/\$\{dayMasterKo\}/g, dayMasterKo).replace(/\$\{count\}/g, String(overload.keyPillars.length))}`;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
     categoryTitle = isKO
