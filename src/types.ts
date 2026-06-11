@@ -203,10 +203,12 @@ export interface BaZiResult {
       isStrong: boolean;
       title: string; 
       summary: string;
+      enSummary?: string;
       description: string; 
       enDescription?: string; 
       socialContext: string; 
       enSocialContext?: string;
+      level?: string;
     };
     relationshipAnalysis?: Record<string, {
       title: string;

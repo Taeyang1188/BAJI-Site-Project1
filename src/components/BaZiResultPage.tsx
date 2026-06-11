@@ -43,6 +43,7 @@ import { ILJU_DESCRIPTIONS } from '../constants/ilju-descriptions';
 import { TEN_GOD_DESCRIPTIONS } from '../constants/tenGodDescriptions';
 import { useTheme } from '../contexts/ThemeContext';
 import { compressPayload } from '../services/share-compress-service';
+import { getShinGangShinYakDetails } from '../services/bazi-advanced-analysis';
 
 const ILJU_BACKGROUND_IMAGES: Record<string, { base: string, detailed: string }> = {
   '己丑': { base: 'https://i.imgur.com/RyKP0u5.jpeg', detailed: 'https://i.imgur.com/RyKP0u5.jpeg' },
@@ -1665,7 +1666,7 @@ export default function BaZiResultPage({
     const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
     const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
 
-    const isSinGang = result.analysis?.shinGangShinYak?.title ? result.analysis.shinGangShinYak.title.includes('강') : false;
+    const isSinGang = result.analysis?.shinGangShinYak?.isStrong ?? (result.analysis?.dayMasterStrength?.isStrong ?? false);
     const yongShin = result.analysis?.yongShen || '';
     const giShin = result.analysis?.yongshinDetail?.giShin?.element || '';
     
@@ -7757,64 +7758,72 @@ export default function BaZiResultPage({
       />
 
       {/* Strength Info Modal */}
-      {showStrengthInfo && result.analysis?.shinGangShinYak && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg bg-goth-bg border border-white/10 rounded-[32px] p-8 relative overflow-hidden"
-          >
-            <button 
-              onClick={() => setShowStrengthInfo(false)}
-              className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"
+      {showStrengthInfo && result.analysis?.shinGangShinYak && (() => {
+        const level = result.analysis.shinGangShinYak.level || 
+          (['극신강', '신강', '중화신강', '중화신약', '신약', '극신약'].includes(result.analysis.shinGangShinYak.title) 
+            ? result.analysis.shinGangShinYak.title 
+            : Object.entries(BAZI_MAPPING.strength).find(([_, val]) => val.en === result.analysis.shinGangShinYak?.title)?.[0] || result.analysis?.dayMasterStrength?.level || '중화신강');
+        const details = getShinGangShinYakDetails(level, result.analysis?.dayMasterStrength?.rootingDetails, lang);
+
+        return createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-lg bg-goth-bg border border-white/10 rounded-[32px] p-8 relative overflow-hidden"
             >
-              <X className="w-6 h-6" />
-            </button>
+              <button 
+                onClick={() => setShowStrengthInfo(false)}
+                className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-neon-cyan/20 flex items-center justify-center">
-                  <Sun className="w-6 h-6 text-neon-cyan" />
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-neon-cyan/20 flex items-center justify-center">
+                    <Sun className="w-6 h-6 text-neon-cyan" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-display font-bold text-white">{lang === 'KO' ? '일간 강약 분석' : 'DM Strength Analysis'}</h3>
+                    <p className="text-xs text-white/40 tracking-widest uppercase">{details.title}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-display font-bold text-white">{lang === 'KO' ? '일간 강약 분석' : 'DM Strength Analysis'}</h3>
-                  <p className="text-xs text-white/40 tracking-widest uppercase">{result.analysis.shinGangShinYak.title}</p>
-                </div>
-              </div>
 
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                <p className="text-sm font-medium text-neon-cyan">{lang === 'KO' ? '일간 강약이란?' : 'What is DM Strength?'}</p>
-                <div className="text-xs leading-relaxed text-white/70">
-                  <ParsedText lang={lang} text={result.analysis.shinGangShinYak.summary} />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-white">{lang === 'KO' ? '나의 상태' : 'My Status'}</p>
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
+                  <p className="text-sm font-medium text-neon-cyan">{lang === 'KO' ? '일간 강약이란?' : 'What is DM Strength?'}</p>
                   <div className="text-xs leading-relaxed text-white/70">
-                    <ParsedText lang={lang} text={result.analysis.shinGangShinYak.description} />
+                    <ParsedText lang={lang} text={details.summary} />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-white">{lang === 'KO' ? '사회적 발현' : 'Social Manifestation'}</p>
-                  <div className="text-xs leading-relaxed text-white/70 font-sans">
-                    <ParsedText lang={lang} text={result.analysis.shinGangShinYak.socialContext} />
-                  </div>
-                </div>
-              </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-white/40">{lang === 'KO' ? '강약 점수' : 'Strength Score'}</span>
-                  <span className="text-lg font-bold text-neon-cyan">{result.analysis.dayMasterStrength.score.toFixed(1)}</span>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-white">{lang === 'KO' ? '나의 상태' : 'My Status'}</p>
+                    <div className="text-xs leading-relaxed text-white/70">
+                      <ParsedText lang={lang} text={details.description} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-white">{lang === 'KO' ? '사회적 발현' : 'Social Manifestation'}</p>
+                    <div className="text-xs leading-relaxed text-white/70 font-sans">
+                      <ParsedText lang={lang} text={details.socialContext} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/10">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-white/40">{lang === 'KO' ? '강약 점수' : 'Strength Score'}</span>
+                    <span className="text-lg font-bold text-neon-cyan">{result.analysis?.dayMasterStrength?.score ? result.analysis.dayMasterStrength.score.toFixed(1) : '50.0'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        </div>,
-        document.body
-      )}
+            </motion.div>
+          </div>,
+          document.body
+        );
+      })()}
 
       {/* Mu-Ja/Da-Ja Detail Modal */}
       {showMuJaDaJaInfo && createPortal(

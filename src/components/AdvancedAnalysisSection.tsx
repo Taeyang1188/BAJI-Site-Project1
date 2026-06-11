@@ -1,6 +1,8 @@
 import React from 'react';
 import { BaZiResult, Language } from '../types';
 import { ParsedText } from './ParsedText';
+import { BAZI_MAPPING } from '../constants/bazi-mapping';
+import { getShinGangShinYakDetails } from '../services/bazi-advanced-analysis';
 
 interface AdvancedAnalysisSectionProps {
   result: BaZiResult;
@@ -85,15 +87,23 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
       )}
 
       {/* Shin-Gang/Shin-Yak */}
-      {analysis.shinGangShinYak && (
-        <div className="p-4 bg-black/40 rounded-xl border border-white/5">
-          <h4 className="text-sm font-display font-medium text-orange-400 uppercase tracking-[0.2em] mb-2">
-            {analysis.shinGangShinYak.title}
-          </h4>
-          <ParsedText lang={lang} text={lang === 'KO' ? analysis.shinGangShinYak.description : analysis.shinGangShinYak.enDescription} className="text-xs text-white/70 mb-2 block" />
-          <ParsedText lang={lang} text={lang === 'KO' ? analysis.shinGangShinYak.socialContext : analysis.shinGangShinYak.enSocialContext} className="text-xs text-white/50 italic block" />
-        </div>
-      )}
+      {analysis.shinGangShinYak && (() => {
+        const level = analysis.shinGangShinYak.level || 
+          (['극신강', '신강', '중화신강', '중화신약', '신약', '극신약'].includes(analysis.shinGangShinYak.title) 
+            ? analysis.shinGangShinYak.title 
+            : Object.entries(BAZI_MAPPING.strength).find(([_, val]) => val.en === analysis.shinGangShinYak?.title)?.[0] || result.analysis?.dayMasterStrength?.level || '중화신강');
+        const details = getShinGangShinYakDetails(level, result.analysis?.dayMasterStrength?.rootingDetails, lang);
+
+        return (
+          <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+            <h4 className="text-sm font-display font-medium text-orange-400 uppercase tracking-[0.2em] mb-2">
+              {details.title}
+            </h4>
+            <ParsedText lang={lang} text={details.description} className="text-xs text-white/70 mb-2 block" />
+            <ParsedText lang={lang} text={details.socialContext} className="text-xs text-white/50 italic block" />
+          </div>
+        );
+      })()}
     </div>
   );
 };

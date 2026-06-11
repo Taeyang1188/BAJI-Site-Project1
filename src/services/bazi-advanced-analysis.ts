@@ -1,6 +1,59 @@
 import { BaZiCard, UserInput, Language } from '../types';
 import { BAZI_MAPPING } from '../constants/bazi-mapping';
 
+export const getShinGangShinYakDetails = (
+  level: string,
+  rootingDetails: any,
+  lang: Language
+) => {
+  const dayMasterDetails = rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
+  const hasStrongRoots = dayMasterDetails?.roots?.some((r: any) => (r.type === 'main' || r.type === 'sub_residual') && !r.isDestroyed);
+  const isWeakButRooted = (level === '신약' || level === '극신약' || level === '중화신약') && hasStrongRoots;
+
+  let summary = '';
+  let description = '';
+  let socialContext = '';
+
+  if (level === '극신강') {
+    summary = lang === 'KO' ? '자아의 기운이 폭발적으로 강해, 주변 환경을 압도하는 제왕의 기운이야.' : 'Explosive self-energy, a monarch-like vibe that overwhelms the surroundings.';
+    description = lang === 'KO' ? '자존심과 고집이 매우 강하며, 남의 밑에 있기 힘든 독립적인 성격이야. 강력한 추진력으로 불가능해 보이는 일도 해내는 힘이 있어.' : 'Very strong pride and stubbornness; an independent personality that finds it hard to be under others. Has the power to achieve seemingly impossible tasks with strong drive.';
+    socialContext = lang === 'KO' ? '전문직, 사업가, 혹은 한 분야의 독보적인 권위자로 성공할 확률이 매우 높아. 다만 독단적인 결정을 주의해야 해.' : 'High probability of success as a professional, entrepreneur, or a unique authority in a field. However, beware of arbitrary decisions.';
+  } else if (level === '신강') {
+    summary = lang === 'KO' ? '자아와 주관이 뚜렷하며, 외부의 압박에 잘 견디는 튼튼한 정신력을 가지고 있어.' : 'Strong sense of self and subjective views, with a resilient mindset that withstands external pressure.';
+    description = lang === 'KO' ? '자신감이 넘치고 독립심이 강해 스스로의 힘으로 인생을 개척해 나가는 스타일이야. 어려운 상황에서도 쉽게 꺾이지 않는 뚝심이 있어.' : 'Confident and independent, a style that pioneers life through one\'s own strength. Has the perseverance to not bend easily even in difficult situations.';
+    socialContext = lang === 'KO' ? '리더십과 추진력이 뛰어나 조직 내에서 핵심적인 역할을 하거나 자기 사업을 운영하기에 아주 적합해.' : 'Excellent leadership and drive, very suitable for playing a key role within an organization or running your own business.';
+  } else if (level === '중화신강') {
+    summary = lang === 'KO' ? '자아의 힘이 충분하면서도 주변과 조화를 이룰 줄 아는 이상적인 강함이야.' : 'Ideal strength where the self is sufficient yet knows how to harmonize with the surroundings.';
+    description = lang === 'KO' ? '주관은 뚜렷하지만 타인의 의견을 수용할 줄 아는 유연함을 갖췄어. 에너지가 안정적이라 기복이 적고 꾸준한 성취를 이뤄내.' : 'Clear subjective views but flexible enough to accept others\' opinions. Stable energy leads to consistent achievements with few ups and downs.';
+    socialContext = lang === 'KO' ? '어느 조직에서나 환영받는 리더이자 조율자야. 안정적인 사회생활과 성공을 동시에 거머쥘 수 있는 좋은 구조야.' : 'A leader and mediator welcomed in any organization. A good structure to achieve both stable social life and success.';
+  } else if (isWeakButRooted) {
+    summary = lang === 'KO' ? '독립성과 주관은 매우 확고하나, 자신의 에너지를 외부로 폭넓게 분산시키며 다루는 능동적이고 활동적인 사주 구조야.' : 'Very firm independence and conviction, an active chart structure that widely disperses and manages its energy outward.';
+    description = lang === 'KO' ? '지지에 튼튼한 뿌리(통근)를 내리고 있어 절대 남에게 쉽게 의존하거나 휘둘리는 뚝심 부족의 "신약"이 아니야. 자체적인 고집과 결단력은 충분하지만, 그것을 능가할 만큼 많은 에너지(재성이나 식상 등)를 현실에서 운용하려다 보니 전체적인 힘의 잔고가 소진되어 "신약"으로 판별되는 특수한 구조지. 혼자 힘이 부족한 게 아니라 너무 많은 걸 이끌고 가는 상태에 가까워.' : 'With strong roots in the branches, this is NOT a "weak" chart that easily relies on or is swayed by others. You have enough stubbornness and determination. However, because you are actively managing massive external energies (like wealth or output/creativity), your overall energy balance is drained, categorizing you technically as "weak". It\'s not a lack of independent strength, but rather a state of carrying heavy responsibilities.';
+    socialContext = lang === 'KO' ? '독자적인 추진력이 대단하지만 혼자 모든 것을 통제하려고 하면 필연적으로 에너지가 고갈돼. 당신의 확실한 주관을 중심에 두되, 실무를 덜어줄 시스템이나 동료를 곁에 둔다면 훨씬 막강한 성과를 창출할 수 있어.' : 'Your independent drive is tremendous, but trying to control everything alone inevitably depletes you. Keep your firm conviction at the core, but if you build systems or keep colleagues who can share the practical burden, you will achieve far greater success.';
+  } else if (level === '중화신약') {
+    summary = lang === 'KO' ? '부드러운 카리스마를 지녔으며, 주변 환경을 자신에게 유리하게 활용할 줄 아는 지혜가 있어.' : 'Possesses soft charisma and the wisdom to utilize the surroundings to your advantage.';
+    description = lang === 'KO' ? '겉으로는 유연해 보이지만 내면에는 자신만의 기준이 확실해. 타인과 협력하여 더 큰 성과를 내는 데 탁월한 재능이 있어.' : 'Appears flexible on the outside but has clear internal standards. Outstanding talent for achieving greater results through cooperation.';
+    socialContext = lang === 'KO' ? '협상가나 전략가로서 빛을 발해. 사람 사이의 관계를 조율하며 실속을 차리는 능력이 뛰어나 사회적 성공이 빨라.' : 'Shines as a negotiator or strategist. Excellent ability to coordinate relationships and gain substance, leading to fast social success.';
+  } else if (level === '신약') {
+    summary = lang === 'KO' ? '타인에 대한 배려와 공감 능력이 뛰어나며, 주변 환경에 유연하게 적응하는 태도를 보여.' : 'Excellent empathy and consideration for others, showing an attitude of flexible adaptation to the surroundings.';
+    description = lang === 'KO' ? '겸손하고 협조적이며, 타인의 감정을 잘 읽어 대인관계가 원만해. 강하게 밀어붙이기보다 주변의 도움을 이끌어내어 목표를 달성해.' : 'Humble and cooperative, with smooth interpersonal relations by reading others\' emotions well. Achieves goals by drawing help rather than pushing forcefully.';
+    socialContext = lang === 'KO' ? '팀워크가 중시되는 조직이나 서비스, 교육 분야에서 큰 성과를 내. 주변의 신망을 얻어 안정적인 사회 기반을 닦아.' : 'Achieves great results in team-oriented organizations, services, or education. Builds a stable social foundation by gaining trust.';
+  } else { // 극신약
+    summary = lang === 'KO' ? '섬세하고 예민한 감수성을 지녔으며, 주변의 기운을 민감하게 받아들이는 유리잔 같은 사주야.' : 'Possesses delicate and sensitive sensibilities, a glass-like chart that sensitively absorbs surrounding energies.';
+    description = lang === 'KO' ? '타인의 시선을 많이 의식하고 거절을 어려워할 수 있어. 하지만 이는 곧 타인의 니즈를 완벽히 파악하는 능력이기도 해. 자신만의 보호막이 필요해.' : 'May be very conscious of others\' views and find it hard to say no. However, this is also the ability to perfectly grasp others\' needs. Needs a personal shield.';
+    socialContext = lang === 'KO' ? '참모, 비서, 혹은 고도의 집중력이 필요한 전문직에서 빛을 발해. 강한 사람이나 시스템에 의지할 때 오히려 더 큰 안전과 성공을 보장받아.' : 'Shines as an advisor, secretary, or in professional roles requiring high focus. Guaranteed greater safety and success when relying on strong people or systems.';
+  }
+
+  const mappedTitle = lang === 'KO' ? level : (BAZI_MAPPING.strength[level as keyof typeof BAZI_MAPPING.strength]?.en || level);
+
+  return {
+    title: mappedTitle,
+    summary,
+    description,
+    socialContext
+  };
+};
+
 export const calculateAdvancedAnalysis = (
   pillars: BaZiCard[],
   tenGodsRatio: Record<string, number>,
@@ -1036,78 +1089,20 @@ export const calculateAdvancedAnalysis = (
     const level = strength.level;
     const score = strength.score;
     
-    let summaryKo = '';
-    let summaryEn = '';
-    let descKo = '';
-    let descEn = '';
-    let socialKo = '';
-    let socialEn = '';
-
-    const dayMasterDetails = strength.rootingDetails?.find((r: any) => r.pillarTitle === 'Day');
-    const hasStrongRoots = dayMasterDetails?.roots?.some((r: any) => (r.type === 'main' || r.type === 'sub_residual') && !r.isDestroyed);
-    const isWeakButRooted = (level === '신약' || level === '극신약' || level === '중화신약') && hasStrongRoots;
-
-    if (level === '극신강') {
-      summaryKo = '자아의 기운이 폭발적으로 강해, 주변 환경을 압도하는 제왕의 기운이야.';
-      summaryEn = 'Explosive self-energy, a monarch-like vibe that overwhelms the surroundings.';
-      descKo = '자존심과 고집이 매우 강하며, 남의 밑에 있기 힘든 독립적인 성격이야. 강력한 추진력으로 불가능해 보이는 일도 해내는 힘이 있어.';
-      descEn = 'Very strong pride and stubbornness; an independent personality that finds it hard to be under others. Has the power to achieve seemingly impossible tasks with strong drive.';
-      socialKo = '전문직, 사업가, 혹은 한 분야의 독보적인 권위자로 성공할 확률이 매우 높아. 다만 독단적인 결정을 주의해야 해.';
-      socialEn = 'High probability of success as a professional, entrepreneur, or a unique authority in a field. However, beware of arbitrary decisions.';
-    } else if (level === '신강') {
-      summaryKo = '자아와 주관이 뚜렷하며, 외부의 압박에 잘 견디는 튼튼한 정신력을 가지고 있어.';
-      summaryEn = 'Strong sense of self and subjective views, with a resilient mindset that withstands external pressure.';
-      descKo = '자신감이 넘치고 독립심이 강해 스스로의 힘으로 인생을 개척해 나가는 스타일이야. 어려운 상황에서도 쉽게 꺾이지 않는 뚝심이 있어.';
-      descEn = 'Confident and independent, a style that pioneers life through one\'s own strength. Has the perseverance to not bend easily even in difficult situations.';
-      socialKo = '리더십과 추진력이 뛰어나 조직 내에서 핵심적인 역할을 하거나 자기 사업을 운영하기에 아주 적합해.';
-      socialEn = 'Excellent leadership and drive, very suitable for playing a key role within an organization or running your own business.';
-    } else if (level === '중화신강') {
-      summaryKo = '자아의 힘이 충분하면서도 주변과 조화를 이룰 줄 아는 이상적인 강함이야.';
-      summaryEn = 'Ideal strength where the self is sufficient yet knows how to harmonize with the surroundings.';
-      descKo = '주관은 뚜렷하지만 타인의 의견을 수용할 줄 아는 유연함을 갖췄어. 에너지가 안정적이라 기복이 적고 꾸준한 성취를 이뤄내.';
-      descEn = 'Clear subjective views but flexible enough to accept others\' opinions. Stable energy leads to consistent achievements with few ups and downs.';
-      socialKo = '어느 조직에서나 환영받는 리더이자 조율자야. 안정적인 사회생활과 성공을 동시에 거머쥘 수 있는 좋은 구조야.';
-      socialEn = 'A leader and mediator welcomed in any organization. A good structure to achieve both stable social life and success.';
-    } else if (isWeakButRooted) {
-      summaryKo = '독립성과 주관은 매우 확고하나, 자신의 에너지를 외부로 폭넓게 분산시키며 다루는 능동적이고 활동적인 사주 구조야.';
-      summaryEn = 'Very firm independence and conviction, an active chart structure that widely disperses and manages its energy outward.';
-      descKo = '지지에 튼튼한 뿌리(통근)를 내리고 있어 절대 남에게 쉽게 의존하거나 휘둘리는 뚝심 부족의 "신약"이 아니야. 자체적인 고집과 결단력은 충분하지만, 그것을 능가할 만큼 많은 에너지(재성이나 식상 등)를 현실에서 운용하려다 보니 전체적인 힘의 잔고가 소진되어 "신약"으로 판별되는 특수한 구조지. 혼자 힘이 부족한 게 아니라 너무 많은 걸 이끌고 가는 상태에 가까워.';
-      descEn = 'With strong roots in the branches, this is NOT a "weak" chart that easily relies on or is swayed by others. You have enough stubbornness and determination. However, because you are actively managing massive external energies (like wealth or output/creativity), your overall energy balance is drained, categorizing you technically as "weak". It\'s not a lack of independent strength, but rather a state of carrying heavy responsibilities.';
-      socialKo = '독자적인 추진력이 대단하지만 혼자 모든 것을 통제하려고 하면 필연적으로 에너지가 고갈돼. 당신의 확실한 주관을 중심에 두되, 실무를 덜어줄 시스템이나 동료를 곁에 둔다면 훨씬 막강한 성과를 창출할 수 있어.';
-      socialEn = 'Your independent drive is tremendous, but trying to control everything alone inevitably depletes you. Keep your firm conviction at the core, but if you build systems or keep colleagues who can share the practical burden, you will achieve far greater success.';
-    } else if (level === '중화신약') {
-      summaryKo = '부드러운 카리스마를 지녔으며, 주변 환경을 자신에게 유리하게 활용할 줄 아는 지혜가 있어.';
-      summaryEn = 'Possesses soft charisma and the wisdom to utilize the surroundings to your advantage.';
-      descKo = '겉으로는 유연해 보이지만 내면에는 자신만의 기준이 확실해. 타인과 협력하여 더 큰 성과를 내는 데 탁월한 재능이 있어.';
-      descEn = 'Appears flexible on the outside but has clear internal standards. Outstanding talent for achieving greater results through cooperation.';
-      socialKo = '협상가나 전략가로서 빛을 발해. 사람 사이의 관계를 조율하며 실속을 차리는 능력이 뛰어나 사회적 성공이 빨라.';
-      socialEn = 'Shines as a negotiator or strategist. Excellent ability to coordinate relationships and gain substance, leading to fast social success.';
-    } else if (level === '신약') {
-      summaryKo = '타인에 대한 배려와 공감 능력이 뛰어나며, 주변 환경에 유연하게 적응하는 태도를 보여.';
-      summaryEn = 'Excellent empathy and consideration for others, showing an attitude of flexible adaptation to the surroundings.';
-      descKo = '겸손하고 협조적이며, 타인의 감정을 잘 읽어 대인관계가 원만해. 강하게 밀어붙이기보다 주변의 도움을 이끌어내어 목표를 달성해.';
-      descEn = 'Humble and cooperative, with smooth interpersonal relations by reading others\' emotions well. Achieves goals by drawing help rather than pushing forcefully.';
-      socialKo = '팀워크가 중시되는 조직이나 서비스, 교육 분야에서 큰 성과를 내. 주변의 신망을 얻어 안정적인 사회 기반을 닦아.';
-      socialEn = 'Achieves great results in team-oriented organizations, services, or education. Builds a stable social foundation by gaining trust.';
-    } else { // 극신약
-      summaryKo = '섬세하고 예민한 감수성을 지녔으며, 주변의 기운을 민감하게 받아들이는 유리잔 같은 사주야.';
-      summaryEn = 'Possesses delicate and sensitive sensibilities, a glass-like chart that sensitively absorbs surrounding energies.';
-      descKo = '타인의 시선을 많이 의식하고 거절을 어려워할 수 있어. 하지만 이는 곧 타인의 니즈를 완벽히 파악하는 능력이기도 해. 자신만의 보호막이 필요해.';
-      descEn = 'May be very conscious of others\' views and find it hard to say no. However, this is also the ability to perfectly grasp others\' needs. Needs a personal shield.';
-      socialKo = '참모, 비서, 혹은 고도의 집중력이 필요한 전문직에서 빛을 발해. 강한 사람이나 시스템에 의지할 때 오히려 더 큰 안전과 성공을 보장받아.';
-      socialEn = 'Shines as an advisor, secretary, or in professional roles requiring high focus. Guaranteed greater safety and success when relying on strong people or systems.';
-    }
+    const detailsKo = getShinGangShinYakDetails(level, strength.rootingDetails, 'KO');
+    const detailsEn = getShinGangShinYakDetails(level, strength.rootingDetails, 'EN');
 
     return {
       isStrong,
       score,
       level,
-      title: lang === 'KO' ? level : (BAZI_MAPPING.strength[level as keyof typeof BAZI_MAPPING.strength]?.en || level),
-      summary: lang === 'KO' ? summaryKo : summaryEn,
-      description: lang === 'KO' ? descKo : descEn,
-      enDescription: descEn,
-      socialContext: lang === 'KO' ? socialKo : socialEn,
-      enSocialContext: socialEn
+      title: lang === 'KO' ? detailsKo.title : detailsEn.title,
+      summary: lang === 'KO' ? detailsKo.summary : detailsEn.summary,
+      enSummary: detailsEn.summary,
+      description: lang === 'KO' ? detailsKo.description : detailsEn.description,
+      enDescription: detailsEn.description,
+      socialContext: lang === 'KO' ? detailsKo.socialContext : detailsEn.socialContext,
+      enSocialContext: detailsEn.socialContext
     };
   };
 
