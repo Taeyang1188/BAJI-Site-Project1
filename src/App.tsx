@@ -779,37 +779,16 @@ export default function App() {
                   }}
                   isSharedView={true}
                   skipLoading={true}
+                  onStartAnalysis={() => {
+                    if (typeof window !== 'undefined') {
+                      const newUrl = window.location.origin + window.location.pathname;
+                      window.history.replaceState(null, '', newUrl);
+                    }
+                    setIsSharedView(false);
+                    setSharedInput(null);
+                    setPage(2); // Go directly to saju birth date input form
+                  }}
                 />
-
-                {/* High-Impact CTA Button at the bottom of interpretation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="w-full max-w-md mx-auto mt-10 px-4"
-                >
-                  <div className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan animate-[pulse_3s_infinite] shadow-[0_0_25px_rgba(255,0,122,0.25)] hover:shadow-[0_0_35px_rgba(0,243,255,0.4)] transition-all duration-300">
-                    <button
-                      onClick={() => {
-                        if (typeof window !== 'undefined') {
-                          const newUrl = window.location.origin + window.location.pathname;
-                          window.history.replaceState(null, '', newUrl);
-                        }
-                        setIsSharedView(false);
-                        setSharedInput(null);
-                        setPage(2); // Go directly to saju birth date input form
-                      }}
-                      className="w-full py-5 px-6 bg-[#0B0118] hover:bg-[#0B0118]/80 text-white font-bold rounded-2xl transition-all flex flex-col items-center justify-center gap-1.5 focus:outline-none"
-                    >
-                      <span className={`text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-neon-cyan flex items-center gap-2 ${lang === 'KO' ? 'font-sans tracking-normal' : 'font-display tracking-wider'}`}>
-                        🌌 {lang === 'KO' ? '나도 5초만에 무료 영혼 분석 시작하기' : 'Analyze My Cosmic Soul Theme too for Free'}
-                      </span>
-                      <span className="text-[10px] sm:text-xs text-white/50 font-sans tracking-normal font-normal">
-                        {lang === 'KO' ? '이름과 태어난 일시만 입력하면 즉시 계산 완료! (100% 무료)' : 'Takes only 5 seconds to reveal your destiny!'}
-                      </span>
-                    </button>
-                  </div>
-                </motion.div>
               </div>
             ) : (
               <motion.div
