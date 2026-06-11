@@ -1144,22 +1144,17 @@ export function generatePersonalizedTexts(
   const dayBranchEn = BRANCH_EN_NAMES[dayBranch] || dayBranch;
   const monthBranchKo = BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch;
   const monthBranchEn = BRANCH_EN_NAMES[monthBranch] || monthBranch;
+  const hourBranchKo = hourBranch ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : '';
+  const hourBranchEn = hourBranch ? (BRANCH_EN_NAMES[hourBranch] || hourBranch) : '';
+  const yearBranchKo = yearBranch ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : '';
+  const yearBranchEn = yearBranch ? (BRANCH_EN_NAMES[yearBranch] || yearBranch) : '';
 
-  const dmSection = isKO
-    ? `• **일간 ${dayStem}(${dayMasterKo}) — 내면의 본질적 자아**\n${STEM_PERSONALITIES[dayStem]?.coreIdentity || ''}\n${STEM_PERSONALITIES[dayStem]?.innateDesire || ''}`
-    : `• **Day Master ${dayStem}(${dayMasterKo}) — Your Core Self**\n${STEM_INFO_EN[dayStem]?.coreIdentity || ''}\n${STEM_INFO_EN[dayStem]?.innateDesire || ''}`;
-
-  const dbSection = isKO
-    ? `• **일지 ${dayBranch}(${dayBranchKo}) — 내밀한 감성과 태도**\n${BRANCH_PERSONALITIES[dayBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[dayBranch]?.hiddenStruggle || ''}`
-    : `• **Day Branch ${dayBranch}(${dayBranchEn}) — Inner Mind & Private Demeanor**\n${BRANCH_INFO_EN[dayBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[dayBranch]?.hiddenStruggle || ''}`;
-
-  const mbSection = isKO
-    ? `• **월지 ${monthBranch}(${monthBranchKo}) — 사회적 환경과 처세**\n귀하의 사회적 삶은 월지 ${monthBranch}의 분위기 안에서 펼쳐집니다. ${BRANCH_PERSONALITIES[monthBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[monthBranch]?.socialPattern || ''}`
-    : `• **Month Branch ${monthBranch}(${monthBranchEn}) — Social Context & Relationships**\nYour social life unfolds within the atmosphere of Month Branch ${monthBranch}. ${BRANCH_INFO_EN[monthBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[monthBranch]?.socialPattern || ''}`;
-
-  const pillarTemperamentDesc = isKO
-    ? `**[🔍 기둥별 타고난 기질 해설]**\n\n${dmSection}\n\n${dbSection}\n\n${mbSection}`
-    : `**[🔍 Pillar-by-Pillar Innate Temperament]**\n\n${dmSection}\n\n${dbSection}\n\n${mbSection}`;
+  const monthStemKo = STEM_PERSONALITIES[monthStem]?.koName || monthStem;
+  const monthStemEn = STEM_EN_NAMES[monthStem] || monthStem;
+  const hourStemKo = hourStem ? (STEM_PERSONALITIES[hourStem]?.koName || hourStem) : '';
+  const hourStemEn = hourStem ? (STEM_EN_NAMES[hourStem] || hourStem) : '';
+  const yearStemKo = yearStem ? (STEM_PERSONALITIES[yearStem]?.koName || yearStem) : '';
+  const yearStemEn = yearStem ? (STEM_EN_NAMES[yearStem] || yearStem) : '';
 
   let categoryTitle = '';
   let categoryDesc = '';
@@ -1225,6 +1220,88 @@ export function generatePersonalizedTexts(
       innatePillars.push({ pillarTitle: 'Year', type: 'stem' as const });
     }
   }
+
+  // Dynamic build of Pillar-by-pillar personalized text based on innatePillars
+  const getPillarSection = (key: string): { ko: string; en: string } => {
+    switch (key) {
+      case 'Day-stem':
+        return {
+          ko: `• **일간 ${dayStem}(${dayMasterKo}) — 내면의 본질적 자아**\n${STEM_PERSONALITIES[dayStem]?.coreIdentity || ''}\n${STEM_PERSONALITIES[dayStem]?.innateDesire || ''}`,
+          en: `• **Day Master ${dayStem}(${dayMasterKo}) — Your Core Self**\n${STEM_INFO_EN[dayStem]?.coreIdentity || ''}\n${STEM_INFO_EN[dayStem]?.innateDesire || ''}`
+        };
+      case 'Day-branch':
+        return {
+          ko: `• **일지 ${dayBranch}(${dayBranchKo}) — 내밀한 감성과 태도**\n${BRANCH_PERSONALITIES[dayBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[dayBranch]?.hiddenStruggle || ''}`,
+          en: `• **Day Branch ${dayBranch}(${dayBranchEn}) — Inner Mind & Private Demeanor**\n${BRANCH_INFO_EN[dayBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[dayBranch]?.hiddenStruggle || ''}`
+        };
+      case 'Month-stem':
+        return {
+          ko: `• **월간 ${monthStem}(${monthStemKo}) — 사회적 지향성과 가치관**\n${STEM_PERSONALITIES[monthStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[monthStem]?.strengthInSociety || ''}`,
+          en: `• **Month Stem ${monthStem}(${monthStemEn}) — Social Orientation & Values**\n${STEM_INFO_EN[monthStem]?.coreIdentity || ''} ${STEM_INFO_EN[monthStem]?.strengthInSociety || ''}`
+        };
+      case 'Month-branch':
+        return {
+          ko: `• **월지 ${monthBranch}(${monthBranchKo}) — 사회적 환경과 처세**\n귀하의 사회적 삶은 월지 ${monthBranch}의 분위기 안에서 펼쳐집니다. ${BRANCH_PERSONALITIES[monthBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[monthBranch]?.socialPattern || ''}`,
+          en: `• **Month Branch ${monthBranch}(${monthBranchEn}) — Social Context & Relationships**\nYour social life unfolds within the atmosphere of Month Branch ${monthBranch}. ${BRANCH_INFO_EN[monthBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[monthBranch]?.socialPattern || ''}`
+        };
+      case 'Hour-stem':
+        return {
+          ko: `• **시간 ${hourStem}(${hourStemKo}) — 미래의 지향점과 이상향**\n${STEM_PERSONALITIES[hourStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[hourStem]?.innateDesire || ''}`,
+          en: `• **Hour Stem ${hourStem}(${hourStemEn}) — Future Aspirations & Ideals**\n${STEM_INFO_EN[hourStem]?.coreIdentity || ''} ${STEM_INFO_EN[hourStem]?.innateDesire || ''}`
+        };
+      case 'Hour-branch':
+        return {
+          ko: `• **시지 ${hourBranch}(${hourBranchKo}) — 속마음과 결과물**\n귀하의 깊은 내면과 최종 결실을 지배하는 시지 ${hourBranch}는 행동의 원동력입니다. ${BRANCH_PERSONALITIES[hourBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[hourBranch]?.hiddenStruggle || ''}`,
+          en: `• **Hour Branch ${hourBranch}(${hourBranchEn}) — Inner Thoughts & Outcomes**\nThe Hour Branch ${hourBranch} governs your deepest desires and final outcomes. ${BRANCH_INFO_EN[hourBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[hourBranch]?.hiddenStruggle || ''}`
+        };
+      case 'Year-stem':
+        return {
+          ko: `• **년간 ${yearStem}(${yearStemKo}) — 외부 대외적 이미지와 첫인상**\n${STEM_PERSONALITIES[yearStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[yearStem]?.strengthInSociety || ''}`,
+          en: `• **Year Stem ${yearStem}(${yearStemEn}) — Public Image & First Impression**\n${STEM_INFO_EN[yearStem]?.coreIdentity || ''} ${STEM_INFO_EN[yearStem]?.strengthInSociety || ''}`
+        };
+      case 'Year-branch':
+        return {
+          ko: `• **년지 ${yearBranch}(${yearBranchKo}) — 삶의 뿌리와 행동의 토대**\n삶의 무의식적 뿌리를 이루는 년지 ${yearBranch}는 기초적인 행동 성향을 형성합니다. ${BRANCH_PERSONALITIES[yearBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[yearBranch]?.socialPattern || ''}`,
+          en: `• **Year Branch ${yearBranch}(${yearBranchEn}) — Ancestral Roots & Life Foundation**\nThe Year Branch ${yearBranch} forms the root and foundation of your life. ${BRANCH_INFO_EN[yearBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[yearBranch]?.socialPattern || ''}`
+        };
+      default:
+        return { ko: '', en: '' };
+    }
+  };
+
+  const pillarKeys = new Set<string>();
+  pillarKeys.add('Day-stem'); // Always include Day Master first
+  if (innatePillars) {
+    innatePillars.forEach(kp => {
+      pillarKeys.add(`${kp.pillarTitle}-${kp.type}`);
+    });
+  }
+
+  const sortOrder = [
+    'Day-stem',
+    'Day-branch',
+    'Month-stem',
+    'Month-branch',
+    'Hour-stem',
+    'Hour-branch',
+    'Year-stem',
+    'Year-branch'
+  ];
+
+  const sortedKeys = Array.from(pillarKeys).sort((a, b) => sortOrder.indexOf(a) - sortOrder.indexOf(b));
+
+  const sectionsKo: string[] = [];
+  const sectionsEn: string[] = [];
+
+  sortedKeys.forEach(key => {
+    const sec = getPillarSection(key);
+    if (sec.ko) sectionsKo.push(sec.ko);
+    if (sec.en) sectionsEn.push(sec.en);
+  });
+
+  const pillarTemperamentDesc = isKO
+    ? `**[🔍 기둥별 타고난 기질 해설]**\n\n${sectionsKo.join('\n\n')}`
+    : `**[🔍 Pillar-by-Pillar Innate Temperament]**\n\n${sectionsEn.join('\n\n')}`;
 
   const categorySection = isKO
     ? `**[🧬 기질의 구조적 지향성: ${categoryTitle}]**\n\n${categoryDesc}`

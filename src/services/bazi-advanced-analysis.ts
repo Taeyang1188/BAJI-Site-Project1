@@ -1102,10 +1102,12 @@ export const calculateAdvancedAnalysis = (
       isStrong,
       score,
       level,
-      title: level,
+      title: lang === 'KO' ? level : (BAZI_MAPPING.strength[level as keyof typeof BAZI_MAPPING.strength]?.en || level),
       summary: lang === 'KO' ? summaryKo : summaryEn,
       description: lang === 'KO' ? descKo : descEn,
-      socialContext: lang === 'KO' ? socialKo : socialEn
+      enDescription: descEn,
+      socialContext: lang === 'KO' ? socialKo : socialEn,
+      enSocialContext: socialEn
     };
   };
 
