@@ -567,6 +567,8 @@ interface BaZiResultPageProps {
   skipTyping?: boolean;
   userInput?: UserInput;
   coords?: { lat: number; lon: number };
+  viewMode?: 'result' | 'interpretation';
+  setViewMode?: (mode: 'result' | 'interpretation') => void;
 }
 
 const parseColorBracketsToHtml = (text: string): string => {
@@ -752,7 +754,23 @@ const BaziTooltip = ({
   );
 };
 
-export default function BaZiResultPage({ result, lang, userName, gender, city, socialContext, onBack, skipTyping = false, userInput, coords }: BaZiResultPageProps) {
+export default function BaZiResultPage({ 
+  result, 
+  lang, 
+  userName, 
+  gender, 
+  city, 
+  socialContext, 
+  onBack, 
+  skipTyping = false, 
+  userInput, 
+  coords,
+  viewMode: externalViewMode,
+  setViewMode: externalSetViewMode
+}: BaZiResultPageProps) {
+  const [localViewMode, localSetViewMode] = useState<'result' | 'interpretation'>('result');
+  const viewMode = externalViewMode !== undefined ? externalViewMode : localViewMode;
+  const setViewMode = externalSetViewMode !== undefined ? externalSetViewMode : localSetViewMode;
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const t = TRANSLATIONS[lang].result as any;
@@ -1101,7 +1119,6 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
   const [showYongshinRolesInfo, setShowYongshinRolesInfo] = useState(false);
   const [showInteractionInfo, setShowInteractionInfo] = useState<string | null>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const [viewMode, setViewMode] = useState<'result' | 'interpretation'>('result');
   const [showHanja, setShowHanja] = useState(true);
   const [guideStep, setGuideStep] = useState(0); // 0: None, 1: Year, 2: Month, 3: Day, 4: Hour, 5: JiJangGan, 6: TenGods, 7: Daewun
 

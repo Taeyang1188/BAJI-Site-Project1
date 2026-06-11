@@ -87,9 +87,25 @@ export default function BaZiInterpretationPage({
   const pinkColor = isLight ? '#E11D48' : '#FF2A6D';
   const purpleColor = isLight ? '#7C3AED' : '#9B30FF';
 
-  const [isLoading, setIsLoading] = useState(!skipLoading);
-  const [progress, setProgress] = useState(skipLoading ? 100 : 0);
-  const [activeStep, setActiveStep] = useState(skipLoading ? 7 : 0);
+  const cacheKey = useMemo(() => {
+    return `${userInput.name || ''}_${userInput.birthDate || ''}_${userInput.birthTime || ''}_${userInput.calendarType || ''}_${userInput.gender || ''}_${coords?.lat || 0}_${coords?.lon || 0}`;
+  }, [userInput, coords]);
+
+  const hasCache = useMemo(() => {
+    if (skipLoading) return true;
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem(`visited_interpretation_${cacheKey}`) === 'true';
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  }, [cacheKey, skipLoading]);
+
+  const [isLoading, setIsLoading] = useState(!hasCache);
+  const [progress, setProgress] = useState(hasCache ? 100 : 0);
+  const [activeStep, setActiveStep] = useState(hasCache ? 7 : 0);
 
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'error'>('idle');
 
@@ -213,7 +229,7 @@ export default function BaZiInterpretationPage({
 
   // Loading effect
   useEffect(() => {
-    if (skipLoading) {
+    if (hasCache) {
       onLoadingComplete?.();
       return;
     }
@@ -226,6 +242,16 @@ export default function BaZiInterpretationPage({
       if (currentProgress >= 100) {
         currentProgress = 100;
         setProgress(100);
+
+        // Save to cache
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`visited_interpretation_${cacheKey}`, 'true');
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
         setTimeout(() => {
           setIsLoading(false);
           onLoadingComplete?.();
@@ -555,19 +581,21 @@ export default function BaZiInterpretationPage({
   return (
     <div className={`w-full max-w-3xl mx-auto px-4 py-8 space-y-10 sm:space-y-14 relative z-10 select-text bazi-interpretation-root ${isLight ? 'text-neutral-900' : 'text-white'}`}>
       {/* Go Back button */}
-      <div className="flex justify-start">
-        <button
-          onClick={onBack}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all tracking-wider border ${
-            isLight
-              ? 'bg-black/5 border-black/10 text-neutral-700 hover:bg-black/10 hover:text-black'
-              : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-          }`}
-        >
-          <ArrowLeft className="w-4 h-4 text-neon-pink" />
-          {lang === 'KO' ? '결과 요약으로 돌아가기' : 'Back to Summary'}
-        </button>
-      </div>
+      {!isSharedView && (
+        <div className="flex justify-start">
+          <button
+            onClick={onBack}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all tracking-wider border ${
+              isLight
+                ? 'bg-black/5 border-black/10 text-neutral-700 hover:bg-black/10 hover:text-black'
+                : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            <ArrowLeft className="w-4 h-4 text-neon-pink" />
+            {lang === 'KO' ? '결과 요약으로 돌아가기' : 'Back to Summary'}
+          </button>
+        </div>
+      )}
 
       {/* Hero Header Section */}
       <motion.div

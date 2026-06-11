@@ -363,6 +363,7 @@ export default function App() {
   const { theme, toggleTheme } = useTheme();
   
   const [page, setPage] = useState<1 | 2 | 3>(1);
+  const [resultViewMode, setResultViewMode] = useState<'result' | 'interpretation'>('result');
   const [ufoLoaded, setUfoLoaded] = useState(false);
   const [lang, setLang] = useState<Language>('KO');
 
@@ -646,12 +647,19 @@ export default function App() {
     }
 
     setSubmitTimestamps([...recentSubmits, now]);
+    setResultViewMode('result'); // Reset view mode to summary when calculating new result
     setPage(3);
   };
 
   const handleBack = () => {
     if (page === 2) setPage(1);
-    else if (page === 3) setPage(2);
+    else if (page === 3) {
+      if (resultViewMode === 'interpretation') {
+        setResultViewMode('result');
+      } else {
+        setPage(2);
+      }
+    }
   };
 
   return (
@@ -746,21 +754,29 @@ export default function App() {
           {isSharedView && sharedResult && sharedInput ? (
             sharedViewMode === 'interpretation' ? (
               <div className="w-full max-w-4xl mx-auto px-4 relative z-10 py-6 animate-fade-in">
-                <div className="mb-4 text-center">
+                <div className="mb-8 text-center p-6 rounded-3xl border border-neon-purple/20 bg-neon-purple/5 backdrop-blur-md shadow-[0_0_20px_rgba(155,48,255,0.05)] relative overflow-hidden">
+                  {/* Subtle reflection light effect */}
+                  <div className="absolute -top-12 -left-12 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
+                  
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-semibold uppercase tracking-widest font-mono select-none mb-2"
+                    className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neon-purple/20 border border-neon-purple/30 text-neon-purple text-[10px] sm:text-xs font-bold uppercase tracking-wider font-mono select-none mb-3"
                   >
-                    <Sparkles className="w-3.5 h-3.5 animate-pulse text-neon-pink" />
+                    <Sparkles className="w-3.5 h-3.5 animate-pulse text-neon-purple" />
                     {lang === 'KO' ? '공유된 운명의 상세 해설 리포트' : 'Shared Detailed Interpretation Report'}
                   </motion.div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight mb-2">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan pr-1 select-none">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-tight">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan pr-1 select-none font-black">
                       {sharedInput.name || (lang === 'KO' ? '익명' : 'Anonymous')}
                     </span>
-                    {lang === 'KO' ? '님의 상세 분석 해설' : "'s Detailed Interpretation"}
+                    <span className="text-white/90">
+                      {lang === 'KO' ? '님의 상세 분석 해설' : "'s Detailed Interpretation"}
+                    </span>
                   </h1>
+                  <p className="text-[10px] sm:text-xs text-white/40 mt-1.5 font-sans">
+                    {lang === 'KO' ? '공유된 링크를 통해 상세 해설을 열람 중입니다.' : 'Viewing detailed interpretation via a shared link.'}
+                  </p>
                 </div>
 
                 <BaZiInterpretationPage
@@ -1253,6 +1269,8 @@ export default function App() {
                   skipTyping={skipTyping}
                   userInput={userInput}
                   coords={coords}
+                  viewMode={resultViewMode}
+                  setViewMode={setResultViewMode}
                 />
               </Suspense>
             </motion.div>
