@@ -54,139 +54,139 @@ const BRANCH_EN_NAMES: Record<string, string> = {
 
 const STEM_INFO_EN: Record<string, { coreIdentity: string, innateDesire: string, strengthInSociety: string, shadowSide: string }> = {
   '甲': {
-    coreIdentity: "a giant tree stretching straight toward the sky, holding a pioneering instinct and unbending willpower in your DNA.",
-    innateDesire: "You possess a strong drive to leave a unique mark on the world, with a hidden fear of being unrecognized or ignored.",
-    strengthInSociety: "Your strength lies in offering clear direction, maintaining focus in chaos, and carrying out responsibilities single-handedly.",
-    shadowSide: "Your stubbornness can make collaboration rigid, as you find it hard to compromise or accept other ways of doing things."
+    coreIdentity: "a giant tree stretching straight toward the sky, holding a **pioneering instinct** and **unbending willpower** in your DNA.",
+    innateDesire: "You possess a **strong drive to leave a unique mark** on the world, with a hidden fear of being unrecognized or ignored.",
+    strengthInSociety: "Your strength lies in **offering clear direction**, maintaining focus in chaos, and **carrying out responsibilities single-handedly**.",
+    shadowSide: "Your **stubbornness** can make collaboration rigid, as you find it hard to compromise or accept other ways of doing things."
   },
   '乙': {
-    coreIdentity: "a delicate ivy or wildflower climbing along others, holding a flexible survival instinct and natural coexisting charm.",
-    innateDesire: "You desire to bloom safely within a stable environment, harboring a primal fear of being left alone in the wild.",
-    strengthInSociety: "Your strength is your outstanding adaptability and sociability to blend in, drawing help from strong partners.",
-    shadowSide: "You tend to overly compromise to fit in, sometimes losing track of your own desires and failing to take a clear stand."
+    coreIdentity: "a delicate ivy or wildflower climbing along others, holding a **flexible survival instinct** and **natural coexisting charm**.",
+    innateDesire: "You desire to **bloom safely within a stable environment**, harboring a primal fear of being left alone in the wild.",
+    strengthInSociety: "Your strength is your **outstanding adaptability** and sociability to blend in, drawing help from strong partners.",
+    shadowSide: "You tend to **overly compromise to fit in**, sometimes losing track of your own desires and failing to take a clear stand."
   },
   '丙': {
-    coreIdentity: "the brilliant sun in the sky, naturally sharing warmth and seeking to shine at the center of any stage.",
-    innateDesire: "You have a strong desire to be noticed, appreciated, and recognized, feeling empty when the spotlight fades.",
-    strengthInSociety: "Your warm charisma and sociability can instantly brighten up any atmosphere, serving as a valuable social asset.",
-    shadowSide: "You feel anxious and empty when not in the spotlight, sometimes leading to over-expression or seeking attention."
+    coreIdentity: "the brilliant sun in the sky, naturally **sharing warmth** and seeking to **shine at the center of any stage**.",
+    innateDesire: "You have a **strong desire to be noticed, appreciated, and recognized**, feeling empty when the spotlight fades.",
+    strengthInSociety: "Your **warm charisma and sociability** can instantly brighten up any atmosphere, serving as a valuable social asset.",
+    shadowSide: "You feel **anxious and empty** when not in the spotlight, sometimes leading to over-expression or seeking attention."
   },
   '丁': {
-    coreIdentity: "a flickering candle light, quietly illuminating the darkness for those closest to you with precision and sincerity.",
-    innateDesire: "You yearn for sincere connections and deep understanding, often holding a quiet disappointment towards the busy world.",
-    strengthInSociety: "Your sharp observation, sensitive intuition, and deep loyalty to those you care about create solid relationships.",
-    shadowSide: "Your sensitive nature makes you easily hurt, and you tend to suppress emotions rather than speak out."
+    coreIdentity: "a flickering candle light, **quietly illuminating the darkness** for those closest to you with **precision and sincerity**.",
+    innateDesire: "You yearn for **sincere connections and deep understanding**, often holding a quiet disappointment towards the busy world.",
+    strengthInSociety: "Your **sharp observation, sensitive intuition**, and deep loyalty to those you care about create solid relationships.",
+    shadowSide: "Your **sensitive nature** makes you easily hurt, and you tend to suppress emotions rather than speak out."
   },
   '戊': {
-    coreIdentity: "a massive mountain, providing a heavy presence, steady stability, and broad tolerance to those around you.",
-    innateDesire: "You desire to keep your place securely, harboring resistance to sudden changes or unverified concepts.",
-    strengthInSociety: "Your reliable presence keeps relationships and organizations grounded, earning deep trust over time.",
-    shadowSide: "Your resistance to change and attachment to old methods can delay your growth in a rapidly changing world."
+    coreIdentity: "a massive mountain, providing a **heavy presence, steady stability**, and broad tolerance to those around you.",
+    innateDesire: "You desire to **keep your place securely**, harboring resistance to sudden changes or unverified concepts.",
+    strengthInSociety: "Your **reliable presence** keeps relationships and organizations grounded, earning deep trust over time.",
+    shadowSide: "Your **resistance to change** and attachment to old methods can delay your growth in a rapidly changing world."
   },
   '己': {
-    coreIdentity: "fertile garden soil, naturally nurturing seeds with a strategic mindset that prepares thoroughly before action.",
-    innateDesire: "You pursue practical results and inner substance over flashiness, fearing hollow success or unstable foundations.",
-    strengthInSociety: "Your ability to quickly identify and utilize people's strengths, combined with a sharp sense of reality, is key.",
-    shadowSide: "Your suspicious nature makes you slow to open up, and you might appear overly calculating or miss opportunities."
+    coreIdentity: "fertile garden soil, naturally **nurturing seeds** with a **strategic mindset** that prepares thoroughly before action.",
+    innateDesire: "You pursue **practical results and inner substance** over flashiness, fearing hollow success or unstable foundations.",
+    strengthInSociety: "Your ability to **quickly identify and utilize people's strengths**, combined with a sharp sense of reality, is key.",
+    shadowSide: "Your **suspicious nature** makes you slow to open up, and you might appear overly calculating or miss opportunities."
   },
   '庚': {
-    coreIdentity: "hard steel or raw iron, guided by unyielding principles and clear standards, choosing logic over emotion.",
-    innateDesire: "You want your standards to be respected, feeling highly uncomfortable with compromise, exceptions, or chaos.",
-    strengthInSociety: "Your iron willpower and structured decision-making excel in organizing chaos and building efficient systems.",
-    shadowSide: "Your bluntness and lack of emotional consideration can freeze relationships, and you struggle to admit mistakes."
+    coreIdentity: "hard steel or raw iron, guided by **unyielding principles and clear standards**, choosing logic over emotion.",
+    innateDesire: "You want your **standards to be respected**, feeling highly uncomfortable with compromise, exceptions, or chaos.",
+    strengthInSociety: "Your **iron willpower and structured decision-making** excel in organizing chaos and building efficient systems.",
+    shadowSide: "Your **bluntness and lack of emotional consideration** can freeze relationships, and you struggle to admit mistakes."
   },
   '辛': {
-    coreIdentity: "a refined gem or sharp needle, possessing precise, delicate senses and aiming for absolute perfection.",
-    innateDesire: "You want to be recognized in your unique domain, rejecting mediocrity and always finding your distinct value.",
-    strengthInSociety: "Your detail-oriented observation and high standards create unmatched professionalism and quality.",
-    shadowSide: "Your high standards can exhaust both you and others, sometimes leading to self-criticism or hesitation to start."
+    coreIdentity: "a refined gem or sharp needle, possessing precise, delicate senses and **aiming for absolute perfection**.",
+    innateDesire: "You want to be **recognized in your unique domain**, rejecting mediocrity and always finding your distinct value.",
+    strengthInSociety: "Your **detail-oriented observation and high standards** create unmatched professionalism and quality.",
+    shadowSide: "Your **high standards** can exhaust both you and others, sometimes leading to self-criticism or hesitation to start."
   },
   '壬': {
-    coreIdentity: "a grand river or ocean, containing a vast mind that constantly flows, adapts, and seeks new horizons.",
-    innateDesire: "You yearn for freedom and endless expansion, showing resistance to boundaries, rules, or being boxed in.",
-    strengthInSociety: "Your quick wit, high adaptability across fields, and strategic vision help you connect naturally with anyone.",
-    shadowSide: "You may spread yourself too thin without completing tasks, and you keep true feelings hidden from deep commitments."
+    coreIdentity: "a grand river or ocean, containing a vast mind that **constantly flows, adapts**, and seeks new horizons.",
+    innateDesire: "You yearn for **freedom and endless expansion**, showing resistance to boundaries, rules, or being boxed in.",
+    strengthInSociety: "Your **quick wit, high adaptability**, and strategic vision help you connect naturally with anyone.",
+    shadowSide: "You may spread yourself too thin without completing tasks, and you **keep true feelings hidden** from deep commitments."
   },
   '癸': {
-    coreIdentity: "clear morning dew or spring water, soft on the surface but seeping in with profound wisdom and sharp intuition.",
-    innateDesire: "You seek deep truths and meaning in life, feeling empty with superficial interactions or mundane routines.",
-    strengthInSociety: "Your sharp intuition to read people and detect hidden patterns quietly helps you adapt and gather information.",
-    shadowSide: "You overanalyze and hesitate to make decisions, and keeping thoughts to yourself can create isolation."
+    coreIdentity: "clear morning dew or spring water, soft on the surface but seeping in with **profound wisdom and sharp intuition**.",
+    innateDesire: "You seek **deep truths and meaning** in life, feeling empty with superficial interactions or mundane routines.",
+    strengthInSociety: "Your **sharp intuition to read people** and detect hidden patterns quietly helps you adapt and gather information.",
+    shadowSide: "You **overanalyze and hesitate** to make decisions, and keeping thoughts to yourself can create isolation."
   }
 };
 
 const BRANCH_INFO_EN: Record<string, { lifeEnvironment: string, behavioralTrigger: string, socialPattern: string, hiddenStruggle: string }> = {
   '子': {
-    lifeEnvironment: "a quiet midnight setting, where you enjoy reflection and inner conversations away from external noise.",
-    behavioralTrigger: "harboring a strong defense when your private space is invaded or trust is broken.",
-    socialPattern: "preferring a small circle of deep relationships, slow to trust but deeply loyal once committed.",
-    hiddenStruggle: "suppressing intense emotional waves inside while appearing calm on the outside, which can lead to isolation."
+    lifeEnvironment: "a quiet midnight setting, where you enjoy **reflection and inner conversations** away from external noise.",
+    behavioralTrigger: "harboring a **strong defense** when your private space is invaded or trust is broken.",
+    socialPattern: "preferring a **small circle of deep relationships**, slow to trust but deeply loyal once committed.",
+    hiddenStruggle: "suppressing **intense emotional waves** inside while appearing calm on the outside, which can lead to isolation."
   },
   '丑': {
-    lifeEnvironment: "frozen earth at winter's end, quietly concealing strong life forces that bloom after long patience.",
-    behavioralTrigger: "feeling deep disappointment and frustration when your hard work goes unrecognized or unrewarded.",
-    socialPattern: "silently carrying out your duties and preferring stable, practical connections over flashy ones.",
-    hiddenStruggle: "accumulating unexpressed grievances inside, which may erupt unexpectedly under pressure."
+    lifeEnvironment: "frozen earth at winter's end, quietly concealing **strong life forces** that bloom after long patience.",
+    behavioralTrigger: "feeling **deep disappointment and frustration** when your hard work goes unrecognized or unrewarded.",
+    socialPattern: "silently **carrying out your duties** and preferring stable, practical connections over flashy ones.",
+    hiddenStruggle: "accumulating **unexpressed grievances** inside, which may erupt unexpectedly under pressure."
   },
   '寅': {
-    lifeEnvironment: "the vigorous energy of early dawn, filled with a desire to start, pioneer, and keep moving.",
-    behavioralTrigger: "acting immediately upon new excitement, but feeling severe boredom with repetitive routines.",
-    socialPattern: "thriving in relationships with influential leaders, naturally acting as the brave pioneer.",
-    hiddenStruggle: "struggling to finish what you start, often leaving projects incomplete as your focus shifts."
+    lifeEnvironment: "the vigorous energy of early dawn, filled with a **desire to start, pioneer**, and keep moving.",
+    behavioralTrigger: "acting **immediately upon new excitement**, but feeling severe boredom with repetitive routines.",
+    socialPattern: "thriving in relationships with **influential leaders**, naturally acting as the brave pioneer.",
+    hiddenStruggle: "struggling to **finish what you start**, often leaving projects incomplete as your focus shifts."
   },
   '卯': {
-    lifeEnvironment: "a spring flower garden, valuing your own space, delicate sensitivity, and unique pace.",
-    behavioralTrigger: "reacting strongly when your personal values, aesthetic standards, or originality are ignored.",
-    socialPattern: "sticking to your own world rather than conforming, but forming deep bonds with those who understand you.",
-    hiddenStruggle: "appearing highly independent while harboring a deep desire to be understood by someone."
+    lifeEnvironment: "a spring flower garden, valuing your **own space, delicate sensitivity**, and unique pace.",
+    behavioralTrigger: "reacting **strongly when your personal values**, aesthetic standards, or originality are ignored.",
+    socialPattern: "sticking to your **own world** rather than conforming, but forming deep bonds with those who understand you.",
+    hiddenStruggle: "appearing highly independent while harboring a **deep desire to be understood** by someone."
   },
   '辰': {
-    lifeEnvironment: "a sleeping dragon's cave, quiet on the surface but concealing explosive potential and energy.",
-    behavioralTrigger: "unleashing massive energy and focus when a critical opportunity or moment of proof arrives.",
-    socialPattern: "showing strong presence in key moments and helping to organize chaotic situations.",
-    hiddenStruggle: "handling too many possibilities at once, leading to internal distraction and lack of focus."
+    lifeEnvironment: "a sleeping dragon's cave, quiet on the surface but concealing **explosive potential and energy**.",
+    behavioralTrigger: "unleashing **massive energy and focus** when a critical opportunity or moment of proof arrives.",
+    socialPattern: "showing **strong presence** in key moments and helping to organize chaotic situations.",
+    hiddenStruggle: "handling **too many possibilities** at once, leading to internal distraction and lack of focus."
   },
   '巳': {
-    lifeEnvironment: "a strategic snake observing in silence, moving precisely at the most beneficial moment.",
-    behavioralTrigger: "moving actively when a clear advantage or opportunity arises, but ignoring meaningless requests.",
-    socialPattern: "building selective relationships after evaluating the potential and values of others.",
-    hiddenStruggle: "concealing your true feelings to avoid appearing calculating, making it hard for others to read you."
+    lifeEnvironment: "a strategic snake observing in silence, moving **precisely at the most beneficial moment**.",
+    behavioralTrigger: "moving actively when a **clear advantage or opportunity** arises, but ignoring meaningless requests.",
+    socialPattern: "building **selective relationships** after evaluating the potential and values of others.",
+    hiddenStruggle: "concealing your **true feelings** to avoid appearing calculating, making it hard for others to read you."
   },
   '午': {
-    lifeEnvironment: "the burning midday sun, direct, honest, and unable to hide emotions or opinions.",
-    behavioralTrigger: "reacting instantly to injustice or hypocrisy, especially when your core values are challenged.",
-    socialPattern: "forming a wide network of friends, but having frequent clashes with those of different values.",
-    hiddenStruggle: "riding intense emotional rollercoasters, which can make you appear unpredictable to others."
+    lifeEnvironment: "the burning midday sun, direct, honest, and **unable to hide emotions or opinions**.",
+    behavioralTrigger: "reacting **instantly to injustice or hypocrisy**, especially when your core values are challenged.",
+    socialPattern: "forming a **wide network of friends**, but having frequent clashes with those of different values.",
+    hiddenStruggle: "riding **intense emotional rollercoasters**, which can make you appear unpredictable to others."
   },
   '未': {
-    lifeEnvironment: "dry earth under the summer sun, focusing on inner substance and practical results over appearance.",
-    behavioralTrigger: "participating actively when your worth is recognized or tangible results are in sight.",
-    socialPattern: "valuing trust and practical help in relationships, building trust through deeds rather than words.",
-    hiddenStruggle: "possessing a stubborn nature that makes it hard to accept new directions or others' methods."
+    lifeEnvironment: "dry earth under the summer sun, focusing on **inner substance and practical results** over appearance.",
+    behavioralTrigger: "participating actively when your **worth is recognized** or tangible results are in sight.",
+    socialPattern: "valuing **trust and practical help** in relationships, building trust through deeds rather than words.",
+    hiddenStruggle: "possessing a **stubborn nature** that makes it hard to accept new directions or others' methods."
   },
   '申': {
-    lifeEnvironment: "a sharp sword, featuring a bright mind and quick analytical skills to find the best path.",
-    behavioralTrigger: "striving to improve systems when facing technical challenges or inefficient methods.",
-    socialPattern: "preferring competency-based networks, thriving in environments with talented peers.",
-    hiddenStruggle: "suffering from impatience, making hasty decisions or rushing others who move slower."
+    lifeEnvironment: "a sharp sword, featuring a **bright mind and quick analytical skills** to find the best path.",
+    behavioralTrigger: "striving to **improve systems** when facing technical challenges or inefficient methods.",
+    socialPattern: "preferring **competency-based networks**, thriving in environments with talented peers.",
+    hiddenStruggle: "suffering from **impatience**, making hasty decisions or rushing others who move slower."
   },
   '酉': {
-    lifeEnvironment: "the tranquility of twilight, pursuing a refined personal world with strict standards.",
-    behavioralTrigger: "reacting strongly when your aesthetic standards or professional judgment are questioned.",
-    socialPattern: "slow to open up but building highly precise and deep connections that grow stronger over time.",
-    hiddenStruggle: "letting your high standards exhaust you and others, sometimes creating a cycle of isolation."
+    lifeEnvironment: "the tranquility of twilight, pursuing a **refined personal world with strict standards**.",
+    behavioralTrigger: "reacting **strongly when your aesthetic standards** or professional judgment are questioned.",
+    socialPattern: "slow to open up but building **highly precise and deep connections** that grow stronger over time.",
+    hiddenStruggle: "letting your **high standards exhaust you** and others, sometimes creating a cycle of isolation."
   },
   '戌': {
-    lifeEnvironment: "an evening field, holding deep reflection, strong principles, and immense loyalty.",
-    behavioralTrigger: "defending fiercely when your values are challenged or those under your protection are threatened.",
-    socialPattern: "maintaining relationships with unchanging loyalty, standing firmly by those you trust.",
-    hiddenStruggle: "holding onto stubborness and old emotions, making forgiveness and letting go difficult."
+    lifeEnvironment: "an evening field, holding **deep reflection, strong principles, and immense loyalty**.",
+    behavioralTrigger: "defending **fiercely when your values** are challenged or those under your protection are threatened.",
+    socialPattern: "maintaining relationships with **unchanging loyalty**, standing firmly by those you trust.",
+    hiddenStruggle: "holding onto **stubborness and old emotions**, making forgiveness and letting go difficult."
   },
   '亥': {
-    lifeEnvironment: "the deep sea, quiet on the surface but holding massive depth, intuition, and truth underneath.",
-    behavioralTrigger: "diving head-on when your intuition triggers, but losing energy in artificial or calculating setups.",
-    socialPattern: "reading people's energies instinctively, drawn to those with genuine sincerity.",
-    hiddenStruggle: "absorbing others' emotions easily due to vague boundaries, struggling to separate your own feelings."
+    lifeEnvironment: "the deep sea, quiet on the surface but holding **massive depth, intuition, and truth** underneath.",
+    behavioralTrigger: "diving **head-on when your intuition triggers**, but losing energy in artificial or calculating setups.",
+    socialPattern: "reading people's **energies instinctively**, drawn to those with genuine sincerity.",
+    hiddenStruggle: "absorbing others' **emotions easily due to vague boundaries**, struggling to separate your own feelings."
   }
 };
 
@@ -492,22 +492,26 @@ function findOverloadedTenGods(
   stems: { title: 'Day' | 'Month' | 'Year' | 'Hour', val: string }[],
   branches: { title: 'Day' | 'Month' | 'Year' | 'Hour', val: string }[]
 ) {
-  const allChars: { title: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch'; char: string; element: string; tenGodGroup: string }[] = [];
-  
+  const groups: Record<string, { ko: string; en: string; keyPillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] }> = {
+    '비겁': { ko: '비겁', en: 'Companion (Bi-Geop)', keyPillars: [] },
+    '식상': { ko: '식상', en: 'Expression (Sik-Sang)', keyPillars: [] },
+    '재성': { ko: '재성', en: 'Wealth (Jae-Seong)', keyPillars: [] },
+    '관성': { ko: '관성', en: 'Influence (Gwan-Seong)', keyPillars: [] },
+    '인성': { ko: '인성', en: 'Intellect (In-Seong)', keyPillars: [] },
+  };
+
   stems.forEach(s => {
-    const el = STEM_INFO_LOCAL[s.val]?.element || 'Earth';
-    const tg = s.title === 'Day' ? 'Self' : computeTenGodLocal(dayStem, s.val, true);
+    const tg = s.title === 'Day' ? '비견' : computeTenGodLocal(dayStem, s.val, true);
     let tgGroup = '비겁';
     if (tg === '식신' || tg === '상관') tgGroup = '식상';
     else if (tg === '편재' || tg === '정재') tgGroup = '재성';
     else if (tg === '편관' || tg === '정관') tgGroup = '관성';
     else if (tg === '편인' || tg === '정인') tgGroup = '인성';
-    
-    allChars.push({ title: s.title, type: 'stem', char: s.val, element: el, tenGodGroup: s.title === 'Day' ? '비겁' : tgGroup });
+
+    groups[tgGroup].keyPillars.push({ pillarTitle: s.title, type: 'stem' });
   });
 
   branches.forEach(b => {
-    const el = BRANCH_INFO_LOCAL[b.val]?.element || 'Earth';
     const tg = computeTenGodLocal(dayStem, b.val, false);
     let tgGroup = '비겁';
     if (tg === '식신' || tg === '상관') tgGroup = '식상';
@@ -515,286 +519,271 @@ function findOverloadedTenGods(
     else if (tg === '편관' || tg === '정관') tgGroup = '관성';
     else if (tg === '편인' || tg === '정인') tgGroup = '인성';
 
-    allChars.push({ title: b.title, type: 'branch', char: b.val, element: el, tenGodGroup: tgGroup });
+    groups[tgGroup].keyPillars.push({ pillarTitle: b.title, type: 'branch' });
   });
 
-  const elCounts: Record<string, number> = {};
-  allChars.forEach(c => { elCounts[c.element] = (elCounts[c.element] || 0) + 1; });
-
-  const tgCounts: Record<string, number> = {};
-  allChars.forEach(c => { tgCounts[c.tenGodGroup] = (tgCounts[c.tenGodGroup] || 0) + 1; });
-
-  const maxTg = Object.entries(tgCounts).filter(([_, count]) => count >= 3).sort((a, b) => b[1] - a[1])[0];
-  const maxEl = Object.entries(elCounts).filter(([_, count]) => count >= 3).sort((a, b) => b[1] - a[1])[0];
-
-  const EN_GROUPS: Record<string, string> = { '비겁': 'Companion (Bi-Gyeop)', '식상': 'Creator (Sik-Sang)', '재성': 'Wealth (Jae-Seong)', '관성': 'Officer (Gwan-Seong)', '인성': 'Resource (In-Seong)' };
-  const EN_ELEMENTS: Record<string, string> = { 'Wood': 'Wood', 'Fire': 'Fire', 'Earth': 'Earth', 'Metal': 'Metal', 'Water': 'Water' };
-  const KO_ELEMENTS: Record<string, string> = { 'Wood': '목(木)', 'Fire': '화(火)', 'Earth': '토(土)', 'Metal': '금(金)', 'Water': '수(水)' };
-
-  if (maxTg && maxTg[1] >= 3) {
-    const keyPillars = allChars.filter(c => c.tenGodGroup === maxTg[0]).map(c => ({ pillarTitle: c.title, type: c.type }));
-    return { matched: true, type: 'TenGod', nameKo: maxTg[0], nameEn: EN_GROUPS[maxTg[0]] || maxTg[0], keyPillars };
-  } else if (maxEl && maxEl[1] >= 3) {
-    const keyPillars = allChars.filter(c => c.element === maxEl[0]).map(c => ({ pillarTitle: c.title, type: c.type }));
-    return { matched: true, type: 'Element', nameKo: KO_ELEMENTS[maxEl[0]] || maxEl[0], nameEn: EN_ELEMENTS[maxEl[0]] || maxEl[0], keyPillars };
+  for (const group of Object.values(groups)) {
+    if (group.keyPillars.length >= 3) {
+      return {
+        nameKo: group.ko,
+        nameEn: group.en,
+        keyPillars: group.keyPillars,
+      };
+    }
   }
+
   return null;
 }
 
-// 3순위: 비겁의 뿌리 (2개 이상)
 function findSiblingRoots(
   dayStem: string,
   branches: { title: 'Day' | 'Month' | 'Year' | 'Hour', val: string }[]
 ) {
-  const dmElement = STEM_INFO_LOCAL[dayStem]?.element || '';
-  const matchingBranches = branches.filter(b => {
-    const el = BRANCH_INFO_LOCAL[b.val]?.element || '';
-    return el === dmElement;
+  const keyPillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
+
+  branches.forEach(b => {
+    const tg = computeTenGodLocal(dayStem, b.val, false);
+    if (tg === '비견' || tg === '겁재') {
+      keyPillars.push({ pillarTitle: b.title, type: 'branch' });
+    }
   });
 
-  if (matchingBranches.length >= 2) {
-    const keyPillars = matchingBranches.map(b => ({ pillarTitle: b.title, type: 'branch' as const }));
-    return { matched: true, keyPillars };
+  if (keyPillars.length >= 2) {
+    return { keyPillars };
   }
   return null;
 }
 
-// ─────────────────────────────────────────────
-// 잠재력 강점 상세 매핑 헬퍼
-// ─────────────────────────────────────────────
 function getTraitDetailText(key: string, score: number, lang: string = 'KO'): string {
   const isKO = lang === 'KO';
   
   if (key === 'creativity') {
     if (score >= 75) {
       return isKO 
-        ? `**창의력(${score}점)**이 매우 높아 기존의 방식을 깨고 세상에 없던 독창적인 아이디어와 가치를 창조해내는 데 탁월한 두각을 드러내며`
-        : `with **Creativity (${score})** being exceptionally high, allowing you to break conventional molds and pioneer original ideas;`;
+        ? `**창의력(${score}점)**이 매우 높아 **기존의 방식을 깨고** 세상에 없던 **독창적인 아이디어와 가치를 창조**하는 데 탁월한 두각을 드러내며`
+        : `with **Creativity (${score})** being exceptionally high, allowing you to **break conventional molds** and **pioneer original ideas**;`;
     } else if (score >= 40) {
       return isKO
-        ? `**창의력(${score}점)**이 양호하여 기존의 방식들을 영리하게 재조합하고 실무에서 즉시 활용할 수 있는 현실적인 아이디어를 응용하는 능력이 있고`
-        : `with **Creativity (${score})** being balanced, enabling you to combine existing templates into practical applications;`;
+        ? `**창의력(${score}점)**이 양호하여 기존의 방식들을 영리하게 새롭게 **재조합**하고 실무에서 즉시 활용할 수 있는 **현실적인 아이디어를 응용**하는 능력이 있고`
+        : `with **Creativity (${score})** being balanced, enabling you to **combine existing templates** into **practical applications**;`;
     } else {
       return isKO
-        ? `**창의력(${score}점)**이 담담하여 허황된 상상보다는 이미 검증되어 있는 탄탄한 매뉴얼과 성공 규칙을 충실히 실행하는 안정을 택하며`
-        : `with **Creativity (${score})** being low, preferring to follow structured rules and proven manuals over speculative changes;`;
+        ? `**창의력(${score}점)**이 담담하여 허황된 상상보다는 이미 검증되어 있는 탄탄한 매뉴얼과 **성공 규칙을 충실히 실행**하는 안정을 택하며`
+        : `with **Creativity (${score})** being low, preferring to **follow structured rules and proven manuals** over speculative changes;`;
     }
   }
   
   if (key === 'expressiveness') {
     if (score >= 75) {
       return isKO
-        ? `**표현력(${score}점)**이 매우 강력하여 글, 말, 혹은 감정적 호소력을 동원해 자신의 생각을 상대의 머릿속에 선명하게 각인시키는 설득력이 비범하고`
-        : `with **Expressiveness (${score})** being very strong, giving you the ability to vividly project and print your thoughts into others' minds;`;
+        ? `**표현력(${score}점)**이 매우 강력하여 글, 말, 혹은 감정적 호소력을 동원해 자신의 생각을 상대의 머릿속에 **선명하게 각인시키는 설득력**이 비범하고`
+        : `with **Expressiveness (${score})** being very strong, giving you the ability to **vividly project and print** your thoughts into others' minds;`;
     } else if (score >= 40) {
       return isKO
-        ? `**표현력(${score}점)**이 적절하여 과장이나 허세 없이 필요한 내용을 조리 있고 명확하게 상대방에게 오해 없이 전달하는 실무형 소통이 훌륭하며`
-        : `with **Expressiveness (${score})** being decent, enabling clear and constructive communication without unnecessary exaggeration;`;
+        ? `**표현력(${score}점)**이 적절하여 과장이나 허세 없이 필요한 내용을 **조리 있고 명확하게** 상대방에게 오해 없이 전달하는 실무형 소통이 훌륭하며`
+        : `with **Expressiveness (${score})** being decent, enabling **clear and constructive communication** without unnecessary exaggeration;`;
     } else {
       return isKO
-        ? `**표현력(${score}점)**이 묵직하여 겉으로 화려하게 자기를 드러내기보다 침묵과 진지한 실천으로 결과 자체를 묵묵히 증명해내며`
-        : `with **Expressiveness (${score})** being low, choosing to remain quiet and prove your worth through silent execution rather than words;`;
+        ? `**표현력(${score}점)**이 묵직하여 겉으로 화려하게 자기를 드러내기보다 침묵과 진지한 실천으로 **결과 자체를 묵묵히 증명**해내며`
+        : `with **Expressiveness (${score})** being low, choosing to remain quiet and **prove your worth through silent execution** rather than words;`;
     }
   }
 
   if (key === 'leadership') {
     if (score >= 75) {
       return isKO
-        ? `**리더십(${score}점)**이 매우 높아 스스로 책임감 있게 무대의 전면에 나서서 집단과 조직이 나아갈 큰 그림을 제시하고 진두지휘하는 데 타고난 카리스마를 발휘하며`
-        : `with **Leadership (${score})** being very high, allowing you to take charge and steer organizations with visionary charisma;`;
+        ? `**리더십(${score}점)**이 매우 높아 스스로 책임감 있게 무대의 전면에 나서서 집단과 조직이 나아갈 **큰 그림을 제시하고 진두지휘**하는 데 타고난 카리스마를 발휘하며`
+        : `with **Leadership (${score})** being very high, allowing you to **take charge and steer organizations** with **visionary charisma**;`;
     } else if (score >= 40) {
       return isKO
-        ? `**리더십(${score}점)**이 완만하여 권위적으로 지배하기보다는 수평적이고 민주적인 소통으로 팀원들의 잠재력을 끌어내는 뒤편의 중재자 역할을 잘 해내고`
-        : `with **Leadership (${score})** being moderate, leading not by authority but through cooperative orchestration of team members;`;
+        ? `**리더십(${score}점)**이 완만하여 권위적으로 지배하기보다는 **수평적이고 민주적인 소통**으로 팀원들의 잠재력을 끌어내는 뒤편의 중재자 역할을 잘 해내고`
+        : `with **Leadership (${score})** being moderate, leading not by authority but through **cooperative orchestration** of team members;`;
     } else {
       return isKO
-        ? `**리더십(${score}점)**이 낮아 전면에 나서는 책임 부담보다는 실무 전문가로서 나만의 영역을 온전히 구축하고 임무를 수행하는 데 더 편안함을 느끼며`
-        : `with **Leadership (${score})** being low, feeling more at ease performing as a specialist rather than carrying the burden of leading others;`;
+        ? `**리더십(${score}점)**이 낮아 전면에 나서는 책임 부담보다는 실무 전문가로서 **나만의 영역을 온전히 구축**하고 임무를 수행하는 데 더 편안함을 느끼며`
+        : `with **Leadership (${score})** being low, feeling more at ease performing as a **specialist** rather than carrying the burden of leading others;`;
     }
   }
 
   if (key === 'decisionMaking') {
     if (score >= 75) {
       return isKO
-        ? `**결단력(${score}점)**이 아주 높아 어떤 불확실한 위기나 리스크 속에서도 주저함 없이 신속하게 핵심을 파고들어 단호한 실행을 돌파하고`
-        : `with **Decision Making (${score})** being very high, enabling swift, bold choices and immediate execution under pressure;`;
-    } else if (score >= 40) {
+        ? `**결단력(${score}점)**이 아주 높아 어떤 불확실한 위기나 리스크 속에서도 주저함 없이 **신속하게 핵심을 파고들어** 단호한 실행을 돌파하고`
+        : `with **Decision Making (${score})** being very high, enabling **swift, bold choices** and **immediate execution** under pressure;`;
+    } else if (score >= 40) { 
       return isKO
-        ? `**결단력(${score}점)**이 합리적이어서 정보와 데이터를 충분히 검토하고 비교 분석하여 가장 안전하고 확실한 대안을 선택하는 데 탁월하고`
-        : `with **Decision Making (${score})** being sensible, carefully balancing options and data before choosing the safest route;`;
+        ? `**결단력(${score}점)**이 합리적이어서 정보와 데이터를 충분히 검토하고 비교 분석하여 **가장 안전하고 확실한 대안**을 선택하는 데 탁월하고`
+        : `with **Decision Making (${score})** being sensible, carefully balancing options and data before **choosing the safest route**;`;
     } else {
       return isKO
-        ? `**결단력(${score}점)**이 신중하여 때로 결정 장애나 우유부단함을 겪을 수 있으나 실수와 실패 리스크를 극소화하는 돌다리 두드리기 강점이 돋보이고`
-        : `with **Decision Making (${score})** being overly cautious, minimizing risks of failure by double-checking all variables;`;
+        ? `**결단력(${score}점)**이 신중하여 때로 결정 장애나 우유부단함을 겪을 수 있으나 실수와 실패 리스크를 극소화하는 **돌다리 두드리기** 강점이 돋보이고`
+        : `with **Decision Making (${score})** being overly cautious, **minimizing risks of failure** by double-checking all variables;`;
     }
   }
 
   if (key === 'mental') {
     if (score >= 75) {
       return isKO
-        ? `**멘탈(${score}점)**이 대단히 강건하여 혹독한 외부의 압박이나 갈등이 밀려와도 감정적으로 굴복하지 않고 내면의 평정심과 냉철함을 지키는 회복탄력성이 넘치며`
-        : `with **Mental Strength (${score})** being extremely robust, granting high resilience to withstand external pressure without losing focus;`;
+        ? `**멘탈(${score}점)**이 대단히 강건하여 혹독한 외부의 압박이나 갈등이 밀려와도 감정적으로 굴복하지 않고 내면의 **평정심과 냉철함**을 지키는 회복탄력성이 넘치며`
+        : `with **Mental Strength (${score})** being extremely robust, granting **high resilience** to withstand external pressure without losing focus;`;
     } else if (score >= 40) {
       return isKO
-        ? `**멘탈(${score}점)**이 평이하여 보편적인 환경에서는 안정감을 가지나 스트레스 수치가 한계에 달할 때는 나만의 휴식과 심리적 정화가 요구되고`
-        : `with **Mental Strength (${score})** being average, staying stable under normal situations but requiring proper reset cycles when highly stressed;`;
+        ? `**멘탈(${score}점)**이 평이하여 보편적인 환경에서는 안정감을 가지나 스트레스 수치가 한계에 달할 때는 나만의 **휴식과 심리적 정화**가 요구되고`
+        : `with **Mental Strength (${score})** being average, staying stable under normal situations but requiring **proper reset cycles** when highly stressed;`;
     } else {
       return isKO
-        ? `**멘탈(${score}점)**이 매우 섬세하여 환경의 미세한 변화나 타인의 시선에 민감하게 반응하므로 평정심을 지켜줄 든든한 지지층과 루틴을 필요로 하고`
-        : `with **Mental Strength (${score})** being sensitive, making you vulnerable to external opinions and requiring protective boundaries;`;
+        ? `**멘탈(${score}점)**이 매우 섬세하여 환경의 미세한 변화나 타인의 시선에 민감하게 반응하므로 평정심을 지켜줄 든든한 **지지층과 루틴**을 필요로 하고`
+        : `with **Mental Strength (${score})** being sensitive, making you vulnerable to external opinions and requiring **protective boundaries**;`;
     }
   }
 
   if (key === 'responsibility') {
     if (score >= 75) {
       return isKO
-        ? `**책임감(${score}점)**이 완벽에 가까워 자기 영역의 성과나 약속을 타협 없이 지켜내며, 아무리 고단해도 조직과 약자를 위해 끝까지 헌신해내는 신뢰를 주며`
-        : `with **Responsibility (${score})** being absolute, ensuring you fulfill your commitments to the end, earning deep respect for your integrity;`;
+        ? `**책임감(${score}점)**이 완벽에 가까워 자기 영역의 성과나 약속을 타협 없이 지켜내며, 아무리 고단해도 조직과 약자를 위해 **끝까지 헌신해내는 신뢰**를 주며`
+        : `with **Responsibility (${score})** being absolute, ensuring you **fulfill your commitments to the end**, earning deep respect for your integrity;`;
     } else if (score >= 40) {
       return isKO
-        ? `**책임감(${score}점)**이 성실하여 나에게 할당된 직무는 꼼꼼히 소화하되 나의 일상과 건강도 소중히 지키는 스마트한 라이프 밸런스를 발휘하며`
-        : `with **Responsibility (${score})** being diligent, performing your assigned duties reliably while maintaining a healthy personal boundaries;`;
+        ? `**책임감(${score}점)**이 성실하여 나에게 할당된 직무는 꼼꼼히 소화하되 나의 일상과 건강도 소중히 지키는 스마트한 **라이프 밸런스**를 발휘하며`
+        : `with **Responsibility (${score})** being diligent, performing your assigned duties reliably while maintaining **healthy personal boundaries**;`;
     } else {
       return isKO
-        ? `**책임감(${score}점)**이 유연하여 스스로 모든 짐을 짊어지려 애쓰기보다 적절한 타이밍에 주위에 도움을 요청하고 역할을 지혜롭게 분배할 줄 알며`
-        : `with **Responsibility (${score})** being flexible, knowing when to delegate and share the load rather than burning out from carrying it alone;`;
+        ? `**책임감(${score}점)**이 유연하여 스스로 모든 짐을 짊어지려 애쓰기보다 적절한 타이밍에 주위에 도움을 요청하고 **역할을 지혜롭게 분배**할 줄 알며`
+        : `with **Responsibility (${score})** being flexible, knowing **when to delegate and share the load** rather than burning out from carrying it alone;`;
     }
   }
 
   if (key === 'fightingSpirit') {
     if (score >= 75) {
       return isKO
-        ? `**승부욕(${score}점)**이 뜨겁게 타올라 어려운 장벽이나 라이벌이 나타날 때 강한 투지를 불태우며 목표를 쟁취해내는 승부사 마인드가 강하고`
-        : `with **Competitive Drive (${score})** being intense, igniting a powerful fighting spirit and drive to win when facing obstacles or rivals;`;
+        ? `**승부욕(${score}점)**이 뜨겁게 타올라 어려운 장벽이나 라이벌이 나타날 때 **강한 투지를 불태우며** 목표를 쟁취해내는 승부사 마인드가 강하고`
+        : `with **Competitive Drive (${score})** being intense, igniting a **powerful fighting spirit and drive to win** when facing obstacles or rivals;`;
     } else if (score >= 40) {
       return isKO
-        ? `**승부욕(${score}점)**이 적절하여 굳이 남을 밟고 올라서기보다 어제의 나 자신을 극복하려는 평화적이며 건강한 성장에 초점을 맞추며`
-        : `with **Competitive Drive (${score})** being healthy, focusing on personal growth and self-improvement rather than fighting others;`;
+        ? `**승부욕(${score}점)**이 적절하여 굳이 남을 밟고 올라서기보다 어제의 나 자신을 극복하려는 **평화적이며 건강한 성장**에 초점을 맞추며`
+        : `with **Competitive Drive (${score})** being healthy, focusing on **personal growth and self-improvement** rather than fighting others;`;
     } else {
       return isKO
-        ? `**승부욕(${score}점)**이 완만하여 대립과 소모적 경쟁을 지양하고 다 함께 시너지를 낼 수 있는 따뜻한 연대와 타협을 지향하며`
-        : `with **Competitive Drive (${score})** being low, prioritizing collaboration and mutual alignment over exhausting rivalry;`;
+        ? `**승부욕(${score}점)**이 완만하여 대립과 소모적 경쟁을 지양하고 다 함께 시너지를 낼 수 있는 따뜻한 **연대와 타협**을 지향하며`
+        : `with **Competitive Drive (${score})** being low, prioritizing **collaboration and mutual alignment** over exhausting rivalry;`;
     }
   }
 
   if (key === 'nobleSupport') {
     if (score >= 75) {
       return isKO
-        ? `**귀인복(${score}점)**이 대단히 훌륭하여 인생의 결정적 위기마다 생각지 못한 스승, 파트너, 혹은 조력자가 나타나 구원의 물꼬를 트여주는 혜택을 누리며`
-        : `with **Benefactor Luck (${score})** being exceptional, ensuring supportive mentors, patrons, or opportunities emerge to guide you through crises;`;
+        ? `**귀인복(${score}점)**이 대단히 훌륭하여 인생의 결정적 위기마다 생각지 못한 스승, 파트너, 혹은 조력자가 나타나 **구원의 물꼬**를 트여주는 혜택을 누리며`
+        : `with **Benefactor Luck (${score})** being exceptional, ensuring **supportive mentors, patrons, or opportunities** emerge to guide you through crises;`;
     } else if (score >= 40) {
       return isKO
-        ? `**귀인복(${score}점)**이 원만하여 본인의 성실하고 예의 바른 태도를 통해 서서히 믿음직한 인맥과 동료들의 소중한 지지를 획득해내며`
-        : `with **Benefactor Luck (${score})** being decent, gradually earning valuable support and trust through your polite and honest interactions;`;
+        ? `**귀인복(${score}점)**이 원만하여 본인의 성실하고 예의 바른 태도를 통해 서서히 **믿음직한 인맥과 동료들의 소중한 지지지**를 획득해내며`
+        : `with **Benefactor Luck (${score})** being decent, gradually earning **valuable support and trust** through your polite and honest interactions;`;
     } else {
       return isKO
-        ? `**귀인복(${score}점)**에 의지하기보다 오직 내 실력과 의지로 삶의 개척길을 열어가야 하니 강인한 자수성가형 독립 정신을 입증하며`
-        : `with **Benefactor Luck (${score})** being low, prompting you to build success strictly on your own merits, proving a self-made resilience;`;
+        ? `**귀인복(${score}점)**에 의지하기보다 오직 내 실력과 의지로 삶의 개척길을 열어가야 하니 강인한 **자수성가형 독립 정신**을 입증하며`
+        : `with **Benefactor Luck (${score})** being low, prompting you to build success strictly on your own merits, proving a **self-made resilience**;`;
     }
   }
 
   if (key === 'peopleReading') {
     if (score >= 75) {
       return isKO
-        ? `**사람보는 눈(${score}점)**이 극도로 예리하여 스쳐 지나가는 대화나 눈빛만으로도 상대방의 숨겨진 장단점과 속내를 꿰뚫어보는 초감각적 인간 통찰을 가졌으며`
-        : `with **Insight into People (${score})** being extremely sharp, allowing you to read hidden motives and traits through microscopic cues;`;
+        ? `**사람보는 눈(${score}점)**이 극도로 예리하여 스쳐 지나가는 대화나 눈빛만으로도 상대방의 숨겨진 장단점과 속내를 꿰뚫어보는 **초감각적 인간 통찰**을 가졌으며`
+        : `with **Insight into People (${score})** being extremely sharp, allowing you to **read hidden motives and traits** through microscopic cues;`;
     } else if (score >= 40) {
       return isKO
-        ? `**사람보는 눈(${score}점)**이 균형을 이루어 열린 태도로 사람들과 소통하면서도 상식을 바탕으로 객관적인 신용도를 합리적으로 검증해내는 안목이 있고`
-        : `with **Insight into People (${score})** being pragmatic, communicating openly while maintaining logical filters to assess trustworthiness;`;
+        ? `**사람보는 눈(${score}점)**이 균형을 이루어 열린 태도로 사람들과 소통하면서도 상식을 바탕으로 객관적인 신용도를 합리적으로 **검증해내는 안목**이 있고`
+        : `with **Insight into People (${score})** being pragmatic, communicating openly while maintaining logical filters to **assess trustworthiness**;`;
     } else {
       return isKO
-        ? `**사람보는 눈(${score}점)**이 소박하여 남들을 지나치게 긍정적으로 믿다가 상처를 받을 수 있으니 계약이나 금전 동업 시 철저한 팩트 체크가 필요하며`
-        : `with **Insight into People (${score})** being low, cautioning you to rely on written contracts and facts rather than blind assumptions;`;
+        ? `**사람보는 눈(${score}점)**이 소박하여 남들을 지나치게 긍정적으로 믿다가 상처를 받을 수 있으니 계약이나 금전 동업 시 **철저한 팩트 체크**가 필요하며`
+        : `with **Insight into People (${score})** being low, cautioning you to **rely on written contracts and facts** rather than blind assumptions;`;
     }
   }
 
   if (key === 'sensitivity') {
     if (score >= 75) {
       return isKO
-        ? `**감수성(${score}점)**이 깊어 예술적 정서, 타인의 마음 상처에 공감하는 온기를 품고 있어 다른 이들이 포착하지 못하는 미세한 뉘앙스를 섬세히 만져줄 수 있고`
-        : `with **Sensitivity (${score})** being deep, gifting you a rich artistic sense and emotional empathy to connect with hidden nuances;`;
+        ? `**감수성(${score}점)**이 깊어 예술적 정서, 타인의 마음 상처에 공감하는 온기를 품고 있어 다른 이들이 포착하지 못하는 **미세한 뉘앙스를 섬세히 만져줄 수** 있고`
+        : `with **Sensitivity (${score})** being deep, gifting you a **rich artistic sense and emotional empathy** to connect with hidden nuances;`;
     } else if (score >= 40) {
       return isKO
-        ? `**감수성(${score}점)**이 건강하여 상대방의 아픔을 공감해주면서도 감정에 매몰되지 않는 냉철한 균형 감각을 현명하게 이끌어내며`
-        : `with **Sensitivity (${score})** being balanced, offering warm empathy without letting emotions cloud your logical judgment;`;
+        ? `**감수성(${score}점)**이 건강하여 상대방의 아픔을 공감해주면서도 감정에 매몰되지 않는 **냉철한 균형 감각**을 현명하게 이끌어내며`
+        : `with **Sensitivity (${score})** being balanced, offering warm empathy without letting emotions **cloud your logical judgment**;`;
     } else {
       return isKO
-        ? `**감수성(${score}점)**이 담백하여 불필요한 감정 소모를 배제하고 객관적인 팩트와 수치, 현실적인 결과 중심의 냉철한 이성을 중시하며`
-        : `with **Sensitivity (${score})** being low, keeping interactions objective and focusing strictly on practical facts and results;`;
+        ? `**감수성(${score}점)**이 담백하여 불필요한 감정 소모를 배제하고 객관적인 팩트와 수치, 현실적인 결과 중심의 **냉철한 이성**을 중시하며`
+        : `with **Sensitivity (${score})** being low, keeping interactions objective and focusing strictly on **practical facts and results**;`;
     }
   }
 
   if (key === 'independence') {
     if (score >= 75) {
       return isKO
-        ? `**독립심(${score}점)**이 우뚝 서 있어 타인의 잔소리나 지시를 극도로 기피하며, 모든 중요한 행보는 주체적으로 설계하고 책임질 때 깊은 주권 행복을 얻고`
-        : `with **Independence (${score})** being very high, refusing subordinate constraints and thriving best when commanding your own path;`;
+        ? `**독립심(${score}점)**이 우뚝 서 있어 타인의 잔소리나 지시를 극도로 기피하며, 모든 중요한 행보는 **주체적으로 설계하고 책임**질 때 깊은 주권 행복을 얻고`
+        : `with **Independence (${score})** being very high, refusing subordinate constraints and thriving best when **commanding your own path**;`;
     } else if (score >= 40) {
       return isKO
-        ? `**독립심(${score}점)**이 성숙하여 내 주관을 뚜렷이 수호하되 타인의 합당한 비판이나 조언은 겸허히 융합할 수 있는 유연한 에고를 가지고 있고`
-        : `with **Independence (${score})** being balanced, maintaining your values while constructively integrating others' feedback;`;
+        ? `**독립심(${score}점)**이 성숙하여 내 주관을 뚜렷이 수호하되 타인의 합당한 비판이나 조언은 겸허히 융합할 수 있는 **유연한 에고**를 가지고 있고`
+        : `with **Independence (${score})** being balanced, maintaining your values while constructively **integrating others' feedback**;`;
     } else {
       return isKO
-        ? `**독립심(${score}점)**이 낮아 혼자 고립되는 것보다 거대한 기업의 인프라, 든든한 멘토, 혹은 시스템의 조력을 결합할 때 안정과 성장이 극대화되고`
-        : `with **Independence (${score})** being low, thriving best when leaning on robust systems, partners, or corporate infrastructures;`;
+        ? `**독립심(${score}점)**이 낮아 혼자 고립되는 것보다 거대한 기업의 인프라, 든든한 멘토, 혹은 **시스템의 조력을 결합**할 때 안정과 성장이 극대화되고`
+        : `with **Independence (${score})** being low, thriving best when leaning on **robust systems, partners, or corporate infrastructures**;`;
     }
   }
 
   if (key === 'patience') {
     if (score >= 75) {
       return isKO
-        ? `**인내심(${score}점)**이 아주 두터워 모든 이가 낙담하고 중도 하차하는 지루한 모래밭 싸움 속에서도 기어이 버티며 임계점을 넘는 끝판왕 끈기가 강점이며`
-        : `with **Patience (${score})** being very high, empowering you to persist through prolonged hardships and cross the finish line;`;
+        ? `**인내심(${score}점)**이 아주 두터워 모든 이가 낙담하고 중도 하차하는 지루한 모래밭 싸움 속에서도 기어이 버티며 임계점을 넘는 **끝판왕 끈기**가 강점이며`
+        : `with **Patience (${score})** being very high, empowering you to **persist through prolonged hardships** and cross the finish line;`;
     } else if (score >= 40) {
       return isKO
-        ? `**인내심(${score}점)**이 현실적이어서 가망 없는 곳에 무작정 존버하기보다는 효율성과 가능성을 영리하게 재서 방향을 틀 줄 아는 순발력이 조화롭고`
-        : `with **Patience (${score})** being practical, knowing when to endure and when to pivot to preserve resources;`;
+        ? `**인내심(${score}점)**이 현실적이어서 가망 없는 곳에 무작정 존버하기보다는 효율성과 가능성을 영리하게 재서 방향을 틀 줄 아는 **순발력이 조화롭고**`
+        : `with **Patience (${score})** being practical, knowing **when to endure and when to pivot** to preserve resources;`;
     } else {
       return isKO
-        ? `**인내심(${score}점)**이 급하여 변화 없는 단순 반복을 견디기 어렵지만 빠른 속도와 기동성이 요구되는 단기 임팩트 무대에서 놀라운 몰입을 끌어내고`
-        : `with **Patience (${score})** being low, finding routine boring but exhibiting explosive concentration in fast-paced short-term tasks;`;
+        ? `**인내심(${score}점)**이 급하여 변화 없는 단순 반복을 견디기 어렵지만 빠른 속도와 기동성이 요구되는 단기 임팩트 무대에서 **놀라운 몰입**을 끌어내고`
+        : `with **Patience (${score})** being low, finding routine boring but exhibiting **explosive concentration** in fast-paced short-term tasks;`;
     }
   }
 
   if (key === 'businessSense') {
     if (score >= 75) {
       return isKO
-        ? `**사업감각(${score}점)**이 탁월하여 무형의 가치나 상황에서 기회와 돈의 냄새를 맡고 자원을 효율적으로 배분해 현실적 실속을 쓸어 담는 장사꾼 직감이 있고`
-        : `with **Business Acumen (${score})** being exceptional, letting you spot market opportunities and allocate assets to maximize profits;`;
+        ? `**사업감각(${score}점)**이 탁월하여 무형의 가치나 상황에서 기회와 돈의 냄새를 맡고 자원을 효율적으로 배분해 현실적 실속을 쓸어 담는 **장사꾼 직감**이 있고`
+        : `with **Business Acumen (${score})** being exceptional, letting you **spot market opportunities** and allocate assets to maximize profits;`;
     } else if (score >= 40) {
       return isKO
-        ? `**사업감각(${score}점)**이 차분하여 일확천금을 쫓기보다 명확한 저축, 합리적 지출 필터를 작동시켜 가계를 단단히 설계하는 안정주의 재테크를 선호하며`
-        : `with **Business Acumen (${score})** being stable, avoiding speculative gambles and focusing on reliable asset accumulation and management;`;
+        ? `**사업감각(${score}점)**이 차분하여 일확천금을 쫓기보다 명확한 저축, 합리적 지출 필터를 작동시켜 가계를 단단히 설계하는 **안정주의 재테크**를 선호하며`
+        : `with **Business Acumen (${score})** being stable, avoiding speculative gambles and focusing on **reliable asset accumulation** and management;`;
     } else {
       return isKO
-        ? `**사업감각(${score}점)**이 순수하여 오직 이익만을 쫓는 계산적 처세보다는 공익, 도덕적 가치, 혹은 정신적 만족을 우선하는 따뜻한 인도주의를 품었고`
-        : `with **Business Acumen (${score})** being low, prioritizing intellectual values, public good, or artistic growth over calculations;`;
+        ? `**사업감각(${score}점)**이 순수하여 오직 이익만을 쫓는 계산적 처세보다는 공익, 도덕적 가치, 혹은 정신적 만족을 우선하는 **따뜻한 인도주의**를 품었고`
+        : `with **Business Acumen (${score})** being low, prioritizing **intellectual values, public good**, or artistic growth over calculations;`;
     }
   }
 
   if (key === 'relationshipLuck') {
     if (score >= 75) {
       return isKO
-        ? `**관계운(${score}점)**이 넘치어 특유의 사교성과 호감 가는 처세로 처음 보는 사람과도 금방 벽을 허물며 풍성한 대인관계를 유지하는 재주를 보이고`
-        : `with **Relationship Luck (${score})** being high, helping you break boundaries easily with social warmth and charm;`;
+        ? `**관계운(${score}점)**이 넘치어 특유의 사교성과 호감 가는 처세로 처음 보는 사람과도 금방 벽을 허물며 **풍성한 대인관계를 유지**하는 재주를 보이고`
+        : `with **Relationship Luck (${score})** being high, helping you **break boundaries easily** with social warmth and charm;`;
     } else if (score >= 40) {
       return isKO
-        ? `**관계운(${score}점)**이 합리적이어서 불필요하게 넓은 인간관계로 에너지를 낭비하지 않고 소수와의 단단한 정서적 유대를 실리적으로 지향하고`
-        : `with **Relationship Luck (${score})** being average, maintaining healthy distance and focusing on meaningful, stable connections;`;
+        ? `**관계운(${score}점)**이 합리적이어서 불필요하게 넓은 인간관계로 에너지를 낭비하지 않고 소수와의 **단단한 정서적 유대**를 실리적으로 지향하고`
+        : `with **Relationship Luck (${score})** being average, maintaining healthy distance and focusing on **meaningful, stable connections**;`;
     } else {
       return isKO
-        ? `**관계운(${score}점)**이 고독하여 얕고 시끄러운 모임을 거부하고 나만의 사색과 진정한 소수정예 친밀함으로 불필요한 인간적 피로를 차단하며`
-        : `with **Relationship Luck (${score})** being low, avoiding superficial networking and preserving your energy through solitary focus;`;
+        ? `**관계운(${score}점)**이 고독하여 얕고 시끄러운 모임을 거부하고 나만의 사색과 진정한 소수정예 친밀함으로 **불필요한 인간적 피로를 차단**하며`
+        : `with **Relationship Luck (${score})** being low, avoiding superficial networking and **preserving your energy** through solitary focus;`;
     }
   }
 
   return '';
 }
 
-// ─────────────────────────────────────────────
-// 천간 투간(투출) 감지 헬퍼 & 행동 양식/모순점 매핑
-// ─────────────────────────────────────────────
 const tenGodPenetrationKo: Record<string, string> = {
   '비겁': '주변과 조율하면서도 본인의 독립적인 신념과 주체성을 타협 없이 관철하려는 성향이 돋보입니다. 다만 겉으로는 조화롭게 수용하는 듯 제스처를 취하지만, 실제 행동 단계에서는 무의식적으로 내 고집대로 밀어붙이는 이중적인 태도(모순점)가 종종 버릇으로 관찰됩니다.',
   '식상': '내면에 내포된 창의적 아이디어와 비평적 안목(식상)을 말, 글, 또는 독창적인 기획으로 거침없이 바깥으로 방출하는 능력이 탑재되어 있습니다. 그러나 하고 싶은 말을 참지 못하고 섣부르게 뱉어 가벼운 오해를 사거나, 기획의 출발은 요란하나 세부 디테일을 끝까지 챙기지 못하는 행동적 버릇(문제점)을 겪기 쉽습니다.',
@@ -1087,7 +1076,7 @@ export function generatePersonalizedTexts(
       : `[Union Network] Powerful Alignment Crafted by Cosmic Conjunction`;
     categoryDesc = isKO
       ? `귀하의 명식은 지지에 **${hapNet.koName}의 합(合) 네트워크를 정밀하게 완성**하고, 그 압도적인 자장이 천간의 **${hapNet.type}** 오행으로 통하여 하늘과 땅이 수직 직통하는 매우 비범한 천지맥 구조입니다. 이는 **에너지가 정밀하게 한곳으로 집속되어 누구도 꺾기 힘든 고집스러운 돌파력과 영민한 정체성**을 뿜어냅니다. 하지만 **합 기운이 강한 나머지, 특정한 방향이나 신념에 철저하게 내면이 매몰될 때 타인의 조언을 귀담아듣지 않은 채 독선적 마이웨이를 걷는 구조적 모순점**도 가집니다. 위기 돌파 등 **결정적인 문제 해결** 상황에서는 극강의 화력을 뽐내나, 평시 일상의 조화와 협조 국면에서는 의식적인 조율이 절대 필요합니다.`
-      : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your core drive is highly focused, granting you unyielding determination and a clear sense of identity. You are naturally equipped with the pioneering leadership to define your own path and command situations even amidst chaos.`;
+      : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your **core drive is highly focused**, granting you **unyielding determination** and a **clear sense of identity**. You are naturally equipped with the **pioneering leadership to define your own path** and command situations even amidst chaos.`;
     innatePillars = hapNet.keyPillars;
   } else if (overload) {
     categoryTitle = isKO 
@@ -1095,7 +1084,7 @@ export function generatePersonalizedTexts(
       : `[Concentrated Type] Character Dominated by ${overload.nameEn}`;
     categoryDesc = isKO
       ? `귀하의 명식은 우주적 성분 중 오직 **${overload.nameKo} 기운 하나에 에너지가 극단적으로 쏠려 쏠림의 한계를 만드는 개성과 특이점**을 품고 있습니다. 이는 **남들과 궤를 달리하는 극대화된 독립성과 칼날 같은 전문성**의 무기를 가졌음을 반증하지만, 반대로 **에너지의 심한 정체로 특정 상황이나 관계에서 한 번 눈이 돌거나 꼬이면 이성을 잃고 한평생 후회할 무리수를 고집스럽게 밀어붙이는 집착적인 모습을 보이기도 합니다**. 스스로 제어하기 힘든 과포화 상태의 마력을 온전히 길들여 일상생활의 루틴과 조화로운 소통 속에서 다듬어야만 이 강력한 무기가 비로소 빛을 냅니다.`
-      : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to strongly dictate your behavior and character. This marks you as an individual of extreme color and distinct talent. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an explosive creative force.`;
+      : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to **strongly dictate your behavior and character**. This marks you as an individual of **extreme color and distinct talent**. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an **explosive creative force**.`;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
     categoryTitle = isKO
@@ -1103,7 +1092,7 @@ export function generatePersonalizedTexts(
       : `[Root of Ego] Indestructible Foundation Anchoring the Self`;
     categoryDesc = isKO
       ? `귀하의 원국은 어지러운 에너지의 극단 비대함 없이, 오직 **나를 지지하고 단단하게 밀어주는 지지의 비겁(뿌리 글자)들을 통해 자아 세포를 완벽히 고정**해 두었습니다. 이는 세상사의 모진 도전에 마주해도 **스스로 회복하고 우뚝 일어설 내면의 용암 같은 복원 주체성이 탑재**되었음을 보증합니다. 반면, **자존심에 사소한 상처라도 받으면 즉각적으로 자아 방어기제가 과도하게 발동되어 타인의 사소한 일침에도 차가운 반감과 장벽**을 세우며 자가 격리를 고집하는 모순을 겪기도 하니 유의하셔야 합니다. 타인과 경쟁하기보다 **나 자신과의 동행**을 지향할 때 가장 성숙한 성장을 이뤄냅니다.`
-      : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a highly resilient "ego root system" that keeps you anchored through any external turbulence. Your fundamental strength lies in your autonomous recovery power and self-reliance, rising like a phoenix from any setback.`;
+      : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a **highly resilient "ego root system"** that keeps you **anchored through any external turbulence**. Your fundamental strength lies in your **autonomous recovery power and self-reliance**, rising like a phoenix from any setback.`;
     innatePillars = siblingRoot.keyPillars;
   } else {
     // Default
