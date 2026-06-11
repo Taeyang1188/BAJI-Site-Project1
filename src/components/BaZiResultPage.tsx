@@ -2354,7 +2354,7 @@ export default function BaZiResultPage({
           guideKo = `주변과 유기적으로 협력하고 상생하는 시기입니다. 공동의 지향점을 향해 나아가며 압도적인 성장의 시너지를 발휘하세요.`;
           guideEn = `Rallying passionate companions to launch strong joint play instead of wandering on a solo path.`;
         } else {
-          guideKo = `조화로운 유대의 은덕이 가득 가중되고 우호적 원조 세력이 보강되어, 추진하던 바가 한결 유연하고 견고하게 발달합니다.`;
+          guideKo = `서로 돕고 협력하는 긍정적인 관계가 늘어나고 나를 지원해주는 든든한 조력자들을 얻게 되어, 추진하던 일들이 한층 더 매끄럽고 안정적으로 나아갑니다.`;
           guideEn = `Bringing supportive entities closer to create high-leverage collaborations.`;
         }
       } else if (isHaePa) {
