@@ -1251,7 +1251,7 @@ export function generatePersonalizedTexts(
       { pillarTitle: 'Day',   type: 'branch' as const },
       { pillarTitle: 'Month', type: 'stem'   as const }
     ];
-    if (hourStem) {
+    if (hourStem && !result?.isTimeUnknown) {
       innatePillars.push({ pillarTitle: 'Hour', type: 'stem' as const });
     } else {
       innatePillars.push({ pillarTitle: 'Year', type: 'stem' as const });
@@ -1423,8 +1423,8 @@ export function generatePersonalizedTexts(
   let lifeDesc = '';
   let lifePillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
 
-  const branchList = [dayBranch, monthBranch, yearBranch, hourBranch].filter(Boolean);
-  const stemList = [dayStem, monthStem, yearStem, hourStem].filter(Boolean);
+  const branchList = [dayBranch, monthBranch, yearBranch, result?.isTimeUnknown ? '' : hourBranch].filter(Boolean);
+  const stemList = [dayStem, monthStem, yearStem, result?.isTimeUnknown ? '' : hourStem].filter(Boolean);
   
   let tugwanCount = 0;
   branchList.forEach(b => {
@@ -1445,9 +1445,9 @@ export function generatePersonalizedTexts(
     ? (BRANCH_PERSONALITIES[yearBranch] ? `\n\n삶의 뿌리와 행동 방식의 토대를 이루는 **년지 ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**은 귀하의 가장 기본적인 관계 패턴을 형성합니다.\n**${BRANCH_PERSONALITIES[yearBranch].lifeEnvironment}**\n${BRANCH_PERSONALITIES[yearBranch].socialPattern}` : '')
     : (BRANCH_INFO_EN[yearBranch] ? `\n\nThe **Year Branch ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**, forming the root and foundation of your life, shapes your basic relationship patterns.\n**${BRANCH_INFO_EN[yearBranch].lifeEnvironment}**\n${BRANCH_INFO_EN[yearBranch].socialPattern}` : '');
 
-  const ls3 = isKO
+  const ls3 = result?.isTimeUnknown ? '' : (isKO
     ? (BRANCH_PERSONALITIES[hourBranch] ? `\n\n**시지 ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})**은 귀하가 진정으로 원하고 이루고자 하는 욕망의 방향을 보여줍니다.\n**${BRANCH_PERSONALITIES[hourBranch].behavioralTrigger}**\n${BRANCH_PERSONALITIES[hourBranch].hiddenStruggle}` : '')
-    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n**${BRANCH_INFO_EN[hourBranch].behavioralTrigger}**\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : '');
+    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n**${BRANCH_INFO_EN[hourBranch].behavioralTrigger}**\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : ''));
 
   const individualDetails = [ls1, ls2, ls3].filter(s => s.trim().length > 0).join('');
 
@@ -1532,7 +1532,7 @@ export function generatePersonalizedTexts(
       { pillarTitle: 'Month', type: 'branch' as const },
       { pillarTitle: 'Month', type: 'stem' as const }
     ];
-    if (hourBranch) {
+    if (hourBranch && !result?.isTimeUnknown) {
       lifePillars.push({ pillarTitle: 'Hour', type: 'branch' as const });
     } else {
       lifePillars.push({ pillarTitle: 'Year', type: 'branch' as const });
@@ -2064,21 +2064,33 @@ export function generatePersonalizedTexts(
       : `\n\n**The benefactor pull of Deungra-Gyegap (藤蘿繫甲) is added on top of all these patterns.**\nRather than breaking through alone, this energy is magnified when you collaborate with an outstanding partner or mentor.`;
   }
 
+  const cleanInnatePillars = result?.isTimeUnknown
+    ? innatePillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : innatePillars;
+
+  const cleanLifePillars = result?.isTimeUnknown
+    ? lifePillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : lifePillars;
+
+  const cleanWealthPillars = result?.isTimeUnknown
+    ? wealthPillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : wealthPillars;
+
   return {
     innateTemperament: {
       title: innateTitle,
       description: innateDesc,
-      keyPillars: innatePillars,
+      keyPillars: cleanInnatePillars,
     },
     lifestylePattern: {
       title: lifeTitle,
       description: lifeDesc,
-      keyPillars: lifePillars,
+      keyPillars: cleanLifePillars,
     },
     wealthFlow: {
       title: wealthTitle,
       description: wealthDesc,
-      keyPillars: wealthPillars,
+      keyPillars: cleanWealthPillars,
       typeTitle,
       pipeline,
       expansionScore,

@@ -42,6 +42,18 @@ export function calculateRelationshipDynamics(
 ): RelationshipDynamicsResult {
     let baseScore = 50;
     const isKO = lang === 'KO';
+
+    const getPillar = (res: BaZiResult, titleStr: string, idx: number) => {
+        if (!res || !res.pillars) return null;
+        const matches = res.pillars.find(p => 
+            p.title === titleStr || 
+            (titleStr === 'Day' && (p.title === '일주' || p.title === '일')) ||
+            (titleStr === 'Month' && (p.title === '월주' || p.title === '월')) ||
+            (titleStr === 'Year' && (p.title === '년주' || p.title === '년' || p.title === 'Year Pillar')) ||
+            (titleStr === 'Hour' && (p.title === '시주' || p.title === '시'))
+        );
+        return matches || res.pillars[idx];
+    };
     
     const uYongHee = [
         ...getElements(userResult.analysis?.yongshinDetail?.primary),
@@ -130,11 +142,11 @@ export function calculateRelationshipDynamics(
         '癸': ['己', '丁']
     };
     
-    const uDayBranch = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.branch || '';
-    const pDayBranch = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.branch || '';
+    const uDayBranch = getPillar(userResult, 'Day', 1)?.branch || '';
+    const pDayBranch = getPillar(partnerResult, 'Day', 1)?.branch || '';
 
-    const uDayStem = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '';
-    const pDayStem = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '';
+    const uDayStem = getPillar(userResult, 'Day', 1)?.stem || '';
+    const pDayStem = getPillar(partnerResult, 'Day', 1)?.stem || '';
 
     let hasStemHap = false;
     let hasStemChung = false;
@@ -227,8 +239,8 @@ export function calculateRelationshipDynamics(
     const _uyh = [..._getEls(userResult.analysis?.yongshinDetail?.primary), ..._getEls(userResult.analysis?.yongshinDetail?.heeShin)].filter(Boolean);
     const _pyh = [..._getEls(partnerResult.analysis?.yongshinDetail?.primary), ..._getEls(partnerResult.analysis?.yongshinDetail?.heeShin)].filter(Boolean);
     
-    const uMBR = userResult.pillars.find(p => p.title === 'Month' || p.title === '월주')?.branch || '';
-    const pMBR = partnerResult.pillars.find(p => p.title === 'Month' || p.title === '월주')?.branch || '';
+    const uMBR = getPillar(userResult, 'Month', 2)?.branch || '';
+    const pMBR = getPillar(partnerResult, 'Month', 2)?.branch || '';
 
     const uCE = getCheonEul(uDayStem);
     const pCE = getCheonEul(pDayStem);
@@ -576,8 +588,8 @@ export function calculateRelationshipDynamics(
     });
 
     // [v5.8] Same-Age (Birth Year) Dynamics
-    const uYearBranch = userResult.pillars.find(p => p.title === 'Year' || p.title === '년주' || p.title === 'Year Pillar')?.branch || '';
-    const pYearBranch = partnerResult.pillars.find(p => p.title === 'Year' || p.title === '년주' || p.title === 'Year Pillar')?.branch || '';
+    const uYearBranch = getPillar(userResult, 'Year', 3)?.branch || '';
+    const pYearBranch = getPillar(partnerResult, 'Year', 3)?.branch || '';
     const isSameYear = uYearBranch && pYearBranch && uYearBranch === pYearBranch;
 
     if (isSameYear) {
@@ -1021,8 +1033,8 @@ export function calculateRelationshipDynamics(
             if (uFireEarth > 45 && pWater > 30) { gates.push({ name: isKO ? "[정신적 휴식] 폭주하는 열기를 식히다" : "[Mental Oasis] Cooling the Heat", desc: isKO ? "과열된 엔진 열기를 상대의 지혜로운 물기운이 씻어 완벽한 휴식을 줍니다." : "Her calm water energy cools down your overheated engine." }); gateBonus += 15; }
         }
     } else {
-        const uDMStemForEaster = userResult?.pillars?.[1]?.stem || userResult?.pillars?.find(p => p.title === 'Day' || p.title === '일 || Day')?.stem || '甲';
-        const pDMStemForEaster = partnerResult?.pillars?.[1]?.stem || partnerResult?.pillars?.find(p => p.title === 'Day' || p.title === '일 || Day')?.stem || '甲';
+        const uDMStemForEaster = getPillar(userResult, 'Day', 1)?.stem || '甲';
+        const pDMStemForEaster = getPillar(partnerResult, 'Day', 1)?.stem || '甲';
         const isMountainSynergy = (uDMStemForEaster === '戊' || uDMStemForEaster === '己') && (pDMStemForEaster === '戊' || pDMStemForEaster === '己') && ((uDayBranch === '寅' && pDayBranch === '午') || (uDayBranch === '午' && pDayBranch === '寅') || (uDMStemForEaster === '戊' && pDMStemForEaster === '戊'));
         
         if (isMountainSynergy && uDayBranch && ['寅', '午'].includes(uDayBranch) && pDayBranch && ['寅', '午'].includes(pDayBranch)) {
@@ -1100,8 +1112,8 @@ export function calculateRelationshipDynamics(
     const uBranchesStr = userResult.pillars.map(p => p.branch).join('');
     const pBranchesStr = partnerResult.pillars.map(p => p.branch).join('');
     if (uBranchesStr.includes('寅') && pBranchesStr.includes('亥')) {
-        const uDM = userResult.pillars.find(p => p.title === 'Day')?.stem;
-        const pDM = partnerResult.pillars.find(p => p.title === 'Day')?.stem;
+        const uDM = getPillar(userResult, 'Day', 1)?.stem;
+        const pDM = getPillar(partnerResult, 'Day', 1)?.stem;
         if (uDM === '戊' && pDM && STEM_ELEMENTS[pDM] === 'Wood') {
              structuralSynergy = { 
                  badge: isKO ? "[인해합(寅亥): 목과 수의 포용]" : "[In-Hae Combination: Embracing Synergy]", 
@@ -1220,8 +1232,8 @@ export function calculateRelationshipDynamics(
 
     console.log(`[DEBUG_SCORE] lang=${lang}, finalScore=${syncScore}, base=${baseScore}, uYongHee=${JSON.stringify(uYongHee)}, pYongHee=${JSON.stringify(pYongHee)}, disease=${diseaseBonus}, uGeJuRaw=${userResult.analysis?.geJu}, pGeJuRaw=${partnerResult.analysis?.geJu}`);
 
-    const uDMStemForEaster = userResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '甲';
-    const pDMStem = partnerResult.pillars.find(p => p.title === 'Day' || p.title === '일주')?.stem || '甲';
+    const uDMStemForEaster = getPillar(userResult, 'Day', 1)?.stem || '甲';
+    const pDMStem = getPillar(partnerResult, 'Day', 1)?.stem || '甲';
 
     const uIljuData = getIljuData(uDMStemForEaster, uDayBranch);
     const pIljuData = getIljuData(pDMStem, pDayBranch);
