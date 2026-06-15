@@ -416,31 +416,66 @@ const BRANCH_EN: Record<string, string> = {
 };
 
 const IljuStampImage: React.FC<{ stem: string; branch: string; lang: 'KO' | 'EN' }> = ({ stem, branch, lang }) => {
+  const { theme } = useTheme();
   const stemData = STEM_INFO[stem] || { color: '#FFF', ko: stem, bg: 'rgba(255,255,255,0.1)', element: 'None' };
   const branchData = BRANCH_INFO[branch] || { color: '#FFF', ko: branch, animal: '', bg: 'rgba(255,255,255,0.1)', element: 'None' };
 
+  const isLight = theme === 'light';
+
+  const getElementColor = (color: string, element: string) => {
+    if (!isLight) return color;
+    switch (element) {
+      case 'Wood':
+        return '#16a34a'; // Premium dark green
+      case 'Fire':
+        return '#dc2626'; // Premium dark red
+      case 'Earth':
+        return '#ca8a04'; // Premium dark gold/brown
+      case 'Metal':
+        return '#4b5563'; // Premium deep metal gray
+      case 'Water':
+        return '#2563eb'; // Premium dark blue
+      default:
+        return '#374151';
+    }
+  };
+
+  const stemColor = getElementColor(stemData.color, stemData.element);
+  const branchColor = getElementColor(branchData.color, branchData.element);
   const iljuRomanized = `${STEM_EN[stem] || stem}${BRANCH_EN[branch] || branch}`;
 
   return (
     <div 
-      className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-lg flex flex-col items-center justify-center p-1 select-none pointer-events-none transition-all duration-300"
+      className={`relative w-12 h-12 rounded-xl overflow-hidden shrink-0 flex flex-col items-center justify-center p-1 select-none pointer-events-none transition-all duration-300 ${
+        isLight 
+          ? 'border border-slate-200/80 shadow-[0_2px_4px_rgba(0,0,0,0.05)]' 
+          : 'border border-white/10 shadow-lg'
+      }`}
       style={{
-        background: `linear-gradient(135deg, ${stemData.color}15 0%, ${branchData.color}15 100%)`,
-        boxShadow: `inset 0 0 8px ${stemData.color}15, 0 4px 10px rgba(0,0,0,0.4)`
+        background: isLight 
+          ? `linear-gradient(135deg, ${stemColor}15 0%, ${branchColor}15 100%)`
+          : `linear-gradient(135deg, ${stemData.color}15 0%, ${branchData.color}15 100%)`,
+        boxShadow: isLight
+          ? `inset 0 0 8px ${stemColor}10`
+          : `inset 0 0 8px ${stemData.color}15, 0 4px 10px rgba(0,0,0,0.4)`
       }}
     >
       {/* Decorative Elemental Ring */}
       <div 
         className="absolute inset-[2px] rounded-[10px] border border-dashed opacity-30"
-        style={{ borderColor: stemData.color }}
+        style={{ borderColor: isLight ? stemColor : stemData.color }}
       />
       {/* Dynamic Hanja Text Stamps */}
       <div className="flex gap-[1px] items-center justify-center font-gothic z-10 leading-none">
-        <span className="text-xs font-black" style={{ color: stemData.color, textShadow: `0 0 4px ${stemData.color}50` }}>{stem}</span>
-        <span className="text-xs font-black" style={{ color: branchData.color, textShadow: `0 0 4px ${branchData.color}50` }}>{branch}</span>
+        <span className="text-xs font-black" style={{ color: stemColor, textShadow: isLight ? 'none' : `0 0 4px ${stemData.color}50` }}>{stem}</span>
+        <span className="text-xs font-black" style={{ color: branchColor, textShadow: isLight ? 'none' : `0 0 4px ${branchData.color}50` }}>{branch}</span>
       </div>
       {/* Korean text tag / English phonetic tag */}
-      <span className="text-[7px] font-bold text-white/95 z-10 tracking-tighter leading-none mt-1.5 bg-black/50 px-1 py-0.5 rounded text-center truncate max-w-full">
+      <span className={`text-[8px] font-bold z-10 tracking-tighter leading-none mt-1.5 px-1 py-0.5 rounded text-center truncate max-w-full transition-colors ${
+        isLight 
+          ? 'bg-slate-100 text-slate-705 font-extrabold border border-slate-200/60' 
+          : 'bg-black/50 text-white/95 border border-white/5'
+      }`}>
         {lang === 'KO' ? `${stemData.ko}${branchData.ko}일주` : iljuRomanized}
       </span>
     </div>
@@ -1681,72 +1716,114 @@ export default function App() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 26, stiffness: 240 }}
-              className="fixed inset-y-0 left-0 w-[80vw] max-w-[320px] bg-[#0b0512]/95 backdrop-blur-md border-r border-[#FF2A6D]/30 z-[101] shadow-2xl flex flex-col h-full overflow-hidden pointer-events-auto"
+              className={`fixed inset-y-0 left-0 w-[80vw] max-w-[320px] ${
+                theme === 'light' 
+                  ? 'bg-slate-50 border-r border-slate-200 text-slate-800' 
+                  : 'bg-[#0b0512]/95 border-r border-[#FF2A6D]/30 text-white'
+              } backdrop-blur-md z-[101] shadow-2xl flex flex-col h-full overflow-hidden pointer-events-auto`}
             >
               {/* Drawer Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/40">
+              <div className={`flex items-center justify-between p-4 border-b ${
+                theme === 'light' ? 'border-slate-250 bg-slate-100' : 'border-white/10 bg-black/40'
+              }`}>
                 <div className="flex items-center gap-2">
-                  <Bookmark className="w-5 h-5 text-[#FF2A6D] animate-pulse" />
-                  <span className="font-gothic text-lg font-bold tracking-tight text-white select-none">
+                  <Bookmark className={`w-5 h-5 ${theme === 'light' ? 'text-[#E8185A]' : 'text-[#FF2A6D]'} animate-pulse`} />
+                  <span className={`font-gothic text-lg font-bold tracking-tight ${
+                    theme === 'light' ? 'text-slate-800' : 'text-white'
+                  } select-none`}>
                     {lang === 'KO' ? '메뉴 & 명식저장소' : 'Menu & Saju Storage'}
                   </span>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-1.5 rounded-lg border border-white/10 hover:border-white hover:bg-white/5 text-white/70 hover:text-white transition-all"
+                  className={`p-1.5 rounded-lg border transition-all ${
+                    theme === 'light' 
+                      ? 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-100 text-slate-700' 
+                      : 'border-white/10 hover:border-white hover:bg-white/5 text-white/70 hover:text-white'
+                  }`}
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Drawer Main Scrollable Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-white/15 scrollbar-track-transparent">
+              <div className={`flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin ${
+                theme === 'light' ? 'scrollbar-thumb-slate-350' : 'scrollbar-thumb-white/15'
+              } scrollbar-track-transparent`}>
                 
                 {/* 1. Save Current Saju Area */}
-                <div className="space-y-3 p-4 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF2A6D]/5 rounded-bl-full blur-xl pointer-events-none" />
+                <div className={`space-y-3 p-4 rounded-2xl border relative overflow-hidden group ${
+                  theme === 'light' ? 'bg-white border-slate-250 shadow-sm' : 'bg-white/5 border-white/10'
+                }`}>
+                  <div className={`absolute top-0 right-0 w-24 h-24 ${
+                    theme === 'light' ? 'bg-[#E8185A]/5' : 'bg-[#FF2A6D]/5'
+                  } rounded-bl-full blur-xl pointer-events-none`} />
                   
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold font-mono tracking-wider text-[#FF2A6D] uppercase">
+                    <h3 className={`text-xs font-bold font-mono tracking-wider uppercase ${
+                      theme === 'light' ? 'text-[#E8185A]' : 'text-[#FF2A6D]'
+                    }`}>
                       {lang === 'KO' ? '현재 명식 저장하기' : 'Save Current Profile'}
                     </h3>
-                    <span className="text-[10px] text-white/40 font-mono">Local Storage</span>
+                    <span className={`text-[10px] font-mono ${theme === 'light' ? 'text-slate-400' : 'text-white/40'}`}>Local Storage</span>
                   </div>
 
                   <div className="space-y-2 text-xs">
                     {/* Saju Brief Information Label */}
-                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 text-white/70">
-                      <div className="flex justify-between font-bold text-[#05d9e8] mb-1">
+                    <div className={`p-2.5 rounded-xl border ${
+                      theme === 'light' 
+                        ? 'bg-slate-50 border-slate-200 text-slate-700' 
+                        : 'bg-black/30 border border-white/5 text-white/70'
+                    }`}>
+                      <div className={`flex justify-between font-bold mb-1 ${
+                        theme === 'light' ? 'text-sky-750 font-bold' : 'text-[#05d9e8]'
+                      }`}>
                         <span>{userInput.name || (lang === 'KO' ? '무명씨(미입력)' : 'Anonymous')}</span>
                         <span>{userInput.gender === 'male' ? '남성' : userInput.gender === 'female' ? '여성' : '선택무'}</span>
                       </div>
-                      <div className="text-[11px] text-white/50 leading-relaxed">
+                      <div className={`text-[11px] leading-relaxed ${
+                        theme === 'light' ? 'text-slate-500' : 'text-white/50'
+                      }`}>
                         {userInput.birthDate} {userInput.isTimeUnknown ? '시간모름' : userInput.birthTime} ({(!userInput.calendarType || userInput.calendarType === 'solar') ? '양력' : '음력'})
                       </div>
                     </div>
 
                     {/* Inputs */}
                     <div className="space-y-2 mt-2">
-                      <label className="block text-[11px] text-white/60 font-semibold">{lang === 'KO' ? '저장용 별명/이름' : 'Custom Nickname'}</label>
+                      <label className={`block text-[11px] font-semibold ${
+                        theme === 'light' ? 'text-slate-600' : 'text-white/60'
+                      }`}>{lang === 'KO' ? '저장용 별명/이름' : 'Custom Nickname'}</label>
                       <input
                         type="text"
                         placeholder={userInput.name || (lang === 'KO' ? '예: 내 사주, 친구 사주' : 'My Saju')}
                         value={newRecordCustomName}
                         onChange={(e) => setNewRecordCustomName(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#FF2A6D] transition-colors"
+                        className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none transition-colors ${
+                          theme === 'light' 
+                            ? 'bg-slate-50 border-slate-250 text-slate-800 placeholder-slate-400 focus:border-[#E8185A]' 
+                            : 'bg-black/40 border-white/10 text-white placeholder-white/30 focus:border-[#FF2A6D]'
+                        }`}
                       />
 
-                      <label className="block text-[11px] text-white/60 font-semibold mt-1">{lang === 'KO' ? '메모 (궁합, 직업, 메모 등)' : 'Memo Note'}</label>
+                      <label className={`block text-[11px] font-semibold mt-1 ${
+                        theme === 'light' ? 'text-slate-600' : 'text-white/60'
+                      }`}>{lang === 'KO' ? '메모 (궁합, 직업, 메모 등)' : 'Memo Note'}</label>
                       <textarea
                         rows={2}
                         placeholder={lang === 'KO' ? '이 명식에 관한 정보나 특징을 기록해보세요.' : 'Record characteristics, notes & tags.'}
                         value={newRecordMemo}
                         onChange={(e) => setNewRecordMemo(e.target.value)}
-                        className="w-full px-3 py-1.5 rounded-xl bg-black/40 border border-[#FF2A6D]/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#FF2A6D] transition-colors resize-none mb-1"
+                        className={`w-full px-3 py-1.5 rounded-xl border text-xs focus:outline-none transition-colors resize-none mb-1 ${
+                          theme === 'light' 
+                            ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-[#E8185A]' 
+                            : 'bg-black/40 border-[#FF2A6D]/20 text-white placeholder-white/30 focus:border-[#FF2A6D]'
+                        }`}
                       />
 
                       {/* Group selection */}
-                      <label className="block text-[11px] text-white/60 font-semibold mt-1">{lang === 'KO' ? '📂 저장 그룹 선택' : '📂 Select Profile Group'}</label>
+                      <label className={`block text-[11px] font-semibold mt-1 ${
+                        theme === 'light' ? 'text-slate-600' : 'text-white/60'
+                      }`}>{lang === 'KO' ? '📂 저장 그룹 선택' : '📂 Select Profile Group'}</label>
                       <div className="flex flex-wrap gap-1 max-h-[100px] overflow-y-auto pr-1">
                         {[
                           ...profileGroups,
@@ -1761,8 +1838,12 @@ export default function App() {
                               onClick={() => setSelectedSaveGroup(g.id)}
                               className={`py-1 px-2.5 rounded-lg text-[9px] font-bold border transition-all text-center shrink-0 ${
                                 active
-                                  ? 'bg-[#FF2A6D]/20 border-[#FF2A6D] text-white shadow-[0_0_6px_rgba(255,42,109,0.4)]'
-                                  : 'bg-black/40 border-white/10 text-white/55 hover:border-white/20 hover:text-white'
+                                  ? theme === 'light'
+                                    ? 'bg-[#E8185A]/15 border-[#E8185A] text-[#E8185A] shadow-[0_0_6px_rgba(232,24,90,0.15)]'
+                                    : 'bg-[#FF2A6D]/20 border-[#FF2A6D] text-white shadow-[0_0_6px_rgba(255,42,109,0.4)]'
+                                  : theme === 'light'
+                                    ? 'bg-slate-100 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-800'
+                                    : 'bg-black/40 border-white/10 text-white/55 hover:border-white/20 hover:text-white'
                               }`}
                             >
                               {label}
@@ -1775,7 +1856,11 @@ export default function App() {
                     <button
                       onClick={handleSaveCurrentBazi}
                       disabled={!userInput.birthDate || !userInput.birthTime}
-                      className="w-full mt-3 py-2 px-4 rounded-xl bg-gradient-to-r from-[#FF2A6D] to-[#9B30FF] hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-md shadow-[#FF2A6D]/10"
+                      className={`w-full mt-3 py-2 px-4 rounded-xl hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-md ${
+                        theme === 'light'
+                          ? 'bg-gradient-to-r from-[#E8185A] to-[#8024D9] shadow-inner'
+                          : 'bg-gradient-to-r from-[#FF2A6D] to-[#9B30FF] shadow-[#FF2A6D]/10'
+                      }`}
                     >
                       <Save className="w-3.5 h-3.5" />
                       <span>{lang === 'KO' ? '사주 저장소에 입력' : 'Save To Repository'}</span>
@@ -1787,10 +1872,12 @@ export default function App() {
                 <div className="space-y-3">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between px-1">
-                      <h3 className="text-xs font-bold font-mono tracking-wider text-neon-cyan uppercase">
+                      <h3 className={`text-xs font-bold font-mono tracking-wider uppercase ${
+                        theme === 'light' ? 'text-sky-750 font-bold' : 'text-neon-cyan'
+                      }`}>
                         {lang === 'KO' ? `보관 목록` : `Repository`}
                       </h3>
-                      <span className="text-[10px] font-mono text-white/40">
+                      <span className={`text-[10px] font-mono ${theme === 'light' ? 'text-slate-400' : 'text-white/40'}`}>
                         {lang === 'KO' ? `총 ${savedBaziList.length}개` : `${savedBaziList.length} total`}
                       </span>
                     </div>
@@ -1808,8 +1895,12 @@ export default function App() {
                               onClick={() => setFilterGroup('all')}
                               className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
                                 active
-                                  ? 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
-                                  : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
+                                  ? theme === 'light'
+                                    ? 'bg-sky-50 border-sky-600 text-sky-700 shadow-sm'
+                                    : 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
+                                  : theme === 'light'
+                                    ? 'bg-slate-100 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-850'
+                                    : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
                               }`}
                             >
                               {lang === 'KO' ? '전체' : 'All'} <span className="opacity-60 text-[9px] font-mono">({count})</span>
@@ -1833,8 +1924,12 @@ export default function App() {
                                 g.id !== 'me' ? 'pr-5.5' : ''
                               } ${
                                 active
-                                  ? 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
-                                  : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
+                                  ? theme === 'light'
+                                    ? 'bg-sky-50 border-sky-600 text-sky-700 shadow-sm'
+                                    : 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
+                                  : theme === 'light'
+                                    ? 'bg-slate-100 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-850'
+                                    : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
                               }`}
                             >
                               {label} <span className="opacity-60 text-[9px] font-mono">({count})</span>
@@ -1844,7 +1939,9 @@ export default function App() {
                               <button
                                 type="button"
                                 onClick={(e) => handleDeleteGroup(g.id, e)}
-                                className="absolute right-1.5 text-white/40 hover:text-red-500 font-bold text-[10px] w-3 h-3 flex items-center justify-center transition-all cursor-pointer"
+                                className={`absolute right-1.5 font-bold text-[10px] w-3 h-3 flex items-center justify-center transition-all cursor-pointer ${
+                                  theme === 'light' ? 'text-slate-400 hover:text-red-650' : 'text-white/40 hover:text-red-500'
+                                }`}
                                 title={lang === 'KO' ? '그룹 삭제' : 'Delete Group'}
                               >
                                 &times;
@@ -1865,8 +1962,12 @@ export default function App() {
                               onClick={() => setFilterGroup('others')}
                               className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
                                 active
-                                  ? 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
-                                  : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
+                                  ? theme === 'light'
+                                    ? 'bg-sky-50 border-sky-600 text-sky-700 shadow-sm'
+                                    : 'bg-neon-cyan/15 border-neon-cyan text-neon-cyan shadow-[0_0_6px_rgba(5,217,232,0.3)]'
+                                  : theme === 'light'
+                                    ? 'bg-slate-100 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-850'
+                                    : 'bg-white/[0.02] border-white/5 text-white/55 hover:border-white/10 hover:text-white'
                               }`}
                             >
                               {lang === 'KO' ? '기타/해제' : 'Others'} <span className="opacity-60 text-[9px] font-mono">({count})</span>
@@ -1883,7 +1984,11 @@ export default function App() {
                           setNewGroupName('');
                           setSelectedProfileIdsForNewGroup([]);
                         }}
-                        className="px-2 py-1 rounded-lg text-[10px] font-extrabold bg-[#FF2A6D]/15 border border-dashed border-[#FF2A6D]/40 text-[#FF2A6D] hover:bg-[#FF2A6D]/25 transition-all shrink-0 flex items-center gap-0.5 cursor-pointer"
+                        className={`px-2 py-1 rounded-lg text-[10px] font-extrabold border border-dashed transition-all shrink-0 flex items-center gap-0.5 cursor-pointer ${
+                          theme === 'light'
+                            ? 'bg-[#E8185A]/10 border-[#E8185A]/30 text-[#E8185A] hover:bg-[#E8185A]/15'
+                            : 'bg-[#FF2A6D]/15 border-[#FF2A6D]/40 text-[#FF2A6D] hover:bg-[#FF2A6D]/25'
+                        }`}
                       >
                         <Plus className="w-3 h-3" />
                         <span>{lang === 'KO' ? '그룹 추가' : 'Add Group'}</span>
@@ -1891,7 +1996,9 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  <div className={`space-y-2 max-h-[380px] overflow-y-auto pr-1 scrollbar-thin ${
+                    theme === 'light' ? 'scrollbar-thumb-slate-300' : 'scrollbar-thumb-white/10'
+                  } scrollbar-track-transparent`}>
                     {(() => {
                       const filteredList = savedBaziList.filter(item => {
                         if (filterGroup === 'all') return true;
@@ -1905,12 +2012,14 @@ export default function App() {
 
                       if (filteredList.length === 0) {
                         return (
-                          <div className="text-center p-6 rounded-2xl border border-dashed border-white/10 text-white/40 mt-1">
+                          <div className={`text-center p-6 rounded-2xl border border-dashed mt-1 ${
+                            theme === 'light' ? 'border-slate-350 text-slate-400' : 'border-white/10 text-white/40'
+                          }`}>
                             <Bookmark className="w-8 h-8 mx-auto opacity-25 mb-2" />
                             <p className="text-xs font-medium font-gothic">
                               {lang === 'KO' ? '저장된 사주가 없습니다.' : 'No saved records.'}
                             </p>
-                            <p className="text-[10px] opacity-60 mt-1 leading-relaxed">
+                            <p className="text-[10px] opacity-65 mt-1 leading-relaxed">
                               {lang === 'KO' ? '현재 카테고리에 조건이 맞는 사주 기록이 비어있습니다.' : 'No profiles match the active filter.'}
                             </p>
                           </div>
@@ -1935,44 +2044,66 @@ export default function App() {
                                 <div
                                   key={item.id}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="p-3 rounded-xl bg-black/50 border-2 border-[#05d9e8]/40 shadow-[0_0_12px_rgba(5,217,232,0.1)] flex flex-col gap-2 mb-2 transition-all cursor-default"
+                                  className={`p-3 rounded-xl border-2 flex flex-col gap-2 mb-2 transition-all cursor-default ${
+                                    theme === 'light' 
+                                      ? 'bg-white border-sky-400 shadow-md text-slate-800' 
+                                      : 'bg-black/50 border-2 border-[#05d9e8]/40 shadow-[0_0_12px_rgba(5,217,232,0.1)]'
+                                  }`}
                                 >
-                                  <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-1">
-                                    <span className="text-[11px] font-bold text-neon-cyan">{lang === 'KO' ? '📝 명식 수정' : '📝 Edit Profile'}</span>
+                                  <div className={`flex items-center justify-between border-b pb-1.5 mb-1 ${
+                                    theme === 'light' ? 'border-slate-200' : 'border-white/10'
+                                  }`}>
+                                    <span className={`text-[11px] font-bold ${
+                                      theme === 'light' ? 'text-sky-750 font-bold' : 'text-neon-cyan'
+                                    }`}>{lang === 'KO' ? '📝 명식 수정' : '📝 Edit Profile'}</span>
                                     <button
                                       onClick={() => { setEditingRecordId(null); setEditForm(null); }}
-                                      className="text-white/40 hover:text-white transition-colors text-[10px]"
+                                      className={`transition-colors text-[10px] ${
+                                        theme === 'light' ? 'text-slate-400 hover:text-slate-800' : 'text-white/40 hover:text-white'
+                                      }`}
                                     >
                                       {lang === 'KO' ? '취소' : 'Cancel'}
                                     </button>
                                   </div>
 
                                   <div>
-                                    <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '이름' : 'Name'}</label>
+                                    <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '이름' : 'Name'}</label>
                                     <input
                                       type="text"
                                       value={editForm.name}
                                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                      className="w-full px-2 py-1 rounded bg-black/60 border border-white/15 text-white text-xs focus:outline-none focus:border-neon-cyan"
+                                      className={`w-full px-2 py-1 rounded text-xs focus:outline-none focus:ring-1 ${
+                                        theme === 'light' 
+                                          ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400 focus:ring-sky-455' 
+                                          : 'bg-black/60 border border-white/15 text-white focus:border-neon-cyan'
+                                      }`}
                                     />
                                   </div>
 
                                   <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                      <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '생년월일' : 'Birth Date'}</label>
+                                      <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '생년월일' : 'Birth Date'}</label>
                                       <input
                                         type="date"
                                         value={editForm.birthDate}
                                         onChange={(e) => setEditForm({...editForm, birthDate: e.target.value})}
-                                        className="w-full px-1.5 py-1 rounded bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan"
+                                        className={`w-full px-1.5 py-1 rounded text-[10px] focus:outline-none ${
+                                          theme === 'light' 
+                                            ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400' 
+                                            : 'bg-black/60 border border-white/15 text-white focus:border-neon-cyan'
+                                        }`}
                                       />
                                     </div>
                                     <div>
-                                      <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '달력 구분' : 'Calendar'}</label>
+                                      <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '달력 구분' : 'Calendar'}</label>
                                       <select
                                         value={editForm.calendarType}
                                         onChange={(e) => setEditForm({...editForm, calendarType: e.target.value as 'solar' | 'lunar'})}
-                                        className="w-full px-1.5 py-1 rounded bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan"
+                                        className={`w-full px-1.5 py-1 rounded text-[10px] focus:outline-none ${
+                                          theme === 'light' 
+                                            ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400' 
+                                            : 'bg-black/60 border border-white/15 text-white focus:border-neon-cyan'
+                                        }`}
                                       >
                                         <option value="solar">{lang === 'KO' ? '양력' : 'Solar'}</option>
                                         <option value="lunar">{lang === 'KO' ? '음력' : 'Lunar'}</option>
@@ -1982,16 +2113,24 @@ export default function App() {
 
                                   <div className="grid grid-cols-2 gap-2 items-end">
                                     <div>
-                                      <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '태어난 시간' : 'Birth Time'}</label>
+                                      <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '태어난 시간' : 'Birth Time'}</label>
                                       <input
                                         type="time"
                                         disabled={editForm.isTimeUnknown}
                                         value={editForm.isTimeUnknown ? "12:00" : editForm.birthTime}
                                         onChange={(e) => setEditForm({...editForm, birthTime: e.target.value})}
-                                        className="w-full px-1.5 py-1 rounded bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan disabled:opacity-30"
+                                        className={`w-full px-1.5 py-1 rounded text-[10px] focus:outline-none disabled:opacity-30 ${
+                                          theme === 'light' 
+                                            ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400' 
+                                            : 'bg-black/60 border border-white/15 text-white focus:border-neon-cyan'
+                                        }`}
                                       />
                                     </div>
-                                    <div className="flex items-center gap-1.5 mb-1 bg-black/35 px-2 py-1 rounded border border-white/5 h-7">
+                                    <div className={`flex items-center gap-1.5 mb-1 px-2 py-1 rounded border h-7 ${
+                                      theme === 'light' 
+                                        ? 'bg-slate-100 border-slate-200' 
+                                        : 'bg-black/35 border-white/5'
+                                    }`}>
                                       <input
                                         type="checkbox"
                                         id={`edit-time-unknown-${item.id}`}
@@ -1999,7 +2138,9 @@ export default function App() {
                                         onChange={(e) => setEditForm({...editForm, isTimeUnknown: e.target.checked})}
                                         className="rounded border-white/20 text-[#05d9e8] focus:ring-0 cursor-pointer w-3.5 h-3.5"
                                       />
-                                      <label htmlFor={`edit-time-unknown-${item.id}`} className="text-[9px] text-white/60 cursor-pointer select-none">
+                                      <label htmlFor={`edit-time-unknown-${item.id}`} className={`text-[9px] cursor-pointer select-none ${
+                                        theme === 'light' ? 'text-slate-650' : 'text-white/60'
+                                      }`}>
                                         {lang === 'KO' ? '시간모름' : 'Unknown'}
                                       </label>
                                     </div>
@@ -2007,11 +2148,15 @@ export default function App() {
 
                                   <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                      <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '성별' : 'Gender'}</label>
+                                      <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '성별' : 'Gender'}</label>
                                       <select
                                         value={editForm.gender}
                                         onChange={(e) => setEditForm({...editForm, gender: e.target.value as any})}
-                                        className="w-full px-1.5 py-1 rounded bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan"
+                                        className={`w-full px-1.5 py-1 rounded text-[10px] focus:outline-none ${
+                                          theme === 'light' 
+                                            ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400' 
+                                            : 'bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan'
+                                        }`}
                                       >
                                         <option value="male">{lang === 'KO' ? '남성' : 'Male'}</option>
                                         <option value="female">{lang === 'KO' ? '여성' : 'Female'}</option>
@@ -2020,12 +2165,16 @@ export default function App() {
                                       </select>
                                     </div>
                                     <div>
-                                      <label className="block text-[9px] text-white/55 mb-0.5">{lang === 'KO' ? '메모' : 'Memo'}</label>
+                                      <label className={`block text-[9px] mb-0.5 ${theme === 'light' ? 'text-slate-500' : 'text-white/55'}`}>{lang === 'KO' ? '메모' : 'Memo'}</label>
                                       <input
                                         type="text"
                                         value={editForm.memo}
                                         onChange={(e) => setEditForm({...editForm, memo: e.target.value})}
-                                        className="w-full px-1.5 py-1 rounded bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan"
+                                        className={`w-full px-1.5 py-1 rounded text-[10px] focus:outline-none ${
+                                          theme === 'light' 
+                                            ? 'bg-slate-50 border border-slate-250 text-slate-800 focus:border-sky-400' 
+                                            : 'bg-black/60 border border-white/15 text-white text-[10px] focus:outline-none focus:border-neon-cyan'
+                                        }`}
                                         placeholder={lang === 'KO' ? '메모' : 'Memo'}
                                       />
                                     </div>
@@ -2034,7 +2183,11 @@ export default function App() {
                                   <button
                                     type="button"
                                     onClick={() => handleUpdateBazi(item.id, editForm)}
-                                    className="w-full mt-1 py-1.5 rounded-lg bg-neon-cyan hover:brightness-110 font-black text-black text-[10px] tracking-widest transition-all flex items-center justify-center gap-1 shadow-[0_0_8px_rgba(5,217,232,0.25)]"
+                                    className={`w-full mt-1 py-1.5 rounded-lg font-black text-[10px] tracking-widest transition-all flex items-center justify-center gap-1 ${
+                                      theme === 'light' 
+                                        ? 'bg-sky-650 hover:brightness-110 text-white shadow-sm' 
+                                        : 'bg-neon-cyan hover:brightness-110 text-black shadow-[0_0_8px_rgba(5,217,232,0.25)]'
+                                    }`}
                                   >
                                     <Save className="w-3 h-3" />
                                     <span>{lang === 'KO' ? '수정 완료' : 'Save Changes'}</span>
@@ -2047,7 +2200,11 @@ export default function App() {
                               <div
                                 key={item.id}
                                 onClick={() => handleLoadBazi(item)}
-                                className="group relative flex flex-col p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-[#FF2A6D] hover:bg-[#FF2A6D]/5 cursor-pointer transition-all duration-300 mb-2"
+                                className={`group relative flex flex-col p-3 rounded-xl border cursor-pointer transition-all duration-300 mb-2 ${
+                                  theme === 'light' 
+                                    ? 'bg-white border-slate-200 hover:border-[#E8185A] hover:bg-slate-50 text-slate-850 shadow-sm' 
+                                    : 'bg-white/[0.02] border border-white/10 hover:border-[#FF2A6D] hover:bg-[#FF2A6D]/5 text-white'
+                                }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -2056,14 +2213,22 @@ export default function App() {
                                     
                                     <div className="min-w-0 flex-1">
                                       <div className="flex items-center gap-1.5">
-                                        <span className="font-bold text-xs text-white truncate max-w-[110px] group-hover:text-[#FF2A6D] transition-colors">
+                                        <span className={`font-bold text-xs truncate max-w-[110px] transition-colors ${
+                                          theme === 'light' ? 'text-slate-800 group-hover:text-[#E8185A]' : 'text-white group-hover:text-[#FF2A6D]'
+                                        }`}>
                                           {item.name}
                                         </span>
-                                        <span className="text-[9px] text-[#05d9e8] bg-[#05d9e8]/10 px-1 py-[1.5px] rounded border border-[#05d9e8]/20 leading-none shrink-0">
+                                        <span className={`text-[9px] px-1 py-[1.5px] rounded border leading-none shrink-0 ${
+                                          theme === 'light' 
+                                            ? 'text-sky-700 bg-sky-50 border-sky-200' 
+                                            : 'text-[#05d9e8] bg-[#05d9e8]/10 border-[#05d9e8]/20'
+                                        }`}>
                                           {item.gender === 'male' ? (lang === 'KO' ? '남' : 'M') : item.gender === 'female' ? (lang === 'KO' ? '여' : 'F') : 'N/A'}
                                         </span>
                                       </div>
-                                      <p className="text-[10px] text-white/50 mt-1 font-mono whitespace-nowrap">
+                                      <p className={`text-[10px] mt-1 font-mono whitespace-nowrap ${
+                                        theme === 'light' ? 'text-slate-500' : 'text-white/50'
+                                      }`}>
                                         {item.birthDate} &bull; {item.isTimeUnknown ? (lang === 'KO' ? '시간모름' : 'Unknown') : item.birthTime}
                                       </p>
                                     </div>
@@ -2071,17 +2236,21 @@ export default function App() {
 
                                   {pendingDeleteId === item.id ? (
                                     <div 
-                                      className="flex items-center gap-1.5 bg-red-950/40 border border-red-500/35 px-2 py-1 rounded-lg shrink-0" 
+                                      className={`flex items-center gap-1.5 border px-2 py-1 rounded-lg shrink-0 ${
+                                        theme === 'light' ? 'bg-red-50 border-red-200 text-slate-800' : 'bg-red-950/40 border-red-500/35 text-white'
+                                      }`} 
                                       onClick={(e) => e.stopPropagation()}
                                     >
-                                      <span className="text-[10px] font-black text-red-400">{lang === 'KO' ? '삭제할까요?' : 'Delete?'}</span>
+                                      <span className={`text-[10px] font-black ${theme === 'light' ? 'text-red-700' : 'text-red-400'}`}>
+                                        {lang === 'KO' ? '삭제할까요?' : 'Delete?'}
+                                      </span>
                                       <button
                                         type="button"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           executeDeleteBazi(item.id);
                                         }}
-                                        className="px-1.5 py-0.5 rounded bg-red-600 hover:bg-red-700 text-white text-[9px] font-bold transition-all"
+                                        className="px-1.5 py-0.5 rounded bg-red-600 hover:bg-red-750 text-white text-[9px] font-bold transition-all"
                                       >
                                         {lang === 'KO' ? '삭제' : 'Yes'}
                                       </button>
@@ -2091,7 +2260,9 @@ export default function App() {
                                           e.stopPropagation();
                                           setPendingDeleteId(null);
                                         }}
-                                        className="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white text-[9px] font-bold transition-all"
+                                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition-all ${
+                                          theme === 'light' ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-white/10 hover:bg-white/20 text-white'
+                                        }`}
                                       >
                                         {lang === 'KO' ? '취소' : 'No'}
                                       </button>
@@ -2113,7 +2284,9 @@ export default function App() {
                                             memo: item.memo || ''
                                           });
                                         }}
-                                        className="p-1 text-white/30 hover:text-neon-cyan hover:bg-white/5 rounded-lg transition-colors"
+                                        className={`p-1 rounded-lg transition-colors ${
+                                          theme === 'light' ? 'text-slate-450 hover:text-sky-650 hover:bg-slate-100' : 'text-white/30 hover:text-neon-cyan hover:bg-white/5'
+                                        }`}
                                         title={lang === 'KO' ? '수정' : 'Edit'}
                                       >
                                         <Edit2 className="w-3.5 h-3.5" />
@@ -2121,13 +2294,17 @@ export default function App() {
                                       <button
                                         type="button"
                                         onClick={(e) => handleDeleteBazi(item.id, e)}
-                                        className="p-1 text-white/30 hover:text-[#FF2A6D] hover:bg-white/5 rounded-lg transition-colors"
+                                        className={`p-1 rounded-lg transition-colors ${
+                                          theme === 'light' ? 'text-slate-450 hover:text-[#E8185A] hover:bg-slate-100' : 'text-white/30 hover:text-[#FF2A6D] hover:bg-white/5'
+                                        }`}
                                         title={lang === 'KO' ? '삭제' : 'Delete'}
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
                                       </button>
                                       {dateStr && (
-                                        <span className="text-[8px] text-white/30 font-mono leading-none ml-1 shrink-0">
+                                        <span className={`text-[8px] font-mono leading-none ml-1 shrink-0 ${
+                                          theme === 'light' ? 'text-slate-400' : 'text-white/30'
+                                        }`}>
                                           {dateStr}
                                         </span>
                                       )}
@@ -2136,14 +2313,20 @@ export default function App() {
                                 </div>
 
                                 {item.memo && (
-                                  <p className="text-[10px] text-[#05d9e8] mt-2 truncate border-l border-[#05d9e8]/30 pl-1.5 leading-tight italic">
+                                  <p className={`text-[10px] mt-2 truncate pl-1.5 leading-tight italic border-l ${
+                                    theme === 'light' ? 'text-sky-750 font-bold border-sky-300' : 'text-[#05d9e8] border-[#05d9e8]/30'
+                                  }`}>
                                     {item.memo}
                                   </p>
                                 )}
 
                                 {/* Group assignment & cancel toggles */}
-                                <div className="flex items-center gap-1 mt-2.5 pt-2 border-t border-white/5 flex-wrap">
-                                  <span className="text-[8px] text-white/35 mr-1 font-semibold">{lang === 'KO' ? '그룹 지정:' : 'Set group:'}</span>
+                                <div className={`flex items-center gap-1 mt-2.5 pt-2 border-t flex-wrap ${
+                                  theme === 'light' ? 'border-slate-150' : 'border-white/5'
+                                }`}>
+                                  <span className={`text-[8px] mr-1 font-semibold ${
+                                    theme === 'light' ? 'text-slate-400' : 'text-white/35'
+                                  }`}>{lang === 'KO' ? '그룹 지정:' : 'Set group:'}</span>
                                   {(() => {
                                     const assignableGroups = [
                                       { id: 'me', name: lang === 'KO' ? '나' : 'Me' },
@@ -2156,11 +2339,16 @@ export default function App() {
                                       return (
                                         <button
                                           key={grp.id}
+                                          type="button"
                                           onClick={(e) => handleToggleRecordGroup(item.id, grp.id, e)}
                                           className={`text-[8.5px] px-1.5 py-0.5 rounded transition-all font-bold ${
                                             isTargetActive 
-                                              ? 'bg-[#FF2A6D]/20 text-[#FF2A6D] border border-[#FF2A6D]/40 shadow-[0_0_4px_rgba(255,42,109,0.2)]' 
-                                              : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white border border-transparent'
+                                              ? theme === 'light'
+                                                ? 'bg-[#E8185A]/10 text-[#E8185A] border border-[#E8185A]/20 shadow-sm'
+                                                : 'bg-[#FF2A6D]/20 text-[#FF2A6D] border border-[#FF2A6D]/40 shadow-[0_0_4px_rgba(255,42,109,0.2)]' 
+                                              : theme === 'light'
+                                                ? 'bg-slate-100 text-slate-455 hover:bg-slate-200 hover:text-slate-700 border border-transparent'
+                                                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white border border-transparent'
                                           }`}
                                         >
                                           {grp.name}
@@ -2181,7 +2369,11 @@ export default function App() {
                                   e.stopPropagation();
                                   setVisibleCount(prev => prev + 4);
                                 }}
-                                className="flex-1 py-2 px-3 rounded-xl border border-dashed border-white/10 hover:border-[#05d9e8] text-white/50 hover:text-[#05d9e8] hover:bg-[#05d9e8]/5 text-[11px] font-bold tracking-wider transition-all duration-300 flex items-center justify-center gap-1"
+                                className={`flex-1 py-2 px-3 rounded-xl border border-dashed text-[11px] font-bold tracking-wider transition-all duration-300 flex items-center justify-center gap-1 ${
+                                  theme === 'light'
+                                    ? 'border-slate-300 hover:border-sky-600 text-slate-500 hover:text-sky-750 hover:bg-sky-50/50'
+                                    : 'border-white/10 hover:border-[#05d9e8] text-white/50 hover:text-[#05d9e8] hover:bg-[#05d9e8]/5'
+                                }`}
                               >
                                 <span>{lang === 'KO' ? `더보기 (${visibleCount}/${filteredList.length})` : `Load More (${visibleCount}/${filteredList.length})`}</span>
                               </button>
@@ -2193,7 +2385,11 @@ export default function App() {
                                   e.stopPropagation();
                                   setVisibleCount(4);
                                 }}
-                                className="py-2 px-3 hover:bg-white/5 text-white/40 hover:text-white rounded-xl text-[10px] font-semibold border border-transparent hover:border-white/10 transition-all"
+                                className={`py-2 px-3 rounded-xl text-[10px] font-semibold border border-transparent transition-all ${
+                                  theme === 'light'
+                                    ? 'hover:bg-slate-100 text-slate-450 hover:text-slate-750 hover:border-slate-200'
+                                    : 'hover:bg-white/5 text-white/40 hover:text-white hover:border-white/10'
+                                }`}
                               >
                                 {lang === 'KO' ? '목록 접기' : 'Collapse'}
                               </button>
@@ -2206,21 +2402,33 @@ export default function App() {
                 </div>
 
                 {/* 3. Extra Services (회원가입, 커뮤니티, 유튜브 바로가기 등) */}
-                <div className="space-y-2 border-t border-white/5 pt-4">
-                  <h3 className="text-xs font-bold font-mono tracking-wider text-white/60 px-1 mb-2 uppercase">
+                <div className={`space-y-2 border-t pt-4 ${theme === 'light' ? 'border-slate-150' : 'border-white/5'}`}>
+                  <h3 className={`text-xs font-bold font-mono tracking-wider px-1 mb-2 uppercase ${
+                    theme === 'light' ? 'text-slate-500' : 'text-white/60'
+                  }`}>
                     {lang === 'KO' ? '계정 및 즐겨찾기' : 'Global Portals'}
                   </h3>
 
                   {/* 회원가입 (Sign Up) 개발준비중 */}
                   <button
                     onClick={() => setShowPendingModal('signup')}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all text-xs font-medium text-white/80 group text-left"
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-xs font-medium group text-left ${
+                      theme === 'light'
+                        ? 'bg-white border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-800'
+                        : 'bg-white/[0.02] border border-white/5 hover:border-white/20 text-white/80'
+                    }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <LogIn className="w-4 h-4 text-[#FF2A6D] group-hover:scale-110 transition-transform" />
+                      <LogIn className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                        theme === 'light' ? 'text-[#E8185A]' : 'text-[#FF2A6D]'
+                      }`} />
                       <span>{lang === 'KO' ? '회원가입' : 'Sign Up'}</span>
                     </div>
-                    <span className="text-[9px] font-mono tracking-tighter bg-neon-pink/10 border border-neon-pink/30 text-[#FF2A6D] px-1.5 py-0.5 rounded uppercase">
+                    <span className={`text-[9px] font-mono tracking-tighter border px-1.5 py-0.5 rounded uppercase ${
+                      theme === 'light'
+                        ? 'bg-[#E8185A]/10 border-[#E8185A]/20 text-[#E8185A]'
+                        : 'bg-neon-pink/10 border border-neon-pink/30 text-[#FF2A6D]'
+                    }`}>
                       {lang === 'KO' ? '개발 준비 중' : 'Coming Soon'}
                     </span>
                   </button>
@@ -2230,13 +2438,21 @@ export default function App() {
                     href="https://cafe.naver.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all text-xs font-medium text-white/80 group"
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-xs font-medium group ${
+                      theme === 'light'
+                        ? 'bg-white border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-800'
+                        : 'bg-white/[0.02] border border-white/5 hover:border-white/20 text-white/80'
+                    }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Compass className="w-4 h-4 text-neon-cyan group-hover:scale-110 transition-transform" />
+                      <Compass className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                        theme === 'light' ? 'text-sky-650' : 'text-neon-cyan'
+                      }`} />
                       <span>{lang === 'KO' ? '커뮤니티 바로가기' : 'Go to Community Cafe'}</span>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className={`w-3.5 h-3.5 group-hover:translate-x-1 transition-transform ${
+                      theme === 'light' ? 'text-slate-400' : 'text-white/30'
+                    }`} />
                   </a>
 
                   {/* 유튜브 바로가기 */}
@@ -2244,20 +2460,30 @@ export default function App() {
                     href="https://www.youtube.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all text-xs font-medium text-white/80 group"
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-xs font-medium group ${
+                      theme === 'light'
+                        ? 'bg-white border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-800'
+                        : 'bg-white/[0.02] border border-white/5 hover:border-white/20 text-white/80'
+                    }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <Youtube className="w-4 h-4 text-[#FF0000] rotate-0 group-hover:scale-110 transition-transform" />
                       <span>{lang === 'KO' ? '유튜브 비법 바로가기' : 'Secrets on YouTube Channels'}</span>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className={`w-3.5 h-3.5 group-hover:translate-x-1 transition-transform ${
+                      theme === 'light' ? 'text-slate-400' : 'text-white/30'
+                    }`} />
                   </a>
                 </div>
 
               </div>
               
               {/* Footer and credit info */}
-              <div className="p-4 border-t border-white/5 bg-black/60 text-center font-mono text-[9px] text-white/40">
+              <div className={`p-4 border-t text-center font-mono text-[9px] ${
+                theme === 'light'
+                  ? 'border-slate-200 bg-slate-100 text-slate-500'
+                  : 'border-white/5 bg-black/60 text-white/40'
+              }`}>
                 VOID Saju Engine v1.1.2 &bull; Cloud Storage Offline
               </div>
             </motion.div>

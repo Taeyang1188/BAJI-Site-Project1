@@ -1170,6 +1170,12 @@ export function calculateRelationshipDynamics(
             if (combo === 'Gwan-Sik') return { badge: "식신제살(食神制殺)", desc: isKO ? "⚔️ [해결사 콤비] 당신이 느끼는 억압과 사면초가의 압박감(편관)을, 파트너의 기발한 창의성과 실천력(식상)이 완벽하게 돌파해줍니다." : "⚔️ [Problem-Solver Duo] The extreme pressure and oppression you feel (Gwan) is thoroughly broken through by your partner's brilliant creativity and execution (Sik).", bonus: 15 };
             if (combo === 'Sik-Gwan') return { badge: "식신제살(食神制殺)", desc: isKO ? "⚔️ [해결사 콤비] 상대방이 느끼는 억압과 사면초가의 압박감(편관)을, 당신의 기발한 창의성과 실천력(식상)이 완벽하게 돌파해줍니다." : "⚔️ [Problem-Solver Duo] The extreme pressure and oppression your partner feels (Gwan) is thoroughly broken through by your brilliant creativity and execution (Sik).", bonus: 15 };
 
+
+
+        
+
+
+
             if (combo === 'Sik-Jae') return { badge: "식상생재(食傷生財)", desc: isKO ? "🤝 [이익 창출 콤비] 당신의 넘치는 끼와 아이디어(식상)가 상대방의 현실적이고 촘촘한 기획(재성)을 만나 확실한 수익으로 변환됩니다." : "🤝 [Profit Duo] Your overflowing talent and ideas (Sik) meet your partner's realistic logic (Jae) to reliably transform into real profit.", bonus: 10 };
             if (combo === 'Jae-Sik') return { badge: "식상생재(食傷生財)", desc: isKO ? "🤝 [이익 창출 콤비] 상대방의 넘치는 끼와 아이디어(식상)가 당신의 현실적이고 촘촘한 기획(재성)을 만나 확실한 수익으로 변환됩니다." : "🤝 [Profit Duo] Your partner's overflowing talent and ideas (Sik) meet your realistic logic (Jae) to reliably transform into real profit.", bonus: 10 };
 
