@@ -1648,7 +1648,7 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
     const missing = Object.entries(tenGodsRatio).filter(([_, r]) => r === 0).map(([k]) => k.split(' ')[0]);
     const overflow = Object.entries(tenGodsRatio).filter(([_, r]) => r > 30).map(([k]) => k.split(' ')[0]);
 
-    const isSinGang = result.analysis?.shinGangShinYak?.title ? result.analysis.shinGangShinYak.title.includes('강') : false;
+    const isSinGang = result.analysis?.shinGangShinYak?.level ? result.analysis.shinGangShinYak.level.includes('강') : false;
     const yongShin = result.analysis?.yongShen || '';
     const giShin = result.analysis?.yongshinDetail?.giShin?.element || '';
     
@@ -5349,14 +5349,19 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
 
                           {/* Absence / Excess Summary */}
                           <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[10px] font-bold uppercase tracking-widest ${isLight ? 'text-slate-500 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '무자/다자 분석' : 'Absence / Excess Analysis'}</span>
-                              <button 
-                                onClick={() => setShowMuJaDaJaHelp(true)}
-                                className="p-1 hover:bg-white/5 rounded-full transition-colors"
-                              >
-                                <HelpCircle className="w-3 h-3 text-neon-cyan/60" />
-                              </button>
+                            <div className="flex flex-col space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${isLight ? 'text-slate-500 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '무자/다자 분석' : 'Absence / Excess Analysis'}</span>
+                                <button 
+                                  onClick={() => setShowMuJaDaJaHelp(true)}
+                                  className="p-1 hover:bg-white/5 rounded-full transition-colors"
+                                >
+                                  <HelpCircle className="w-3 h-3 text-neon-cyan/60" />
+                                </button>
+                              </div>
+                              <span className={`text-[10px] ${isLight ? 'text-slate-400' : 'text-white/40'} italic block`}>
+                                {lang === 'KO' ? '*각 배지를 클릭하면 상세 개운 조언을 볼 수 있어.' : '*Click each badge to view deep-dive advice.'}
+                              </span>
                             </div>
                             <div className="flex flex-wrap gap-3">
                               {result.analysis.muJaRon?.map((item: any, i: number) => (
@@ -5369,7 +5374,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   lang={lang}
                                 >
                                   <div 
-                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-rose-50/50 border-rose-250 hover:border-rose-400 hover:bg-rose-50 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/25 hover:border-red-500/50 text-red-200'}`}
+                                    onClick={() => setShowMuJaDaJaInfo(item)}
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300 ${isLight ? 'bg-rose-50/50 border-rose-220 hover:border-rose-400 hover:bg-rose-50/80 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/25 hover:border-red-500/50 hover:bg-red-900/20 text-red-200'}`}
                                   >
                                     <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" />
                                     <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-red-700' : 'text-red-400'}`}>{item.title}</span>
@@ -5386,7 +5392,8 @@ export default function BaZiResultPage({ result, lang, userName, gender, city, s
                                   lang={lang}
                                 >
                                   <div 
-                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-indigo-50/50 border-indigo-250 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/25 hover:border-purple-500/50 text-purple-200'}`}
+                                    onClick={() => setShowMuJaDaJaInfo(item)}
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300 ${isLight ? 'bg-indigo-50/50 border-indigo-220 hover:border-indigo-400 hover:bg-indigo-50/80 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/25 hover:border-purple-500/50 hover:bg-purple-900/20 text-purple-200'}`}
                                   >
                                     <span className="w-1 h-1 rounded-full bg-purple-500 animate-pulse" />
                                     <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-indigo-700' : 'text-purple-400'}`}>{item.title}</span>

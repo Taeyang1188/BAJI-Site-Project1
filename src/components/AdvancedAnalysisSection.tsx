@@ -27,27 +27,6 @@ export const AdvancedAnalysisSection: React.FC<AdvancedAnalysisSectionProps> = (
         </div>
       )}
 
-      {/* Mu-Ja-Ron & Da-Ja-Ron */}
-      {(analysis.muJaRon || analysis.daJaRon) && (
-        <div className="p-4 bg-black/40 rounded-xl border border-white/5">
-          <h4 className="text-sm font-display font-medium text-purple-400 uppercase tracking-[0.2em] mb-2">
-            {lang === 'KO' ? '무자론 및 다자론' : 'Mu-Ja & Da-Ja Analysis'}
-          </h4>
-          <div className="space-y-2">
-            {analysis.muJaRon?.map((item, i) => (
-              <div key={i} className="text-xs text-white/70">
-                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText lang={lang} text={lang === 'KO' ? item.description : item.enDescription} />
-              </div>
-            ))}
-            {analysis.daJaRon?.map((item, i) => (
-              <div key={i} className="text-xs text-white/70">
-                <span className="font-bold text-purple-300">{item.title}:</span> <ParsedText lang={lang} text={lang === 'KO' ? item.description : item.enDescription} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Overload Analysis */}
       {analysis.overloadAnalysis && analysis.overloadAnalysis.length > 0 && (
         <div className="p-4 bg-red-900/20 rounded-xl border border-red-500/20">

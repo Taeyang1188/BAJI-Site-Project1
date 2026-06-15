@@ -1098,14 +1098,21 @@ export const calculateAdvancedAnalysis = (
       socialEn = 'Shines as an advisor, secretary, or in professional roles requiring high focus. Guaranteed greater safety and success when relying on strong people or systems.';
     }
 
+    const strengthMapping = BAZI_MAPPING.strength[level as keyof typeof BAZI_MAPPING.strength];
+    const displayTitle = lang === 'KO' 
+      ? (strengthMapping?.ko || level) 
+      : (strengthMapping?.en || level);
+
     return {
       isStrong,
       score,
       level,
-      title: level,
+      title: displayTitle,
       summary: lang === 'KO' ? summaryKo : summaryEn,
       description: lang === 'KO' ? descKo : descEn,
-      socialContext: lang === 'KO' ? socialKo : socialEn
+      enDescription: descEn,
+      socialContext: lang === 'KO' ? socialKo : socialEn,
+      enSocialContext: socialEn
     };
   };
 
