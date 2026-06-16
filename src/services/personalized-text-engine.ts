@@ -1828,19 +1828,21 @@ export function generatePersonalizedTexts(
 
   // Construct dynamic element descriptions
   const elementDescriptionsKo = explainedElements.map(el => {
-    const tenGodLine = el.pos === 'Day' 
-      ? '' 
-      : `\n  - **상호 작용 에너지 (역할군):** ${el.tenGodNameKo} (${el.tenGodHumanKoTitle}) - ${el.tenGodHumanKoDesc}`;
-    
-    return `• **${el.posNameKo} ${el.char}(${el.name}) — ${el.posDescKo}**${tenGodLine}\n  - **기질적 본모습:** ${el.coreIdentityKo}\n  - **행동지향성:** ${el.innateDesireKo}`;
+    const header = `• **${el.posNameKo} ${el.char}(${el.name}) — ${el.posDescKo}**`;
+    if (el.pos === 'Day') {
+      return `${header}\n  ${el.coreIdentityKo} 이를 바탕으로 삶에서는 ${el.innateDesireKo}`;
+    } else {
+      return `${header}\n  이 자리는 사주 내에서 **${el.tenGodNameKo}**(${el.tenGodHumanKoTitle})의 기운으로 작용합니다. 즉, ${el.tenGodHumanKoDesc} ${el.coreIdentityKo} 한편으로 내면 깊은 곳에서는 ${el.innateDesireKo}`;
+    }
   }).join('\n\n');
 
   const elementDescriptionsEn = explainedElements.map(el => {
-    const tenGodLine = el.pos === 'Day' 
-      ? '' 
-      : `\n  - **Interaction Energy (Role):** ${el.tenGodNameEn} (${el.tenGodHumanEnTitle}) - ${el.tenGodHumanEnDesc}`;
-    
-    return `• **${el.posNameEn} ${el.char}(${el.name}) — ${el.posDescEn}**${tenGodLine}\n  - **Temperament Aspect:** ${el.coreIdentityEn}\n  - **Behavioral Focus:** ${el.innateDesireEn}`;
+    const header = `• **${el.posNameEn} ${el.char}(${el.name}) — ${el.posDescEn}**`;
+    if (el.pos === 'Day') {
+      return `${header}\n  ${el.coreIdentityEn} Driven by this foundation, you ${el.innateDesireEn.charAt(0).toLowerCase() + el.innateDesireEn.slice(1)}`;
+    } else {
+      return `${header}\n  This position acts as **${el.tenGodNameEn}** (${el.tenGodHumanEnTitle}) within your chart, which means ${el.tenGodHumanEnDesc} ${el.coreIdentityEn} Deep down, you ${el.innateDesireEn.charAt(0).toLowerCase() + el.innateDesireEn.slice(1)}`;
+    }
   }).join('\n\n');
 
   // Construct dynamic interaction narrative based on the collection of highlighted elements
@@ -1969,16 +1971,16 @@ export function generatePersonalizedTexts(
 
   // 개별 지지 환경 상세 카드는 모든 유형에 공통적으로 병합하여 구체적인 해석을 보장합니다.
   const ls1 = isKO
-    ? (BRANCH_PERSONALITIES[monthBranch] ? `\n\n귀하의 사회적 삶은 **월지 ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**의 분위기 안에서 펼쳐집니다.\n**${BRANCH_PERSONALITIES[monthBranch].lifeEnvironment}**\n${BRANCH_PERSONALITIES[monthBranch].socialPattern}` : '')
-    : (BRANCH_INFO_EN[monthBranch] ? `\n\nYour social life unfolds within the atmosphere of **Month Branch ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**.\n**${BRANCH_INFO_EN[monthBranch].lifeEnvironment}**\n${BRANCH_INFO_EN[monthBranch].socialPattern}` : '');
+    ? (BRANCH_PERSONALITIES[monthBranch] ? `\n\n귀하의 사회적 삶은 **월지 ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**의 분위기 안에서 펼쳐집니다.\n${BRANCH_PERSONALITIES[monthBranch].lifeEnvironment}\n${BRANCH_PERSONALITIES[monthBranch].socialPattern}` : '')
+    : (BRANCH_INFO_EN[monthBranch] ? `\n\nYour social life unfolds within the atmosphere of **Month Branch ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**.\n${BRANCH_INFO_EN[monthBranch].lifeEnvironment}\n${BRANCH_INFO_EN[monthBranch].socialPattern}` : '');
 
   const ls2 = isKO
-    ? (BRANCH_PERSONALITIES[yearBranch] ? `\n\n삶의 뿌리와 행동 방식의 토대를 이루는 **년지 ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**은 귀하의 가장 기본적인 관계 패턴을 형성합니다.\n**${BRANCH_PERSONALITIES[yearBranch].lifeEnvironment}**\n${BRANCH_PERSONALITIES[yearBranch].socialPattern}` : '')
-    : (BRANCH_INFO_EN[yearBranch] ? `\n\nThe **Year Branch ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**, forming the root and foundation of your life, shapes your basic relationship patterns.\n**${BRANCH_INFO_EN[yearBranch].lifeEnvironment}**\n${BRANCH_INFO_EN[yearBranch].socialPattern}` : '');
+    ? (BRANCH_PERSONALITIES[yearBranch] ? `\n\n삶의 뿌리와 행동 방식의 토대를 이루는 **년지 ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**은 귀하의 가장 기본적인 관계 패턴을 형성합니다.\n${BRANCH_PERSONALITIES[yearBranch].lifeEnvironment}\n${BRANCH_PERSONALITIES[yearBranch].socialPattern}` : '')
+    : (BRANCH_INFO_EN[yearBranch] ? `\n\nThe **Year Branch ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**, forming the root and foundation of your life, shapes your basic relationship patterns.\n${BRANCH_INFO_EN[yearBranch].lifeEnvironment}\n${BRANCH_INFO_EN[yearBranch].socialPattern}` : '');
 
   const ls3 = result?.isTimeUnknown ? '' : (isKO
-    ? (BRANCH_PERSONALITIES[hourBranch] ? `\n\n**시지 ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})**은 귀하가 진정으로 원하고 이루고자 하는 욕망의 방향을 보여줍니다.\n**${BRANCH_PERSONALITIES[hourBranch].behavioralTrigger}**\n${BRANCH_PERSONALITIES[hourBranch].hiddenStruggle}` : '')
-    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n**${BRANCH_INFO_EN[hourBranch].behavioralTrigger}**\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : ''));
+    ? (BRANCH_PERSONALITIES[hourBranch] ? `\n\n**시지 ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})**은 귀하가 진정으로 원하고 이루고자 하는 욕망의 방향을 보여줍니다.\n${BRANCH_PERSONALITIES[hourBranch].behavioralTrigger}\n${BRANCH_PERSONALITIES[hourBranch].hiddenStruggle}` : '')
+    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n${BRANCH_INFO_EN[hourBranch].behavioralTrigger}\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : ''));
 
   const individualDetails = [ls1, ls2, ls3].filter(s => s.trim().length > 0).join('');
 

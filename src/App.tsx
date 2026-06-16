@@ -1853,6 +1853,7 @@ export default function App() {
                     <button
                       onClick={handleSaveCurrentBazi}
                       disabled={!userInput.birthDate || !userInput.birthTime}
+                      style={{ color: '#ffffff' }}
                       className={`w-full mt-3 py-2 px-4 rounded-xl hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-md ${
                         theme === 'light'
                           ? 'bg-gradient-to-r from-[#E8185A] to-[#8024D9] shadow-inner'
