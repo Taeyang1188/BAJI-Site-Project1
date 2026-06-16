@@ -339,17 +339,17 @@ export const ParsedText: React.FC<ParsedTextProps> = ({ text, className = "", la
       let endStrongIndex = processedText.indexOf('</strong>', i);
       if (endStrongIndex !== -1) {
         const strongContent = processedText.substring(i + 8, endStrongIndex);
-        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+        elements.push(<strong key={`${idId}-${keyCount++}`} className="font-bold" style={{ fontWeight: 'bold' }}>
           <ParsedText text={strongContent} lang={lang} />
-        </span>);
+        </strong>);
         i = endStrongIndex + 9;
         continue;
       } else {
         // Tag is open but not closed yet
         const strongContent = processedText.substring(i + 8);
-        elements.push(<span key={`${idId}-${keyCount++}`} className="font-bold">
+        elements.push(<strong key={`${idId}-${keyCount++}`} className="font-bold" style={{ fontWeight: 'bold' }}>
           <ParsedText text={strongContent} lang={lang} />
-        </span>);
+        </strong>);
         i = processedText.length;
         continue;
       }

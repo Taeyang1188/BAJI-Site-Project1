@@ -1854,14 +1854,14 @@ export default function App() {
                       onClick={handleSaveCurrentBazi}
                       disabled={!userInput.birthDate || !userInput.birthTime}
                       style={{ color: '#ffffff' }}
-                      className={`w-full mt-3 py-2 px-4 rounded-xl hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-md ${
+                      className={`w-full mt-3 py-2 px-4 rounded-xl hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-md text-white ${
                         theme === 'light'
                           ? 'bg-gradient-to-r from-[#E8185A] to-[#8024D9] shadow-inner'
                           : 'bg-gradient-to-r from-[#FF2A6D] to-[#9B30FF] shadow-[#FF2A6D]/10'
                       }`}
                     >
-                      <Save className="w-3.5 h-3.5" />
-                      <span>{lang === 'KO' ? '사주 저장소에 입력' : 'Save To Repository'}</span>
+                      <Save className="w-3.5 h-3.5 text-white" style={{ color: '#ffffff' }} />
+                      <span className="text-white" style={{ color: '#ffffff' }}>{lang === 'KO' ? '사주 저장소에 입력' : 'Save To Repository'}</span>
                     </button>
                   </div>
                 </div>

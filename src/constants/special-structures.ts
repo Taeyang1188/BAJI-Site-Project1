@@ -43,7 +43,7 @@ export const SPECIAL_STRUCTURE_DEFINITIONS: Record<string, SpecialStructureInfo>
     category: "Monarch",
     description: "금(金)의 기운이 결집된 격국으로, 의리와 변혁, 결단력을 상징해.",
     enDescription: "A structure where Metal energy is concentrated, symbolizing loyalty, transformation, and decisiveness.",
-    marketingMessage: "낡은 것을 혁파하고 새로운 질서를 세우는 강력한 결단력의 소유자야.",
+    marketingMessage: "낡은 관습을 깨고 새로운 질서를 세우는 강력한 결단력의 소유자야.",
     enMarketingMessage: "Possesses powerful decisiveness to overthrow the old and establish a new order."
   },
   "윤하격": {
