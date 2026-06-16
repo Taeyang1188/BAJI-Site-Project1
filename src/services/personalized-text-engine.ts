@@ -2378,7 +2378,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[재고귀인 폭발형] 재고(財庫)의 금고를 열어 일구는 폭발적 자산" : "[Tomb-Wealth Explosive Type] Sudden Wealth Vault Unlock";
     pipeline = getPipelineByDayStem(dayStem, 'EXPLOSIVE');
     defaultPsychology = isKO
-      ? "귀하는 재물을 묵직하게 가두고 지키는 거대한 비밀 금고인 **재고(財庫)** 또는 지지 결합 구조가 발달해 있습니다. **돈을 대할 때** 잔돈을 허투루 쓰지 않고 언젠가 올 큰 승부처를 위해 인내하며 시기를 기다리는 **대범함**이 특징입니다. **돈을 벌 때는** 평소에는 일반적인 자산 규모를 조용히 보존하며 종잣돈을 극단적으로 압축하고 있다가, 대운이나 세운에서 이 금고 문을 열어젖히는 결정적인 타이밍(충·합의 시기)에 **한 번의 웅장한 도약**으로 거대한 부를 일시적으로 거머쥐어야 합니다. 즉, 자잘한 잔돈을 벌기 위해 힘을 빼기보다, 내 인생을 바꿀 수 있는 **큰 자산 흐름**을 사전에 치밀하게 설계하는 것이 중요합니다. **주의할 점**은 사소한 유혹이나 단타 투자, 주변의 가벼운 권유에 흔들려 애써 축적한 종잣돈을 허비하는 것입니다. 스스로 돈을 쉽게 꺼내 쓰지 못하도록 자산이 완전히 묶이는 **부동산이나 장기 채권 형태의 가상 금고**를 다져야 비로소 폭발적인 자산이 누수 없이 온전히 귀하의 것이 됩니다."
+      ? "귀하는 재물을 묵직하게 가두고 지키는 거대한 비밀 금고인 **재고(財庫)** 또는 지지 결합 구조가 발달해 있습니다. 돈을 대할 때 **잔돈을 허투루 쓰지 않고** 언젠가 올 큰 승부처를 위해 **인내하며 시기를 기다리는 대범함이 특징**입니다. 돈을 벌 때는 평소에는 일반적인 **자산 규모를 조용히 보존하며** 종잣돈을 극단적으로 압축하고 있다가, 대운이나 세운에서 이 **금고 문을 열어젖히는 결정적인 타이밍(충·합의 시기)에 한 번의 웅장한 도약으로 거대한 부를 일시적으로 거머쥐어야 합니다.** 즉, **잔돈을 벌기 위해 힘을 빼기보다** 내 인생을 바꿀 수 있는 **큰 자산 흐름을 설계하는 것이 중요**합니다. 주의할 점은 사소한 유혹이나 단타 투자, 주변의 가벼운 권유에 흔들려 **애써 축적한 종잣돈을 허비하는 것**입니다. 스스로 돈을 쉽게 꺼내 쓰지 못하도록 자산이 완전히 묶이는 부동산이나 장기 채권 형태의 가상 금고를 다져야 비로소 폭발적인 자산이 누수 없이 온전히 귀하의 것이 됩니다."
       : "Your chart holds a cosmic vault (Wealth Tomb) or branch conjunctions. Your asset levels stay normal until a luck cycle clashes or merges to unlock this vault, triggering rapid and explosive financial gains.";
     actionPlans = isKO ? [
       "운(대운/세운)에서 충·합이 들어오는 타이밍을 기다리며 종잣돈을 극단적으로 압축·보존할 것",
@@ -2572,9 +2572,7 @@ export function generatePersonalizedTexts(
   }
 
   const wealthTitle = typeTitle;
-  const wealthDesc = isKO
-    ? `${defaultPsychology}\n\n**📊 추천 현대적 자산 파이프라인**\n${pipeline}`
-    : `${defaultPsychology}\n\n**💼 Recommended Pipeline**\n${pipeline}`;
+  const wealthDesc = defaultPsychology;
 
   // C. 현실에서 나타나는 패턴 (격국×일간 맞춤)
   // ─────────────────────────────────────────────
