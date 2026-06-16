@@ -210,7 +210,6 @@ export interface BaZiResult {
       enDescription?: string; 
       socialContext: string; 
       enSocialContext?: string;
-      level?: string;
     };
     relationshipAnalysis?: Record<string, {
       title: string;
