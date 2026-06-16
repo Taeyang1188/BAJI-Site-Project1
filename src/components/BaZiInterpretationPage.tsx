@@ -1100,6 +1100,15 @@ export default function BaZiInterpretationPage({
             </div>
           </div>
 
+          {/* 부의 엔진 유형 상세 서술형 해설 */}
+          <div className="goth-glass p-5 sm:p-7 rounded-3xl space-y-4" style={{ borderColor: `${purpleColor}26` }}>
+            <h4 className="text-sm sm:text-base font-bold leading-snug" style={{ color: purpleColor }}>
+              {lang === 'KO' ? '부의 엔진 유형 상세 해설' : 'Wealth Engine Detailed Interpretation'}
+            </h4>
+            <div className="w-20 h-[1px]" style={{ backgroundColor: `${purpleColor}4d` }}></div>
+            {renderParagraphs(data.wealthFlow.description, purpleColor)}
+          </div>
+
           {/* 2. 3-Indicator Stats with narrative analyses */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">

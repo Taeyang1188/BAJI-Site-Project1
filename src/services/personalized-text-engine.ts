@@ -2378,7 +2378,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[재고귀인 폭발형] 재고(財庫)의 금고를 열어 일구는 폭발적 자산" : "[Tomb-Wealth Explosive Type] Sudden Wealth Vault Unlock";
     pipeline = getPipelineByDayStem(dayStem, 'EXPLOSIVE');
     defaultPsychology = isKO
-      ? "당신의 사주에는 재물을 가두고 지키는 거대한 창고인 재고(財庫) 또는 지지 결합 구조가 발달해 있습니다. 평소에는 일반적인 자산 흐름을 유지하다가, 운에서 이를 충하거나 합하여 창고 문을 열 때 일확천금과 같은 비약적인 부를 움켜쥐는 강력한 에너지가 숨어 있습니다."
+      ? "귀하는 재물을 묵직하게 가두고 지키는 거대한 비밀 금고인 **재고(財庫)** 또는 지지 결합 구조가 발달해 있습니다. **돈을 대할 때** 잔돈을 허투루 쓰지 않고 언젠가 올 큰 승부처를 위해 인내하며 시기를 기다리는 **대범함**이 특징입니다. **돈을 벌 때는** 평소에는 일반적인 자산 규모를 조용히 보존하며 종잣돈을 극단적으로 압축하고 있다가, 대운이나 세운에서 이 금고 문을 열어젖히는 결정적인 타이밍(충·합의 시기)에 **한 번의 웅장한 도약**으로 거대한 부를 일시적으로 거머쥐어야 합니다. 즉, 자잘한 잔돈을 벌기 위해 힘을 빼기보다, 내 인생을 바꿀 수 있는 **큰 자산 흐름**을 사전에 치밀하게 설계하는 것이 중요합니다. **주의할 점**은 사소한 유혹이나 단타 투자, 주변의 가벼운 권유에 흔들려 애써 축적한 종잣돈을 허비하는 것입니다. 스스로 돈을 쉽게 꺼내 쓰지 못하도록 자산이 완전히 묶이는 **부동산이나 장기 채권 형태의 가상 금고**를 다져야 비로소 폭발적인 자산이 누수 없이 온전히 귀하의 것이 됩니다."
       : "Your chart holds a cosmic vault (Wealth Tomb) or branch conjunctions. Your asset levels stay normal until a luck cycle clashes or merges to unlock this vault, triggering rapid and explosive financial gains.";
     actionPlans = isKO ? [
       "운(대운/세운)에서 충·합이 들어오는 타이밍을 기다리며 종잣돈을 극단적으로 압축·보존할 것",
@@ -2406,7 +2406,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[식상생재 순환형] 마르지 않는 재물의 파이프라인과 순환" : "[Expression-to-Wealth Circulating Type] Perpetual Product Cash Pipeline";
     pipeline = getPipelineByDayStem(dayStem, 'CIRCULATION');
     defaultPsychology = isKO
-      ? "내 재능과 추진력(식상)이 돈(재성)으로 바로 환원되는 순환 구조를 타고났습니다. 남의 도구를 빌리기보다는 나만의 무기, 아이디어, 창작물 자체를 가치 있는 상품으로 변환해 평생 지속되는 마르지 않는 파이프라인을 다집니다."
+      ? "귀하는 타고난 재능과 기획력(**식상**)이 즉각적인 재물(**재성**)로 선순환하는 흐름을 가지고 있습니다. **돈을 대할 때** 단순히 남 밑에서 고정된 월급을 받는 것보다, 내가 직접 머리를 쓰고 행동하여 부가가치를 창출하는 것에 가장 큰 짜릿함을 느낍니다. **돈을 벌 때는** 자신의 아이디어, 콘텐츠, 혹은 전문 스킬을 복제 가능한 상품(온라인 강의, 솔루션, 지적재산 등)으로 패키징하여 **시간과 소득을 분리시키는 구조**를 만드는 것이 핵심 전략입니다. 일하는 시간을 직접 파는 구조에서 벗어나 **내 브랜드를 자동 복제할 수 있는 시스템**으로 확장해야 합니다. **주의할 점**은 자신만의 만족이나 예술에 그쳐 시장의 실제 수요를 놓치는 것입니다. 내가 좋아하는 것보다 **시장이 기꺼이 지갑을 여는 지점**을 날카롭게 분석해 상품화할 때, 비로소 마르지 않는 재물의 파이프라인이 완성됩니다."
       : "You possess a flowing pipeline where your creative output (SikSang) directly transforms into capital (JaeSeong). Success comes from converting your personal ideas, codes, or assets into scalable assets.";
     actionPlans = isKO ? [
       "스스로 만족하는 예술에 그치지 말고 시장 수요와 즉시 결합해 상품화할 것",
@@ -2440,7 +2440,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[재생관 시스템형] 시스템과 인프라가 지키는 철벽의 자산" : "[Wealth-to-Officer System Type] Rigid Asset Protected by Corporate Systems";
     pipeline = getPipelineByDayStem(dayStem, 'SYSTEM');
     defaultPsychology = isKO
-      ? "돈(재성)이 나를 보호하는 거대한 조직이나 신용망(관성)을 든든하게 받쳐주는 구조입니다. 내 육체 노동보다 대형 플랫폼, 법인 설립, 특허·저작권 라이선스, 또는 공적인 파트너십 같은 '시스템의 그늘' 아래서 자산을 굴려야 안전합니다."
+      ? "귀하는 재물(**재성**)을 벌어들이고 이를 튼튼한 시스템이나 신용망(**관성**)으로 안전하게 지켜내는 구조를 지녔습니다. **돈을 대할 때** 일시적인 일확천금보다는 안정적이고 영속적인 흐름을 중시하는 경향이 있습니다. **돈을 벌 때는** 내 몸을 바쳐 직접 노동하기보다, 프랜차이즈, 법인 시스템, 혹은 대형 플랫폼이나 정부 지원과의 연계 등 **'시스템의 그늘'**을 빌려 자산을 굴려야 가장 강력해집니다. 체계적인 매뉴얼과 규정을 만들어 **내가 없어도 굴러가는 구조**를 설계하는 것이 정답입니다. **주의할 점**은 개인 신용도나 기업 브랜드 평판의 흠집입니다. 평판을 잃는 순간 재물의 흐름도 흔들리니, 항상 **정직하고 공적인 약속 이행**을 최우선으로 삼으며 규칙적인 캐시카우(정기 로열티, 고정 임대료 등)를 모아나가야 합니다."
       : "Your wealth (JaeSeong) supports and feeds corporate systems and legal networks (Officer). Instead of high-risk hustling, your wealth compounds safest when placed under systematic shields.";
     actionPlans = isKO ? [
       "직접 모든 실무를 총괄하지 말고 매뉴얼과 규정을 만들어 시스템이 돌아가게 만들 것",
@@ -2474,7 +2474,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[인성 라이선스형] 특허와 지식재산(IP)의 권리 자산" : "[IP Owner Resource-Wealth Type] Intellectual Document Wealth Engine";
     pipeline = getPipelineByDayStem(dayStem, 'IP');
     defaultPsychology = isKO
-      ? "학습과 정보, 혹은 라이선스(인성)가 돈(재성)을 끌어오거나 지키는 자산 구조입니다. 몸을 바쁘게 움직여 영업을 뛰기보다는, 특정한 계약 권리나 학구적 가치, 무형의 스펙을 문서화하여 대가를 받는 것이 소득 효율이 높습니다."
+      ? "귀하는 탄탄한 정보와 지식 자격(**인성**)이 실질적인 자산(**재성**)으로 치환되는 흐름을 지녔습니다. **돈을 대할 때** 단순한 육체노동이나 영업보다는 지식과 기술의 가치를 높게 사며, 무형의 스펙과 권리에 큰 가치를 둡니다. **돈을 벌 때는** 몸을 분주히 움직여 영업하기보다 내 노하우와 학술 가치를 문서로 박제(**상표 등록, 특허, 저작권, 출판 등**)하여 로열티를 받는 방식으로 벌어야 효율이 극대화됩니다. 단기 대행 업무에 갇히기보다는 내 지식을 남에게 가르치고 **라이선스를 부여하는 상위 포지션**에 앉아야 합니다. **주의할 점**은 무형의 자산을 제대로 지키지 못하고 방치하는 것입니다. 반드시 내 결과물들에 **법적 권리 장치**를 마련하고 전문가 집단과의 교류를 통해 내 지식의 권위를 끊임없이 사회적으로 인증받아야 합니다."
       : "Learning, qualifications, and licensing (Resource) act as the primary magnet and shield for your money. You scale best when converting intellectual competence into legal documents.";
     actionPlans = isKO ? [
       "무형의 노하우를 방치하지 말고 반드시 상표 등록, 특허, 혹은 책 출판 등으로 문서화하여 락을 걸 것",
@@ -2508,7 +2508,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[군비쟁재 리스크관리형] 내 돈을 사수하여 불리는 자산 보호기" : "[Shielded Partner Risk-Control Type] High-Guard Asset Protection Engine";
     pipeline = getPipelineByDayStem(dayStem, 'SHIELD');
     defaultPsychology = isKO
-      ? "나와 동등한 세력(비겁)이 돈을 노리는 구조가 발달하여 동업이나 차용에 있어 손실을 보기 쉬운 명식입니다. 남 좋은 일 시켜주는 돈 탈탈 털리기 버릇을 조심하고, 버는 즉시 부동산이나 강제 저축으로 현금을 묶어 보이지 않게 감추어야 합니다."
+      ? "귀하는 나와 힘이 대등한 동료나 경쟁자(**비겁**)가 내 재물(**재성**)을 두고 치열하게 다투는 군비쟁재 흐름을 타고났습니다. **돈을 대할 때** 인정이 많아 주변 사람에게 베풀거나 쉽게 빌려주는 등 돈 관리에 있어 귀가 얇아지기 쉽습니다. **돈을 벌 때는** 타인과의 경쟁 속에서 독자적인 기량을 발휘해 내 몫을 똑 부러지게 쟁취해야 합니다. 또한 번 돈을 **시야에서 완전히 감추는 것**이 자산을 불리는 가장 빠른 지름길입니다. 현금이 통장에 가볍게 굴러다니면 반드시 쓸 곳이 생기거나 남에게 흘러가므로, 버는 즉시 부동산, 연금, 청약 등 **강제로 출금이 묶이는 곳**으로 이체하여 보이지 않게 잠가야 합니다. **주의할 점**은 주변의 동업 제안, 투자 권유, 혹은 돈을 빌려달라는 요청입니다. 인생에서 이 세 가지를 원천 차단하고 **내 구체적인 자산 규모를 철저히 비밀**로 부칠 때 자산이 안전하게 보호됩니다."
       : "The presence of rival stars (BiGyeop) competing for your wealth makes you vulnerable to losses in joint ventures. You must hide and lock your cash into illiquid holdings.";
     actionPlans = isKO ? [
       "아무리 친한 사이여도 동업, 투자 유치, 돈을 빌려주는 거래는 인생에서 원천 차단할 것",
@@ -2528,7 +2528,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[무재 역발상 예술형] 돈을 쫓지 않음으로써 완성되는 예술가형 부" : "[No-Wealth Visionary Artisan] Wealth Compounded by Ignoring Money";
     pipeline = getPipelineByDayStem(dayStem, 'ARTISAN');
     defaultPsychology = isKO
-      ? "사주에 돈을 뜻하는 재성 글자가 없어 돈 계산 자체에 얽매이면 행동이 막히는 사주입니다. 하지만 내 '재미'와 '창의력(식상)'에 극단적으로 몰입하여 독보적인 전문 영역을 굳힐 때 돈이 나를 알아서 찾아오는 놀라운 기류를 가집니다."
+      ? "귀하는 사주 원국에 재물의 직접적인 형상(**재성**)이 없거나 옅은 구조로, 돈을 노골적으로 쫓으려 계산기를 두드릴수록 되려 일이 꼬이고 결정이 흐려집니다. **돈을 대할 때** 돈 그 자체보다 내가 가진 순수한 열정, 흥미, 그리고 창작의 가치(**식상**)를 소중히 생각합니다. **돈을 벌 때는** 역설적이게도 '돈 생각'을 버리고 **나만의 깊이 있는 전문성과 특수한 재능**에 온전히 집착하듯 몰입하여 독보적인 장인 영역을 구축할 때 비로소 거대한 부가 나를 찾아옵니다. 내 특수한 스킬이 시장의 인정을 받을 때까지 한 우물만 우직하게 파는 **장인 정신**이 정답입니다. **주의할 점**은 대가 청구와 수익 정산 같은 자잘한 계산을 꺼리다가 실속을 잃는 것입니다. 정당한 대가를 요구하는 것을 머뭇거리지 마시고 **고정 요율표를 투명하게 미리 공시**해두거나, 돈 관리 자체는 나보다 계산이 철저한 신뢰할 수 있는 파트너나 아웃소싱 시스템에 아예 위탁해 버리는 것이 현명합니다."
       : "Lacking Wealth elements, trying to chase profits directly blocks your decision-making. Your income compounds dramatically when you immerse yourself fully in your creativity and craft.";
     actionPlans = isKO ? [
       "수익 모델을 억지로 짜느라 고통받지 말고, 나보다 철저한 파트너나 기계적인 시스템에 돈 관리를 위탁할 것",
@@ -2553,7 +2553,7 @@ export function generatePersonalizedTexts(
     typeTitle = isKO ? "[비식재 자수성가형] 내 몸과 기술로 일구는 단단한 자산 엔진" : "[Self-Made Engine Type] Autonomous Cash Engine Fueled by Personal Expertise";
     pipeline = getPipelineByDayStem(dayStem, 'SELFMADE');
     defaultPsychology = isKO
-      ? "주체성(비겁)과 실행력(식상)을 결합하여 맨땅에서 스스로 가치를 키워내는 자수성가형 명식입니다. 외부 대기업의 인프라나 타인의 혜택에 의존하지 않고 본인의 높은 기준과 실전 감각으로 부딪혀 몸값을 높여 나갈 때 가장 안전합니다."
+      ? "귀하는 주체적인 뚝심(**비겁**)과 강력한 실천력(**식상**), 그리고 정직한 결과(**재성**)가 촘촘히 엮여 맨땅에서 직접 일어나는 자수성가형 흐름을 지녔습니다. **돈을 대할 때** 남에게 아쉬운 소리를 하거나 얹혀가는 것을 극도로 거부하며, 내 땀방울로 정직하게 일구어낸 자산에만 진정한 믿음을 보냅니다. **돈을 벌 때는** 거대 대기업의 줄을 잡거나 남의 혜택에 의존하기보다, 나만의 확실한 기술력과 독보적인 실전 감각을 갈고닦아 **본인의 몸값을 스스로 올리는 방향**을 잡아야 성공합니다. 내 기술적 노하우를 패키징하여 전자책이나 강좌 같은 **나만의 독자적인 유통 루트**를 만드는 것이 자산을 폭발시키는 열쇠입니다. **주의할 점**은 내 몸을 너무 과신하여 모든 실무를 혼자 다 껴안다가 몸이 망가지는 것입니다. 1인 비즈니스 단계를 넘어서면 점진적으로 **업무를 아웃소싱하고 협업**해야 하며, 무엇보다 일정한 시간과 에너지를 **나만의 건강 루틴을 보존하는 데 최우선 배정**해야 평생 건강하게 부를 누릴 수 있습니다."
       : "You possess an autonomous cash engine powered by your own willpower and executing skills. Your wealth compounds safest when you actively scale your personal skills and leverage them.";
     actionPlans = isKO ? [
       "몸값을 무작정 올리기만 하지 말고, 내 기술 노하우를 전자책이나 강좌로 패키징하여 자가 유통망을 만들 것",
