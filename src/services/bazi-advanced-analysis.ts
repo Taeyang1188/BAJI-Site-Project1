@@ -1092,6 +1092,11 @@ export const calculateAdvancedAnalysis = (
     const detailsKo = getShinGangShinYakDetails(level, strength.rootingDetails, 'KO');
     const detailsEn = getShinGangShinYakDetails(level, strength.rootingDetails, 'EN');
 
+    const strengthMapping = BAZI_MAPPING.strength[level as keyof typeof BAZI_MAPPING.strength];
+    const displayTitle = lang === 'KO' 
+      ? (strengthMapping?.ko || level) 
+      : (strengthMapping?.en || level);
+
     return {
       isStrong,
       score,

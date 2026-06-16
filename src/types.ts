@@ -201,6 +201,8 @@ export interface BaZiResult {
     specialPatterns?: { code: string; name: string; rarity: string; effect: string; enName: string; enEffect: string }[];
     shinGangShinYak?: { 
       isStrong: boolean;
+      score: number;
+      level: string;
       title: string; 
       summary: string;
       enSummary?: string;

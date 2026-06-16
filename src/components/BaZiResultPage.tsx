@@ -33,7 +33,8 @@ import {
   AlertTriangle,
   Shield,
   Image,
-  Link
+  Link,
+  Lock
 } from 'lucide-react';
 
 import { generateSoulSummary, SoulSummary } from '../services/bazi-summary-service';
@@ -1528,7 +1529,7 @@ export default function BaZiResultPage({
           </div>
         </div>
         
-        {isUnknown && (
+        {isUnknown && guideStep === 0 && (
           <div className={`flex flex-col items-center gap-2 mt-4 px-6 py-3 rounded-2xl max-w-md w-full border ${
             isLight 
               ? 'bg-blue-50/60 border-blue-200/70 shadow-sm' 
@@ -3756,9 +3757,11 @@ export default function BaZiResultPage({
             return (
               <div 
                 key={`pillar-${i}`} 
-                className={`flex flex-col gap-1 sm:gap-2 h-full transition-all duration-500 ease-in-out ${isHighlighted ? 'scale-[1.03] sm:scale-105 z-50' : ''} ${guideStep === 5 ? 'z-50' : ''} ${isDimmed ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'} ${isUnknownPillar ? 'opacity-40 grayscale' : ''}`}
+                onClick={isUnknownPillar ? onBack : undefined}
+                className={`flex flex-col gap-1 sm:gap-2 h-full transition-all duration-500 ease-in-out ${isHighlighted ? 'scale-[1.03] sm:scale-105 z-50' : ''} ${guideStep === 5 ? 'z-50' : ''} ${isDimmed ? 'opacity-20 blur-[2px] grayscale-[50%]' : 'z-10'} ${isUnknownPillar ? 'opacity-95 cursor-pointer hover:scale-[1.02] active:scale-98 group/unknown-pillar' : ''}`}
+                title={isUnknownPillar ? (lang === 'KO' ? '정확한 생시를 입력해 🔒시주를 열어보세요! (클릭하여 입력)' : 'Add birth time to unlock 🔒Hour Pillar! (Click to enter)') : undefined}
               >
-                <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest transition-colors ${isDayPillar || isHighlighted ? 'text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]' : isUnknownPillar ? 'text-white/20' : 'text-white/40'}`}>
+                <div className={`text-[9px] sm:text-xs font-bold text-center mb-1 uppercase tracking-widest transition-colors ${isDayPillar || isHighlighted ? 'text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]' : isUnknownPillar ? 'text-white/40 group-hover/unknown-pillar:text-neon-cyan group-hover/unknown-pillar:drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]' : 'text-white/40'}`}>
                   {pillarName}
                 </div>
                 {/* Stem Card */}
@@ -3766,14 +3769,14 @@ export default function BaZiResultPage({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden h-[114px] sm:h-[148px] md:h-[168px] ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''} ${guideStep === 5 && !isRelatedStemHovered ? 'opacity-40 blur-[1px]' : ''} relative transition-all duration-300 ${isRelatedStemHovered ? (isHoveredStemDestroyed ? 'scale-[1.02] z-[90] ring-2 ring-red-500/50 bg-red-500/5 !border-red-500/30' : (isLight ? 'goth-glass-hover-active scale-[1.06] z-[100]' : 'animate-bazi-related-glow scale-[1.06] z-[100] border-2')) : ''}`}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden h-[114px] sm:h-[148px] md:h-[168px] ${isDayPillar ? 'ring-1 ring-neon-cyan/30 bg-neon-cyan/5' : ''} ${guideStep === 5 && !isRelatedStemHovered ? 'opacity-40 blur-[1px]' : ''} relative transition-all duration-300 ${isRelatedStemHovered ? (isHoveredStemDestroyed ? 'scale-[1.02] z-[90] ring-2 ring-red-500/50 bg-red-500/5 !border-red-500/30' : (isLight ? 'goth-glass-hover-active scale-[1.06] z-[100]' : 'animate-bazi-related-glow scale-[1.06] z-[100] border-2')) : ''} ${isUnknownPillar ? 'border-dashed border-white/20 hover:border-neon-cyan/40 bg-black/40 hover:bg-neon-cyan/5' : ''}`}
                   style={{ 
                     '--glow-color': glowColor,
                     '--light-hover-bg': isLight && isRelatedStemHovered && !isHoveredStemDestroyed ? (LIGHT_MODE_ELEMENT_TINTS[pillar.element as keyof typeof LIGHT_MODE_ELEMENT_TINTS]?.bg) : undefined,
                     '--light-hover-border': isLight && isRelatedStemHovered && !isHoveredStemDestroyed ? (LIGHT_MODE_ELEMENT_TINTS[pillar.element as keyof typeof LIGHT_MODE_ELEMENT_TINTS]?.border) : undefined,
                     borderColor: isRelatedStemHovered 
                       ? (isHoveredStemDestroyed ? '#EF4444' : (isLight ? undefined : glowColor)) 
-                      : (isUnknownPillar ? '#333' : glowColor),
+                      : (isUnknownPillar ? '#222' : glowColor),
                     boxShadow: isLight && isRelatedStemHovered && !isHoveredStemDestroyed ? 'none' : auraShadow
                   } as any}
                 >
@@ -3804,7 +3807,15 @@ export default function BaZiResultPage({
                         style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[pillar.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
                       >
                         {isUnknownPillar ? (
-                          <span>?</span>
+                          <div className="relative flex flex-col items-center justify-center w-full min-w-0">
+                            <span className="blur-[7px] opacity-[0.12] select-none pointer-events-none font-gothic text-xs sm:text-sm md:text-base tracking-tighter">
+                              {pillar.stem}({BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})
+                            </span>
+                            <div className="absolute inset-x-0 flex flex-col items-center justify-center text-neon-cyan/90 drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">
+                              <Lock className="w-3.5 h-3.5 sm:w-4 w-4 mb-0.5 text-neon-cyan group-hover/unknown-pillar:animate-bounce" />
+                              <span className="text-[7.5px] sm:text-[9.5px] font-sans font-extrabold whitespace-nowrap uppercase tracking-wider">{lang === 'KO' ? '비공개' : 'Sealed'}</span>
+                            </div>
+                          </div>
                         ) : (
                           lang === 'KO' ? 
                             (showHanja ? `${pillar.stem}(${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem})` : `${BAZI_MAPPING.stems?.[pillar.stem as keyof typeof BAZI_MAPPING.stems]?.ko || pillar.stem}`) : 
@@ -3827,10 +3838,10 @@ export default function BaZiResultPage({
                   </div>
                   <div className="w-full bg-white/5 border-t border-white/10 py-1.5 sm:py-2 px-0.5 min-h-[24px] sm:min-h-[32px] flex items-center justify-center shrink-0">
                     <span 
-                      className={`text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wide leading-none ${isUnknownPillar ? 'text-white/30' : ''}`}
+                      className={`text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wide leading-none ${isUnknownPillar ? 'text-white/20 blur-[2px] select-none' : ''}`}
                       style={{ color: isUnknownPillar ? undefined : getTenGodColor(lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName) }}
                     >
-                      {isUnknownPillar ? (lang === 'KO' ? '미정' : 'Unknown') : (lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName))}
+                      {isUnknownPillar ? (lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName)) : (lang === 'KO' ? pillar.stemKoreanName : formatName(pillar.stemEnglishName))}
                     </span>
                   </div>
                 </div>
@@ -3841,9 +3852,9 @@ export default function BaZiResultPage({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: (i + 4) * 0.05 }}
-                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden h-[114px] sm:h-[148px] md:h-[168px] ${isDayPillar ? 'ring-1 ring-neon-cyan/10 bg-neon-cyan/5' : ''} ${guideStep === 5 ? 'opacity-30 blur-[1px]' : ''} relative`}
+                  className={`w-full min-w-0 goth-glass rounded-lg sm:rounded-xl border-t-2 flex flex-col overflow-hidden h-[114px] sm:h-[148px] md:h-[168px] ${isDayPillar ? 'ring-1 ring-neon-cyan/10 bg-neon-cyan/5' : ''} ${guideStep === 5 ? 'opacity-30 blur-[1px]' : ''} relative ${isUnknownPillar ? 'border-dashed border-white/20 hover:border-neon-cyan/40 bg-black/40 hover:bg-neon-cyan/5' : ''}`}
                   style={{ 
-                    borderColor: isUnknownPillar ? '#333' : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A')
+                    borderColor: isUnknownPillar ? '#222' : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FF007A')
                   }}
                 >
                   <div className="relative z-10 flex flex-col h-full w-full min-w-0">
@@ -3873,7 +3884,15 @@ export default function BaZiResultPage({
                         style={{ color: isUnknownPillar ? undefined : (ELEMENT_COLORS[branchData?.element as keyof typeof ELEMENT_COLORS] || '#FFFFFF') }}
                       >
                         {isUnknownPillar ? (
-                          <span>?</span>
+                          <div className="relative flex flex-col items-center justify-center w-full min-w-0">
+                            <span className="blur-[7px] opacity-[0.12] select-none pointer-events-none font-gothic text-xs sm:text-sm md:text-base tracking-tighter">
+                              {pillar.branch}({branchData?.ko || pillar.branch})
+                            </span>
+                            <div className="absolute inset-x-0 flex flex-col items-center justify-center text-neon-cyan/90 drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">
+                              <Lock className="w-3.5 h-3.5 sm:w-4 w-4 mb-0.5 text-neon-cyan group-hover/unknown-pillar:animate-bounce" />
+                              <span className="text-[7.5px] sm:text-[9.5px] font-sans font-extrabold whitespace-nowrap uppercase tracking-wider">{lang === 'KO' ? '비공개' : 'Sealed'}</span>
+                            </div>
+                          </div>
                         ) : (
                           lang === 'KO' ? 
                             (showHanja ? `${pillar.branch}(${branchData?.ko || pillar.branch})` : `${branchData?.ko || pillar.branch}`) : 
@@ -3896,10 +3915,10 @@ export default function BaZiResultPage({
                   </div>
                   <div className="w-full bg-white/5 border-t border-white/10 py-1.5 sm:py-2 px-0.5 min-h-[24px] sm:min-h-[32px] flex items-center justify-center shrink-0">
                     <span 
-                      className={`text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wide leading-none ${isUnknownPillar ? 'text-white/30' : ''}`}
+                      className={`text-[8px] sm:text-[10px] md:text-[11px] font-display font-bold uppercase tracking-wide leading-none ${isUnknownPillar ? 'text-white/20 blur-[2px] select-none' : ''}`}
                       style={{ color: isUnknownPillar ? undefined : getTenGodColor(lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName) }}
                     >
-                      {isUnknownPillar ? (lang === 'KO' ? '미정' : 'Unknown') : (lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName))}
+                      {isUnknownPillar ? (lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName)) : (lang === 'KO' ? pillar.branchKoreanName : formatName(pillar.branchEnglishName))}
                     </span>
                   </div>
                 </div>
@@ -3912,7 +3931,11 @@ export default function BaZiResultPage({
                   </div>
                   <div className="flex flex-wrap justify-center items-center gap-1 w-full sm:flex-nowrap sm:gap-1.5">
                     {isUnknownPillar ? (
-                      <div className="text-[9px] text-center text-white/20 my-2">?</div>
+                      <div className="flex gap-[3px] blur-[3px] opacity-35 select-none pointer-events-none scale-90 py-1 items-center justify-center">
+                        {hiddenStems.map((hs, hidx) => (
+                          <span key={hidx} className="bg-white/5 px-1 rounded text-[9px] leading-tight text-white">{hs}</span>
+                        ))}
+                      </div>
                     ) : (
                       hiddenStems.map((hs, idx) => {
                         const isThirdOfThree = hiddenStems.length === 3 && idx === 2;
@@ -4342,6 +4365,43 @@ export default function BaZiResultPage({
             );
           })}
         </div>
+
+        {/* Banner requesting the user to fill in their time */}
+        {result.isTimeUnknown && guideStep === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mt-4 p-4 sm:p-5 rounded-2xl border ${
+              theme === 'light' 
+                ? 'bg-gradient-to-r from-blue-50/75 to-indigo-50/75 border-blue-200/80 shadow-[0_4px_12px_rgba(37,99,235,0.06)] text-indigo-950' 
+                : 'bg-gradient-to-r from-neon-cyan/5 via-[#0c1524]/60 to-neon-cyan/5 border-neon-cyan/20 text-white shadow-[0_0_20px_rgba(0,242,255,0.05)]'
+            } flex flex-col sm:flex-row items-center gap-4`}
+          >
+            <div className={`p-3 rounded-xl ${theme === 'light' ? 'bg-indigo-100 text-indigo-600' : 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20'} shrink-0`}>
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+            </div>
+            <div className="flex-1 text-center sm:text-left space-y-1">
+              <h5 className="font-bold text-sm sm:text-base tracking-tight text-neon-cyan">
+                {lang === 'KO' ? '🔒 시주(생시)가 봉인되어 해설이 불완전합니다' : '🔒 Hour Pillar (Birth Time) is Sealed'}
+              </h5>
+              <p className={`text-xs leading-relaxed ${theme === 'light' ? 'text-slate-650' : 'text-slate-300'}`}>
+                {lang === 'KO' 
+                  ? '현재 결과는 태어난 시간을 제외한 삼주(三柱) 기준의 75% 완성도 분석입니다. 생시를 추가하시면 노년운, 자손운, 그리고 삶의 최종 성과(수확물)를 상징하는 시주가 완전히 잠금 해제되어 완벽한 100% 매칭 사주 리포트가 완성됩니다.'
+                  : 'Currently showing a 75% partial report based on Three Pillars. Specifying your exact birth time will instantly unlock your Hour Pillar (representing children, late-life fortuity, and final fruits), giving you a 100% accurate, complete analysis.'}
+              </p>
+            </div>
+            <button
+              onClick={onBack}
+              className={`px-4 py-2.5 text-xs sm:text-sm font-bold tracking-wider uppercase rounded-xl transition-all duration-300 transform active:scale-95 whitespace-nowrap shrink-0 pointer-events-auto ${
+                theme === 'light'
+                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md'
+                  : 'bg-neon-cyan hover:bg-cyan-400 text-[#0f0f1b] font-extrabold shadow-[0_0_15px_rgba(0,242,255,0.4)]'
+              }`}
+            >
+              {lang === 'KO' ? '생생한 생시 입력하고 전체 분석 해제' : 'Unlock Full Report'}
+            </button>
+          </motion.div>
+        )}
       </div>
 
 
@@ -5367,14 +5427,19 @@ export default function BaZiResultPage({
 
                           {/* Absence / Excess Summary */}
                           <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[10px] font-bold uppercase tracking-widest ${isLight ? 'text-slate-500 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '무자/다자 분석' : 'Absence / Excess Analysis'}</span>
-                              <button 
-                                onClick={() => setShowMuJaDaJaHelp(true)}
-                                className="p-1 hover:bg-white/5 rounded-full transition-colors"
-                              >
-                                <HelpCircle className="w-3 h-3 text-neon-cyan/60" />
-                              </button>
+                            <div className="flex flex-col space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${isLight ? 'text-slate-500 font-medium' : 'text-white/40'}`}>{lang === 'KO' ? '무자/다자 분석' : 'Absence / Excess Analysis'}</span>
+                                <button 
+                                  onClick={() => setShowMuJaDaJaHelp(true)}
+                                  className="p-1 hover:bg-white/5 rounded-full transition-colors"
+                                >
+                                  <HelpCircle className="w-3 h-3 text-neon-cyan/60" />
+                                </button>
+                              </div>
+                              <span className={`text-[10px] ${isLight ? 'text-slate-400' : 'text-white/40'} italic block`}>
+                                {lang === 'KO' ? '*각 배지에 마우스를 올리거나 터치하면 상세 조언을 볼 수 있어.' : '*Hover or touch each badge to view deep-dive advice.'}
+                              </span>
                             </div>
                             <div className="flex flex-wrap gap-3">
                               {result.analysis.muJaRon?.map((item: any, i: number) => (
@@ -5387,7 +5452,7 @@ export default function BaZiResultPage({
                                   lang={lang}
                                 >
                                   <div 
-                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-rose-50/50 border-rose-250 hover:border-rose-400 hover:bg-rose-50 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/25 hover:border-red-500/50 text-red-200'}`}
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help hover:scale-105 active:scale-95 transition-all duration-300 ${isLight ? 'bg-rose-50/50 border-rose-220 hover:border-rose-400 hover:bg-rose-50/80 text-rose-800 shadow-sm' : 'bg-red-900/10 border-red-500/25 hover:border-red-500/50 hover:bg-red-900/20 text-red-200'}`}
                                   >
                                     <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" />
                                     <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-red-700' : 'text-red-400'}`}>{item.title}</span>
@@ -5404,7 +5469,7 @@ export default function BaZiResultPage({
                                   lang={lang}
                                 >
                                   <div 
-                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help transition-all duration-300 ${isLight ? 'bg-indigo-50/50 border-indigo-250 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/25 hover:border-purple-500/50 text-purple-200'}`}
+                                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 border cursor-help hover:scale-105 active:scale-95 transition-all duration-300 ${isLight ? 'bg-indigo-50/50 border-indigo-220 hover:border-indigo-400 hover:bg-indigo-50/80 text-indigo-800 shadow-sm' : 'bg-purple-900/10 border-purple-500/25 hover:border-purple-500/50 hover:bg-purple-900/20 text-purple-200'}`}
                                   >
                                     <span className="w-1 h-1 rounded-full bg-purple-500 animate-pulse" />
                                     <span className={`text-[10px] font-bold tracking-tight ${isLight ? 'text-indigo-700' : 'text-purple-400'}`}>{item.title}</span>
@@ -5681,12 +5746,25 @@ export default function BaZiResultPage({
 
                     {/* Fruit (Hour Pillar) */}
                     <div className="absolute top-4 right-0 sm:top-10 sm:right-4 flex flex-col items-center">
-                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/20 border border-yellow-400/50 rounded-full flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-transform hover:scale-110 z-20">
-                          <span className="text-2xl sm:text-3xl">🍏</span>
+                       <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex flex-col items-center justify-center backdrop-blur-md transition-transform hover:scale-110 z-20 ${
+                         result.isTimeUnknown 
+                           ? 'bg-yellow-500/5 border border-yellow-500/20 shadow-none' 
+                           : 'bg-yellow-500/20 border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.4)]'
+                       }`}>
+                          <span className={`text-2xl sm:text-3xl ${result.isTimeUnknown ? 'filter blur-[1.5px] opacity-40 select-none' : ''}`}>🍏</span>
+                          {result.isTimeUnknown && (
+                            <div className="absolute inset-0 flex items-center justify-center text-neon-cyan drop-shadow-[0_0_5px_rgba(0,255,255,0.7)] z-30">
+                              <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-neon-cyan" />
+                            </div>
+                          )}
                        </div>
                        <div className="mt-2 text-center bg-black/60 px-2 py-1 rounded-lg backdrop-blur-md border border-white/10">
-                         <span className="text-yellow-400 font-bold block text-xs sm:text-sm">{lang === 'KO' ? '시주' : 'Hour'}</span>
-                         <span className="text-white/60 text-[10px] sm:text-xs">{lang === 'KO' ? '열매 (결과)' : 'Fruit (Result)'}</span>
+                         <span className="text-yellow-400 font-bold block text-xs sm:text-sm">
+                           {lang === 'KO' ? (result.isTimeUnknown ? '시주 (🔒잠김)' : '시주') : (result.isTimeUnknown ? 'Hour (🔒Locked)' : 'Hour')}
+                         </span>
+                         <span className="text-white/60 text-[10px] sm:text-xs">
+                           {lang === 'KO' ? (result.isTimeUnknown ? '열매 (시간 미입력)' : '열매 (결과)') : (result.isTimeUnknown ? 'Fruit (Requires Time)' : 'Fruit (Result)')}
+                         </span>
                        </div>
                     </div>
                   </div>

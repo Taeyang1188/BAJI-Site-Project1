@@ -148,8 +148,8 @@ const BRANCH_INFO_EN: Record<string, { lifeEnvironment: string, behavioralTrigge
   },
   '巳': {
     lifeEnvironment: "a strategic snake observing in silence, moving **precisely at the most beneficial moment**.",
-    behavioralTrigger: "moving actively when a **clear advantage or opportunity arises**, and **declining requests without a clear benefit**.",
-    socialPattern: "building **selective relationships** by **evaluating the potential and values of others first**.",
+    behavioralTrigger: "moving actively when a **clear advantage or opportunity** arises, but ignoring meaningless requests.",
+    socialPattern: "building **selective relationships** after evaluating the potential and values of others.",
     hiddenStruggle: "concealing your **true feelings** to avoid appearing calculating, making it hard for others to read you."
   },
   '午': {
@@ -173,7 +173,7 @@ const BRANCH_INFO_EN: Record<string, { lifeEnvironment: string, behavioralTrigge
   '酉': {
     lifeEnvironment: "the tranquility of twilight, pursuing a **refined personal world with strict standards**.",
     behavioralTrigger: "reacting **strongly when your aesthetic standards** or professional judgment are questioned.",
-    socialPattern: "slow to open up but **once you accept someone**, building **deep connections** that **grow even stronger over time**.",
+    socialPattern: "slow to open up but building **highly precise and deep connections** that grow stronger over time.",
     hiddenStruggle: "letting your **high standards exhaust you** and others, sometimes creating a cycle of isolation."
   },
   '戌': {
@@ -253,20 +253,20 @@ const TEN_GOD_EN_NAMES: Record<string, string> = {
 
 const REAL_WORLD_DESC_EN: Record<string, string> = {
   GWAN_DA_SHIN_YAK: `**"I must act responsibly"** — this voice echoes inside you dozens of times a day.\nYou tend to jump into action before even questioning if a task is yours to carry. While others see you as highly reliable, this trust can quickly drain your energy.\n**A repeating cycle of failing to say no, taking on sole responsibility, and eventually burning out** is your key pattern.`,
-  JAE_DA_SHIN_YAK: `**Countless opportunities are visible at once** — this is your natural sense.\nHowever, you tend to jump to the next opportunity before fully completing the previous one, dispersing your energy in many directions.\n**Only when you utilize partnerships and delegate roles can your vast ideas materialize into actual wealth and success.**`,
-  SIKSANG_GWADA: `**Your expressive energy flows out unstoppably.**\nYou excel at blunt honesty and speaking truths that others find uncomfortable. While this works positively for creative planning and persuasion, it can create friction if left unrefined.\n**Refining the timing and tone of your expression is your key lesson to let your energy shine.**`,
-  INSEONG_GWADA: `**You always ask "Why?" first** — this is your contemplative nature.\nWithout a complete understanding, you find it hard to take action. While your depth of knowledge is outstanding, you risk missing timings by waiting for perfect preparation.\n**Combining your deep strategy with rapid execution will unleash your ultimate potential in reality.**`,
-  BIGYEOP_GWADA: `**You stay quiet until provoked, but once crossed, you explode.**\nYou silently focus on your work, but your defensive energy erupts the moment your principles or self-esteem are threatened. You dislike interference and absolutely prefer self-reliance.\n**This independent energy builds your path to success, though it can sometimes push away helpful helpers.**`,
-  BALANCED: `**Keeping balance in any extreme situation** — this is your core strength.\nYou stay calm in conflicts, earning trust as a natural mediator who understands both sides.\n**However, by prioritizing harmony too much, you might put your own desires and goals on the back burner.**`
+  JAE_DA_SHIN_YAK: `**Countless opportunities are visible at once** — this is your natural sense.\nHowever, you tend to jump to the next opportunity before fully completing the previous one, dispersing your energy in many directions.\n**Only when you utilize partnerships and delegate roles** can your vast ideas materialize into actual wealth and success.`,
+  SIKSANG_GWADA: `**Your expressive energy flows out unstoppably.**\nYou excel at blunt honesty and speaking truths that others find uncomfortable. While this works positively for creative planning and persuasion, it can create friction if left unrefined.\n**Refining the timing and tone of your expression** is your key lesson to let your energy shine.`,
+  INSEONG_GWADA: `**You always ask "Why?" first** — this is your contemplative nature.\nWithout a complete understanding, you find it hard to take action. While your depth of knowledge is outstanding, you risk missing timings by waiting for perfect preparation.\n**Combining your deep strategy with rapid execution** will unleash your ultimate potential in reality.`,
+  BIGYEOP_GWADA: `**You stay quiet until provoked, but once crossed, you explode.**\nYou silently focus on your work, but your defensive energy erupts the moment your principles or self-esteem are threatened. You dislike interference and absolutely prefer self-reliance.\n**This independent energy builds your path to success**, though it can sometimes push away helpful helpers.`,
+  BALANCED: `**Keeping balance in any extreme situation** — this is your core strength.\nYou stay calm in conflicts, earning trust as a natural mediator who understands both sides.\n**However, by prioritizing harmony too much**, you might put your own desires and goals on the back burner.`
 };
 
 const realWorldDescMap: Record<string, string> = {
   GWAN_DA_SHIN_YAK: `**"내가 책임져야 해"** — 하루에도 수십 번씩 이 말이 내면에서 울립니다.\n의심하기도 전에 먼저 몸을 던지며, 이 책임감이 당신을 믿음직하게 만들지만 동시에 피로를 유발합니다.\n**거절하지 못하고 독박 책임을 지며 결국 번아웃되는 순환**이 주요 현실 패턴입니다.`,
-  JAE_DA_SHIN_YAK: `**수많은 기회가 한눈에 보인다** — 이것이 당신의 직감입니다.\n하지만 결과를 완성하기도 전에 또 다른 기회로 관심을 돌려 에너지가 분산되기 쉽습니다.\n**동료와 역할을 분담하고 협력할 때 비로소 거대한 아이디어가 실재하는 재물과 성과로 실현됩니다.**`,
-  SIKSANG_GWADA: `**당신의 표현하고 표출하는 에너지가 거침없이 흘러나옵니다.**\n솔직하고 직설적인 조언이나 남들이 꺼리는 팩트를 과감히 찌르는 강점이 있습니다. 창의적 기획이나 설득력에는 강점이지만 정제되지 않으면 구설을 만들기 쉽습니다.\n**표현의 타이밍과 강도를 조절하는 것이 에너지를 가치 있게 만드는 핵심 레슨입니다.**`,
-  INSEONG_GWADA: `**항상 "왜?"라는 의문을 먼저 던집니다** — 깊은 사색가 기질입니다.\n완벽한 이해와 납득이 없으면 행동을 개시하기 어려워합니다. 사물과 사람을 읽는 깊이는 탁월하나 완벽한 준비를 기다리다 타이밍을 놓칠 우려가 있습니다.\n**깊은 생각에 즉각적인 실행력을 더할 때 현실에서 폭발적인 에너지가 발동됩니다.**`,
-  BIGYEOP_GWADA: `**평소에는 잠잠하지만 자존심을 건드리면 폭발합니다.**\n묵묵하게 자기 일을 해내다가도 자신의 원칙이나 개성이 침해받는 순간 강한 방어 기제를 보입니다. 간섭을 싫어하고 혼자 결정하여 밀고 나가는 주체성이 강합니다.\n**이 독고다이 에너지가 인생의 강력한 돌파구를 열어주지만, 귀인의 도움을 밀어내는 요인이 되기도 합니다.**`,
-  BALANCED: `**어떤 극단적인 상황에서도 중심을 잡는다** — 이것이 당신의 핵심 능력입니다.\n갈등 상황에서 의외로 차분한 모습을 보여 주변의 신뢰를 얻으며, 양쪽 입장을 모두 이해하고 중재하는 역할을 자연스럽게 맡습니다.\n**다만 지나치게 조화를 중시하다 보면 정작 자신의 진짜 욕구와 목표를 후순위로 미루는 함정에 빠질 수 있습니다.**`
+  JAE_DA_SHIN_YAK: `**수많은 기회가 한눈에 보인다** — 이것이 당신의 직감입니다.\n하지만 결과를 완성하기도 전에 또 다른 기회로 관심을 돌려 에너지가 분산되기 쉽습니다.\n**동료와 역할을 분담하고 협력할 때** 비로소 거대한 아이디어가 실재하는 재물과 성과로 실현됩니다.`,
+  SIKSANG_GWADA: `**당신의 표현하고 표출하는 에너지가 거침없이 흘러나옵니다.**\n솔직하고 직설적인 조언이나 남들이 꺼리는 팩트를 과감히 찌르는 강점이 있습니다. 창의적 기획이나 설득력에는 강점이지만 정제되지 않으면 구설을 만들기 쉽습니다.\n**표현의 타이밍과 강도를 조절하는 것**이 에너지를 가치 있게 만드는 핵심 레슨입니다.`,
+  INSEONG_GWADA: `**항상 "왜?"라는 의문을 먼저 던집니다** — 깊은 사색가 기질입니다.\n완벽한 이해와 납득이 없으면 행동을 개시하기 어려워합니다. 사물과 사람을 읽는 깊이는 탁월하나 완벽한 준비를 기다리다 타이밍을 놓칠 우려가 있습니다.\n**깊은 생각에 즉각적인 실행력을 더할 때** 현실에서 폭발적인 에너지가 발동됩니다.`,
+  BIGYEOP_GWADA: `**평소에는 잠잠하지만 자존심을 건드리면 폭발합니다.**\n묵묵하게 자기 일을 해내다가도 자신의 원칙이나 개성이 침해받는 순간 강한 방어 기제를 보입니다. 간섭을 싫어하고 혼자 결정하여 밀고 나가는 주체성이 강합니다.\n**이 독고다이 에너지가 인생의 강력한 돌파구를 열어주지만**, 귀인의 도움을 밀어내는 요인이 되기도 합니다.`,
+  BALANCED: `**어떤 극단적인 상황에서도 중심을 잡는다** — 이것이 당신의 핵심 능력입니다.\n갈등 상황에서 의외로 차분한 모습을 보여 주변의 신뢰를 얻으며, 양쪽 입장을 모두 이해하고 중재하는 역할을 자연스럽게 맡습니다.\n**다만 지나치게 조화를 중시하다 보면** 정작 자신의 진짜 욕구와 목표를 후순위로 미루는 함정에 빠질 수 있습니다.`
 };
 
 const SIGNATURE_PATTERN_TITLES_EN: Record<string, Record<string, string>> = {
@@ -485,22 +485,6 @@ function findHapNetwork(
   }
   return null;
 }
-
-const OVERLOAD_BEHAVIOR_KO: Record<string, string> = {
-  '비겁': '자립심이 강하고 스스로의 힘으로 주체적인 독립을 이루려는',
-  '식상': '창의적인 에너지를 바탕으로 끊임없이 자신을 표현하고 실천하려는',
-  '재성': '뚜렷한 목표 의식과 현실 감각으로 실질적인 성과를 일궈내려는',
-  '관성': '사회적 책임감과 명예를 무겁게 짊어지고 규칙과 자신을 절제하려는',
-  '인성': '학구적인 태도로 지식을 습득하고 내면의 철학과 깊은 생각을 채우려는'
-};
-
-const OVERLOAD_BEHAVIOR_EN: Record<string, string> = {
-  'Companion (Bi-Geop)': 'seeking independence, self-reliance, and charting your own path with a strong ego root',
-  'Expression (Sik-Sang)': 'expressing yourself creatively, putting ideas into action, and sharing your inner voice',
-  'Wealth (Jae-Seong)': 'setting clear goals, pursuing practical achievements, and bringing results into reality',
-  'Influence (Gwan-Seong)': 'carrying social responsibilities, maintaining self-discipline, and upholding structure',
-  'Intellect (In-Seong)': 'acquiring knowledge, reflecting deeply on life, and building inner wisdom and intuition'
-};
 
 // 2순위: 특정 성분 도배 (3개 이상)
 function findOverloadedTenGods(
@@ -942,11 +926,11 @@ function findClashHyeongDetails(
   const hasJaMyo = branchVals.includes('子') && branchVals.includes('卯');
 
   if (hasInSaSin) {
-    hyeongDescKo += `\n\n- **지지의 역동적 충돌(寅·巳·申 형살)**: 가만히 있으면 도태될 것 같은 불안에 치여 **자신을 극도로 피로하고 급박하게 채찍질하며 속도에 집착하는 습관**이 있습니다. 해결사 노릇을 톡톡히 하지만, **과도한 효율성과 가속도를 곁의 동료에게도 강요함으로써 대인공간에서 불필요한 대립과 갈등을 스스로 유발하고 고립을 자초하는 모순적 행동양식**이 활성화됩니다.`;
+    hyeongDescKo += `\n\n- **지지의 역동적 충돌(寅·巳·申 형살)**: 가만히 있으면 도태될 것 같은 불안에 치여 **자신을 극도로 피로하고 급박하게 채찍질하며 속도에 집착하는 습관**이 있습니다. 해결사 노릇을 톡톡히 하지만, **과도한 효율성과 가속도를 곁의 동료에게도 강요**함으로써 **대인공간에서 불필요한 대립과 갈등을 스스로 유발하고 고립을 자초**하는 모순적 행동양식이 활성화됩니다.`;
     hyeongDescEn += `\n\n- **Dynamic Action Penalty (In-Sa-Sin Hyeong)**: The dynamic, fast-moving penalty (Hyeong) in your branches induces impatience and a low tolerance for inefficiency. You might rush processes to secure quick results, leading to oversight or creating friction by demanding the same speed from others.`;
   }
   if (hasChukSulMi) {
-    hyeongDescKo += `\n\n- **지지의 축적된 마찰(丑·戌·未 형살)**: 스스로 설정한 법관 같은 완고한 프레임 안에 갇혀, **외부의 건설적인 제언이나 따뜻한 피드백에 대해 차가운 불신과 철벽을 세우는 경향**이 있습니다. 갈등이 생기면 **풀어보려 소통하기보다 가슴속에 앙금을 눌러 담은 뒤 소리 없이 관계를 끊고 고독망 속으로 침잠해 버리는 행동양식**을 성찰할 필요가 있습니다.`;
+    hyeongDescKo += `\n\n- **지지의 축적된 마찰(丑·戌·未 형살)**: 스스로 설정한 법관 같은 완고한 프레임 안에 갇혀, **외부의 건설적인 제언이나 따뜻한 피드백에 대해 차가운 불신과 철벽**을 세우는 경향이 있습니다. 갈등이 생기면 **풀어보려 소통하기보다 가슴속에 앙금을 눌러 담은 뒤 소리 없이 관계를 끊고 고독망 속으로 침잠**해 버리는 행동양식을 성찰할 필요가 있습니다.`;
     hyeongDescEn += `\n\n- **Earth Consolidation Penalty (Chuk-Sul-Mi Hyeong)**: The Earth penalty (Hyeong) introduces a stubborn attachment to your own logic, making it difficult to accept external advice. You tend to swallow grievances silently for long periods, which can culminate in sudden, cold terminations of relationships.`;
   }
   if (hasJaMyo) {
@@ -976,7 +960,7 @@ function findClashHyeongDetails(
       if (isPah) {
         pahDescKo += `\n\n- **마무리에 다다르면 흔들리는 매듭 불안정(破)**: 초기 실행 단계에서는 놀라운 야심과 속도전으로 진두지휘하지만, **마무리를 장식해야 할 최종 서류 마감이나 뒷수습 구간에서 급격하게 집중력이 증발해 다 망쳐버리는 패턴**이 성화를 냅니다. **마지막 10%의 매듭짓기를 소홀히 여겨 그동안 쌓아올린 막강한 실적의 알맹이를 사소한 누락으로 상실**하기 십상입니다.`;
         pahDescEn += `\n\n- **Interference (Pah)**: The presence of breaking (Pah) energy in your branches indicates difficulty in closing projects. You start tasks with high momentum but lose steam during the final 10%, leading to administrative oversights or unfinished details.`;
-        break;
+         break;
       }
     }
   }
@@ -990,83 +974,687 @@ function findClashHyeongDetails(
   };
 }
 
-const OVERLOAD_PERSONALIZED_DESC_KO: Record<string, Record<string, string>> = {
-  '비겁': {
-    Wood: '곧고 단단하게 뻗어 나가는 나무의 성정이 겹쳐져, **그 어떤 통제나 간섭도 용납하지 않는 극강의 독립심과 굳건한 자립 자아**를 보여줍니다. 이는 **스스로 길을 개척하는 훌륭한 자수성가형 에너지**가 되지만, 지지의 비겁 세력이 너무 비대해지면 **\'내가 다 맞다\'는 아집에 갇혀 타인의 유익한 조언을 차단하거나, 협업 과정에서 독선적으로 흐르기 쉬운 모순**이 있습니다. 나의 고집을 고수하기보다 유연한 나뭇가지처럼 타인의 의견을 포용하는 연습이 큰 성취를 완성하는 열쇠입니다.',
-    Fire: '활활 타오르는 불꽃의 기운이 증폭되어, **남다른 자존감과 타인의 시선에 굴하지 않는 뜨거운 주체성**을 보여줍니다. 이는 **어떤 불리한 환경에서도 기어코 불씨를 살려 존재감을 내뿜는 원동력**이 되지만, 내면에 경쟁심과 투쟁심이 지나치게 커지면 **사소한 자존심 싸움에 에너지를 낭비하거나 타인을 적으로 인식해 불필요한 갈등을 자초하는 모순**을 품기 쉽습니다. 뜨거운 에너지를 외부와의 대립이 아닌 내면의 창조적 몰입으로 전환할 때 큰 부와 명예가 따릅니다.',
-    Earth: '흔들리지 않는 태산과 넓은 대지의 기운이 중첩되어, **한 번 마음먹은 기준을 꺾지 않는 무거운 뚝심과 묵직한 자아 방어**를 보여줍니다. 이는 **어떤 풍파에도 흔들리지 않고 자리를 지키며 깊은 신뢰를 주는 든든한 강점**이 되지만, 비겁 에너지가 과포화되면 **기존의 방식만을 지나치게 고수하는 완고함에 갇혀 시대의 변화나 기회를 놓치는 융통성 결여의 모순**을 겪기 쉽습니다. 내면의 굳건함을 유지하되, 흘러가는 물을 받아들이듯 변화와 타인의 피드백을 수용하는 유연성이 절실합니다.',
-    Metal: '단단한 무쇠와 정교한 보석의 칼날 같은 주체성이 증폭되어, **스스로 설정한 법관 같은 완벽한 원칙과 극강의 자존심**을 보여줍니다. 이는 **도덕성과 타협 없는 실행력으로 독보적인 카리스마를 관철하는 장점**이 되지만, 금 기운의 비겁이 과해지면 **스스로에게는 물론 타인에게도 너무 칼 같은 잣대를 들이대어 곁의 사람들을 질식시키거나 스스로를 고독 속에 가두는 모순**을 만듭니다. 날카로운 검을 칼집에 부드럽게 넣어두듯, 타인의 불완전함을 용인하는 포용력을 기를 때 귀인의 도움을 얻을 수 있습니다.',
-    Water: '거침없이 흐르는 바다와 이슬의 기운이 한데 뭉쳐, **틀에 갇히는 것을 거부하고 끊임없이 자유를 갈망하는 도도한 독립심**을 보여줍니다. 이는 **어떤 압박에도 유연하게 흐름을 바꾸어 살아남는 적응력의 무기**가 되지만, 수 기운의 비겁이 넘치면 **내면에 감정의 파도를 통제하지 못해 겉으로는 잔잔한 척하면서 속으로는 깊은 우울과 고립감에 스스로를 매몰시키는 이중적 모순**이 작용합니다. 나만의 세계에 침잠하기보다 세상과 적극적으로 소통하며 물길을 외부로 터줄 필요가 있습니다.'
+const humanTenGodMap: Record<string, { titleKo: string; descKo: string; titleEn: string; descEn: string }> = {
+  '비견': {
+    titleKo: '동반자적 주체성',
+    descKo: '동등한 관계를 추구하며 독립적으로 자아를 실현하는 강건한 의지',
+    titleEn: 'Companion/Independent Ego',
+    descEn: 'Strong-willed, structured independence seeking equal relations and autonomy.'
   },
-  '식상': {
-    Wood: '나무가 아낌없이 가지를 뻗어 꽃(火)을 피우듯, **내면의 감성과 반짝이는 아이디어를 거침없이 뿜어내는 정열적인 창의력과 예술적 안목**을 보여줍니다. 이는 **주변을 매료시키는 뛰어난 설득력과 스타성**이 되지만, 솟구치는 화 기운의 식상이 과해지면 **감정 제어가 되지 않아 홧김에 직설적인 팩트를 내뱉어 구설을 사거나, 시작은 불꽃처럼 화려하지만 마무리를 짓지 못하고 쉽게 식어버리는 모순**을 겪기 쉽습니다. 표현의 속도를 늦추고 차분한 절제를 더할 때 당신의 말과 글은 진짜 권위를 갖추게 됩니다.',
-    Fire: '불꽃이 활활 타올라 대지(토)를 덮듯, **어떤 주제든 내 방식대로 가공하고 퍼트리는 막강한 기획력과 뜨거운 표현 본능**을 보여줍니다. 이는 **다양한 분야를 조합하여 대중을 설득해내는 기획 전문가의 자산**이 되지만, 토 기운의 식상이 과해지면 **말과 행동의 무게감이 떨어지거나, 남을 가르치려 드는 오지랖으로 비쳐 호의를 베풀고도 뒤돌아서 원망을 듣는 모순**에 빠지기 쉽습니다. 나의 에너지를 외부에 낭비하기보다 조용히 내실을 채우는 집중력을 발휘하는 것이 부의 단단한 그릇이 됩니다.',
-    Earth: '대지가 품은 광물(金)을 벼려내듯, **말 한마디에 뼈가 있고 사물의 이면을 정확히 도려내는 예리한 관찰력과 비평 능력**을 보여줍니다. 이는 **완벽을 기하는 실무적 디테일과 전문성**이라는 훌륭한 날무기가 되지만, 금 기운의 식상이 과다해지면 **비판을 위한 비판을 던져 상대를 얼어붙게 만들거나 스스로 높은 기준에 짓눌려 시작조차 하지 못하는 완벽주의 늪에 빠지는 모순**을 유발합니다. 차가운 칼날에 따뜻한 정서적 온기를 더할 때 비로소 진정한 조력자를 모을 수 있습니다.',
-    Metal: '단단한 바위 틈에서 맑은 샘물(水)이 솟구치듯, **막힘 없는 언어 감각과 상황을 예리하게 꿰뚫어 해석하는 천재적인 아이디어 뱅크**의 자질을 보여줍니다. 이는 **기획과 트렌드 리딩에서 독보적인 가치**가 되지만, 수 기운의 식상이 과해지면 **생각이 꼬리를 물어 밤잠을 설치고 내면의 불안을 극단적이고 날카로운 말로 표현하여 깊은 관계를 망치는 모순**을 초래하기 쉽습니다. 흐르는 물을 담아둘 단단한 원칙과 고요한 명상의 시간을 마련해 뇌의 피로를 풀어주어야 합니다.',
-    Water: '물이 대지를 적셔 나무(木)를 기르듯, **주변 사람들의 성장을 도우며 조용하지만 끈질기게 자기 아이디어를 현실화하는 기획적 침투력**을 보여줍니다. 이는 **사람을 키우고 가치를 확장하는 교육 및 컨설팅 능력이 돋보이는 강점**이지만, 목 기운의 식상이 과다하면 **너무 많은 일을 동시다발적으로 벌려 마무리를 유실하거나 남의 일에는 열성적이면서 정작 자기 실속은 전혀 챙기지 못하는 모순**에 부딪힙니다. 일의 우선순위를 냉정히 세우고 나의 경계를 지키는 이기심이 일부 필요합니다.'
+  '겁재': {
+    titleKo: '과시/경쟁적 추진력',
+    descKo: '타인을 의식하며 강한 정복 욕구와 승부사 기질로 돌풍을 일으키는 능력',
+    titleEn: 'Rivalry/Competitive Edge',
+    descEn: 'Competitive spark focused on conquest, showing performance driven by rivalry.'
   },
-  '재성': {
-    Wood: '나무가 거대한 영토(토)에 뿌리를 내리려 분투하듯, **끊임없이 새로운 사업적 기회나 결실의 가치를 확장하고자 하는 남다른 영토 개척 욕구와 현실 감각**을 보여줍니다. 이는 **사업적 설계나 유통 흐름을 읽는 안목**이 뛰어나지만, 흙이 너무 많아 나무의 뿌리가 상하는 \'재다신약\'의 역설처럼 **에너지는 부족한데 너무 많은 영역을 홀로 다 가지려 욕심내다 과부하가 걸려 일을 매듭짓지 못하는 모순**이 작용합니다. 욕심을 덜어내고 확실한 한 놈만 패듯 선택과 집중을 할 때 재화가 모입니다.',
-    Fire: '뜨거운 불꽃이 광물(金)을 완벽히 제련하여 결실을 거두려는 욕망처럼, **목표 지향적이고 칼날 같이 선명하게 결과를 취하려는 영민한 실리 본능과 추진력**을 보여줍니다. 이는 **승부처에서 확실한 성과를 움켜쥐는 탁월한 비즈니스 감각**이 되지만, 금 재성이 과포화되면 **결과만을 너무 조급하게 쫓다가 동료들의 신뢰를 잃거나 본인의 건강과 에너지를 극단적으로 소진해 버리는 모순**을 부릅니다. 결과보다 과정을 중요시하며 조율하는 장기적 관점을 훈련해야 부가 단단해집니다.',
-    Earth: '마른 대지가 물(水)을 빈틈없이 흡수해 내 것으로 만드려는 것처럼, **시장의 흐름과 돈이 흘러가는 패턴을 영리하게 파악하고 내 실속을 채우는 현실성**을 보여줍니다. 이는 **실패율을 극소화하는 뛰어난 위기 관리와 현금 흐름 관리 능력**이 강점이지만, 수 재성이 과해지면 **머릿속으로 수십 번 손익계산기만 두드리다가 정작 과감히 투자하고 나설 타이밍을 놓치는 결정 장애의 모순**을 겪기 쉽습니다. 완벽한 계산보다 70%의 확신이 있을 때 발을 떼는 과단성이 필요합니다.',
-    Metal: '예리한 칼날로 나무(木)를 다듬어 작품을 만들 듯, **무엇이든 확실한 수치와 뚜렷한 아웃풋으로 정량화하고 구조를 통제하는 현실 설계력**을 보여줍니다. 이는 **구체적인 목표 달성과 효율적인 재물 관리 능력이 남다른 무기**가 되지만, 목 재성이 과도해지면 **작은 지출이나 디테일에 너무 집착하여 큰 그림의 투자를 보지 못하거나 주변 사람들을 너무 계산적으로 대해 적을 만드는 모순**을 품습니다. 때로는 효율성보다 사람 간의 따뜻한 정서적 유대를 우선시해야 부의 그릇이 커집니다.',
-    Water: '넘치는 강물이 뜨거운 불(화)의 에너지를 덮어 담아내려는 기세처럼, **화려하고 넓은 시장에서 유행을 읽고 역동적으로 재화를 순환시키려는 뛰어난 수완과 사교 감각**을 보여줍니다. 이는 **대범하게 판을 흔들어 부를 창출하는 강점**이 있지만, 화 재성이 과도해지면 **겉으로만 화려해 보이고 실속은 텅 비어 재물이 스쳐 지나가 버리는 만성적 불안(재다신약의 피로)의 모순**을 피하기 힘듭니다. 허세를 걷어내고 가장 보수적인 리스크 관리를 병행하는 것이 부를 움켜쥐는 관건입니다.'
+  '식신': {
+    titleKo: '풍요로운 탐구와 창작',
+    descKo: '한 분야에 깊게 침잠하여 평화롭게 탐미하고 생산성 높은 결실을 맺는 능력',
+    titleEn: 'Creative Explorer',
+    descEn: 'Deep focus on specialization and crafting, producing rich creative outputs.'
   },
-  '관성': {
-    Wood: '연약한 나무가 차가운 바위와 검(金)에 둘러싸여 절제당하는 고통처럼, **어떤 비바람에도 흔들리지 않고 원칙과 의무를 완수해 내려는 철갑 같은 책임감과 자기 통제력**을 보여줍니다. 이는 **조직과 사회에서 깊은 존경을 받는 신뢰의 표상**이 되지만, 금 관성이 과해지면 **나의 한계를 넘는 압박마저 억지로 견디며 감정을 삭이다가 한순간 번아웃으로 주저앉거나 타인에게 너무 엄격한 규칙을 강제하는 모순**을 낳습니다. 자신을 옭아맨 무거운 갑옷을 풀고 때로는 부드럽게 쉬어가는 마음의 쉼표가 절실합니다.',
-    Fire: '타오르는 불씨가 차가운 빗물(水)의 통제를 받아 빛을 조율하는 기류처럼, **대외적인 평판을 엄수하고 완벽한 도덕성으로 자신의 명예를 빛내려는 명예 지향과 공적인 책임 의식**을 보여줍니다. 이는 **안정적이고 투명한 조직 체계 내에서 신뢰받는 조력자이자 관리자로 도약하는 강점**이지만, 수 관성이 과다해지면 **실패나 나쁜 소문에 대한 극심한 공포심 탓에 과도한 감정 검열을 겪거나 눈치를 보며 주눅 드는 모순**을 만듭니다. 타인의 시선이라는 허상을 걷어내고 내면의 진솔한 불꽃을 지키는 뻔뻔함을 키우셔야 합니다.',
-    Earth: '광활한 대지가 빽빽한 나무 숲(木)의 통제를 받아 고정되는 기운처럼, **단단하고 체계적인 법전이자 규칙 그 자체가 되어 조직의 질서를 수호하려는 강직한 의무감**을 보여줍니다. 이는 **어떤 리스크 앞에서도 변치 않는 깊은 신용의 자산**이 되지만, 목 관성이 과포화되면 **내부의 고정관념과 규율에 스스로를 스스로 유폐시켜 생각과 행동의 반경을 극도로 좁히는 자가당착의 모순**을 겪기 쉽습니다. 규칙은 수단일 뿐임을 인지하고, 때로는 과감하게 선을 넘는 모험심을 가져야 성장의 틀을 깨부술 수 있습니다.',
-    Metal: '날카로운 쇠가 용광로의 불(화) 아래 들어가 정교한 제품으로 제련되듯, **타협을 거부하고 스스로를 고도로 채찍질하여 완성하려는 철저한 절제력과 프로페셔널리즘**을 보여줍니다. 이는 **맡은 바 임무를 기어코 완벽하게 마무리 짓는 훌륭한 실행력**이 되지만, 화 관성이 과해지면 **완벽하지 못한 스스로를 견디지 못해 깊은 우울에 빠지거나 사소한 결함을 실패로 간주해버리는 자기 파괴적 완벽주의의 모순**에 도달합니다. 내가 부족해도 충분히 가치 있음을 인정하는 따뜻한 자기 연민이 필요합니다.',
-    Water: '도도히 흐르는 물이 거대한 댐과 둑(토)에 갇혀 질서를 부여받듯, **어떤 낯선 조직이나 환경에서도 나를 그 규격에 유연하게 맞추어 공정함을 잃지 않으려는 사회적 지혜와 평판 관리력**을 보여줍니다. 이는 **집단의 중심에서 조용히 평화를 지키는 훌륭한 완충 자산**이 되지만, 토 관성이 과다하면 **주변의 기대와 압박에 내 감정을 완전히 억눌러 겉으로는 순응하는 척하지만 속으로는 통제에 대한 차가운 반감과 스트레스를 켜켜이 쌓아두는 모순**을 갖습니다. 참기만 하기보다 내 의견을 확실히 발언하는 독립성이 핵심 치유법입니다.'
+  '상관': {
+    titleKo: '표출적인 개성과 달변',
+    descKo: '참신한 언변과 반짝이는 재치로 대중의 이목을 끌고 정면 돌파하는 개성',
+    titleEn: 'Expressive Maverick',
+    descEn: 'Refined self-expression and wit to command attention and challenge conventions.'
   },
-  '인성': {
-    Wood: '나무가 마르지 않는 끊임없는 수분(水)을 받아 뿌리를 깊게 내리듯, **눈앞의 얕은 기교보다 학문적 본질과 지혜, 사물의 이면을 꿰뚫어 사색하려는 남다른 학구열과 수용성**을 보여줍니다. 이는 **어떤 분야든 깊이 있는 통찰을 구축하는 훌륭한 멘토의 그릇**이 되지만, 수 인성이 과포화되면 **머릿속 생각의 물길이 너무 무거워져 생각의 미로에 갇히고 정작 행동을 미루어 기회를 흘리는 실행력 마비의 모순**에 처하게 됩니다. 생각의 양을 줄이고, 배운 것을 즉시 세상 밖으로 꺼내는 실행 훈련이 성공의 지름길입니다.',
-    Fire: '불꽃이 울창한 숲(木)을 땔감 삼아 타오르듯, **나만의 확고한 철학과 세상을 바라보는 고유한 프레임을 구축해 깊이 있게 탐구하려는 지적 열망과 자긍심**을 보여줍니다. 이는 **내공 깊은 아이디어와 철학적 설득력으로 대중을 이끄는 정신적 지도자의 무기**가 되지만, 목 인성이 과도하게 쌓이면 **내 가치관과 기준에 반하는 현실에 대해 강한 불신과 냉소를 보내며 스스로 고립망 속으로 침잠하는 모순**에 빠지기 쉽습니다. 현실이 완벽하지 않더라도 흙을 밟고 걸어가듯 세상의 불완전함 속으로 나아가 부딪쳐야 합니다.',
-    Earth: '거대한 대지가 태양과 온기(화)의 보살핌을 받아 모든 것을 수용하듯, **타인의 고통을 품어주는 깊은 포용력과 상황을 멀리서 조망하여 근본 원인을 짚어내는 지혜**를 보여줍니다. 이는 **누구든 기대고 싶게 만드는 거대한 정신적 쉼터의 그릇**이 되지만, 화 인성이 과포화되면 **주변의 의존을 당연시하거나 모든 행동에 완벽한 당위성과 명분이 갖춰질 때까지 한 발자국도 떼려 하지 않는 고집스러운 완고함의 모순**을 보입니다. 가끔은 명분 없이 가벼운 마음으로 즉흥적인 선택을 즐길 필요가 있습니다.',
-    Metal: '광물이 비옥한 흙(토) 속에 묻혀 단단하게 영양을 채우듯, **세상의 사소한 현상도 허투루 보지 않고 철저하게 구조화하고 분석하여 완성도를 기하려는 장인 정신과 정교한 사색력**을 보여줍니다. 이는 **이론적 깊이와 디테일의 완성도에서 타의 추종을 불허하는 가치**가 되지만, 토 인성이 과다해지면 **내가 완벽히 소화하지 못한 지식이나 매뉴얼은 절대 신뢰하지 않는 의심병에 갇히거나 스스로 정해둔 틀 밖으로 나오지 않으려는 폐쇄성의 모순**을 초래합니다. 내 기준을 깨트릴 파괴적 혁신과 변화를 적극적으로 수용해야 합니다.',
-    Water: '바다와 이슬이 차가운 쇠(금)의 기운을 거쳐 정밀하게 정화되듯, **직관이 매우 뛰어나고 말 너머의 본질을 단숨에 캐치하는 천재적인 통찰력과 지적 욕구**를 보여줍니다. 이는 **남들이 보지 못하는 무의식과 본질을 꿰뚫는 강력한 지혜**가 되지만, 금 인성이 과다하게 쏠리면 **현실적인 실리를 챙기는 세속적인 일을 속으로 하찮게 여기거나, 끊임없이 이론만 연구하며 실전 배팅에는 나서지 않는 지적 허영의 모순**을 유발하기 쉽습니다. 현실의 흙먼지를 묻히며 실리적 성과를 만들어내는 계산기를 켜야 진짜 성공이 찾아옵니다.'
+  '편재': {
+    titleKo: '영토 지배와 스케일',
+    descKo: '판을 흔드는 과감한 사업 수단과 입체적인 공간지각력으로 시장을 장악하는 눈',
+    titleEn: 'Dynamic Wealth/Pioneer',
+    descEn: 'Agile business maneuvering and macro asset exploitation with wide coverage.'
+  },
+  '정재': {
+    titleKo: '정밀하고 성실한 자원 관리',
+    descKo: '안전지대를 지키며 꼼꼼한 축재와 안정적인 구조설계로 절대 무너지지 않는 성',
+    titleEn: 'Solid Steward/Financier',
+    descEn: 'Meticulous asset optimization and steady control over practical structures.'
+  },
+  '편관': {
+    titleKo: '카리스마적 사명감과 통제',
+    descKo: '어려운 난제를 독수리처럼 날아와 단칼에 제압하며 선을 지키는 비장미',
+    titleEn: 'Charismatic Lawgiver',
+    descEn: 'Eagle-eyed crisis management and self-sacrifice for a greater duty.'
+  },
+  '정관': {
+    titleKo: '이정표가 되는 평화 관리',
+    descKo: '합리적인 신용과 품격 넘치는 약속 이행으로 사회적 표준을 제시하는 공정과 신뢰',
+    titleEn: 'Standard-Bearer/Guarantor',
+    descEn: 'Rational credibility, institutional stability, and serving as a trusted beacon.'
+  },
+  '편인': {
+    titleKo: '고독한 철학적 깊이',
+    descKo: '의심하고 재해석하여 세상의 보이지 않는 비책과 정수를 취하는 깊은 정신성',
+    titleEn: 'Esoteric Seeker',
+    descEn: 'Skeptical query and deep philosophical lens looking for unconventional truths.'
+  },
+  '정인': {
+    titleKo: '정화하는 학문적 수용력',
+    descKo: '풍성한 공감 능력과 지적 스킬을 통해 편안하고 따뜻하게 세상의 사랑을 이끄는 수용성',
+    titleEn: 'Nurturing Intellect',
+    descEn: 'Graceful receptivity, warm guidance, and absorbing structured knowledge with empathy.'
   }
 };
 
-const OVERLOAD_PERSONALIZED_DESC_EN: Record<string, Record<string, string>> = {
-  '비겁': {
-    Wood: 'as a **${dayMasterKo}** Day Master, your Gap/Eul Wood nature grants you **intense independence and self-reliance that rejects any control**. While this forms a **powerful self-made energy to carve your own path**, it can also manifest as **stubbornness, where you lock yourself in your own views and ignore helpful advice**. Learning to bend like a flexible branch rather than breaking will be your ultimate key to success.',
-    Fire: 'as a **${dayMasterKo}** Day Master, the roaring fire increases your **strong self-esteem and fierce subjectivity that doesn\'t bend to others**. While this **helps you shine in any situation**, it can lead to **wasting energy on petty pride battles or treating others as competitors**. Channeling this heat into creative work rather than conflict will bring you great wealth.',
-    Earth: 'as a **${dayMasterKo}** Day Master, the heavy mountain or broad earth energy gives you **heavy endurance and solid boundaries**. While this **earns deep trust as you stand firm through any storm**, it can make you **rigid, rejecting change and missing new windows of opportunity**. Embracing changes and others\' feedback like flowing water will unlock your growth.',
-    Metal: 'as a **${dayMasterKo}** Day Master, your iron or gem nature amplifies your **uncompromising principles and strict standards**. While this **projects immense charisma and moral discipline**, it can lead to **measuring others with the same razor-sharp scale, exhausting your peers or isolating yourself**. Softening your blade to accept imperfections will draw precious helpers to your side.',
-    Water: 'as a **${dayMasterKo}** Day Master, your flowing river or morning dew energy grants you **boundless desire for freedom, resisting any box or boundaries**. While this **makes you highly adaptable to survive in any setup**, it can cause you to **suppress intense emotional waves, wearing a calm mask but suffering from deep isolation inside**. Opening up and directing your thoughts outward is vital.'
-  },
-  '식상': {
-    Wood: 'with **Expression** overload, your Wood Day Master sprouts creative fire, **projecting vibrant artistic senses and expressive communication**. While this **serves as a magnetic asset to persuade others**, it can lead to **sharp, unfiltered remarks that cause misunderstandings, or losing steam before finishing tasks**. Slowing down your expression will grant real weight to your words.',
-    Fire: 'with **Expression** overload, your Fire Day Master covers the earth, **generating vast design skills and passionate presentation instincts**. While this **makes you an excellent planner**, it can also **make you look overbearing, or invite resentment by unsolicited preaching**. Focusing your energy on deep substance rather than outward display builds a solid wealth vessel.',
-    Earth: 'with **Expression** overload, your Earth Day Master extracts metal, **refining a sharp eye and analytical criticisms that cut straight to the core**. While this **ensures perfect professional details**, it can **turn into destructive criticism or cause analysis paralysis due to self-imposed high standards**. Adding emotional warmth to your sharp blades will help you win allies.',
-    Metal: 'with **Expression** overload, your Metal Day Master generates water, **projecting swift wit and a genius capacity for trendsetting ideas**. While this **provides unmatched value in conceptualizing**, it can **cause overthinking, sleep disruption, or projecting inner anxiety into sharp words that break relationships**. Establishing quiet meditation routines will heal your mental fatigue.',
-    Water: 'with **Expression** overload, your Water Day Master nurtures wood, **quietly helping others grow while driving your plans with persistence**. While this **shines in coaching and advisory roles**, it can **lead you to take on too many projects or exhaust yourself helping others while ignoring your own profits**. Setting cold boundaries and prioritizing yourself is necessary.'
-  },
-  '재성': {
-    Wood: 'with **Wealth** overload, your Wood Day Master strives to root in vast Earth, **showing a relentless drive to expand business domains and seize practical results**. While this **gives you an outstanding eye for cash flow**, it can **overload you, scattering your focus on too many fields without completing them**. Selecting and concentrating on one key target will consolidate your assets.',
-    Fire: 'with **Wealth** overload, your Fire Day Master refines Metal, **showing a goal-oriented practical instinct to capture achievements**. While this **grabs success in critical moments**, it can **provoke impatience, hurting relationships or burning out your physical health for immediate gains**. Prioritizing sustainable processes over quick wins builds lasting wealth.',
-    Earth: 'with **Wealth** overload, your Earth Day Master absorbs Water, **showing a realistic eye to read market trends and secure profits**. While this **minimizes failure risks through financial management**, it can **lead to calculation paralysis, calculation-based anxiety, or missing investment timings**. Taking action when 70% certain rather than waiting for 100% calculation is key.',
-    Metal: 'with **Wealth** overload, your Metal Day Master shapes Wood, **showing a structured ability to organize reality with quantitative metrics**. While this **sets clear targets and efficient asset management**, it can **make you over-focused on minor details, missing the big picture, or appearing overly calculating**. Prioritizing relational warmth over numbers expands your wealth vessel.',
-    Water: 'with **Wealth** overload, your Water Day Master commands Fire, **showing a brilliant social talent to read trends and circulate assets in active markets**. While this **carves out bold wealth channels**, it can **result in a flashy exterior with hollow substance, letting wealth slip away**. Setting conservative risk management protocols is the key to holding onto your gains.'
-  },
-  '관성': {
-    Wood: 'with **Influence** overload, your Wood Day Master is bound by Metal, **showing an ironclad sense of duty and self-control to fulfill commitments**. While this **makes you a trusted pillar in society**, it can **lead you to swallow extreme stress until you burn out, or enforce rigid rules on others**. Releasing your heavy armor and allowing yourself to rest is crucial.',
-    Fire: 'with **Influence** overload, your Fire Day Master is controlled by Water, **showing a strong desire to protect your reputation and honor with public responsibility**. While this **builds a trusted path in stable organizations**, it can **trigger excessive anxiety over failure or bad reviews, making you overly self-conscious**. Trusting your inner fire over outer opinion is essential.',
-    Earth: 'with **Influence** overload, your Earth Day Master is shaped by Wood, **acting as a solid book of law to maintain system order**. While this **creates deep credit that stays firm under risk**, it can **confine your thinking and action to self-imposed boundaries**. Recognizing that rules are just tools and taking bold steps will break your growth limits.',
-    Metal: 'with **Influence** overload, your Metal Day Master is refined by Fire, **demonstrating relentless self-discipline and professionalism to achieve perfection**. While this **drives you to finish duties flawlessly**, it can **lead to self-destructive perfectionism, treating minor flaws as complete failures**. Practicing self-compassion is the key to mental balance.',
-    Water: 'with **Influence** overload, your Water Day Master is regulated by Earth, **utilizing social wisdom to fit yourself flexibly into any organizational structure**. While this **maintains peace at the center of groups**, it can **suppress your own emotions to conform, accumulating silent resentment toward control**. Expressing your voice clearly is your ultimate remedy.'
-  },
-  '인성': {
-    Wood: 'with **Intellect** overload, your Wood Day Master is nourished by Water, **possessing deep curiosity and academic patience to seek truths**. While this **builds profound wisdom as a natural mentor**, it can **weigh down your thoughts, trapping you in a maze of options and delaying action**. Reducing your analysis and putting knowledge into immediate action is key.',
-    Fire: 'with **Intellect** overload, your Fire Day Master is fueled by Wood, **seeking to establish a unique philosophy and look at the world with deep pride**. While this **projects magnetic intellectual leadership**, it can **manifest as cold skepticism toward an imperfect reality, isolating yourself**. Stepping into the messy world and clashing with it is required.',
-    Earth: 'with **Intellect** overload, your Earth Day Master is warmed by Fire, **holding deep empathy and the wisdom to look at situations from a broad view**. While this **creates a trusted mental refuge for others**, it can **make you refuse to take steps until you have perfect justification**. Embracing spontaneous, light-hearted choices will bring joy.',
-    Metal: 'with **Intellect** overload, your Metal Day Master is nurtured by Earth, **refining a craftsman\'s precision to structure and analyze details**. While this **creates unmatched theoretical depth**, it can **lead to suspicion, refusing to trust systems you haven\'t verified, or closed-mindedness**. Actively accepting external innovations will expand your horizon.',
-    Water: 'with **Intellect** overload, your Water Day Master is purified by Metal, **projecting brilliant intuition to read hidden motives**. While this **gives you the wisdom to see through situations**, it can **make you dismiss practical matters as trivial, focusing on theory while avoiding actual execution**. Getting your hands dirty with real-world execution is your key.'
+const positionTextMapKo = (pos: 'Day' | 'Month' | 'Year' | 'Hour', type: 'stem' | 'branch'): string => {
+  if (type === 'stem') {
+    if (pos === 'Day') return '나라는 사람을 대표하는 가장 중심적인 정체성과 기본 성향';
+    if (pos === 'Month') return '사회 속에서 내가 드러내고자 하는 가치관과 대외적인 지향점';
+    if (pos === 'Year') return '내가 태어나서 자라온 환경으로부터 자연스럽게 스며든 무의식적인 시각';
+    return '살아가면서 마지막까지 추구하고 실현하고 싶은 나만의 꿈과 인생 기획안';
+  } else {
+    if (pos === 'Day') return '가장 가깝고 내밀한 사생활 공간에서 나오는 진짜 생각과 감정 표현 방식';
+    if (pos === 'Month') return '직장 생활이나 사회적 무대에서 실제로 보여주는 실천 능력과 행동 방식';
+    if (pos === 'Year') return '어린 시절부터 몸에 배어 위기 상황이나 평상시에 무의식적으로 튀어나오는 본능적인 반응';
+    return '남들에게 굳이 드러내지 않는 고요하고 개인적인 생각과 야망';
   }
 };
 
+const positionTextMapEn = (pos: 'Day' | 'Month' | 'Year' | 'Hour', type: 'stem' | 'branch'): string => {
+  if (type === 'stem') {
+    if (pos === 'Day') return 'The sovereign anchor of your mind and conscious soul';
+    if (pos === 'Month') return 'The heavenly spotlight illuminating your ideals and societal goals';
+    if (pos === 'Year') return 'The legacy anchor directing your foundational sense of honor';
+    return 'The ultimate vessel where your thoughts manifest into reality';
+  } else {
+    if (pos === 'Day') return 'Your innermost emotional core and private demeanor';
+    if (pos === 'Month') return 'The heavy arena of your actual career and societal environment';
+    if (pos === 'Year') return 'The instinctual habits formed since your childhood';
+    return 'The reserved silent garden keeping your private dreams and secrets';
+  }
+};
 
+function getDynamicPositionExplanationKo(
+  pos: 'Day' | 'Month' | 'Year' | 'Hour',
+  char: string,
+  type: 'stem' | 'branch',
+  dayGan: string
+) {
+  // STEMS (天干)
+  if (type === 'stem') {
+    switch (char) {
+      case '甲':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "하늘을 향해 곧게 수직으로 뻗는 큰 나무처럼, 남의 눈치나 불필요한 규칙에 얽매이지 않고 오롯이 나만의 굳건한 주간과 소신을 지키며 살아갑니다. 타인이 먼저 제안하거나 깔아놓은 안전한 방식보다는 내 스스로 맨 땅에 새로운 우물을 먼저 파내는 행동파 주도성이 나라는 사람을 지켜주는 가장 원초적인 활력소입니다.",
+            innateDesire: "누군가 나를 함부로 평가절하하거나 무기력하게 통제하려 들 때 본능적인 거부감과 오기가 강하게 솟구치며, 세상 속에서 내 개성과 당당한 가치를 확실하게 증명하여 독보적으로 지지받고 싶어 합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "대외적이고 공동체적인 사회 무대에서 활동할 때, 주눅 들거나 망설이기보다는 과감하게 한 발자국 먼저 내딛고 큰 설계와 솔선수범을 추구하여 자연스럽게 사람들을 모으는 능동성을 보입니다. 가볍고 얄팍한 기교보다는 우직하게 내 맡은 책임을 다해 가치 있는 결과물을 직접 증명하려는 성향입니다.",
+            innateDesire: "비굴하게 남의 지도를 억지로 받아 수동적으로 등 떠밀려 움직이는 모양새보다, 내가 주관하고 주도하는 완벽한 추진 구도를 당당히 선포하여 주도권을 안전하게 확보하고 실속을 일궈내고 싶어 합니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "말수가 없거나 고독한 개인적 사색 영역에서, 언젠간 오롯이 나의 순수한 지혜와 기발한 설계만으로 거대한 집이나 성공의 깃발을 완성하겠다는 원대한 목표와 끈끈한 기획력을 간직합니다. 나이가 들수록 허망하게 소멸하지 않고 더 단단하게 신뢰받는 존재가 되고 싶어 합니다.",
+            innateDesire: "순간의 요란함이나 허황된 겉치레 칭찬에 현혹되지 않고, 일생의 최종장에서 참으로 가치 있고 나다운 명예를 오손도손 거두어 완성하겠다는 단호함이 조용히 살아 숨 쉽니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어릴 때 자라난 무의식이나 환경으로부터 내 안 깊숙이 '언제든 주눅 들지 말고 떳떳하며 먼저 앞장서는 리더십을 갖추어야 생존한다'는 주체적이고 늠름한 신조가 평상시 표면적 태도로 툭 튀어나옵니다.",
+            innateDesire: "얄팍한 눈치 싸움이나 편법으로 세상을 요령 피우며 살기보다는 정직하고 올곧게 나를 투영하여, 마침내 누구도 무시 못 할 든든한 기준점으로 존재하고 싶어 합니다."
+          };
+        }
+      case '乙':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "바위를 칭칭 휘감고 기어이 대지를 푸르게 뒤덮는 영리한 생명력처럼, 거친 세파나 혹독한 자갈길을 만나도 유연하게 활로를 찾는 영민한 적응력이 뼈대에 배어 있습니다. 표면적으로 부드러워 보이지만 속내엔 끝끝내 생존해내고야 말겠다는 주체적이고 질긴 생명력을 간직하고 있습니다.",
+            innateDesire: "내 여린 정서를 안심하고 기대며 조화롭게 수용해 줄 따뜻하고 안전한 동반자와 환경을 평화롭게 찾아 나서며, 그 관계 안에서 나만의 섬세한 디자인과 영감을 오롯이 퍼뜨리려 합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "직무를 수행하고 조직을 조율할 때, 기싸움을 요란하게 걸며 칼날을 부딪치기보다는 부드러운 스킨십과 영민한 대화 처세로써 나만의 평화로운 아군을 촘촘히 섭외하여 실속과 권한을 무탈하게 챙겨가는 아주 노련한 현실 감각의 소유자입니다.",
+            innateDesire: "나만의 의견을 억지로 관철하기 위해 고함을 치는 대신, 동료들과 정서적인 공감대를 넓고 우아하게 가구어 누구도 불편하지 않은 가장 자율적인 방향으로 서서히 분위기를 유도해내는 것입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "나만 조용히 영유하고 꿈꾸는 개인적 이상향은, 복잡하고 피로 가득한 경쟁 무대에서 완전히 멀어져 고즈넉하게 나만의 아기자기하고 품격 높은 예술과 여유를 즐길 수 있는 작고 아담한 나만의 비밀 정원을 설계하는 것입니다.",
+            innateDesire: "인생 후반부에는 굳센 책임의 사슬들을 가볍게 내려두고, 마음껏 수채화를 그리듯 자유로이 여행하며 사랑하는 소수의 지인과 다정히 온기를 나누는 꿈을 키워갑니다."
+          };
+        } else {
+          return {
+            coreIdentity: "첫 관계나 평소 모습에서 나도 모르게 은은하고 싹싹하며 온화한 매력이 비추어집니다. 상대방에게 먼저 경직된 거부감이나 차가움을 주지 않는 친절함이 먼저 말을 걸어옵니다.",
+            innateDesire: "세상을 공격의 무대로 날 세우는 우매함을 피하고, 마주하는 타인들의 긴장을 따뜻하게 무장 해제시켜 나와 우리를 안전히 살릴 조력자들을 곁에 잔잔히 영입하는 일입니다."
+          };
+        }
+      case '丙':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "사방으로 눈부시게 밝은 열을 뿜는 한여름의 햇살처럼, 매사 한 점 꿍꿍이나 음모가 없이 솔직하고 뒤끝 없는 성정을 자랑합니다. 성격의 명함이 표정에 고스란히 정직하게 드러나며 어딜 가나 눈물겹게 분위기를 살리는 활약의 전도사입니다.",
+            innateDesire: "스스로가 존재감을 환히 발휘하고 세상을 유쾌하게 가이드할 때 가장 큰 인생의 기쁨을 느낍니다. 주눅 든 채 가림막 뒤에 감추어져 침잠하는 것을 극심하게 거부합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 생활을 수행함에 있어 자잘한 이권 계산이나 뒷말들을 완전히 초월하여, 대외적으로 쾌활하고 대범하며 화통한 분위기로 조직의 미래 방향을 정당하게 밝혀 나가는 핵심 주주이자 가치 수호자가 되고자 분투합니다.",
+            innateDesire: "지루하고 침체하여 갈 길을 잃은 어두운 공동체 분위기 한가운데서 거침없는 동력과 희망찬 비전을 선명히 투영하여 내 카리스마와 지혜를 높이 공인받으려 하는 불꽃의 소유자입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "마음 가장 은밀한 꿈의 상자 뒤에선, 세상에 전혀 유례를 찾기 힘들 만큼 기발하고 아름다운 크리에이티브한 대박의 꽃을 피워 세상을 놀라게 하고 싶은 기획이 끊임없이 연소하고 있습니다.",
+            innateDesire: "보통의 직장에 안주해 늙기보다는 갈수록 더 찬란하고 뜨거운 정신의 유산을 남겨, 세상을 떠난 뒤에도 여전히 온기를 나누는 위대한 전설로 기억되고 싶다는 순수한 열망입니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어릴 적부터 사물을 바라볼 때 희망찬 좋은 면을 먼저 영매하게 찾아내어 웃음 지으려 한 긍정의 유전자가 배어있습니다. 그리하여 첫인상이 시원시원하고 열려있어 호감을 쉽게 자아냅니다.",
+            innateDesire: "우울하고 질척대는 고민들에 깊이 빠져 허우적대기보다, 모든 고난을 대범하고 가벼운 유머로 거침없이 살라 버리는 세상의 건강한 햇살이 되어 지침을 보존하려 하는 일입니다."
+          };
+        }
+      case '丁':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "외진 길을 따뜻이 헤쳐 비춰 기어이 살려내는 어둠 속 길잡이 촛불이나 고결한 밤하늘의 은하수처럼, 소박해 보이는 외면에 비해 상상을 초월하는 매서운 통찰과 극상의 진정성을 간직한 탐구자입니다. 거짓이나 피상적 허세를 가차 없이 고발하는 차분한 강단을 품었습니다.",
+            innateDesire: "얄팍하고 시끄러운 가십 관계를 정리하고, 참으로 영혼의 주파수가 다정하게 일치하며 서로의 세부 아픔까지 온전히 귀히 담아 기댈 수 있는 극소수의 내 편을 끝끝내 찾고 지켜내길 갈망합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "커뮤니티와 직장 속에서 일을 조율해 낼 때, 도저히 기적 같은 대량 기계 생산보다도 오직 장인 정신마냥 사소한 모순 구석이나 마디의 결점을 끝까지 잡아 고쳐내어 최고 완성도로 가공해 발매하는 숨은 장인의 비범함을 드러냅니다.",
+            innateDesire: "요란하게 나팔을 부는 리더 옆에서 묵묵하지만 사실상의 완결적 구도를 총괄하며, 그 누구도 대행하거나 빈 공간을 메울 수조차조차 없는 디테일 비서 실세 권력의 자존심을 유지하는 일입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "가면 아래 단단히 밀봉한 평생 꿈은, 복잡한 사회적 소유욕을 버린 채 오로지 한 두 가지 지극히 신성한 지혜를 극단에 다다르게 연마해 고요히 간직하는 외로운 지혜의 수호신적 태도입니다.",
+            innateDesire: "세간 사람들의 잡다하고 비정상적인 탐욕에 피로를 소실함 없이 온축한 영감을 바탕으로 나이 들어서도 사막 한가운데서 소수 정예의 참된 삶의 안내지가 되고 싶어 합니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어릴 때 경험한 사랑과 신중함으로부터 사람 마음속 아주 작은 흐름이나 기색도 금세 탐지해 내는 남달리 깊고 조심스러운 배려력이 자율 작동합니다. 첫인상이 참으로 단정하고 믿음이 갑니다.",
+            innateDesire: "경솔하게 다가와 선을 가볍게 넘는 행위들을 거르고, 서로의 품격 어린 마음을 오랜 세월 차근차근 확인하며 일생을 다 걸어 함께 수호할 단단한 울타리를 가꾸길 바랍니다."
+          };
+        }
+      case '戊':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "비바람이 아무리 모질게 몰아쳐도 억만 년간 같은 자리를 평화롭게 사수하는 거대한 산맥처럼, 마음의 바탕이 한없이 무겁고 견고하며 높은 믿음을 주는 안식처입니다. 내 가둔 가치관이나 지켜야 할 사람들을 끝까지 단호히 엄수하는 등대입니다.",
+            innateDesire: "내가 설계한 안전 영토와 바운더리가 흔들거리거나, 소중한 내 사람들이 방황하며 나를 신용하지 않고 떠나가는 파란을 본질적으로 거세게 저항하며 수호하려 합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 직책이나 사업에서 일을 장악할 때 조바심을 다 씻어내어 묵직하고 믿음직하게 전체 판도를 중재하는 기둥 역할을 충실히 행합니다. 매 순간 임기응변보단 오랜 신용과 정직 가치로써 결국 타협을 이끕니다.",
+            innateDesire: "많은 이들이 서로 시기 질투하고 소용돌이를 격하게 일으키며 방황하고 있을 때 정당하게 중심을 지키고 우뚝 서, 세간의 모든 기류와 재물을 믿음의 안전지대로 착실히 흡수하려는 듬직한 지향성입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "사적인 내부 은신실 안엔, 내 일생의 소용돌이를 다 겪고 난 뒤에도 털 끝 하나 무너지지 않을 만큼 안전하고 확실하며 굳건한 평생의 바위 영토를 비장하게 축조하고 있습니다.",
+            innateDesire: "눈앞의 트렌드나 반짝 인기에 흔들리지 않고 생의 후반까지 나만의 깊고 드높은 산성을 유지하여 모든 이들이 안주해 길을 묻는 어진 스승이나 태두로 기어가 영광을 보존하고픈 야망입니다."
+          };
+        } else {
+          return {
+            coreIdentity: "가문의 유산이나 환경 무의식 속에 매사 여유를 충분히 두고 차분히 주위 기세를 아우른 태도가 깊이 베여있습니다. 그래서 첫 가동에서부터 듬직한 포용력이 크게 흘러나옵니다.",
+            innateDesire: "아이처럼 변덕 부리지 않고 굳센 안목을 보여줌으로써, 동료나 소수 지인들이 주저함 없이 나에게 고뇌를 의탁할 보금자리가 되어 주고 싶어 합니다."
+          };
+        }
+      case '己':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "온갖 씨앗을 소리 없이 안아 마침내 풍성한 숲으로 길러내는 너그러운 전답처럼, 헛된 야욕을 피하고 일상적인 사람들과 관계를 정성스레 양육하는 다정다감하고도 영민한 모성 성향입니다. 낭비와 비실용을 기피하고 내실의 성공을 세워갑니다.",
+            innateDesire: "남들의 입에만 발린 요란한 허풍이나 가상 대박보다 차곡차곡 모아 내 손으로 완전하게 통제하고 만질 수 있는 확실한 자산과 온기 가득한 주거 가치를 지속 수집하고 싶어 안달합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "직장에서 생활할 때, 동료들의 실력과 단점들을 누구보다 세밀히 진단하여 가장 안전하고 생산성이 극대화되는 명확한 가이드라인을 이식해 주는 최고의 전략 전문가 자질을 완연히 드러냅니다.",
+            innateDesire: "내가 이룩한 알짜권력과 양질의 자원을 철저히 수호하되, 대외적으로는 누구에게나 한결 상냥하고 싹싹하게 연대하여 기류를 완전하게 주무르고자 하는 총명한 내실 지향입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "고요한 혼자만의 일기장에 키우는 평생의 로망은, 시끄러운 빌딩숲의 전투를 다 끝낸 뒤 가장 따뜻한 보금자리에서 나만의 지혜로운 화초와 취향을 기르며 평온을 돌보는 일입니다.",
+            innateDesire: "인생 후반부엔 비루한 수다쟁이들의 질투를 피해, 지극히 아늑하고도 실용적으로 완벽한 나만의 영토에서 하루하루 실속 어린 편안함을 찬란히 수확하겠다는 마감 기획입니다."
+          };
+        } else {
+          return {
+            coreIdentity: "자란 과정 속에서 매정하게 실수를 행하지 않고 차분히 앞길을 확인하는 치밀하고 영명한 처세가 가풍으로 몸에 안착했습니다. 어디서든 귀엽고 실수가 없는 단정함을 풍깁니다.",
+            innateDesire: "사서 고생하는 영토 싸움에 휘말리지 않으며, 내가 감당할 수 있는 확실한 바운더리로 힘을 좁혀 그 안의 행복과 평화를 이성적으로 공고히 약속받으려는 태도입니다."
+          };
+        }
+      case '庚':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "뜨거운 화로에서 단단히 가다듬어진 한 자루의 굳센 철기처럼, 의리와 규칙을 최고 가치로 여기고 한 번 결심한 목표는 절대 굽히거나 모호하게 타협지 않는 곧고 시원한 영혼입니다. 비겁한 꼼수나 헐거운 연대를 미워합니다.",
+            innateDesire: "매사 애매모호하게 흐릿하여 시비조차 못 가리며 헤매는 상황을 답답해하며, 확실하게 선을 그어 진실과 정의, 내 사람들의 안전 지침을 철두철미하게 완수하고자 비장히 달립니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 생활 영역 속에서 비굴하게 주위 눈치나 상사의 비위를 억지로 맞추려 에너지를 낭비하지 않으며, 공동체의 썩은 부위나 무능을 과감히 도려내 완전히 교통정리 해 마치는 단호한 집행자 기질을 선봉에 세웁니다.",
+            innateDesire: "내가 실천한 일관성 높은 투지와 탁월한 기율을 주변 사람들이 진정 높이 평가하여 어른스러운 권위를 무탈히 지키고, 불공정한 협력의 모순들을 영명하게 격하시키는 일입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "아무에게도 굳이 발설 않는 마음속 최종 위업은, 기어코 거친 난관 중심을 가로질러 나만의 명확한 정의 시스템을 완성하고 평화와 질서를 복구해 마치는 영웅적 설계입니다.",
+            innateDesire: "인생길 끝까지 유약하게 빌어 연명하지 않으며, 갈수록 더 매섭고 훌륭한 노장의 힘을 과시하여 후배들에게 무너지지 않는 큰 이정표가 되어주겠다는 의의를 간직합니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어린 날 자랄 때 성미 급하고 도덕 의무를 최고 가치로 훈계하던 환경 혹은 가품 아래 단련됐습니다. 그래서 첫인상에 위엄이 서려 있으며 함부로 경거망동하기 어려운 포스를 지녔습니다.",
+            innateDesire: "가벼운 감정적 대화나 기분 맞춤을 거부하고, 참다운 진실과 약속을 두 손에 단단히 쥐고 신용함으로써 묵직한 가치를 한 평생 뻗어가겠다는 결심입니다."
+          };
+        }
+      case '辛':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "완벽의 장인 정신으로 정교하게 컷팅된 영롱한 사파이어 보석이나 조밀한 메스처럼, 타인들과 뭉뚱그려져 평범한 도토리로 묻혀가는 것을 극도로 기피하는 유니크함의 결정체입니다. 남들이 흉내조차 못 낼 초격차의 세련됨을 엄수합니다.",
+            innateDesire: "오직 나만이 지닌 영민하고 디테일 높은 감수성과 품질 감각을 완전하게 조명받고 공인받기를 희망하며, 내 스스로 빚어낸 세상 모든 흔적에 단 일 점의 오차나 부진도 용서치 않는 치밀함입니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "직공 생활과 세속 업적 영역에서 일할 때 덤벙거리거나 '이 정도면 대충 됐다'는 방치와 타협에 속울렁증을 앓아눕기에, 백 점 만점의 퍼펙트한 밸런스와 오점 없는 매듭으로 동료들 앞에 우뚝 서려 애씁니다.",
+            innateDesire: "얄팍하게 물량이나 요란한 무대로 시선을 끄는 게 아니라, 누구도 도달 못한 완벽한 정교함으로써 독보적인 스페셜리스트의 금테 전속 직함을 독차지하여 살아남는 것입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "골방 안의 나만 지닌 오랜 야망은, 기계적 소음이 가득한 장터에서 빠져나와 나만의 유려하고 보배로운 서재나 작품 하나에 진득히 침전해 기어이 완성시키고 마는 단호함입니다.",
+            innateDesire: "생의 마지막 일기장 페이지에, 단 세 줄의 보잘것없는 수다도 오점 없이 정순하게 정돈되어 참으로 기막힌 아름다움이었노라 완결 짓고 마는 예술주의자 신조입니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어릴 때부터 사물이나 관계의 사소한 모순을 금세 귀신같이 가려내는 청명한 통찰과 감수성이 다져졌습니다. 차분하고 지적으로 정돈된 완벽한 첫 느낌이 기분 좋습니다.",
+            innateDesire: "아무하고나 쉽게 어울러 내 격조를 스스로 소실하지 않으며, 내 진정한 가치와 기준 높이를 다정히 존중하는 귀한 선배들에게만 신용을 통째로 이식합니다."
+          };
+        }
+      case '壬':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "그 어떤 엄격한 제방에도 결국 길을 비집어 기어이 대 바다로 웅장히 유입하고야 마는 도도한 대하처럼, 끝없이 변화하고 새로운 지혜 지평선으로 나아가려는 총명한 지적 탐구심의 소유자입니다.",
+            innateDesire: "어떤 협소한 상자곽이나 숨 막히는 전통 규율 속에 꼼짝달싹 못 하게 길들임 당하는 것을 온몸으로 격렬히 밀쳐내며, 광활한 생의 자율 자유를 힘차고 유려히 갈망합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 무대에서 일을 영위함에 있어 당장 눈앞의 사소한 일희일비에 목매지 않으며, 먼 훗날의 거대한 파도 높이와 시장의 대세 기류 변화를 한눈에 헤아려 판을 먼저 기획 전개하는 사령탑의 지혜입니다.",
+            innateDesire: "평생 사소한 임원 자리에 연연하기보다는, 드넓은 내 독창적인 신생태계를 활짝 열고 영리하게 다듬어, 비바람이 불어도 돈과 사람의 기류가 결국 나를 중심으로 흐르도록 강물을 트는 일입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "내부 가두리에 깊이 잠구어 둔 최종 기획안엔 세상을 입체적으로 여행하며 나만 알 양질의 원초적 철학들을 웅장하게 영유하는 마음의 도전을 굳게 지킵니다.",
+            innateDesire: "속박이 가득한 외계의 타이틀들을 마지막 찬스에 통째로 털어 벗고 드넓은 무한 가치의 우주 속으로 영혼을 편안하고 풍족히 해방해 마치는 노년 완성입니다."
+          };
+        } else {
+          return {
+            coreIdentity: "무의식 속에 지혜롭게 전체 상황을 멀찍이 비장히 관조하려 한 대인배 가풍이 서렸습니다. 그리하여 평소 태도가 매우 느긋하고 속에 깊은 심지가 고요히 영글어 관찰됩니다.",
+            innateDesire: "얄팍한 장벽이나 고집들에 길막힘 당하지 않고, 매사를 부드럽게 흐르는 물결을 빌어 최종 승리 지점에 안전하고 유연하게 미끄러져 들어가고자 하는 영민함입니다."
+          };
+        }
+      case '癸':
+        if (pos === 'Day') {
+          return {
+            coreIdentity: "이슬비나 안개비가 조용히 마른나무들을 적셔 마침내 대지를 소생시키듯, 대놓고 고함을 치지 않아도 사람들의 마음속 깊은 결까지 우아하고 정밀히 스며들어 변화를 유도해내는 지고지순한 지혜림의 연출가입니다.",
+            innateDesire: "피상적이고 얄팍하게 소리만 높이는 무식함에 뼛속 깊이 거부감을 보존해두며, 일생토록 감추어져 숨은 세상의 본질과 은밀한 진리를 영명하게 통찰하고픈 욕구가 유난히 작동합니다."
+          };
+        } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 협업과 관계를 전개할 때 거친 독재 권력처럼 사람을 윽박질러 겁박하기보다, 그들의 가장 내밀하고 외로운 감정의 결함을 정교히 도닥이며 무탈히 동맹군으로 거두는 은밀한 치유사 기풍입니다.",
+            innateDesire: "외부에는 양처럼 한없이 온화하고 부드럽게 협력을 나누나, 실은 사소한 핵심 동향과 기류를 속속들이 분석하여 늘 대체 불가능한 중심 기획 카드로 조용히 실권을 장악하는 삶입니다."
+          };
+        } else if (pos === 'Hour') {
+          return {
+            coreIdentity: "자아 깊숙이 숨어 숨 쉬는 최종 기획은, 평범한 세속 가치를 완전히 이격시킨 채 오직 누구도 넘보지 못할 정결하고 맑은 지적 상아탑을 은밀히 가꾸고 완결 짓는 영험과 예술입니다.",
+            innateDesire: "내 생각의 기령이 단 한 점의 속세 모순에도 흠집 없음만을 평생 수호하여, 노년에는 세상에서 가장 정결하고 향기 청청한 나만의 보배로운 성을 지켜 마감하길 동경합니다."
+          };
+        } else {
+          return {
+            coreIdentity: "어릴 적 생활 속에 무의식적으로 '말보다 생각이 먼저여야 안전하다'는 신조가 배었습니다. 그래서 첫인상에 지극히 지적이고 다정하면서도 섣부른 발을 먼저 디디지 않는 안전함이 투명합니다.",
+            innateDesire: "의견 차이로 고장 난 이들과 불필요하게 날 세워 충돌하지 않고, 물의 조용하고도 비장한 침투력을 빌어 내가 갈망한 목표를 결국 고요하고 완벽히 점령해내는 가치를 중시합니다."
+          };
+        }
+      default:
+        return {
+          coreIdentity: "우주 속에 스민 조화로운 성품으로 차분히 전개해 나갑니다.",
+          innateDesire: "안정과 번영을 실천하며 주변과 조화롭게 공존코자 약속합니다."
+        };
+    }
+  }
+
+  // BRANCHES (地支)
+  switch (char) {
+    case '子':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "고요히 흘려 내리는 깊은 사색의 물결처럼, 세상 소음을 멀리 두고서 혼자 사색하며 생각에 깊이를 더하는 사적인 골방을 가장 신성하게 여깁니다.",
+          innateDesire: "나만의 고결한 쉼의 공간과 소중히 아끼는 비밀의 가치가 남들에게 모욕당하거나 어리석게 해석당하는 것을 극단적으로 경계하며 가치를 보호합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "직무 환경 속에서 일을 정렬할 때 어설프게 기분을 내 오지랖 부리기보다, 오롯이 혼자만의 비장의 논리와 정확한 원천 기술을 심야에 다듬어 입증하는 영명한 해결사입니다.",
+          innateDesire: "실적 한 점 없이 지껄이는 겉핥기식 요설을 차치해 버리고, 오로지 마스터키 같은 날카로운 성취로써 입지를 완고하고 자립적으로 장전하는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "마음속 소원 상자 안엔, 노년의 시기에 그 어떠한 얄팍한 시장의 평판도 신경 끄고 은밀하지만 보석 같은 내 사색 결과로 소중히 채워 넣는 야심을 보존합니다.",
+          innateDesire: "침침하고 우둔한 세간 무리에 휘말리지 않고, 영혼의 깨끗함과 드높은 인식을 끝까지 잃지 않고 마는 영명성입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "자라온 경험에 어떤 세풍 불화가 와도 스스로 먼저 내면의 깊은 곳을 우아히 성찰하며 자기를 돌아보는 든든한 면역과 지혜가 자율 안착했습니다.",
+          innateDesire: "다짜고짜 서둘러 일을 그르치는 우매함을 버리고, 차분하게 다음 대적을 준비하며 명징한 바다를 영미하게 선도하는 일입니다."
+        };
+      }
+    case '丑':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "겨울 한복판에도 봄을 은밀히 머금고 온축하는 견고한 인내심처럼, 어떤 풍파 속에서도 무릎 꿇지 않고 단단히 이겨내는 위대한 회복력과 뒷심을 보유하고 있습니다.",
+          innateDesire: "남들의 섣부른 조언이나 포기 권유에 굴복하기를 거부하며 오직 내 굳센 결기와 꾸준한 실천만이 유일한 삶의 보물이라 신용합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "사회적 무대에서 일을 다치지 않게 책임질 때, 남들이 어렵다 꽁무니 빼고 도망치는 복잡하고 굳은 난관도 조용히 어깨에 얹고 끝끝내 실현 자산을 캐내는 끈기를 보여줍니다.",
+          innateDesire: "겉보기에만 번듯하고 실속은 다 가짜인 유행에 영혼을 기탁하기보다 내일의 평화를 준비하는 씨앗 자산을 땅밑 한 평이라도 더 소유하려는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "깊은 개인 금고 저편엔 생의 마지막까지 절대로 결딴나지 않을 듬직하고 확실한 한 가지 우량 자산을 간직해 두고자 하는 장기 저축 신조입니다.",
+          innateDesire: "거친 시련 속을 뚫고 지내온 만큼 내 노년에는 어떤 폭풍에도 안전한 단단한 성곽을 세우고, 내 귀한 이들을 살릴 듬직한 항구를 간직하는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어릴 때 다소 참아야 이익을 본다는 정밀한 성찰 분위기 속에 자랐습니다. 차분하며 듬직함 속에 은연중 따스한 충절의 의를 품고 나옵니다.",
+          innateDesire: "경도되어 남들에게 억울함을 비굴하게 호소하지 않고 온 마음과 실력의 성장을 마쳐, 임기 도달 시 단번에 보물이 터지듯 실적을 입증하는 일입니다."
+        };
+      }
+    case '寅':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "새벽녘 정적을 힘차게 찢고 들판을 가르는 아침의 고고한 결기처럼, 매사 남의 들러리가 되지 않고 오직 나부터 선두 주도하여 돌파해야 성미가 풀리는 기상을 지녔습니다.",
+          innateDesire: "이미 안전하게 누군가 규정한 답답한 규칙들을 해체해 버리고 직접 미지의 광야에 내 발로 첫 도장을 찍어 마치는 선봉장 기상입니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "사회적 커리어 한가운데서 주춤거리지 않으며 대담한 속도로 일을 벌이고 단숨에 지휘의 큰 뼈대를 만들어 동료들을 맹렬히 견인하는 통솔 본능이 눈부십니다.",
+          innateDesire: "지루한 구습에 얽매여 서로를 지체시키는 미련한 태도들을 혁파해 버리고, 내 책임과 결단만으로 새로운 전성기의 막을 선언하는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "내부의 고요한 상자 속 꿈은 영구히 늙지 않는 총명한 모험가로서 세상에 매번 기상천외한 도전과 기획을 펼쳐 성취하는 소년의 자아를 아끼는 것입니다.",
+          innateDesire: "인생길 전체에 그 어떤 의욕 소실도 침범하지 못하게, 영원한 개척 열기를 가득 충전하여 결국 내 이름을 세상 한복판에 기둥 깊이 새겨 마치는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어린 날 자랄 때부터 '우물쭈물하다 기회를 가로채인다'는 무의식의 굳건한 신조가 서렸습니다. 평소 성향이 활기 가득하고 매우 빠릿빠릿합니다.",
+          innateDesire: "말만 헐하게 지껄이며 판을 질질 끄는 군상들을 정리하고, 웅장한 몸짓 하나로 기선 제압을 완치하여 입지를 고정하는 일입니다."
+        };
+      }
+    case '卯':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "바위틈에서도 싹을 밀치고 올라 기어이 봄을 알리는 고양이처럼 총명하며, 오직 나다운 감성과 영감의 기준을 지고히 고집해 가꾸어내는 조용하고 주체적인 개인의 자태입니다.",
+          innateDesire: "남들의 얄팍한 조언이나 구식 표준에 수동적으로 영혼을 섞이지 않으며, 내 손으로 내 마당을 아름답게 장식하며 자유롭게 노닐기를 바랍니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "직무 환경에서 똑같은 기계형 노정에 에너지를 소진하기보다, 나만의 미적 감수성이나 기민한 기획 촉을 빌려 뛰어난 실속을 수채화마냥 가공해내는 창조성입니다.",
+          innateDesire: "수직적인 완강한 권력 구조에 가위눌려 꼼짝없이 굴종하기를 거절하며 기지 높은 장기로써 자수성가의 영예를 개통하는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "굳이 꺼내 보이고 싶지 않은 이상향은, 가장 소박하면서도 완벽하게 꾸며진 나만의 오붓한 공간에서 영영 가치 있는 영감들을 돌보는 일입니다.",
+          innateDesire: "외부의 모진 날씨와 피곤함에서 멀리 도망쳐 오직 내 마음이 제일 기뻐하는 단 몇 가지 취미나 학업에 평평히 집중할 생을 소망합니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어릴 때부터 사소한 간섭에도 마음의 자물쇠를 단단히 잠그는 생존 지혜가 예리하게 익혀졌습니다. 첫눈에 산뜻하고 호감을 주는 영민함입니다.",
+          innateDesire: "무거운 지침을 다짜고짜 몰아붙이는 행동을 유연히 미끄러져 피하고, 내 마음에 드는 가벼운 속도로 이슬길을 명랑히 걸어 나오고자 합니다."
+        };
+      }
+    case '辰':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "눈앞의 구름을 모아 천하를 움직이려 숨 고르기 하는 안목의 대가처럼, 조용히 내면의 모든 비책들을 거대하게 온축하는 대기만성형의 웅장한 주체성을 숨겨둡니다.",
+          innateDesire: "평범하고 지루한 자질구레한 노정에 사로잡혀 무기력하게 녹슬기를 거절하며 단 한 고비 결정적인 하늘 무대에 도약하기를 항상 예리하게 도모합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "커뮤니티 속에서 낡은 관행과 정체를 단숨에 씻어내고 놀랍도록 큰 전환 가치를 일으켜 세우는 최고 해결사이자 기린아의 자존감을 지향합니다.",
+          innateDesire: "누군가 지인 지시를 소극적으로 대행해 치장하기보단 복합적인 큰 기획을 총괄 지휘하여 드넓은 현실 대세를 내 손안에 가두어 흔드는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "비장하게 간직한 일생 의지는 거센 폭풍 같은 기회가 도래한 날 단 한 번의 움직임으로 세상의 구도를 온전히 변화시킬 웅대한 전략을 품는 것입니다.",
+          innateDesire: "사소하고 자잘한 우환에 낭비함 없이 오직 단 한 번 진정한 기회의 산맥에 내 모든 평생 자취를 정성스레 수놓아 가치를 공인받는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "무의식 속에 세상을 크게 헤아리는 호방한 의지와 큰 도량 신념이 안치됐습니다. 위기가 올수록 웅장한 활력이 툭 드러나 앞장섭니다.",
+          innateDesire: "우둔한 시비 조각들을 비웃으며 한 단계 높이 입체적으로 판을 가공해 인민의 앞뜰에 진수성찬을 안겨주고자 하는 일입니다."
+        };
+      }
+    case '巳':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "감정을 함부로 퍼뜨려 요란 떨지 않으며 차분한 눈빛으로 판을 다 관찰 조율한 뒤에 움직이는, 매우 실속 있고도 완벽한 현실 이성의 대가입니다.",
+          innateDesire: "내 생각이나 사생활의 정밀한 선들이 외인들의 경솔함에 휘청거리는 걸 무엇보다 경멸하며 완전하고 격조 높은 질서만 엄수하려 듭니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "커뮤니티 환경 속에서 분종이 터질 때 혼자 차갑게 원인을 해부해 최소 동력으로 최고 이점과 열매를 거머쥐는 뛰어난 총참모 자질을 지향합니다.",
+          innateDesire: "일말의 실속 없는 말장난에 흔들리지 않으며 오직 참다운 현실 수치를 안전하게 보수하여 나만의 탄탄한 영토를 확보해 놓는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "사색의 방 깊숙한 곳엔 가벼운 세속 정보들을 완전히 뒤엎어 오롯이 나만 소유할 독창적인 무형 보물(지식, 비책)을 축재하는 지혜가 서렸습니다.",
+          innateDesire: "말만 화사한 이들과의 영양 없는 소통에서 진작 마음의 선을 은퇴시킨 채, 이성의 눈으로 말년의 풍족한 자생지 기둥을 다듬는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "자란 기억에 기본적으로 '정확한 주소 확인 없이 한 발짝을 가볍게 떼면 길을 잃는다'는 신중한 판단 지능이 자율 안착했습니다.",
+          innateDesire: "실속 없는 섣부른 의무나 강박적 약속에 영혼 헐려 묶이지 않고, 매사 정확히 전후를 이성 계산하여 나를 수호하길 바라는 신조입니다."
+        };
+      }
+    case '午':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "한낮 태양 아래서 달리는 늠름한 명마처럼, 가면을 쓰거나 꿍꿍이부리길 증오하고 오직 곧고 화통하게 내 마음을 지르는 뒤끝 가공 제로의 진솔함입니다.",
+          innateDesire: "내 속에 꿈틀대는 다정함과 사랑의 불길이 침울한 옛 시샘 속에 가두어짐을 격렬히 피하며 마음껏 드러나 꽃피기를 바립니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "직장 속의 해묵은 침체를 명랑히 소멸시키며 동료들에 한결 시원스러운 유쾌 동력을 충전해 안겨주는 영웅적 분위기메이커의 기풍입니다.",
+          innateDesire: "나를 소외시키거나 시샘하는 세력을 과감한 의리로 돌파하며 환하게 대세를 지휘하는 데 최대 가치를 세우는 가슴입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "고운 마음속 최종 야망은 내 눈부신 불 한 조각이 세상의 가장 명정하고 순수한 밤길 등불이 되어 노년의 가치 교본을 세우는 일입니다.",
+          innateDesire: "시세에 따라 손바닥 뒤집듯 기생하는 위선을 부수고, 처음부터 끝까지 올곧은 신념 하나를 등불 기둥마냥 공고히 간직해 마치는 기획입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어릴 때 성장 과정에 투명하고 뒤끝 없는 따스한 정직성이 심장에 뿌리를 가동했습니다. 기쁠 땐 명확히 기쁘고 걸릴 땐 바로 튀어나와 털어버리는 정직입니다.",
+          innateDesire: "소심하게 자잘한 음모나 뒷말을 일삼는 어리석은 세력을 힘찬 몸짓 하나로 뚫어 버리고 대낮처럼 명징한 생을 개방해 가는 일입니다."
+        };
+      }
+    case '未':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "뜨거운 벌판 위에 그 어떠한 바람에도 내 속의 마르지 않는 자산과 가치관을 성벽마냥 철통 수호하는 완전한 끈기 수호자입니다. 헛멋을 거르고 소박한 이점만을 아낍니다.",
+          innateDesire: "남들의 입에만 발린 요란한 영양가 없는 빈말보다 오직 내 가둥 울타리 안에 뚜렷이 쥐어지는 확실한 결실과 밥그릇 보장을 평생 바립니다."
+        };
+      } else if (pos === 'Month') {
+          return {
+            coreIdentity: "사회적 커리어 속에서 감정 과소비로 이권을 잃는 우매함을 사전에 도려내어, 오로지 한 푼 한 푼 꼼꼼한 수익성을 엄밀히 설계해 마치는 우람한 현실 저력입니다.",
+            innateDesire: "반짝하고 금세 꺼질 유행 기사화 성공보다 인생 전체 최악 한파가 몰아쳐도 끄떡없이 유지될 나만의 탄탄 자산지를 완성해 안착하는 일입니다."
+          };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "인생 후반의 웅대하고 맑은 소망에 헛된 소동을 몰아낸 채, 소중하게 일군 나만의 알짜 보물을 듬직히 가두어 영원한 안주를 세우는 완성입니다.",
+          innateDesire: "인생길 최종장에 보잘것없는 수다에 피로를 흘리지 않고, 평생 성실히 이룩해 모아온 보배로운 자가 결실만을 조용히 지키고 마는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어릴 때부터 사소한 낭비나 장식을 멀리하고, 속을 먼저 기르며 단단히 인내해야 진실 평화를 얻는다는 처세 실용 신조가 무의식에 안착했습니다.",
+          innateDesire: "내 생각에 귀 얇게 흔들어대려는 잔잔한 소음들을 일거에 은퇴시킨 뒤, 옹골찬 영토를 안전하게 보전하길 바라는 마음입니다."
+        };
+      }
+    case '申':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "새롭게 다듬어져 번뜩이는 예리한 칼날처럼, 매우 영명한 정보 계산 능력을 빌어 기회를 전광석화마냥 사냥해 마치는 민첩 전문가입니다.",
+          innateDesire: "느리고 답답한 고루한 고정 선배들에 매스 칼날을 대어, 가장 영리하고 세련된 아이디어 업그레이드 변화를 착수해 갈채 속에 주도권을 잡기를 원합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "직무 환경 속에서 일을 결산할 때, 꼬여서 풀기 힘든 오래된 모순들과 해묵은 과제를 깔끔하게 정렬시켜 최고의 수치 성과로 수립해 마치는 해결사입니다.",
+          innateDesire: "남들이 우왕좌왕 땀 흘리며 고민할 때 전격의 획기 구도를 제안하여, 공동체 내부에서 가장 핵심적이고 입체적인 스포트라이트를 지배하는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "비밀 소장실 속 간직한 참다운 소망은 한 자루 단도마냥 정교히 제련한 최고의 주특기로써 천하 누구도 기웃대지 못할 우수 자리를 점검해 수호하는 것입니다.",
+          innateDesire: "세월 가도 녹슬거나 연약해지지 않는 생생한 두뇌 기력을 축조해, 노후 한가운데서도 거침없이 전장의 해결 기지를 지혜롭게 과시하는 일입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "무의식 속에 '우물쭈물 대열에 서다간 단숨에 도태당한다'는 비장한 생존 스피드 직관이 성마르게 작동합니다. 차가우면서 엄청 기민합니다.",
+          innateDesire: "질척이며 엉거주춤 뒤꿈치나 걸어대는 이들을 사려 쳐내어 버린 뒤, 한 박자 빠른 기획력으로 매사 거뜬하게 최고의 성과를 독차지하는 일입니다."
+        };
+      }
+    case '酉':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "단 한 방울의 물방울 결함도 허투루 허락 않는 순도 백 프로의 다이아몬드 보석처럼, 극상의 고고한 품격과 날카로운 기준 기준을 완고히 수호하고 삽니다.",
+          innateDesire: "내 우려 높은 가치관이 단 일 점의 위선이나 모순으로도 흐릿하게 흐려지는 걸 미워하며, 매사 완벽에 완벽을 더한 결과물을 영명히 도망 가두려는 것입니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "사회적 무대에서 일을 진행할 때 어설픈 가짜 시늉을 정죄하여 치우며, 극강의 아름다운 정확성과 유니크 품질을 부여해 세간에 모범 교과서를 투영합니다.",
+          innateDesire: "평범하게 백 가지를 하기보다 오직 단 한 가지를 신의 경지 가치로 입증해 마쳐, 누구도 대체 불가능한 수령 영역을 직장 내 공인받는 일입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "아무에게도 굳이 선전하지 않는 밤 영토는 깊고 맑은 수정실 속에서 나만의 조밀한 장인 지각을 정교 연마해 유려 보존품을 빚는 것입니다.",
+          innateDesire: "모조품들이나 하등한 속물 탐심에 마음 한 자락도 더럽히지 않고 참으로 우아히 아름다운 내면 질서만을 수선해 갈 마무리 공정입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "자란 이력에 매사를 맑고 청정히 단련해야만 비로소 가치가 보전된다는 엄격 관찰 시선이 베였습니다. 기품 어린 지혜가 아름답게 반짝입니다.",
+          innateDesire: "아무에게나 보풀 섞인 미소를 실실 던져 가벼운 소실에 휩싸이지 않고 오로지 청순 가치 높은 기획 속 동지들에게만 굳센 신용을 입증합니다."
+        };
+      }
+    case '戌':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "눈앞의 자잘한 유혹에 흔들리거나 배신을 일삼지 않고, 언제나 내 신조와 귀한 마음, 의리로 사람들을 포근히 수호하는 충직 지킴이입니다.",
+          innateDesire: "나만의 청명 성역과 아름답고 고운 내 바운더리가 해악들로부터 훼손당함을 극열하게 저항하며 굳센 믿음 연대를 실천에 옮기길 희망합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "세상살이 한가운데서 다들 배 부른 배신으로 눈 멀 때 묵묵하게 조직의 기치와 원리를 굳건히 수호하여 신뢰 장군으로 등극하는 저력입니다.",
+          innateDesire: "사사로운 유행 이권에 침을 흘리기보다 진정 결정적 고난에 봉착한 날 기어코 나와 조직 전체를 건져 올릴 우직 보루로 완고히 기여하는 것입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "비밀 은사처 밑바닥엔 세상 비겁으로 도배될지라도 나만큼은 내 고결 신념 무덤 속까지 떳떳이 쥐어 가겠다는 위대한 수호신을 지킵니다.",
+          innateDesire: "조막만한 가상 배신으로 우애를 던지지 않고 마지막 날 내 삶의 역사관 앞에 가장 자랑스러이 떳떳한 소박 결치를 마련하려 듭니다."
+        };
+      } else {
+        return {
+          coreIdentity: "어릴 때부터 신의와 의무를 최고 가치로 다독이던 분위기 가품아래 길들여져 듬직함이 기본으로 베였고, 평소에 기둥 같은 신용을 안깁니다.",
+          innateDesire: "말바꿈을 밥 먹듯 행하며 위선 떠는 배반군들을 마음 분노로 고발하며 단단하고 따끈한 신뢰 신용를 수호하고자 하는 일입니다."
+        };
+      }
+    case '亥':
+      if (pos === 'Day') {
+        return {
+          coreIdentity: "드넓고 끝없는 심해 바다처럼, 세상 가벼운 겉말 뒤에 숨은 속내를 무섭도록 예리하게 가려내어 안아주는 기정 지혜가 서린 위대한 통찰자입니다.",
+          innateDesire: "얄팍하게 가면 뒤집어쓰고 시비를 다투는 시장바닥 관계에서 탈출해 나만의 무형 지혜 기지를 아름답고 자율성 있게 가두며 수용코자 합니다."
+        };
+      } else if (pos === 'Month') {
+        return {
+          coreIdentity: "비즈니스 지형 속 사소한 서류 이면 너머의 큰 대란이나 미래 파도 흐름을 귀신같이 읽어 영민한 숨은 실세 지참을 조용히 장전하는 자질입니다.",
+          innateDesire: "강압 수직의 딱딱한 규칙에 옴짝달싹 못 해 가위눌림을 거절하고, 은근 유연 침투하는 지혜로 공동체 최고 지혜 보좌로서의 위상을 구축하는 것입니다."
+        };
+      } else if (pos === 'Hour') {
+        return {
+          coreIdentity: "비밀 꿈속 저편엔 세상 보이지 않는 깊은 학업이나 진리 영험에 완전하게 자아를 통찰시켜 평화롭게 안식하는 영성 깊은 성취입니다.",
+          innateDesire: "세속의 피비린내 잔소리에서 영혼을 완전하게 세탁해 마쳐, 아주 광활하고 오목한 평온 기류 속에 영원히 안식하는 노후 기획입니다."
+        };
+      } else {
+        return {
+          coreIdentity: "온 누리에 평온 수용력을 베풀며 어떤 거친 다툼도 침착 수긍해 씻어 내리는 넓은 아량이 부지불식간에 다져졌고, 평소 든든함을 안겨줍니다.",
+          innateDesire: "자그마한 교율로써 내 삶 감시 동태 체크하려는 방해를 쓸려 넘기고, 드넓고 아늑한 물줄기를 빌려 영민한 유연 대범함을 실증코자 하는 일입니다."
+        };
+      }
+    default:
+      return {
+        coreIdentity: "조용하고도 우직하게 세상을 마주하며 본연의 걸음을 걷습니다.",
+        innateDesire: "나만의 소중한 울타리를 보살피며 건강하게 자립하고 공헌합니다."
+      };
+  }
+}
+
+const getStemDetail = (pos: 'Day' | 'Month' | 'Year' | 'Hour', char: string, dayGan: string, isKO: boolean) => {
+  const personality = STEM_PERSONALITIES[char] || { koName: char, coreIdentity: '', innateDesire: '', strengthInSociety: '', shadowSide: '' };
+  const infoEn = STEM_INFO_EN[char] || { coreIdentity: '', innateDesire: '', strengthInSociety: '', shadowSide: '' };
+  const tenGod = computeTenGodLocal(dayGan, char, true);
+  const tenGodHuman = humanTenGodMap[tenGod] || { titleKo: '고유성', descKo: '', titleEn: 'Uniqueness', descEn: '' };
+
+  const posNameKo = pos === 'Day' ? '일간' : pos === 'Month' ? '월간' : pos === 'Year' ? '년간' : '시간';
+  const posNameEn = pos === 'Day' ? 'Day Master' : pos === 'Month' ? 'Month Stem' : pos === 'Year' ? 'Year Stem' : 'Hour Stem';
+
+  let coreIdentityKo = personality.coreIdentity || '';
+  let innateDesireKo = personality.innateDesire || '';
+
+  if (isKO) {
+    const dynamicExplanation = getDynamicPositionExplanationKo(pos, char, 'stem', dayGan);
+    coreIdentityKo = dynamicExplanation.coreIdentity;
+    innateDesireKo = dynamicExplanation.innateDesire;
+  }
+
+  return {
+    pos,
+    type: 'stem' as const,
+    char,
+    name: isKO ? (personality.koName || char) : (STEM_EN_NAMES[char] || char),
+    posNameKo,
+    posNameEn,
+    posDescKo: positionTextMapKo(pos, 'stem'),
+    posDescEn: positionTextMapEn(pos, 'stem'),
+    coreIdentityKo,
+    coreIdentityEn: infoEn.coreIdentity || '',
+    innateDesireKo,
+    innateDesireEn: infoEn.innateDesire || '',
+    tenGodNameKo: tenGod,
+    tenGodNameEn: TEN_GOD_EN_NAMES[tenGod] || tenGod,
+    tenGodHumanKoTitle: tenGodHuman.titleKo,
+    tenGodHumanKoDesc: tenGodHuman.descKo,
+    tenGodHumanEnTitle: tenGodHuman.titleEn,
+    tenGodHumanEnDesc: tenGodHuman.descEn
+  };
+};
+
+const getBranchDetail = (pos: 'Day' | 'Month' | 'Year' | 'Hour', char: string, dayGan: string, isKO: boolean) => {
+  const personality = BRANCH_PERSONALITIES[char] || { koName: char, lifeEnvironment: '', hiddenStruggle: '', socialPattern: '' };
+  const infoEn = BRANCH_INFO_EN[char] || { lifeEnvironment: '', hiddenStruggle: '', socialPattern: '' };
+  const tenGod = computeTenGodLocal(dayGan, char, false);
+  const tenGodHuman = humanTenGodMap[tenGod] || { titleKo: '고유성', descKo: '', titleEn: 'Uniqueness', descEn: '' };
+
+  const posNameKo = pos === 'Day' ? '일지' : pos === 'Month' ? '월지' : pos === 'Year' ? '년지' : '시지';
+  const posNameEn = pos === 'Day' ? 'Day Branch' : pos === 'Month' ? 'Month Branch' : pos === 'Year' ? 'Year Branch' : 'Hour Branch';
+
+  let coreIdentityKo = `${personality.lifeEnvironment || ''} ${personality.hiddenStruggle || ''}`.trim();
+  let innateDesireKo = personality.socialPattern || '';
+
+  if (isKO) {
+    const dynamicExplanation = getDynamicPositionExplanationKo(pos, char, 'branch', dayGan);
+    coreIdentityKo = dynamicExplanation.coreIdentity;
+    innateDesireKo = dynamicExplanation.innateDesire;
+  }
+
+  return {
+    pos,
+    type: 'branch' as const,
+    char,
+    name: isKO ? (personality.koName || char) : (BRANCH_EN_NAMES[char] || char),
+    posNameKo,
+    posNameEn,
+    posDescKo: positionTextMapKo(pos, 'branch'),
+    posDescEn: positionTextMapEn(pos, 'branch'),
+    coreIdentityKo,
+    coreIdentityEn: `${infoEn.lifeEnvironment || ''} ${infoEn.hiddenStruggle || ''}`.trim(),
+    innateDesireKo,
+    innateDesireEn: infoEn.socialPattern || '',
+    tenGodNameKo: tenGod,
+    tenGodNameEn: TEN_GOD_EN_NAMES[tenGod] || tenGod,
+    tenGodHumanKoTitle: tenGodHuman.titleKo,
+    tenGodHumanKoDesc: tenGodHuman.descKo,
+    tenGodHumanEnTitle: tenGodHuman.titleEn,
+    tenGodHumanEnDesc: tenGodHuman.descEn
+  };
+};
 
 // ─────────────────────────────────────────────
 // 메인 생성 함수 (Priority Queue 기반 개편)
@@ -1082,110 +1670,88 @@ export function generatePersonalizedTexts(
   traitScores?: TraitScore[],
   result?: BaZiResult
 ): PersonalizedTexts & { wealthFlow: PersonalizedSection } {
-
   const isKO = lang === 'KO';
 
-  // 글자 및 기둥 배열 구조화
-  const dayStem    = dayPillar?.stem    || '甲';
-  const dayBranch  = dayPillar?.branch  || '子';
-  const monthStem  = monthPillar?.stem  || '甲';
-  const monthBranch = monthPillar?.branch || '子';
-  const yearStem   = yearPillar?.stem   || '甲';
-  const yearBranch  = yearPillar?.branch  || '子';
-  const hourStem   = (hourPillar && !hourPillar.isUnknown) ? (hourPillar.stem || '') : '';
-  const hourBranch  = (hourPillar && !hourPillar.isUnknown) ? (hourPillar.branch || '') : '';
+  const dayStem = dayPillar?.stem || '';
+  const dayBranch = dayPillar?.branch || '';
+  const monthStem = monthPillar?.stem || '';
+  const monthBranch = monthPillar?.branch || '';
+  const yearStem = yearPillar?.stem || '';
+  const yearBranch = yearPillar?.branch || '';
+  const hourStem = hourPillar?.stem || '';
+  const hourBranch = hourPillar?.branch || '';
 
-  const stems: { title: 'Day' | 'Month' | 'Year' | 'Hour', val: string }[] = [
+  const dayMasterStem = dayStem;
+  const dayMasterKo = dayPillar?.stemKoreanName || '';
+  const dayMasterEn = dayPillar?.stemEnglishName || '';
+
+  const stems: { title: 'Day' | 'Month' | 'Year' | 'Hour'; val: string }[] = [
     { title: 'Day', val: dayStem },
     { title: 'Month', val: monthStem },
-    { title: 'Year', val: yearStem }
-  ];
-  if (hourStem) stems.push({ title: 'Hour', val: hourStem });
+    { title: 'Year', val: yearStem },
+    { title: 'Hour', val: hourStem }
+  ].filter(s => !!s.val) as any;
 
-  const branches: { title: 'Day' | 'Month' | 'Year' | 'Hour', val: string }[] = [
+  const branches: { title: 'Day' | 'Month' | 'Year' | 'Hour'; val: string }[] = [
     { title: 'Day', val: dayBranch },
     { title: 'Month', val: monthBranch },
-    { title: 'Year', val: yearBranch }
-  ];
-  if (hourBranch) branches.push({ title: 'Hour', val: hourBranch });
-
-  const dayMasterKo = isKO ? (STEM_PERSONALITIES[dayStem]?.koName || dayStem) : (STEM_EN_NAMES[dayStem] || dayStem);
-
-  // 최상위 잠재력 수치 연동 접미사 (High/Mid/Low 정밀 해설 포함)
-  let traitsSuffixKo = '';
-  let traitsSuffixEn = '';
-  if (traitScores && traitScores.length >= 2) {
-    const top1 = traitScores[0];
-    const top2 = traitScores[1];
-    
-    const explanation1Ko = getTraitDetailText(top1.key, top1.score, 'KO');
-    const explanation2Ko = getTraitDetailText(top2.key, top2.score, 'KO');
-    
-    const explanation1En = getTraitDetailText(top1.key, top1.score, 'EN');
-    const explanation2En = getTraitDetailText(top2.key, top2.score, 'EN');
-
-    traitsSuffixKo = `\n\n특히 귀하의 잠재력 지표 중 가장 강력하게 작용하는 핵심 무기는 **${top1.name}(${top1.score}점)**과 **${top2.name}(${top2.score}점)**입니다. 귀하는 ${explanation1Ko} 또한 ${explanation2Ko} 이러한 지표들이 결합할 때 귀하만의 고유한 기질적 본질이 삶과 사회 무대에서 폭발적인 성공 가능성으로 발현됩니다.`;
-    traitsSuffixEn = `\n\nSpecifically, the strongest potential traits in your profile are **${top1.name} (${top1.score} points)** and **${top2.name} (${top2.score} points)**. You are someone who, ${explanation1En} and also ${explanation2En} When these qualities align, they form your ultimate cosmic weapon, translating your inner potential into outstanding reality.`;
-  }
-
-  // ─────────────────────────────────────────────
-  // 1. [타고난 기질] 연산 및 텍스트 구성
-  // ─────────────────────────────────────────────
-  let innateTitle = '';
-  let innateDesc = '';
-  let innatePillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
+    { title: 'Year', val: yearBranch },
+    { title: 'Hour', val: hourBranch }
+  ].filter(b => !!b.val) as any;
 
   const hapNet = findHapNetwork(stems, branches);
   const overload = findOverloadedTenGods(dayStem, stems, branches);
   const siblingRoot = findSiblingRoots(dayStem, branches);
 
-  // Pillar-by-pillar personalized text
-  const dayBranchKo = BRANCH_PERSONALITIES[dayBranch]?.koName || dayBranch;
-  const dayBranchEn = BRANCH_EN_NAMES[dayBranch] || dayBranch;
-  const monthBranchKo = BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch;
-  const monthBranchEn = BRANCH_EN_NAMES[monthBranch] || monthBranch;
-  const hourBranchKo = hourBranch ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : '';
-  const hourBranchEn = hourBranch ? (BRANCH_EN_NAMES[hourBranch] || hourBranch) : '';
-  const yearBranchKo = yearBranch ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : '';
-  const yearBranchEn = yearBranch ? (BRANCH_EN_NAMES[yearBranch] || yearBranch) : '';
+  let innateTitle = '';
+  let innateDesc = '';
+  let innatePillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
 
-  const monthStemKo = STEM_PERSONALITIES[monthStem]?.koName || monthStem;
-  const monthStemEn = STEM_EN_NAMES[monthStem] || monthStem;
-  const hourStemKo = hourStem ? (STEM_PERSONALITIES[hourStem]?.koName || hourStem) : '';
-  const hourStemEn = hourStem ? (STEM_EN_NAMES[hourStem] || hourStem) : '';
-  const yearStemKo = yearStem ? (STEM_PERSONALITIES[yearStem]?.koName || yearStem) : '';
-  const yearStemEn = yearStem ? (STEM_EN_NAMES[yearStem] || yearStem) : '';
+  const overloadAdvantageKo: Record<string, string> = {
+    '비겁': '타인의 시선이나 간섭에 휘둘리지 않고 나만의 소신과 투지로 돌파구를 일구는 단단한 자립력과 주체적인 의지',
+    '식상': '틀에 갇히지 않고 새로운 아이디어와 혁신적인 돌파구를 마음껏 기획하며 능동적으로 가치를 완성해내는 독창적인 기획력',
+    '재성': '복잡하고 어지러운 상황 속에서도 실질적인 성과와 현실적인 이득을 냉철하게 포착하고 한결같이 마무리해내는 뛰어난 현실 대처력',
+    '관성': '어떤 위기 속에서도 자신이 약속한 책임을 끝끝내 마주하며, 조직 속에서 묵묵히 신용과 명예를 지켜내는 숭고한 통제력',
+    '인성': '조급하게 반응하기보다 넓은 마음으로 현상을 수용하며, 깊이 있는 지적 재능과 철학적 안목으로 핵심을 헤아리는 고도의 통찰력'
+  };
+
+  const overloadShadowKo: Record<string, string> = {
+    '비겁': '나의 고집이나 경쟁의식만 부리다가 소중한 지인과 파트너들의 합리적인 조언을 완전히 외면하고, 손해를 보더라도 자존심 때문에 독단적으로 행동을 밀어붙이게 되는 완고함',
+    '식상': '마음속 생각을 정제되지 않은 언어로 충동적으로 내뱉어 타인과의 오래된 신뢰를 한순간에 그르치거나, 기성 조직이나 상식적인 선을 불필요하게 어기며 감정적인 편을 가르게 되는 모습',
+    '재성': '눈앞에 당장 쥐어지는 확실한 수치나 실익에 지나치게 얽매여, 가장 소중한 주변 사람들과의 따뜻한 인간적 호의와 마음의 교류를 단순한 득실로 치부하다가 서운함과 불신을 사고 마는 실리 위주의 태도',
+    '관성': '스스로 감당하기 힘들 정도로 과도한 의무감과 타인의 평판에 사로잡혀 자신을 가혹하게 검열하며 지치게 만들고, 주변 사람들에게까지 무거운 규율과 가차없는 잣대를 들이대며 가로막는 엄격함',
+    '인성': '실제 현장에서 두 발로 실행하기보다 지나치게 복잡한 고민과 사색, 또는 마음의 부정적인 염려에 먼저 주저앉아, 눈앞의 소중한 타이밍을 놓치고 타인의 선의조차가 왜곡해서 받아들이며 정체되는 모습'
+  };
 
   let categoryTitle = '';
   let categoryDesc = '';
 
   if (hapNet) {
     categoryTitle = isKO 
-      ? `[합(合) 네트워크] 우주적 에너지가 결집된 강력한 지향성` 
+      ? `[연합 에너지] 여러 기운이 힘을 합쳐 발휘하는 강력한 집중력` 
       : `[Union Network] Powerful Alignment Crafted by Cosmic Conjunction`;
     categoryDesc = isKO
-      ? `귀하의 명식은 지지에 **${hapNet.koName}의 합(合) 네트워크를 정밀하게 완성**하고, 그 압도적인 자장이 천간의 **${hapNet.type}** 오행으로 통하여 하늘과 땅이 수직 직통하는 매우 비범한 천지맥 구조입니다. 이는 **에너지가 정밀하게 한곳으로 집속되어 누구도 꺾기 힘든 고집스러운 돌파력과 영민한 정체성**을 뿜어냅니다. 하지만 **합 기운이 강한 나머지, 특정한 방향이나 신념에 철저하게 내면이 매몰될 때 타인의 조언을 귀담아듣지 않은 채 독선적 마이웨이를 걷는 구조적 모순점**도 가집니다. 위기 돌파 등 **결정적인 문제 해결** 상황에서는 극강의 화력을 뽐내나, 평시 일상의 조화와 협조 국면에서는 의식적인 조율이 절대 필요합니다.`
+      ? `당신의 성향은 아래 지지 영역에서 **${hapNet.koName} 기운의 긴밀한 연대가 완성**되고, 그 강력한 지향성이 천간의 **${hapNet.type}** 에너지로 고스란히 흘러갑니다. 이는 생각과 실제 행동이 조화롭게 한 방향으로 연결되어, **한곳에 정신을 집중하는 남다른 돌파력과 확실한 정체성**을 보여줍니다. 다만 **기운이 이처럼 한쪽으로 쏠린 만큼, 특정 분야나 생각에 깊게 빠져들면 주위의 부드럽고 합리적인 조언을 듣지 않고 나만의 방식만 고집하는 경향**이 나타나기도 합니다. 위기 극복이나 중요한 실적으로 증명해내야 할 상황에서는 엄청난 에너지를 뿜어내지만, 직장과 가족 등 평온한 일상에서 서로 조율하고 협조할 때는 의식적으로 소통하는 태도가 꼭 필요합니다.`
       : `Your chart exhibits a rare and powerful structure where the branches complete the **${hapNet.enName}** union, channelizing this immense energy directly into the **${hapNet.type}** element of the stem. This suggests your **core drive is highly focused**, granting you **unyielding determination** and a **clear sense of identity**. You are naturally equipped with the **pioneering leadership to define your own path** and command situations even amidst chaos.`;
     innatePillars = hapNet.keyPillars;
   } else if (overload) {
     categoryTitle = isKO 
-      ? `[성분 집중형] ${overload.nameKo} 에너지가 지배하는 개성파 기질` 
+      ? `[특정 성향의 집중] ${overload.nameKo} 에너지가 이끄는 뚜렷한 개성` 
       : `[Concentrated Type] Character Dominated by ${overload.nameEn}`;
     
-    const element = STEM_INFO_LOCAL[dayStem]?.element || 'Wood';
-    const overloadKoDesc = OVERLOAD_PERSONALIZED_DESC_KO[overload.nameKo]?.[element] || '';
-    const overloadEnDesc = OVERLOAD_PERSONALIZED_DESC_EN[overload.nameKo]?.[element] || '';
+    const advantage = overloadAdvantageKo[overload.nameKo] || '남들과 차별화되는 자신만의 독특하고 선명한 재능';
+    const shadow = overloadShadowKo[overload.nameKo] || '특정 상황에서 유연함을 잃고 주위와의 마찰을 고집스럽게 반복하는 경향';
 
     categoryDesc = isKO
-      ? `귀하의 명식은 우주적 성분 중 **${overload.nameKo} 성분 ${overload.keyPillars.length}개**에 에너지가 다소 한 방향에 쏠려 있습니다. ${overloadKoDesc.replace(/\$\{dayMasterKo\}/g, dayMasterKo).replace(/\$\{count\}/g, String(overload.keyPillars.length))}`
-      : `In your cosmic layout, **${overload.keyPillars.length} characters** are concentrated in **${overload.nameEn}** energy. ${overloadEnDesc.replace(/\$\{dayMasterKo\}/g, dayMasterKo).replace(/\$\{count\}/g, String(overload.keyPillars.length))}`;
+      ? `당신의 성향은 여러 심리 자원 중 특히 **${overload.nameKo} 기운**에 힘이 강하게 흘러 있어, 남들과 확연히 구별되는 선명한 정체성을 지니고 있습니다. 이는 **${advantage}**이라는 훌륭한 평생의 무기가 되지만, 반대로 기운이 지나치게 집중되는 과정에서 주변 상황이나 관계에 걸림돌이 생겼을 때 **${shadow}**로 이어질 우려가 함께 공존합니다. 스스로 과몰입하게 되는 특정 고집의 원천을 정교하게 이해하고, 평온한 일상의 조화로운 루틴과 따뜻한 소통을 늘 곁에 두신다면, 이 강력한 에너지는 세상과 더불어 찬란하게 빛나는 최고의 성공 기반이 되어줄 것입니다.`
+      : `In your cosmic layout, more than three characters are saturated with **${overload.nameEn}** energy, causing this specific vibration to **strongly dictate your behavior and character**. This marks you as an individual of **extreme color and distinct talent**. When you establish your own sovereign domain and specialty, this concentrated energy sublimes into an **explosive creative force**.`;
     innatePillars = overload.keyPillars;
   } else if (siblingRoot) {
     categoryTitle = isKO
-      ? `[주체성의 뿌리] 스스로를 지탱하는 자아의 근본 기둥`
+      ? `[자아의 든든한 지지대] 스스로 중심을 잡고 일어서는 힘`
       : `[Root of Ego] Indestructible Foundation Anchoring the Self`;
     categoryDesc = isKO
-      ? `귀하의 원국은 어지러운 에너지의 극단 비대함 없이, 오직 **나를 지지하고 단단하게 밀어주는 지지의 비겁(뿌리 글자)들을 통해 자아 세포를 완벽히 고정**해 두었습니다. 이는 세상사의 모진 도전에 마주해도 **스스로 회복하고 우뚝 일어설 내면의 용암 같은 복원 주체성이 탑재**되었음을 보증합니다. 반면, **자존심에 사소한 상처라도 받으면 즉각적으로 자아 방어기제가 과도하게 발동되어 타인의 사소한 일침에도 차가운 반감과 장벽**을 세우며 자가 격리를 고집하는 모순을 겪기도 하니 유의하셔야 합니다. 타인과 경쟁하기보다 **나 자신과의 동행**을 지향할 때 가장 성숙한 성장을 이뤄냅니다.`
+      ? `당신의 성향은 모질고 극단적인 쏠림 없이, **나 자신과 뜻을 함께하고 든든하게 받쳐주는 내면의 지지대(자존감과 중심)**를 아름답게 갖추고 있습니다. 이는 외부 여건이 다소 불안정하거나 거친 상황에 직면하더라도, **타인에게 과하게 의지하지 않고 스스로 판단하며 유연하게 일어날 수 있는 견고한 자립력과 마음의 회복탄력성**이 확실하게 정착되어 있음을 의미합니다. 다만, **자신의 생각과 기준이 외부에 의해 사소하게 흔들리거나 반대를 겪을 때, 스스로를 지키려는 방어벽이 과도하게 올라가 상대를 날카롭게 차단하는 모습**을 보일 수 있으니 주의하는 것이 좋습니다. 세상을 투쟁 대상으로 대하기보다 나와 함께할 동반자로 마주할 때 한층 더 편안한 깊이를 가질 수 있습니다.`
       : `While free from extreme imbalances, your configuration features two or more branches that act as the supportive roots of your Day Master. This signifies a **highly resilient "ego root system"** that keeps you **anchored through any external turbulence**. Your fundamental strength lies in your **autonomous recovery power and self-reliance**, rising like a phoenix from any setback.`;
     innatePillars = siblingRoot.keyPillars;
   } else {
@@ -1207,105 +1773,158 @@ export function generatePersonalizedTexts(
     categoryTitle = innateTitleMap[innateElem] || (isKO ? `${dayMasterKo}이 빚어낸 타고난 기질` : `Innate Temperament Crafted by ${dayMasterKo}`);
 
     categoryDesc = isKO
-      ? (STEM_PERSONALITIES[dayStem] ? `당신에게는 일간을 둘러싼 성분들이 조화를 이루며 독특한 이중성과 균형을 보여줍니다. ${STEM_PERSONALITIES[dayStem].strengthInSociety} 반면 때로는 ${STEM_PERSONALITIES[dayStem].shadowSide}` : '')
-      : (STEM_INFO_EN[dayStem] ? `A distinct duality and balance emerge from the surrounding elements around your Day Master. ${STEM_INFO_EN[dayStem].strengthInSociety} On the other hand, ${STEM_INFO_EN[dayStem].shadowSide}` : '');
+      ? (STEM_PERSONALITIES[dayStem] ? `당신에게는 일간을 둘러싼 성분들이 조화를 이루며 독특한 이중성과 균형을 보여줍니다. **${STEM_PERSONALITIES[dayStem].strengthInSociety}** 반면 때로는 **${STEM_PERSONALITIES[dayStem].shadowSide}**` : '')
+      : (STEM_INFO_EN[dayStem] ? `A distinct duality and balance emerge from the surrounding elements around your Day Master. **${STEM_INFO_EN[dayStem].strengthInSociety}** On the other hand, **${STEM_INFO_EN[dayStem].shadowSide}**` : '');
 
     innatePillars = [
       { pillarTitle: 'Day',   type: 'branch' as const },
       { pillarTitle: 'Month', type: 'stem'   as const }
     ];
-    if (hourStem) {
+    if (hourStem && !result?.isTimeUnknown) {
       innatePillars.push({ pillarTitle: 'Hour', type: 'stem' as const });
     } else {
       innatePillars.push({ pillarTitle: 'Year', type: 'stem' as const });
     }
   }
 
-  // Dynamic build of Pillar-by-pillar personalized text based on innatePillars
-  const getPillarSection = (key: string): { ko: string; en: string } => {
-    switch (key) {
-      case 'Day-stem':
-        return {
-          ko: `• **일간 ${dayStem}(${dayMasterKo}) — 내면의 본질적 자아**\n${STEM_PERSONALITIES[dayStem]?.coreIdentity || ''}\n${STEM_PERSONALITIES[dayStem]?.innateDesire || ''}`,
-          en: `• **Day Master ${dayStem}(${dayMasterKo}) — Your Core Self**\n${STEM_INFO_EN[dayStem]?.coreIdentity || ''}\n${STEM_INFO_EN[dayStem]?.innateDesire || ''}`
-        };
-      case 'Day-branch':
-        return {
-          ko: `• **일지 ${dayBranch}(${dayBranchKo}) — 내밀한 감성과 태도**\n${BRANCH_PERSONALITIES[dayBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[dayBranch]?.hiddenStruggle || ''}`,
-          en: `• **Day Branch ${dayBranch}(${dayBranchEn}) — Inner Mind & Private Demeanor**\n${BRANCH_INFO_EN[dayBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[dayBranch]?.hiddenStruggle || ''}`
-        };
-      case 'Month-stem':
-        return {
-          ko: `• **월간 ${monthStem}(${monthStemKo}) — 사회적 지향성과 가치관**\n${STEM_PERSONALITIES[monthStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[monthStem]?.strengthInSociety || ''}`,
-          en: `• **Month Stem ${monthStem}(${monthStemEn}) — Social Orientation & Values**\n${STEM_INFO_EN[monthStem]?.coreIdentity || ''} ${STEM_INFO_EN[monthStem]?.strengthInSociety || ''}`
-        };
-      case 'Month-branch':
-        return {
-          ko: `• **월지 ${monthBranch}(${monthBranchKo}) — 사회적 환경과 처세**\n귀하의 사회적 삶은 월지 ${monthBranch}의 분위기 안에서 펼쳐집니다. ${BRANCH_PERSONALITIES[monthBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[monthBranch]?.socialPattern || ''}`,
-          en: `• **Month Branch ${monthBranch}(${monthBranchEn}) — Social Context & Relationships**\nYour social life unfolds within the atmosphere of Month Branch ${monthBranch}. ${BRANCH_INFO_EN[monthBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[monthBranch]?.socialPattern || ''}`
-        };
-      case 'Hour-stem':
-        return {
-          ko: `• **시간 ${hourStem}(${hourStemKo}) — 미래의 지향점과 이상향**\n${STEM_PERSONALITIES[hourStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[hourStem]?.innateDesire || ''}`,
-          en: `• **Hour Stem ${hourStem}(${hourStemEn}) — Future Aspirations & Ideals**\n${STEM_INFO_EN[hourStem]?.coreIdentity || ''} ${STEM_INFO_EN[hourStem]?.innateDesire || ''}`
-        };
-      case 'Hour-branch':
-        return {
-          ko: `• **시지 ${hourBranch}(${hourBranchKo}) — 속마음과 결과물**\n귀하의 깊은 내면과 최종 결실을 지배하는 시지 ${hourBranch}는 행동의 원동력입니다. ${BRANCH_PERSONALITIES[hourBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[hourBranch]?.hiddenStruggle || ''}`,
-          en: `• **Hour Branch ${hourBranch}(${hourBranchEn}) — Inner Thoughts & Outcomes**\nThe Hour Branch ${hourBranch} governs your deepest desires and final outcomes. ${BRANCH_INFO_EN[hourBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[hourBranch]?.hiddenStruggle || ''}`
-        };
-      case 'Year-stem':
-        return {
-          ko: `• **년간 ${yearStem}(${yearStemKo}) — 외부 대외적 이미지와 첫인상**\n${STEM_PERSONALITIES[yearStem]?.coreIdentity || ''} ${STEM_PERSONALITIES[yearStem]?.strengthInSociety || ''}`,
-          en: `• **Year Stem ${yearStem}(${yearStemEn}) — Public Image & First Impression**\n${STEM_INFO_EN[yearStem]?.coreIdentity || ''} ${STEM_INFO_EN[yearStem]?.strengthInSociety || ''}`
-        };
-      case 'Year-branch':
-        return {
-          ko: `• **년지 ${yearBranch}(${yearBranchKo}) — 삶의 뿌리와 행동의 토대**\n삶의 무의식적 뿌리를 이루는 년지 ${yearBranch}는 기초적인 행동 성향을 형성합니다. ${BRANCH_PERSONALITIES[yearBranch]?.lifeEnvironment || ''} ${BRANCH_PERSONALITIES[yearBranch]?.socialPattern || ''}`,
-          en: `• **Year Branch ${yearBranch}(${yearBranchEn}) — Ancestral Roots & Life Foundation**\nThe Year Branch ${yearBranch} forms the root and foundation of your life. ${BRANCH_INFO_EN[yearBranch]?.lifeEnvironment || ''} ${BRANCH_INFO_EN[yearBranch]?.socialPattern || ''}`
-        };
-      default:
-        return { ko: '', en: '' };
+  // Build unique dynamic array of actually highlighted elements to explain (Day Master is always first)
+  const explainedElements: any[] = [];
+  
+  // 1. Day Master (Always first)
+  explainedElements.push(getStemDetail('Day', dayStem, dayStem, isKO));
+  
+  // 2. Add others from innatePillars
+  innatePillars.forEach(p => {
+    // Skip if it's Day Master itself to avoid duplicate
+    if (p.pillarTitle === 'Day' && p.type === 'stem') return;
+    
+    // Resolve correct glyph/character
+    let char = '';
+    if (p.type === 'stem') {
+      if (p.pillarTitle === 'Day') char = dayStem;
+      else if (p.pillarTitle === 'Month') char = monthStem;
+      else if (p.pillarTitle === 'Year') char = yearStem;
+      else if (p.pillarTitle === 'Hour') char = hourStem;
+    } else {
+      if (p.pillarTitle === 'Day') char = dayBranch;
+      else if (p.pillarTitle === 'Month') char = monthBranch;
+      else if (p.pillarTitle === 'Year') char = yearBranch;
+      else if (p.pillarTitle === 'Hour') char = hourBranch;
     }
-  };
-
-  const pillarKeys = new Set<string>();
-  pillarKeys.add('Day-stem'); // Always include Day Master first
-  if (innatePillars) {
-    innatePillars.forEach(kp => {
-      pillarKeys.add(`${kp.pillarTitle}-${kp.type}`);
-    });
-  }
-
-  const sortOrder = [
-    'Day-stem',
-    'Day-branch',
-    'Month-stem',
-    'Month-branch',
-    'Hour-stem',
-    'Hour-branch',
-    'Year-stem',
-    'Year-branch'
-  ];
-
-  const sortedKeys = Array.from(pillarKeys).sort((a, b) => sortOrder.indexOf(a) - sortOrder.indexOf(b));
-
-  const sectionsKo: string[] = [];
-  const sectionsEn: string[] = [];
-
-  sortedKeys.forEach(key => {
-    const sec = getPillarSection(key);
-    if (sec.ko) sectionsKo.push(sec.ko);
-    if (sec.en) sectionsEn.push(sec.en);
+    
+    if (!char) return;
+    
+    const alreadyAdded = explainedElements.some(el => el.pos === p.pillarTitle && el.type === p.type);
+    if (alreadyAdded) return;
+    
+    if (p.type === 'stem') {
+      explainedElements.push(getStemDetail(p.pillarTitle, char, dayStem, isKO));
+    } else {
+      explainedElements.push(getBranchDetail(p.pillarTitle, char, dayStem, isKO));
+    }
   });
 
+  // Construct dynamic element descriptions
+  const elementDescriptionsKo = explainedElements.map(el => {
+    const tenGodLine = el.pos === 'Day' 
+      ? '' 
+      : `\n  - **상호 작용 에너지 (역할군):** ${el.tenGodNameKo} (${el.tenGodHumanKoTitle}) - ${el.tenGodHumanKoDesc}`;
+    
+    return `• **${el.posNameKo} ${el.char}(${el.name}) — ${el.posDescKo}**${tenGodLine}\n  - **기질적 본모습:** ${el.coreIdentityKo}\n  - **행동지향성:** ${el.innateDesireKo}`;
+  }).join('\n\n');
+
+  const elementDescriptionsEn = explainedElements.map(el => {
+    const tenGodLine = el.pos === 'Day' 
+      ? '' 
+      : `\n  - **Interaction Energy (Role):** ${el.tenGodNameEn} (${el.tenGodHumanEnTitle}) - ${el.tenGodHumanEnDesc}`;
+    
+    return `• **${el.posNameEn} ${el.char}(${el.name}) — ${el.posDescEn}**${tenGodLine}\n  - **Temperament Aspect:** ${el.coreIdentityEn}\n  - **Behavioral Focus:** ${el.innateDesireEn}`;
+  }).join('\n\n');
+
+  // Construct dynamic interaction narrative based on the collection of highlighted elements
+  const groupCounts: Record<string, number> = { '비겁': 0, '식상': 0, '재성': 0, '관성': 0, '인성': 0 };
+  explainedElements.forEach(el => {
+    if (el.pos === 'Day' && el.type === 'stem') return; // Skip Day Master itself
+    const groupName = el.tenGodNameKo === '비견' || el.tenGodNameKo === '겁재' ? '비겁' :
+                      el.tenGodNameKo === '식신' || el.tenGodNameKo === '상관' ? '식상' :
+                      el.tenGodNameKo === '편재' || el.tenGodNameKo === '정재' ? '재성' :
+                      el.tenGodNameKo === '편관' || el.tenGodNameKo === '정관' ? '관성' :
+                      el.tenGodNameKo === '편인' || el.tenGodNameKo === '정인' ? '인성' : '';
+    if (groupName) {
+      groupCounts[groupName]++;
+    }
+  });
+
+  let interactionNarrativeKo = '';
+  let interactionNarrativeEn = '';
+
+  const activeGroups = Object.entries(groupCounts)
+    .filter(([_, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1]);
+
+  if (activeGroups.length === 0) {
+    interactionNarrativeKo = `귀하의 주어진 사주 자원들은 특정한 한쪽으로 쏠리지 않고 고르게 분산되어 있습니다. 이는 성격적으로 모나지 않은 높은 유연성과 뛰어난 상황 적응력으로 나타납니다. 다른 사람들과 유연하게 벽 없이 융화되면서도 자기 행동의 기준을 잃지 않는 은은한 마음의 중심이 돋보입니다.`;
+    interactionNarrativeEn = `Your selected cosmic resources are evenly balanced without extreme bias, granting you superb interpersonal flexibility and high adaptability. You are able to merge harmoniously with your surroundings while keeping an exquisite anchor of self intact.`;
+  } else {
+    const topGroup = activeGroups[0][0];
+    const secondGroup = activeGroups.length > 1 ? activeGroups[1][0] : null;
+
+    const koSegments: string[] = [];
+    const enSegments: string[] = [];
+
+    if (topGroup === '관성') {
+      koSegments.push(`스스로를 지키는 울타리와 규율인 **'관성(수호 규율)'**이 주된 축을 형성합니다. 타고난 기질적으로 매사에 흐지부지 넘어가는 것을 경계하며, **책임감 있게 자신을 조절하고 다스리는 규율성**이 아주 돋보입니다. 타인 앞에서는 함부로 행동하지 않고 **선과 도덕적 의무를 명확히 지키기** 때문에, 대외적으로 **매우 진중하고 신뢰할 수 있는 묵직한 존재감**을 발산합니다.`);
+      enSegments.push(`A strong framework of **'Influence/Power'** functions as your guiding anchor. You value **self-discipline, boundaries, and responsibility**, which manifests as a **dignified, reliable, and slightly guarded outer presence**.`);
+    } else if (topGroup === '식상') {
+      koSegments.push(`창의성과 개성을 발휘하여 표현하는 **'식상(표현 설계)'**이 핵심 기조를 이룹니다. 매사에 높은 호기심을 지니고서 **나만의 영감이나 기획을 세상에 구체적인 실체로 구현하는 표현력**이 뛰어나며, 가식이나 꾸밈이 없는 **솔직하고 담백한 소통**을 지향합니다. 기존의 가둔 틀에 순응하기보다 **자신만의 독창적인 방식과 세련된 색채**를 우아하게 발산해 나갑니다.`);
+      enSegments.push(`Your natural disposition is centered on **'Expression'** as a tool of creation and ingenuity. You approach life with **organic curiosity, seeking to turn inspiration into actual deliverables**, preferring **candid, unfiltered dialogue** over rigid protocols.`);
+    } else if (topGroup === '재성') {
+      koSegments.push(`목표를 실제적인 성취와 결실로 바꾸는 **'재성(실리 성과)'**이 강하게 흐르고 있습니다. 추상적인 아이디어에 그치기보다는 **눈에 선명히 보이고 정량할 수 있는 확실한 결과물**을 이끌어내며, **합리적인 자원 관리와 실리적인 효율 분배**에 뛰어난 역량을 보입니다. 무모한 리스크나 불필요한 감정 낭비를 현명하게 피해 가며 **최적의 마무리 성과를 도출해내는 탁월한 감각**이 있습니다.`);
+      enSegments.push(`A pragmatic drive of **'Wealth/Pragmatism'** acts as the engine of your thoughts. You prefer **highly visible results, concrete data, and tactical asset management** over floating theories, excelling at **bypassing emotional leaks**.`);
+    } else if (topGroup === '인성') {
+      koSegments.push(`세상의 원리와 깊은 배움을 차분히 수용하는 **'인성(학자 수용)'**이 높은 비중을 차지합니다. 외부 자극에 성급하고 가벼이 움직이지 않고, **한 걸음 멈추어 전체 맥락과 원리를 깊이 성찰하며** 숙성된 지혜의 정답을 찾아냅니다. 깊은 생각 속에서 배어나오는 **사려 깊은 경청과 따뜻한 감수성**은 상대방에게 **온 마음으로 기댈 수 있는 편안한 안식처**가 되어 줍니다.`);
+      enSegments.push(`A contemplative current of **'Intellect/Wisdom'** defines your mind. Rather than reacting aggressively to immediate impulses, you choose to **absorb, analyze background contexts, and craft deeply matured answers**, radiating **comfortable wisdom**.`);
+    } else if (topGroup === '비겁') {
+      koSegments.push(`자신에 대한 흔들림 없는 확신과 독립적인 힘을 뜻하는 **'비겁(강인 주체성)'**이 방향을 주도합니다. 누군가의 부당한 강제나 통제를 본능적으로 꺼리며, **스스로 개척하고 주도해 나가는 굳건한 자립심과 신념**이 흐릅니다. 곤경 앞에서도 **나 자아 본질의 주체성을 지키며 뚝심 있게 다시 일어서는 회복탄력성**이 매우 견고합니다.`);
+      enSegments.push(`An indomitable axis of **'Companion/Ego'** steers your life directions. You instinctively challenge external command structures, choosing to **survive and conquer with your pure willpower and self-defined standards**.`);
+    }
+
+    if (secondGroup) {
+      if (secondGroup === '관성') {
+        koSegments.push(`여기에 성실한 조직적 신뢰와 조절 능력을 가진 **관성**이 조화롭게 더해져, **단순한 개인 행동을 넘어 체계적인 조율 능력을 바탕으로 신뢰받는 지위를 견고히 구축하는 역량**을 보완합니다.`);
+        enSegments.push(`Combined with the structured discipline of **Influence**, you possess a **highly organized methodology to secure respected positions in social groups**.`);
+      } else if (secondGroup === '식상') {
+        koSegments.push(`여기에 세상과 끊임없이 소통하고자 하는 **식상**이 유기적으로 맞물려, **자신의 주도적인 에너지를 다채롭고 창의적인 말, 글, 창조적 산출물로 흘려보내며 매혹적인 영향력**을 주위에 발산하게 됩니다.`);
+        enSegments.push(`Combined with the creative flow of **Expression**, your inner drives translate easily into **fluent communicative forms, artistic crafts, or fascinating concepts**.`);
+      } else if (secondGroup === '재성') {
+        koSegments.push(`여기에 현실적인 **재성**의 목표의식이 성공적으로 결합되어, **가벼이 흩어지기 쉬운 무수한 생각들을 실물 경제적인 가치나 피부에 와닿는 뚜렷한 실적 성취**로 확실하게 종지부 찍는 힘을 실어줍니다.`);
+        enSegments.push(`Combined with the finishing touch of **Wealth**, your abstract pursuits find immediate grounding, transforming **ideals into economic gains and concrete wealth**.`);
+      } else if (secondGroup === '인성') {
+        koSegments.push(`여기에 깊고 사색적인 **인성**의 흡수력이 보력으로 조화를 이루며, **지나치게 충동적인 행동 전개를 한 템포 가다듬어 주어 실수를 면하고 평정심을 현명히 이어가도록** 돕습니다.`);
+        enSegments.push(`Combined with the calm filtering of **Intellect**, you avoid premature burnout, enjoying an **intellectual layer of mindfulness that guards your decisions**.`);
+      } else if (secondGroup === '비겁') {
+        koSegments.push(`여기에 주체성 넘치는 **비겁**의 심지가 단단하게 받쳐주며, **사회 도덕적 한계나 모진 외부 부침에 의해서 자존심이 꺾이지 않고 당당한 태도로 자신의 주권을 의지로 수호하는 강력한 방패**가 되어 줍니다.`);
+        enSegments.push(`Combined with the self-reliant shield of **Companion**, you are protected by a **diamond-hard emotional resilience that refuses to crack under societal trends**.`);
+      }
+    } else {
+      koSegments.push(`이 선명하고 돋보이는 자원의 흐름은 오직 **당신만이 가질 수 있는 뚜렷한 가치 기준과 강렬한 정체성**을 빚어내어, 시류에 어설프게 휩쓸리지 않는 단단함을 발현하게 조력합니다.`);
+      enSegments.push(`This pure, focused current helps you **cultivate a highly distinctive identity, remaining unfazed by shallow trends** as you define your own customized space.`);
+    }
+
+    koSegments.push(`\n\n결과적으로, 이 자원들의 상호작용은 귀하 정체성 내부에서 **'나(일간)'**와 **'강조된 성분들'** 사이에 끊임없는 대화와 연대를 이루고 있습니다. 전문용어를 빌리지 않더라도, 귀하는 **본인의 내면적 신조와 사회적으로 입은 명확한 옷(강조된 부위들)이 한데 어우러져 한 사람의 독특하고 안정적인 삶의 오케스트라**를 완성하는 아름다운 구조를 가지고 있습니다.`);
+    enSegments.push(`\n\nUltimately, the constant dialogue between **'You (Day Master)'** and these **'Highlighted Elements'** crafts a beautiful inner symphony. Even without any esoteric jargon, your true beauty lies in this seamless alignment of your innermost self and your designated outer tools, working in harmony.`);
+
+    interactionNarrativeKo = koSegments.join(' ');
+    interactionNarrativeEn = enSegments.join(' ');
+  }
+
   const pillarTemperamentDesc = isKO
-    ? `**[🔍 기둥별 타고난 기질 해설]**\n\n${sectionsKo.join('\n\n')}`
-    : `**[🔍 Pillar-by-Pillar Innate Temperament]**\n\n${sectionsEn.join('\n\n')}`;
+    ? `**[🔍 기둥별 타고난 기질 해설]**\n\n${elementDescriptionsKo}`
+    : `**[🔍 Pillar-by-Pillar Innate Temperament]**\n\n${elementDescriptionsEn}`;
 
   const categorySection = isKO
-    ? `**[🧬 기질의 구조적 지향성: ${categoryTitle}]**\n\n${categoryDesc}`
-    : `**[🧬 Structural Focus: ${categoryTitle}]**\n\n${categoryDesc}`;
+    ? `**[🧬 기질의 구조적 지향성: ${categoryTitle}]**\n\n${categoryDesc}\n\n**[🤝 강조 자원들의 성격적 상호작용 및 해설]**\n\n${interactionNarrativeKo}`
+    : `**[🧬 Structural Focus: ${categoryTitle}]**\n\n${categoryDesc}\n\n**[🤝 Highlighted Resources' Personality Play & Interaction]**\n\n${interactionNarrativeEn}`;
 
   let traitsSection = '';
   if (traitScores && traitScores.length >= 2) {
@@ -1333,8 +1952,8 @@ export function generatePersonalizedTexts(
   let lifeDesc = '';
   let lifePillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
 
-  const branchList = [dayBranch, monthBranch, yearBranch, hourBranch].filter(Boolean);
-  const stemList = [dayStem, monthStem, yearStem, hourStem].filter(Boolean);
+  const branchList = [dayBranch, monthBranch, yearBranch, result?.isTimeUnknown ? '' : hourBranch].filter(Boolean);
+  const stemList = [dayStem, monthStem, yearStem, result?.isTimeUnknown ? '' : hourStem].filter(Boolean);
   
   let tugwanCount = 0;
   branchList.forEach(b => {
@@ -1348,16 +1967,16 @@ export function generatePersonalizedTexts(
 
   // 개별 지지 환경 상세 카드는 모든 유형에 공통적으로 병합하여 구체적인 해석을 보장합니다.
   const ls1 = isKO
-    ? (BRANCH_PERSONALITIES[monthBranch] ? `\n\n귀하의 사회적 삶은 **월지 ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**의 분위기 안에서 펼쳐집니다.\n${BRANCH_PERSONALITIES[monthBranch].lifeEnvironment}\n${BRANCH_PERSONALITIES[monthBranch].socialPattern}` : '')
-    : (BRANCH_INFO_EN[monthBranch] ? `\n\nYour social life unfolds within the atmosphere of **Month Branch ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**.\n${BRANCH_INFO_EN[monthBranch].lifeEnvironment}\n${BRANCH_INFO_EN[monthBranch].socialPattern}` : '');
+    ? (BRANCH_PERSONALITIES[monthBranch] ? `\n\n귀하의 사회적 삶은 **월지 ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**의 분위기 안에서 펼쳐집니다.\n**${BRANCH_PERSONALITIES[monthBranch].lifeEnvironment}**\n${BRANCH_PERSONALITIES[monthBranch].socialPattern}` : '')
+    : (BRANCH_INFO_EN[monthBranch] ? `\n\nYour social life unfolds within the atmosphere of **Month Branch ${monthBranch}(${isKO ? (BRANCH_PERSONALITIES[monthBranch]?.koName || monthBranch) : (BRANCH_EN_NAMES[monthBranch] || monthBranch)})**.\n**${BRANCH_INFO_EN[monthBranch].lifeEnvironment}**\n${BRANCH_INFO_EN[monthBranch].socialPattern}` : '');
 
   const ls2 = isKO
-    ? (BRANCH_PERSONALITIES[yearBranch] ? `\n\n삶의 뿌리와 행동 방식의 토대를 이루는 **년지 ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**은 귀하의 가장 기본적인 관계 패턴을 형성합니다.\n${BRANCH_PERSONALITIES[yearBranch].lifeEnvironment}\n${BRANCH_PERSONALITIES[yearBranch].socialPattern}` : '')
-    : (BRANCH_INFO_EN[yearBranch] ? `\n\nThe **Year Branch ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**, forming the root and foundation of your life, shapes your basic relationship patterns.\n${BRANCH_INFO_EN[yearBranch].lifeEnvironment}\n${BRANCH_INFO_EN[yearBranch].socialPattern}` : '');
+    ? (BRANCH_PERSONALITIES[yearBranch] ? `\n\n삶의 뿌리와 행동 방식의 토대를 이루는 **년지 ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**은 귀하의 가장 기본적인 관계 패턴을 형성합니다.\n**${BRANCH_PERSONALITIES[yearBranch].lifeEnvironment}**\n${BRANCH_PERSONALITIES[yearBranch].socialPattern}` : '')
+    : (BRANCH_INFO_EN[yearBranch] ? `\n\nThe **Year Branch ${yearBranch}(${isKO ? (BRANCH_PERSONALITIES[yearBranch]?.koName || yearBranch) : (BRANCH_EN_NAMES[yearBranch] || yearBranch)})**, forming the root and foundation of your life, shapes your basic relationship patterns.\n**${BRANCH_INFO_EN[yearBranch].lifeEnvironment}**\n${BRANCH_INFO_EN[yearBranch].socialPattern}` : '');
 
-  const ls3 = isKO
-    ? (BRANCH_PERSONALITIES[hourBranch] ? `\n\n**시지 ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})**은 귀하가 진정으로 원하고 이루고자 하는 욕망의 방향을 보여줍니다.\n${BRANCH_PERSONALITIES[hourBranch].behavioralTrigger}\n${BRANCH_PERSONALITIES[hourBranch].hiddenStruggle}` : '')
-    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n${BRANCH_INFO_EN[hourBranch].behavioralTrigger}\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : '');
+  const ls3 = result?.isTimeUnknown ? '' : (isKO
+    ? (BRANCH_PERSONALITIES[hourBranch] ? `\n\n**시지 ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})**은 귀하가 진정으로 원하고 이루고자 하는 욕망의 방향을 보여줍니다.\n**${BRANCH_PERSONALITIES[hourBranch].behavioralTrigger}**\n${BRANCH_PERSONALITIES[hourBranch].hiddenStruggle}` : '')
+    : (BRANCH_INFO_EN[hourBranch] ? `\n\nThe **Hour Branch ${hourBranch}(${isKO ? (BRANCH_PERSONALITIES[hourBranch]?.koName || hourBranch) : (BRANCH_EN_NAMES[hourBranch] || hourBranch)})** reveals the direction of your true desires and goals.\n**${BRANCH_INFO_EN[hourBranch].behavioralTrigger}**\n${BRANCH_INFO_EN[hourBranch].hiddenStruggle}` : ''));
 
   const individualDetails = [ls1, ls2, ls3].filter(s => s.trim().length > 0).join('');
 
@@ -1385,10 +2004,14 @@ export function generatePersonalizedTexts(
         keyPillars.push({ pillarTitle: s.title, type: 'stem' });
       }
     });
-    keyPillars.push({ pillarTitle: 'Month', type: 'branch' as const });
-    keyPillars.push({ pillarTitle: 'Year', type: 'branch' as const });
-    if (hourBranch) {
-      keyPillars.push({ pillarTitle: 'Hour', type: 'branch' as const });
+    branches.forEach(b => {
+      if (pen.matchedBranches.includes(b.title)) {
+        keyPillars.push({ pillarTitle: b.title, type: 'branch' });
+      }
+    });
+    if (keyPillars.length === 0) {
+      keyPillars.push({ pillarTitle: 'Day', type: 'stem' });
+      keyPillars.push({ pillarTitle: 'Month', type: 'stem' });
     }
     lifePillars = keyPillars;
   } else if (hasTension) {
@@ -1410,11 +2033,9 @@ export function generatePersonalizedTexts(
     if (!isKO) lifeDesc = detailEn + individualDetails;
 
     const keyPillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
-    keyPillars.push({ pillarTitle: 'Month', type: 'branch' as const });
-    keyPillars.push({ pillarTitle: 'Year', type: 'branch' as const });
-    if (hourBranch) {
-      keyPillars.push({ pillarTitle: 'Hour', type: 'branch' as const });
-    }
+    branches.forEach(b => {
+      keyPillars.push({ pillarTitle: b.title, type: 'branch' });
+    });
     lifePillars = keyPillars;
   } else {
     // 3순위: 사회적 소통형 (Default)
@@ -1436,13 +2057,15 @@ export function generatePersonalizedTexts(
 
     lifeDesc = individualDetails;
 
-    const keyPillars: { pillarTitle: 'Day' | 'Month' | 'Year' | 'Hour'; type: 'stem' | 'branch' }[] = [];
-    keyPillars.push({ pillarTitle: 'Month', type: 'branch' as const });
-    keyPillars.push({ pillarTitle: 'Year', type: 'branch' as const });
-    if (hourBranch) {
-      keyPillars.push({ pillarTitle: 'Hour', type: 'branch' as const });
+    lifePillars = [
+      { pillarTitle: 'Month', type: 'branch' as const },
+      { pillarTitle: 'Month', type: 'stem' as const }
+    ];
+    if (hourBranch && !result?.isTimeUnknown) {
+      lifePillars.push({ pillarTitle: 'Hour', type: 'branch' as const });
+    } else {
+      lifePillars.push({ pillarTitle: 'Year', type: 'branch' as const });
     }
-    lifePillars = keyPillars;
   }
 
   // ─────────────────────────────────────────────
@@ -1970,21 +2593,33 @@ export function generatePersonalizedTexts(
       : `\n\n**The benefactor pull of Deungra-Gyegap (藤蘿繫甲) is added on top of all these patterns.**\nRather than breaking through alone, this energy is magnified when you collaborate with an outstanding partner or mentor.`;
   }
 
+  const cleanInnatePillars = result?.isTimeUnknown
+    ? innatePillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : innatePillars;
+
+  const cleanLifePillars = result?.isTimeUnknown
+    ? lifePillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : lifePillars;
+
+  const cleanWealthPillars = result?.isTimeUnknown
+    ? wealthPillars.filter(kp => kp.pillarTitle !== 'Hour')
+    : wealthPillars;
+
   return {
     innateTemperament: {
       title: innateTitle,
       description: innateDesc,
-      keyPillars: innatePillars,
+      keyPillars: cleanInnatePillars,
     },
     lifestylePattern: {
       title: lifeTitle,
       description: lifeDesc,
-      keyPillars: lifePillars,
+      keyPillars: cleanLifePillars,
     },
     wealthFlow: {
       title: wealthTitle,
       description: wealthDesc,
-      keyPillars: wealthPillars,
+      keyPillars: cleanWealthPillars,
       typeTitle,
       pipeline,
       expansionScore,

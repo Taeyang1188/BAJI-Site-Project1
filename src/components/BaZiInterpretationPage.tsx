@@ -608,9 +608,11 @@ export default function BaZiInterpretationPage({
           {data.iljuName}
         </div>
 
-        <h1 className={`text-2xl sm:text-4xl font-extrabold leading-tight px-2 ${isLight ? 'text-black' : 'text-white'}`}>
-          {lang === 'KO' ? `${data.userName}님의 사주 분석 리포트` : `${data.userName}'s BaZi Analysis Report`}
-        </h1>
+        {!isSharedView && (
+          <h1 className={`text-2xl sm:text-4xl font-extrabold leading-tight px-2 ${isLight ? 'text-black' : 'text-white'}`}>
+            {lang === 'KO' ? `${data.userName}님의 사주 분석 리포트` : `${data.userName}'s BaZi Analysis Report`}
+          </h1>
+        )}
 
         {/* Dynamic Type Card */}
         <div className="p-[1px] bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan rounded-3xl shadow-[0_0_40px_rgba(255,0,122,0.15)] mt-4">
@@ -628,6 +630,31 @@ export default function BaZiInterpretationPage({
           </div>
         </div>
       </motion.div>
+
+      {/* Time Unknown Alert Banner */}
+      {result.isTimeUnknown && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-center sm:items-start gap-3.5 ${
+            isLight
+              ? 'bg-amber-500/10 border-amber-500/30 text-amber-950 shadow-sm'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-400 [text-shadow:_0_0_10px_rgba(245,158,11,0.2)]'
+          }`}
+        >
+          <AlertCircle className={`w-6 h-6 shrink-0 ${isLight ? 'text-amber-600' : 'text-amber-400'}`} />
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="text-xs sm:text-sm font-black tracking-wide">
+              {lang === 'KO' ? '⏳ 삼주(三柱) 기반 임시 분석 결과' : '⏳ 3-Pillar Provisional Report'}
+            </h4>
+            <p className={`text-[11px] sm:text-xs leading-relaxed opacity-95`}>
+              {lang === 'KO'
+                ? '태어난 시간(시주)이 등록되지 않아 사주 8자 중 6자(삼주) 기운만을 감정한 임시 해설 결과입니다. 시주 영역은 완전 잠금 상태(🔒)로 표시되며 시주가 미반영된 결과임을 알립니다. 시간을 추가로 입력하시면 말년 자산선, 자녀운, 무의식 에센스 등 100% 완전한 결과를 확인하실 수 있습니다.'
+                : 'Provisional report based on 6 characters (3 Pillars) because birth time is missing. The Hour Pillar is locked (🔒) and corresponding interpretations are excluded/blurred. Input exact birth time to unlock late-life luck, descendant prospects, and subconscious matrix!'}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* 8-Letter grid visualization */}
       <motion.div
@@ -653,47 +680,66 @@ export default function BaZiInterpretationPage({
             const branchStyle = elementStyles[BAZI_MAPPING.branches?.[pillar.branch]?.element as keyof typeof elementStyles] || elementStyles.Earth;
             const animalEmoji = ZODIAC_EMOJIS[pillar.branch] || '🌌';
 
+            const isHourPillar = title === 'Hour';
+            const isUnknownHour = result.isTimeUnknown && isHourPillar;
+
             return (
               <div
                 key={title}
-                className={`flex flex-col rounded-2xl border ${title === 'Day'
+                className={`relative flex flex-col rounded-2xl border ${title === 'Day'
                   ? 'bg-neon-pink/5 border-neon-pink shadow-[0_0_20px_rgba(255,0,122,0.15)]'
-                  : (isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10')
+                  : isUnknownHour
+                    ? 'border-amber-500/20 bg-amber-500/[0.02]'
+                    : (isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10')
                   } overflow-hidden`}
               >
                 {/* Pillar Header */}
-                <div className={`py-1.5 text-[10px] sm:text-xs font-bold tracking-widest text-center ${title === 'Day' ? 'bg-neon-pink/20 text-neon-pink' : (isLight ? 'bg-black/10 text-neutral-500' : 'bg-white/5 text-white/40')
+                <div className={`py-1.5 text-[10px] sm:text-xs font-bold tracking-widest text-center ${title === 'Day' ? 'bg-neon-pink/20 text-neon-pink' : isUnknownHour ? 'bg-amber-500/10 text-amber-500' : (isLight ? 'bg-black/10 text-neutral-500' : 'bg-white/5 text-white/40')
                   }`}>
                   {lang === 'KO'
-                    ? (title === 'Hour' ? '시주 (Hour)' : title === 'Day' ? '일주 (Day)' : title === 'Month' ? '월주 (Month)' : '연주 (Year)')
-                    : (title === 'Hour' ? 'Hour Pillar' : title === 'Day' ? 'Day Pillar' : title === 'Month' ? 'Month Pillar' : 'Year Pillar')
+                    ? (isUnknownHour ? '시주 (🔒잠김)' : title === 'Hour' ? '시주 (Hour)' : title === 'Day' ? '일주 (Day)' : title === 'Month' ? '월주 (Month)' : '연주 (Year)')
+                    : (isUnknownHour ? 'Hour (🔒Locked)' : title === 'Hour' ? 'Hour Pillar' : title === 'Day' ? 'Day Pillar' : title === 'Month' ? 'Month Pillar' : 'Year Pillar')
                   }
                 </div>
 
-                {/* Stem Card */}
-                <div className={`p-3 sm:p-5 border-b flex flex-col items-center space-y-1 ${isLight ? 'border-black/5' : 'border-white/5'}`}>
-                  <span className="text-2xl sm:text-4xl font-black font-gothic transition-transform hover:scale-110" style={{ color: stemStyle.color }}>
-                    {pillar.stem}
-                  </span>
-                  <span className={`text-[9px] sm:text-[10px] font-bold ${isLight ? 'text-neutral-600' : 'text-white/50'}`}>
-                    {lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}
-                  </span>
-                  <span className="text-[7px] sm:text-[8px] opacity-60 uppercase font-mono px-1 rounded-sm" style={{ color: stemStyle.color, backgroundColor: `${stemStyle.color}15` }}>
-                    {lang === 'KO' ? stemStyle.ko : stemStyle.name}
-                  </span>
-                </div>
+                <div className="relative flex-1 flex flex-col justify-center">
+                  {/* Stem Card */}
+                  <div className={`p-3 sm:p-5 border-b flex flex-col items-center space-y-1 ${isLight ? 'border-black/5' : 'border-white/5'} ${isUnknownHour ? 'filter blur-[5px] select-none opacity-20 pointer-events-none' : ''}`}>
+                    <span className="text-2xl sm:text-4xl font-black font-gothic transition-transform hover:scale-110" style={{ color: stemStyle.color }}>
+                      {pillar.stem}
+                    </span>
+                    <span className={`text-[9px] sm:text-[10px] font-bold ${isLight ? 'text-neutral-600' : 'text-white/50'}`}>
+                      {lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}
+                    </span>
+                    <span className="text-[7px] sm:text-[8px] opacity-60 uppercase font-mono px-1 rounded-sm" style={{ color: stemStyle.color, backgroundColor: `${stemStyle.color}15` }}>
+                      {lang === 'KO' ? stemStyle.ko : stemStyle.name}
+                    </span>
+                  </div>
 
-                {/* Branch Card */}
-                <div className={`p-3 sm:p-5 flex flex-col items-center space-y-1 ${isLight ? 'bg-black/5' : 'bg-black/20'}`}>
-                  <span className="text-2xl sm:text-4xl font-black font-gothic transition-transform hover:scale-110" style={{ color: branchStyle.color }}>
-                    {pillar.branch}
-                  </span>
-                  <span className={`text-[9px] sm:text-[10px] font-bold flex items-center gap-0.5 ${isLight ? 'text-neutral-600' : 'text-white/50'}`}>
-                    {lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName} {animalEmoji}
-                  </span>
-                  <span className="text-[7px] sm:text-[8px] opacity-60 uppercase font-mono px-1 rounded-sm" style={{ color: branchStyle.color, backgroundColor: `${branchStyle.color}15` }}>
-                    {lang === 'KO' ? branchStyle.ko : branchStyle.name}
-                  </span>
+                  {/* Branch Card */}
+                  <div className={`p-3 sm:p-5 flex flex-col items-center space-y-1 ${isLight ? 'bg-black/5' : 'bg-black/20'} ${isUnknownHour ? 'filter blur-[5px] select-none opacity-20 pointer-events-none' : ''}`}>
+                    <span className="text-2xl sm:text-4xl font-black font-gothic transition-transform hover:scale-110" style={{ color: branchStyle.color }}>
+                      {pillar.branch}
+                    </span>
+                    <span className={`text-[9px] sm:text-[10px] font-bold flex items-center gap-0.5 ${isLight ? 'text-neutral-600' : 'text-white/50'}`}>
+                      {lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName} {animalEmoji}
+                    </span>
+                    <span className="text-[7px] sm:text-[8px] opacity-60 uppercase font-mono px-1 rounded-sm" style={{ color: branchStyle.color, backgroundColor: `${branchStyle.color}15` }}>
+                      {lang === 'KO' ? branchStyle.ko : branchStyle.name}
+                    </span>
+                  </div>
+
+                  {isUnknownHour && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center space-y-1.5 z-10 bg-black/5 backdrop-blur-[1px]">
+                      <span className="text-xl">🔒</span>
+                      <span className="text-[9px] font-black tracking-tight text-amber-500/90 whitespace-nowrap">
+                        {lang === 'KO' ? '비공개' : 'Locked'}
+                      </span>
+                      <span className="text-[7px] leading-snug text-neutral-400 font-bold max-w-[80px]">
+                        {lang === 'KO' ? '시간 미정' : 'Missing Time'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -815,26 +861,32 @@ export default function BaZiInterpretationPage({
               const isBranchHighlighted = innateKey?.some(k => k.pillarTitle === title && k.type === 'branch');
               const isHighlighted = isStemHighlighted || isBranchHighlighted;
               
-              const borderClass = isHighlighted
-                ? (isLight ? 'border-emerald-600/40 shadow-[0_0_12px_rgba(5,150,105,0.15)]' : 'border-[#39FF14]/40 shadow-[0_0_12px_rgba(57,255,20,0.15)]')
-                : (isLight ? 'border-black/10' : 'border-white/5');
-              const opacityClass = isHighlighted ? '' : 'opacity-30';
-              const stemBg = isStemHighlighted
+              const isHourPillar = title === 'Hour';
+              const isUnknownHour = result.isTimeUnknown && isHourPillar;
+
+              const borderClass = isUnknownHour
+                ? 'border-amber-500/10 bg-amber-500/[0.01]'
+                : isHighlighted
+                  ? (isLight ? 'border-emerald-600/40 shadow-[0_0_12px_rgba(5,150,105,0.15)]' : 'border-[#39FF14]/40 shadow-[0_0_12px_rgba(57,255,20,0.15)]')
+                  : (isLight ? 'border-black/10' : 'border-white/5');
+              const opacityClass = isUnknownHour ? 'opacity-40' : (isHighlighted ? '' : 'opacity-30');
+              const stemBg = isUnknownHour ? 'bg-amber-500/[0.01]' : isStemHighlighted
                 ? (isLight ? 'bg-emerald-500/10' : 'bg-[#39FF14]/10')
                 : (isLight ? 'bg-black/[0.02]' : 'bg-white/3');
-              const branchBg = isBranchHighlighted
+              const branchBg = isUnknownHour ? 'bg-amber-500/[0.02]' : isBranchHighlighted
                 ? (isLight ? 'bg-emerald-500/10' : 'bg-[#39FF14]/10')
                 : (isLight ? 'bg-black/[0.04]' : 'bg-black/20');
 
               return (
-                <div key={title} className={`flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
-                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.stem}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                <div key={title} className={`relative flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
+                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.stem}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                    {isUnknownHour && <span className="absolute inset-0 flex items-center justify-center text-xs">🔒</span>}
                   </div>
-                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.branch}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
+                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.branch}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
                   </div>
                 </div>
               );
@@ -870,7 +922,7 @@ export default function BaZiInterpretationPage({
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cyanColor }}></span>
             {lang === 'KO' ? (
               <>
-                당신의 살아가는 방식은 8글자 중{' '}
+                당신의 살아가는 방식은 {result.isTimeUnknown ? '6자' : '8글자'} 중{' '}
                 <span className="font-bold" style={{ color: cyanColor }}>
                   {data.lifestylePattern.keyPillars.map(kp => {
                     const tMap: Record<string, string> = { Day: '일', Month: '월', Year: '년', Hour: '시' };
@@ -886,7 +938,7 @@ export default function BaZiInterpretationPage({
                 <span className="font-bold" style={{ color: cyanColor }}>
                   {formatKeyPillarsEn(data.lifestylePattern.keyPillars)}
                 </span>{' '}
-                among the 8 characters
+                among the {result.isTimeUnknown ? '6' : '8'} characters
               </>
             )}
           </div>
@@ -902,26 +954,32 @@ export default function BaZiInterpretationPage({
               const isBranchHighlighted = lifeKey?.some(k => k.pillarTitle === title && k.type === 'branch');
               const isHighlighted = isStemHighlighted || isBranchHighlighted;
               
-              const borderClass = isHighlighted
-                ? (isLight ? 'border-sky-500/40 shadow-[0_0_12px_rgba(2,132,199,0.15)]' : 'border-neon-cyan/40 shadow-[0_0_12px_rgba(0,243,255,0.12)]')
-                : (isLight ? 'border-black/10' : 'border-white/5');
-              const opacityClass = isHighlighted ? '' : 'opacity-30';
-              const stemBg = isStemHighlighted
+              const isHourPillar = title === 'Hour';
+              const isUnknownHour = result.isTimeUnknown && isHourPillar;
+
+              const borderClass = isUnknownHour
+                ? 'border-amber-500/10 bg-amber-500/[0.01]'
+                : isHighlighted
+                  ? (isLight ? 'border-sky-500/40 shadow-[0_0_12px_rgba(2,132,199,0.15)]' : 'border-neon-cyan/40 shadow-[0_0_12px_rgba(0,243,255,0.12)]')
+                  : (isLight ? 'border-black/10' : 'border-white/5');
+              const opacityClass = isUnknownHour ? 'opacity-40' : (isHighlighted ? '' : 'opacity-30');
+              const stemBg = isUnknownHour ? 'bg-amber-500/[0.01]' : isStemHighlighted
                 ? (isLight ? 'bg-sky-500/10' : 'bg-neon-cyan/10')
                 : (isLight ? 'bg-black/[0.02]' : 'bg-white/3');
-              const branchBg = isBranchHighlighted
+              const branchBg = isUnknownHour ? 'bg-amber-500/[0.02]' : isBranchHighlighted
                 ? (isLight ? 'bg-sky-500/10' : 'bg-neon-cyan/10')
                 : (isLight ? 'bg-black/[0.04]' : 'bg-black/20');
 
               return (
-                <div key={title} className={`flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
-                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000025' : '#ffffff30') }}>{pillar.stem}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-400/60 font-bold' : 'text-white/30'}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                <div key={title} className={`relative flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
+                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000025' : '#ffffff30') }}>{pillar.stem}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-400/60 font-bold' : 'text-white/30'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                    {isUnknownHour && <span className="absolute inset-0 flex items-center justify-center text-xs">🔒</span>}
                   </div>
-                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000025' : '#ffffff30') }}>{pillar.branch}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
+                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000025' : '#ffffff30') }}>{pillar.branch}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
                   </div>
                 </div>
               );
@@ -987,26 +1045,32 @@ export default function BaZiInterpretationPage({
               const isBranchHighlighted = wealthKey?.some(k => k.pillarTitle === title && k.type === 'branch');
               const isHighlighted = isStemHighlighted || isBranchHighlighted;
               
-              const borderClass = isHighlighted
-                ? (isLight ? 'border-purple-600/40 shadow-[0_0_12px_rgba(124,58,237,0.15)]' : 'border-[#9B30FF]/40 shadow-[0_0_12px_rgba(155,48,255,0.15)]')
-                : (isLight ? 'border-black/10' : 'border-white/5');
-              const opacityClass = isHighlighted ? '' : 'opacity-30';
-              const stemBg = isStemHighlighted
+              const isHourPillar = title === 'Hour';
+              const isUnknownHour = result.isTimeUnknown && isHourPillar;
+
+              const borderClass = isUnknownHour
+                ? 'border-amber-500/10 bg-amber-500/[0.01]'
+                : isHighlighted
+                  ? (isLight ? 'border-purple-600/40 shadow-[0_0_12px_rgba(124,58,237,0.15)]' : 'border-[#9B30FF]/40 shadow-[0_0_12px_rgba(155,48,255,0.15)]')
+                  : (isLight ? 'border-black/10' : 'border-white/5');
+              const opacityClass = isUnknownHour ? 'opacity-40' : (isHighlighted ? '' : 'opacity-30');
+              const stemBg = isUnknownHour ? 'bg-amber-500/[0.01]' : isStemHighlighted
                 ? (isLight ? 'bg-purple-500/10' : 'bg-[#9B30FF]/10')
                 : (isLight ? 'bg-black/[0.02]' : 'bg-white/3');
-              const branchBg = isBranchHighlighted
+              const branchBg = isUnknownHour ? 'bg-amber-500/[0.02]' : isBranchHighlighted
                 ? (isLight ? 'bg-purple-500/10' : 'bg-[#9B30FF]/10')
                 : (isLight ? 'bg-black/[0.04]' : 'bg-black/20');
 
               return (
-                <div key={title} className={`flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
-                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.stem}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                <div key={title} className={`relative flex flex-col rounded-xl border overflow-hidden ${borderClass} ${opacityClass}`}>
+                  <div className={`p-2 sm:p-3 border-b flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${stemBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isStemHighlighted ? stemStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.stem}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.stemKoreanName : pillar.stemEnglishName}</span>
+                    {isUnknownHour && <span className="absolute inset-0 flex items-center justify-center text-xs">🔒</span>}
                   </div>
-                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg}`}>
-                    <span className="text-lg sm:text-2xl font-black font-gothic" style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.branch}</span>
-                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
+                  <div className={`p-2 sm:p-3 flex flex-col items-center gap-0.5 ${isLight ? 'border-black/5' : 'border-white/5'} ${branchBg} relative`}>
+                    <span className={`text-lg sm:text-2xl font-black font-gothic ${isUnknownHour ? 'filter blur-[3px] select-none opacity-20 pointer-events-none' : ''}`} style={{ color: isBranchHighlighted ? branchStyle.color : (isLight ? '#00000030' : '#ffffff40') }}>{pillar.branch}</span>
+                    <span className={`text-[8px] ${isLight ? 'text-neutral-500 font-bold' : 'text-white/40'} ${isUnknownHour ? 'opacity-10' : ''}`}>{lang === 'KO' ? pillar.branchKoreanName : pillar.branchEnglishName}</span>
                   </div>
                 </div>
               );
