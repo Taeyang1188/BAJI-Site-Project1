@@ -718,5 +718,12 @@ input[type="date"]::-webkit-datetime-edit-day-field {
   animation: neonTextGlowCycle 4s infinite linear !important;
 }
 
-
-
+/* Keep text white in buttons regardless of theme overrides */
+body.light-mode .keep-white,
+body.light-mode .keep-white * {
+  color: #ffffff !important;
+}
+.keep-white,
+.keep-white * {
+  color: #ffffff !important;
+}
