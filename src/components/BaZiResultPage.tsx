@@ -1304,6 +1304,50 @@ export default function BaZiResultPage({
 
   const [showAllThemes, setShowAllThemes] = useState(false);
 
+  // Reset all interactive states when the selected Saju (result) changes
+  React.useEffect(() => {
+    if (!result) return;
+
+    // Reset Cycle Vibe states to initial state
+    setIsCycleVibeExpanded(false);
+    setVibePhase('intro');
+    setSkipCycleVibeTyping(false);
+    setIsQuestionPromptComplete(false);
+    setSelectedThemeId(null);
+    setHasAskedAnotherQuestion(false);
+    setShowAllThemes(false);
+    setShowVibeTooltip(false);
+
+    // Reset Romance & Moving specific states of Cycle Vibe
+    setRomanceStep('marital');
+    setMaritalStatus(null);
+    setHasChildren(null);
+    setMovingStep('target');
+    setMovingTarget(null);
+    setMovingContext(socialContext || 'none');
+
+    // Reset Timeline/Calendar expanded states
+    setExpandedCycle(null);
+    setExpandedYear(null);
+    setExpandedMonth(null);
+    setSelectedDay(null);
+    setShowDailyVibe(false);
+
+    // Reset general guide/analysis UI states
+    setGuideStep(0);
+    setShowGuideDetailModal(false);
+    setShowTongGwanInfo(false);
+    setShowEokbuInfo(false);
+    setShowYongshinInfo(false);
+    setShowYongshinRolesInfo(false);
+    setShowInteractionInfo(null);
+    setShowAnalysis(false);
+    setShowStrengthInfo(false);
+    setShowGeJuInfo(false);
+    setShowMuJaDaJaInfo(null);
+    setShowMuJaDaJaHelp(false);
+  }, [result, socialContext]);
+
   const elementData = useMemo(() => {
     const defaultCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
     const counts = result.analysis?.elementRatios || defaultCounts;
